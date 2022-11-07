@@ -76,6 +76,7 @@ const App = () => {
   const dispatch = useDispatch();
   const { decodedRefresh } = useSelector(userSelector);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [avatar, setAvatar] = useState(null);
   // const [decodedRefresh, setDecodedRefresh] = useState(null);
 
 
@@ -85,6 +86,7 @@ const App = () => {
   useEffect(() => {
     // fetchRefreshToken();
     // console.log(decodedRefresh);
+    fetchAvatar();
   }, [])
 
   const fetchRefreshToken = async() => {
@@ -110,6 +112,18 @@ const App = () => {
       // await AsyncStorage.removeItem('access');
       // await AsyncStorage.removeItem('refresh');
       // dispatch(resetRefreshToken());
+  }
+
+  const fetchAvatar = async() => {
+    try {
+      await Api
+      .get("/api/v1/user/avatar/")
+      .then((res) => {
+        setAvatar(res.data.avatar);
+      })
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   // return(
@@ -163,7 +177,7 @@ const App = () => {
                 }
       
                 // You can return any component that you like here!
-                return <Feather name={iconName} size={size} color={color} />;
+                return <Feather name={iconName} size={28} color={color} />;
               },
               tabBarActiveTintColor: 'black',
               tabBarInactiveTintColor: 'gray',
@@ -193,7 +207,27 @@ const App = () => {
               })}
             />
             <Tab.Screen name="Bookmark" component={BookmarkScreen} options={{ headerShown: false, }} />
-            <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false, }} />
+            <Tab.Screen 
+              name="Profile" 
+              component={ProfileScreen} 
+              options={{ 
+                headerShown: false, 
+                tabBarIcon: ({ focused }) => {
+                  return (
+                    <Image 
+                      source={ avatar !== null ? { uri: `http://3.38.62.105${avatar}`} : blankAvatar} 
+                      style={{        
+                        width: 33,
+                        height: 33,
+                        resizeMode: "cover",
+                        borderRadius: 50,
+                        borderWidth: focused ? 2 : 0,
+                      }} 
+                    />
+                  )
+                }
+              }} 
+            />
           </Tab.Navigator>
         )}
       </NavigationContainer>

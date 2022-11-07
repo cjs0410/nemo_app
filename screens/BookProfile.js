@@ -24,10 +24,11 @@ const BookProfile = ({route, navigation}) => {
     const fetchBook = async() => {
         try {
             setLoading(true)
-            await Api.post("/api/v3/book/bookview/", {
+            await Api.post("/api/v3/book/list/", {
                 book_id: bookId,
             })
             .then((res) => {
+                console.log(res.data);
                 setBookInfo(res.data);
             })
         } catch (err) {
@@ -85,7 +86,7 @@ const BookProfile = ({route, navigation}) => {
                     >
                         <View style={{ alignItems: "center", borderBottomWidth: 0.2, }}>
                             <Image 
-                                source={ bookInfo.book_cover !== null ? { uri: `http://3.38.228.24${bookInfo.book_cover}`} : bookCover} 
+                                source={ bookInfo.book_cover !== null ? { uri: `http://3.38.62.105${bookInfo.book_cover}`} : bookCover} 
                                 style={styles.bookImage}
                             />
                             <Text style={{ fontSize: 20, fontWeight: "700", marginVertical: 10,}}>
@@ -99,11 +100,27 @@ const BookProfile = ({route, navigation}) => {
                             <TouchableOpacity activeOpacity={1} onPress={selectBookmark}>
                                 <View style={{...styles.bookmarkOrPost, borderBottomColor: isBookmark ? "red" : "white" }}>
                                     <Feather name="bookmark" size={24} color={isBookmark ? "red" : "black"} />
+                                    <Text style={{
+                                        fontSize: 13,
+                                        fontWeight: "500",
+                                        marginHorizontal: 4,
+                                        color: isBookmark ? "red" : "black"
+                                    }}>
+                                        {bookInfo.bookmarks ? bookInfo.bookmarks.length : null}
+                                    </Text>
                                 </View>
                             </TouchableOpacity>
                             <TouchableOpacity activeOpacity={1} onPress={selectPost}>
                                 <View style={{...styles.bookmarkOrPost, borderBottomColor: !isBookmark ? "red" : "white" }}>
-                                    <MaterialIcons name="collections-bookmark" size={24} color={!isBookmark ? "red" : "black"} />
+                                    <Feather name="folder" size={24} color={!isBookmark ? "red" : "black"} />
+                                    <Text style={{
+                                        fontSize: 13,
+                                        fontWeight: "500",
+                                        marginHorizontal: 4,
+                                        color: !isBookmark ? "red" : "black"
+                                    }}>
+                                        {bookInfo.albums ? bookInfo.albums.length : null}
+                                    </Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -121,7 +138,7 @@ const BookProfile = ({route, navigation}) => {
                                         {bookInfo.bookmarks && bookInfo.bookmarks.map((bookmark, index) => (
                                             <TouchableOpacity
                                                 activeOpacity={1}
-                                                onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
+                                                onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookInfo.bookmarks, index: index, })} 
                                                 key={index}
                                             >
                                                 <BookmarkList bookmark={bookmark} navigation={navigation} />
@@ -204,6 +221,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderBottomWidth: 1,
         paddingVertical: 15,
+        flexDirection: "row",
+        justifyContent: "center",
     },
 })
 

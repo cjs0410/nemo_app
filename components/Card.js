@@ -29,7 +29,8 @@ const Card = (props) => {
     const contents = props.contents;
     const [bookmarking, setBookmarking] = useState(bookmark.bookmarking);
     const [watermark, setWatermark] = useState('');
-    
+    const backgroundImageValue = useRef(new Animated.Value(0)).current;
+    const bookCoverValue = useRef(new Animated.Value(0)).current;
 
     // useEffect(() => {
     //     fetchBookmarking();
@@ -81,6 +82,24 @@ const Card = (props) => {
         }
     }
 
+    const showBackgroundImage = () => {
+        Animated.timing(backgroundImageValue, {
+            toValue: 0.2,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
+
+    const showBookCover = () => {
+        Animated.timing(bookCoverValue, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
+
+
+
     return (
         <View style={styles.postContentsScrollBox}>
             <View 
@@ -93,10 +112,13 @@ const Card = (props) => {
                 {bookmark.backgroundimg !== null ? 
                 
                     <View style={styles.backgroungImageContainer}>
-                        <Image 
+                        <Animated.Image 
                             source={{ uri: `http://3.38.62.105${bookmark.backgroundimg}` }}
-                            style={styles.backgroundImage}
-                            // onLoad={() => console.log("loading")}
+                            style={{
+                                ...styles.backgroundImage,
+                                opacity: backgroundImageValue,
+                            }}
+                            onLoadEnd={showBackgroundImage}
                             // onLoadEnd={() => console.log("end!")}
                         />
                     </View>
@@ -112,9 +134,13 @@ const Card = (props) => {
                         })}
                     >
                         <View>
-                            <Image 
+                            <Animated.Image 
                                 source={ bookmark.book_cover !== null ? { uri: `http://3.38.62.105${bookmark.book_cover}`} : bookCover} 
-                                style={styles.postContentsBookCover}
+                                style={{
+                                    ...styles.postContentsBookCover,
+                                    opacity: bookCoverValue,
+                                }}
+                                onLoadEnd={showBookCover}
                             />
                         </View>
                         <View>

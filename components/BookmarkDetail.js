@@ -1,5 +1,5 @@
 import { StyleSheet, View, ScrollView, Text, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, } from "react";
 import { Entypo } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
@@ -24,6 +24,7 @@ const BookmarkDetail = (props) => {
     const navigation = props.navigation;
     const [current, setCurrent] = useState(0);
     const [contentsByNum, setContentsByNum] = useState([]);
+    const value = useRef(new Animated.Value(0)).current;
 
     // useEffect(() => {
     //     const cardNum = parseInt(bookmark.contents.length / 200) + 1;
@@ -47,12 +48,25 @@ const BookmarkDetail = (props) => {
         setCurrent(nextCurrent);
     };
 
+    const showAvatar = () => {
+        Animated.timing(value, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
+
     return (
         <View style={styles.bookmarkContainer}>
             <View style={styles.bookmarkTop}>
-                <Image 
+                <Animated.Image 
                     source={ bookmark.avatar !== null ? { uri: `http://3.38.62.105${bookmark.avatar}`} : blankAvatar} 
-                    style={styles.bookmarkWriterImage} 
+                    style={{
+                        ...styles.bookmarkWriterImage,
+                        opacity: value,
+                    }} 
+                    // onLoadStart={}
+                    onLoadEnd={showAvatar}
                 />
                 <Pressable 
                     activeOpacity={1} 

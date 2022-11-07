@@ -156,7 +156,6 @@ const UserStorage = ({navigation}) => {
             .get("api/v1/user/myprofile/")
             .then((res) => {
                 setProfile(res.data);
-                console.log(res.data);
             })
         } catch (err) {
             console.error(err);
