@@ -1,0 +1,29 @@
+npm install @react-navigation/bottom-tabs
+npm install @react-navigation/native @react-navigation/native-stack
+expo install react-native-screens react-native-safe-area-context
+npm install @reduxjs/toolkit react-redux
+npm install @reduxjs/toolkit
+npm install @react-navigation/stack
+npm install react-native-select-dropdown
+npm install axios
+npm install @expo/webpack-config
+npx expo install expo-secure-store
+npm install redux-persist
+npm install -D @types/react-redux
+npm install jwt-decode
+npx expo install react-native@0.69.5
+npx expo install @react-native-async-storage/async-storage
+npm install react-native-svg
+expo install react-native-svg
+npm install -g eas-cli
+npm install expo-image-picker
+npm install expo-font
+npm i react-native-pell-rich-editor
+npm install react-native-tab-view
+expo install react-native-pager-view
+npm i react-native-htmlview
+npm install react-native-htmlview --save
+npx expo install react-native-webview
+npm install --save-prod react-native-render-html
+npx expo install react-native-fast-image
+expo install react-native-gesture-handler
