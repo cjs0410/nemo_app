@@ -28,7 +28,6 @@ const BookProfile = ({route, navigation}) => {
                 book_id: bookId,
             })
             .then((res) => {
-                console.log(res.data);
                 setBookInfo(res.data);
             })
         } catch (err) {

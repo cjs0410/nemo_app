@@ -20,3 +20,4 @@ export { default as CreatePost } from './CreatePost';
 export { default as EditPost } from './EditPost';
 export { default as BookProfile } from './BookProfile';
 export { default as CreateAlbumModal } from './CreateAlbumModal';
+export { default as AlbumProfile } from './AlbumProfile';

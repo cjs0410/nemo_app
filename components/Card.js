@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, ActivityIndicator, } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome } from '@expo/vector-icons'; 
@@ -27,6 +27,7 @@ const Card = (props) => {
     // const nemos = props.bookmark.nemos;
     // const nemo = props.nemo;
     const contents = props.contents;
+    const index = props.index;
     const [bookmarking, setBookmarking] = useState(bookmark.bookmarking);
     const [watermark, setWatermark] = useState('');
     const backgroundImageValue = useRef(new Animated.Value(0)).current;
@@ -125,7 +126,9 @@ const Card = (props) => {
                     :
                     null
                 }
-                <View style={styles.postContentsBook}>
+                <View style={{
+                    ...styles.postContentsBook,
+                }}>
                     <TouchableOpacity 
                         activeOpacity={1}
                         style={{ flexDirection: "row" }}
@@ -180,12 +183,22 @@ const Card = (props) => {
                         source={{ html: nemo.contents }}
                         tagsStyles={tagsStyles}
                     /> */}
-                    <Text style={styles.postContentsText}>
-                        {contents.join('')}
-                    </Text>
+                    {/* <Text style={styles.postContentsText}>
+                        {contents.join()}
+                    </Text> */}
+                    {contents.map((line, index) => (
+                        <Text style={styles.postContentsText} key={index}>
+                            {line.replace(/\n/g, '')}
+                        </Text> 
+                    ))}
                 </View>
                 <View style={styles.postContentsWatermark}>
-                    <Text style={{ fontSize: 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
+                    <Pressable
+                        onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })}
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    >
+                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
+                    </Pressable>
                 </View>
             </View>
             
@@ -254,7 +267,7 @@ const CardPreview = (props) => {
                     // tagsStyles={tagsStyles}
                 /> */}
                 <View style={styles.postContentsWatermark}>
-                    <Text style={{ fontSize: 11, fontWeight: "700", }} >{`@${watermark}`}</Text>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${watermark}`}</Text>
                 </View>
             </View>
             
@@ -512,7 +525,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
     )
 }
 
-const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard }) => {
+const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, }) => {
     const [whatBook, setWhatBook] = useState('');
     const [bookList, setBookList] = useState(null);
     // const [selectedBook, setSelectedBook] = useState(null);
@@ -645,7 +658,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                             </ScrollView>
                         </>
                         :
-                        <View style={{ flexDirection: "row" }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", }}>
                             <View>
                                 <Image 
                                     source={ selectedBook.book_cover !== null ? { uri: `http://3.38.62.105${selectedBook.book_cover}`} : bookCover} 
@@ -720,58 +733,66 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                         ...styles.postContentsInput,
                         borderWidth: isFocus ? 0.5 : 0
                     }} 
-                    // onLayout={textInputContainterHeight}
                 >
-                    {/* text input만 사용하는 코드(가변) */}
-                    {/* <ScrollView
-                        scrollEnabled={false}
-                    > */}
-                        <TextInput 
-                            style={{         
-                                fontWeight: "500",
-                                // fontSize: SCREEN_0.041,
-                                fontSize: regWidth * 16,
-                                lineHeight: 28,
-                                
-                            }} 
-                            placeholder="북마크를 입력하세요"
-                            multiline={true}
-                            // maxLength={200}
-                            onChangeText={onChangeFront}
-                            // onLayout={textInputHeight}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
-                            // onSubmitEditing={() => console.log("asdf")}
-                            // onTextLayout={textInputHeight}
+                    {ocrLoading ? 
+                        <ActivityIndicator 
+                            color="white" 
+                            style={{marginTop: 10}} 
+                            size="large"
                         />
-                        <ScrollView
-                            style={{
-                                position: "absolute",
-                                // backgroundColor: "pink",
-                                width: "100%",
-                                height: "100%",
-                                zIndex: -10,
-                                opacity: 0,
-                            }}
+                        : 
+                        <>
+                        {/* text input만 사용하는 코드(가변) */}
+                        {/* <ScrollView
                             scrollEnabled={false}
-                        >
-                            <Text
+                        > */}
+                            <TextInput 
                                 style={{         
                                     fontWeight: "500",
-                                    color: "blue",
+                                    // fontSize: SCREEN_0.041,
                                     fontSize: regWidth * 16,
-                                    lineHeight: 28,
-
+                                    lineHeight: regWidth * 28,
+                                    // paddingHorizontal: 8,
                                 }} 
-                                onTextLayout={textInputLineNum}
+                                placeholder="북마크를 입력하세요"
+                                multiline={true}
+                                onChangeText={onChangeFront}
+                                onFocus={() => setIsFocus(true)}
+                                onBlur={() => setIsFocus(false)}
+                                value={frontContent}
+                            />
+                            <ScrollView
+                                style={{
+                                    position: "absolute",
+                                    // backgroundColor: "pink",
+                                    width: "100%",
+                                    height: "100%",
+                                    zIndex: -10,
+                                    opacity: 0,
+                                }}
+                                scrollEnabled={false}
                             >
-                                {frontContent}
-                            </Text>
-                        </ScrollView>
-                    {/* </ScrollView> */}
+                                <Text
+                                    style={{         
+                                        fontWeight: "500",
+                                        color: "blue",
+                                        fontSize: regWidth * 16,
+                                        lineHeight: 28,
+
+                                    }} 
+                                    onTextLayout={textInputLineNum}
+                                >
+                                    {frontContent}
+                                </Text>
+                            </ScrollView>
+                        {/* </ScrollView> */}
+                        </>
+                    }
+
+
                 </View>
                 <View style={styles.postContentsWatermark}>
-                    <Text style={{ fontSize: 11, fontWeight: "700", }} >{`@${watermark}`}</Text>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${watermark}`}</Text>
                 </View>
             </View>
         </View>
@@ -1147,17 +1168,17 @@ const styles = StyleSheet.create({
     postContentsBox: {
         flex: 1,
         // backgroundColor: "#D9D9D9",
-        marginVertical: 13,
-        marginHorizontal: 13,
-        paddingVertical: 5,
+        marginVertical: regWidth * 13,
+        marginHorizontal: regWidth * 13,
+        paddingVertical: regWidth * 5,
         borderRadius: 2,
-        paddingHorizontal: 10,
+        paddingHorizontal: regWidth * 10,
     },
     postContentsBookCover: {
         // flex: 1,
         // backgroundColor: "red",
-        width: 40,
-        height: 40,
+        width: regWidth * 40,
+        height: regWidth * 40,
         resizeMode: "contain",
     },
     postContentsBook: {
@@ -1169,33 +1190,33 @@ const styles = StyleSheet.create({
     },
     postContentsBookTitle: {
         fontWeight: "700",
-        fontSize: 15,
-        marginTop: 8,
+        fontSize: regWidth * 15,
+        marginTop: regWidth * 8,
     },
     postContentsBookChapter: {
         fontWeight: "400",
-        fontSize: 10,
+        fontSize: regWidth * 10,
     },
     postContentsBookChapterInput: {
         fontWeight: "400",
-        fontSize: 15,
+        fontSize: regWidth * 15,
     },
     postContentsTextBox: {
         // backgroundColor: "pink",
         flex: 4,
-        marginTop: 8,
+        marginTop: regHeight * 8,
         justifyContent: "center", 
     },
     postContentsText: {
         fontWeight: "500",
         // fontSize: SCREEN_WIDTH * 0.041,
         fontSize: regWidth * 16,
-        lineHeight: 28,
+        lineHeight: regWidth * 28,
     },
     postContentsInput: {
         // backgroundColor: "pink",
         flex: 4,
-        marginTop: 8,
+        marginTop: regWidth * 8,
         justifyContent: "center",
         textAlignVertical: "top",
         
@@ -1222,7 +1243,7 @@ const styles = StyleSheet.create({
     searchList: {
         backgroundColor: "#D9D9D9",
         position: "absolute",
-        width: SCREEN_WIDTH - 26,
+        width: SCREEN_WIDTH - regWidth * 26,
         height: "91%",
         marginTop: "12%",
         // height: SCREEN_WIDTH - 26 - 55,
@@ -1233,12 +1254,14 @@ const styles = StyleSheet.create({
         borderTopWidth: 0.5, 
         flexDirection: "row", 
         alignItems: "center", 
-        paddingVertical: 6,
+        paddingVertical: regHeight * 6,
     },
     backgroungImageContainer: {
         position: "absolute",
-        width: SCREEN_WIDTH - 26,
-        height: SCREEN_WIDTH - 26,
+        width: SCREEN_WIDTH - regWidth * 26,
+        height: SCREEN_WIDTH - regWidth * 26,
+        // width: 300,
+        // height: 300,
         borderRadius: 2,
         backgroundColor: "#D9D9D9", 
         // zIndex: 10,

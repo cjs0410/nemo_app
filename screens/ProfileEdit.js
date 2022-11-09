@@ -18,7 +18,7 @@ const ProfileEdit = ({route, navigation}) => {
     // const [image, setImage] = useState(profile.avatar);
     const [image, setImage] = useState(null);
     const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
-    const [userTag, setUserTag] = useState(profile.userTag);
+    const [userTag, setUserTag] = useState(profile.user_tag);
     const [name, setName] = useState(profile.name);
 
     const pickImage = async () => {
@@ -36,7 +36,7 @@ const ProfileEdit = ({route, navigation}) => {
             quality: 1,
           });
       
-        //   console.log(result.uri);
+          console.log(result.uri);
       
           if (!result.cancelled) {
             setImage(result.uri);
@@ -49,7 +49,7 @@ const ProfileEdit = ({route, navigation}) => {
 
     const changeUserTag = (payload) => {
         if (payload.length === 0) {
-            setUserTag(profile.userTag);
+            setUserTag(profile.user_tag);
         } else {
             setUserTag(payload);
         }
@@ -77,6 +77,7 @@ const ProfileEdit = ({route, navigation}) => {
 
         formData.append('user_tag', userTag);
         formData.append('name', name);
+        console.log(formData);
         try {
             await Api.put('/api/v1/user/myprofile/edit/', formData, 
                 {
@@ -124,7 +125,7 @@ const ProfileEdit = ({route, navigation}) => {
                     <>
                         <View style={styles.imageEdit}>
                             <Image 
-                                source={image === null ? { uri: `http://3.38.62.105${profile.avatar}`} : { uri: image}} 
+                                source={image === null ? { uri: `http://3.38.62.105${profile.avatar}`} : { uri: image }} 
                                 style={styles.profileImage}
                             />
                             <TouchableOpacity
@@ -139,7 +140,7 @@ const ProfileEdit = ({route, navigation}) => {
                         </View>
                         <View style={styles.profileEdit}>
                             <Text style={{ fontSize: 15, fontWeight: "500", }}>
-                                사용자 아이디
+                                유저 태그
                             </Text>
                             <TextInput 
                                 placeholder={profile.user_tag}

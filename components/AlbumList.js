@@ -1,22 +1,40 @@
-import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Animated } from "react-native";
+import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, FontAwesome, } from '@expo/vector-icons'; 
 import bookCover from '../assets/images/steve.jpeg';
 import blankAlbumImg from '../assets/images/blankAlbumImage.png';
 
 const AlbumList = (props) => {
+    const album = props.album;
+    const albumCoverValue = useRef(new Animated.Value(0)).current;
+
+    const showAlbumCover = () => {
+        Animated.timing(albumCoverValue, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
+
     return(
         <View style={styles.AlbumListContainer}>
             <View style={{ flexDirection: "row", alignItems: "center", }}>
-                <Image source={blankAlbumImg} style={styles.AlbumImage} />
+                <Animated.Image 
+                    source={{ uri: `http://3.38.62.105${album.album_cover}`}} 
+                    style={{
+                        ...styles.AlbumImage,
+                        opacity: albumCoverValue,
+                    }} 
+                    onLoadEnd={showAlbumCover}
+                />
                 <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 12, }}>
-                    트럼프가 부자가 된 방법
+                    {album.album_title}
                 </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", }}>
                 <Feather name="bookmark" size={18} color="#606060" />
                 <Text style={{ fontSize: 15, fontWeight: "500", color: "#606060", }}>
-                    16
+                    {album.bookmark_count}
                 </Text>
             </View>
         </View>

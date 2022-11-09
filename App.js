@@ -42,6 +42,7 @@ import {
   Profile,
   ProfileEdit,
   CreateAlbumModal,
+  AlbumProfile,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -63,6 +64,9 @@ const SIGN_KEY = "@isSignedIn";
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const persistor = persistStore(store);
+
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.allowFontScaling = false;
 
 const appRedux = () => (
   <Provider store={store}>
@@ -222,8 +226,10 @@ const App = () => {
                         resizeMode: "cover",
                         borderRadius: 50,
                         borderWidth: focused ? 2 : 0,
+                        borderColor: "black",
                       }} 
                     />
+
                   )
                 }
               }} 
@@ -417,6 +423,7 @@ const BookmarkScreen = () => {
           presentation: "transparentModal",
         }}
       />
+      <BookmarkStack.Screen name="OtherProfile" component={OtherProfile} />
     </BookmarkStack.Navigator>
   )
 }
@@ -495,6 +502,8 @@ const ProfileScreen = () => {
       />
       <ProfileStack.Screen name="BookProfile" component={BookProfile} />
       <ProfileStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
+      <ProfileStack.Screen name="AlbumProfile" component={AlbumProfile} />
+      <ProfileStack.Screen name="OtherProfile" component={OtherProfile} />
     </ProfileStack.Navigator>
   )
 }

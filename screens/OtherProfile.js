@@ -1,5 +1,5 @@
-import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, } from "react-native";
+import React, { useEffect, useState, useRef, } from "react";
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Api from "../lib/Api";
@@ -17,6 +17,7 @@ const OtherProfile = ({navigation, route}) => {
     const [loading, setLoading] = useState(false);
     const [bookmarks, setBookmarks] = useState(null);
     const [albums, setAlbums] = useState([1, 2, 3]);
+    const avatarValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         fetchProfile();
@@ -60,7 +61,15 @@ const OtherProfile = ({navigation, route}) => {
             console.error(err);
         }
         setLoading(false);
-    }
+    };
+
+    const showAvatarImage = () => {
+        Animated.timing(avatarValue, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    };
 
     return (
         <View style={styles.container}>
@@ -76,15 +85,9 @@ const OtherProfile = ({navigation, route}) => {
                         <Ionicons name="chevron-back" size={28} color="black" />
                     </TouchableOpacity>
                     <View style={{ alignItems: "center", }}>
-                        <Text style={{ fontSize: 10, fontWeight: "500", color: "#808080", }} >
+                        <Text style={{ fontSize: 16, fontWeight: "500", color: "black", }} >
+                            {profile.name}
                         </Text>
-                        <TouchableOpacity>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: "500",
-                        }}>
-                        </Text>
-                        </TouchableOpacity>
                     </View>
                     <View style={{ opacity: 0, }} >
                         <MaterialCommunityIcons name="square-outline" size={30} color="black" />
@@ -103,9 +106,13 @@ const OtherProfile = ({navigation, route}) => {
                     />
                     :
                     <>
-                    <Image 
+                    <Animated.Image 
                         source={ profile.avatar !== null ? { uri: `http://3.38.62.105${profile.avatar}`} : blankAvatar} 
-                        style={styles.profileImage} 
+                        style={{
+                            ...styles.profileImage,
+                            opacity: avatarValue,
+                        }} 
+                        onLoadEnd={showAvatarImage} 
                     />
                     <View style={{ marginHorizontal: 18, }}>
                         <Text style={{

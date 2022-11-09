@@ -1,19 +1,41 @@
-import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity } from "react-native";
+import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Pressable, } from "react-native";
 import React, { useEffect, useState } from "react";
 import SelectDropdown from 'react-native-select-dropdown'
 import { Entypo, Feather, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import bookCover from '../assets/images/steve.jpeg';
-import { Card, BookmarkTile } from '../components';
+import { Card, BookmarkTile, BookmarkList, } from '../components';
+import Api from "../lib/Api";
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
-const BookmarkBook = ({navigation}) => {
+const BookmarkBook = ({route, navigation}) => {
     const [isTile, setIsTile] = useState(true);
+    const { book, bookId, } = route.params;
+    const [bookmarks, setBookmarks] = useState(null);
+
+    useEffect(() => {
+        fetchBook();
+    }, []);
 
     const onArrange = () => {
         setIsTile(!isTile);
     }
     
+    const fetchBook = async() => {
+        try {
+            await Api
+            .post("/api/v2/bookmark/scrap_list/book/", {
+                book_id: bookId,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                setBookmarks(res.data);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header} >
@@ -24,64 +46,43 @@ const BookmarkBook = ({navigation}) => {
                     fontSize: 16,
                     fontWeight: "500",
                 }}>
-                    스티브 잡스
+                    {book.book_title}
                 </Text>
-                <TouchableOpacity activeOpacity={1} onPress={onArrange}>
-                    <MaterialCommunityIcons name={ isTile ? "square-outline" : "view-grid-outline" } size={30} color="black" />
-                </TouchableOpacity>
+                <Pressable
+                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                >
+                    <Entypo name="dots-three-horizontal" size={24} color="black" />
+                </Pressable>
             </View>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.book} >
-                    <Image source={bookCover} style={styles.bookImage} />
-                    <View>
-                    <Text style={styles.bookTitle} >스티브 잡스</Text>
-                    <Text style={styles.bookAuthor}>월터 아이작슨</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", }}>
+                        <Image 
+                            source={ book.book_cover !== null ? { uri: `http://3.38.62.105${book.book_cover}`} : bookCover} 
+                            style={styles.bookImage} 
+                        />
+                        <View style={{ marginHorizontal: 8, }}>
+                            <Text style={styles.bookTitle} >{book.book_title}</Text>
+                            <Text style={styles.bookAuthor}>{book.book_author}</Text>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: "row", alignItems: "center", marginHorizontal: 4,}}>
+                        <Feather name="bookmark" size={18} color="#606060" />
+                        <Text style={{ fontSize: 15, fontWeight: "500", color: "#606060", marginHorizontal: 4, }}>
+                            {book.count}
+                        </Text>
                     </View>
                 </View>
-                {isTile ? 
-                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                        <TouchableOpacity onPress={() => navigation.navigate('BookmarkBookDetail')} >
-                            <BookmarkTile />
-                        </TouchableOpacity>
-                        <BookmarkTile />
-                        <BookmarkTile />
-                        <BookmarkTile />
-                        <BookmarkTile />
-                        <BookmarkTile />
-                        <BookmarkTile />
-                        <BookmarkTile />
-                    </View>
-                    :
-                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                        <Card
-                            bookTitle="스티브 잡스"
-                            bookChapter="15장"
-                            bookMark="123"
-                            bookContents="1996년 애플이 NeXT를 인수하게 되면서 다시 애플로 돌아오게 되었고 1997년에는 임시 CEO로 애플을 다시 이끌게 되었으며 이후 다시금 애플을 혁신해 시장에서 성공을 거두게 이끌었다. 2001년 아이팟을 출시하여 음악 산업 전체를 뒤바꾸어 놓았다. 또한, 2007년 아이폰을 출시하면서 스마트폰 시장을 바꾸어 놓았고 2010년 아이패드를 출시함으로써 포스트PC 시대(Post-PC era)를 열었다."
-                            reverseContents="뒷면"
-                            watermark="@jungdongin"
-                            cardColor="pink"
-                        />
-                        <Card
-                            bookTitle="스티브 잡스"
-                            bookChapter="15장"
-                            bookMark="123"
-                            bookContents="1996년 애플이 NeXT를 인수하게 되면서 다시 애플로 돌아오게 되었고 1997년에는 임시 CEO로 애플을 다시 이끌게 되었으며 이후 다시금 애플을 혁신해 시장에서 성공을 거두게 이끌었다. 2001년 아이팟을 출시하여 음악 산업 전체를 뒤바꾸어 놓았다. 또한, 2007년 아이폰을 출시하면서 스마트폰 시장을 바꾸어 놓았고 2010년 아이패드를 출시함으로써 포스트PC 시대(Post-PC era)를 열었다."
-                            reverseContents="뒷면"
-                            watermark="@jungdongin"
-                            cardColor="pink"
-                        />
-                        <Card
-                            bookTitle="스티브 잡스"
-                            bookChapter="15장"
-                            bookMark="123"
-                            bookContents="1996년 애플이 NeXT를 인수하게 되면서 다시 애플로 돌아오게 되었고 1997년에는 임시 CEO로 애플을 다시 이끌게 되었으며 이후 다시금 애플을 혁신해 시장에서 성공을 거두게 이끌었다. 2001년 아이팟을 출시하여 음악 산업 전체를 뒤바꾸어 놓았다. 또한, 2007년 아이폰을 출시하면서 스마트폰 시장을 바꾸어 놓았고 2010년 아이패드를 출시함으로써 포스트PC 시대(Post-PC era)를 열었다."
-                            reverseContents="뒷면"
-                            watermark="@jungdongin"
-                            cardColor="pink"
-                        />
-                    </View>
-                }
+                {bookmarks && bookmarks.map((bookmark, index) => (
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
+                      key={index}
+                    >
+                      <BookmarkList bookmark={bookmark} navigation={navigation} />
+                    </TouchableOpacity>
+                ))}
 
             </ScrollView>
         </View>
@@ -108,6 +109,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         borderBottomWidth: 0.3,
         borderBottomColor: "#808080",
+        alignItems: "center",
+        justifyContent: "space-between",
       },
     bookImage: {
         width: 92,
@@ -117,14 +120,11 @@ const styles = StyleSheet.create({
     bookTitle: {
         fontSize: 18,
         fontWeight: "700",
-        paddingVertical: 18,
-        paddingHorizontal: 8,
     },
     bookAuthor: {
         fontSize: 15,
         fontWeight: "400",
-        // paddingVertical: ,
-        paddingHorizontal: 8,
+        marginTop: 5,
     },
 })
 

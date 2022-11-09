@@ -7,7 +7,8 @@ import {
   ScrollView, 
   Dimensions, 
   TouchableOpacity, 
-  ActivityIndicator 
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -34,8 +35,8 @@ const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const Bookmark = ({navigation}) => {
   const dispatch = useDispatch();
-  const categories = ["최신 순으로 정렬", "오래된 순으로 정렬", "책 별로 정렬", "생성자 별로 정렬", ];
-  const alignment = ["new", "old", "book", "writer", ];
+  const categories = ["최신 순으로 정렬", "책 별로 분류", "유저 별로 분류", ];
+  const alignment = ["new", "book", "user", ];
   const [whichCategory, setWhichCategory] = useState(0);
   const [isTile, setIsTile] = useState(true);
   const { accessToken, } = useSelector(userSelector);
@@ -45,6 +46,7 @@ const Bookmark = ({navigation}) => {
   const [users, setUsers] = useState(null);
   const [bookmarks, setBookmarks] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const ref = useRef();
   useScrollToTop(ref);
   
@@ -62,6 +64,11 @@ const Bookmark = ({navigation}) => {
     setIsTile(!isTile);
   }
 
+  const onRefresh = useCallback(async() => {
+    setRefreshing(true);
+    await fetchBookmarks()
+    .then(() => setRefreshing(false));
+  }, []);
 
   const fetchBookmarks = async() => {
     try {
@@ -72,11 +79,13 @@ const Bookmark = ({navigation}) => {
         },
       )
       .then((res) => {
-        if (whichCategory === 2) {
-          setBooks(res.data.books);
+        if (whichCategory === 1) {
+          setBooks(res.data);
+          
         }
-        else if (whichCategory === 3) {
-          setUsers(res.data.users);
+        else if (whichCategory === 2) {
+          setUsers(res.data);
+          console.log(res.data);
         }
         else {
           setBookmarks(res.data);
@@ -102,7 +111,7 @@ const Bookmark = ({navigation}) => {
                   fontSize: 25,
                   fontWeight: "900",
               }}>
-                  Bookmark
+                  Storage
               </Text>
 
               <SelectDropdown
@@ -139,13 +148,20 @@ const Bookmark = ({navigation}) => {
           <ScrollView 
             showsVerticalScrollIndicator={false}
             ref={ref}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
           >
             {loading ? (
-              <ActivityIndicator 
-                color="black" 
-                style={{marginTop: 100}} 
-                size="large"
-              />
+              // <ActivityIndicator 
+              //   color="black" 
+              //   style={{marginTop: 100}} 
+              //   size="large"
+              // />
+              null
             ) : (
               <>
                 <View>
@@ -166,6 +182,75 @@ const Bookmark = ({navigation}) => {
       );
 
     // 오래된 순으로 정렬
+    // case 1:
+    //   return (
+    //     <View style={styles.container}>
+    //       <View style={styles.header} >
+    //           <Text style={{
+    //               fontSize: 25,
+    //               fontWeight: "900",
+    //           }}>
+    //               Storage
+    //           </Text>
+
+    //           <SelectDropdown
+    //             data={categories}
+    //             onSelect={(selectedItem, index) => {
+    //               setWhichCategory(index);
+    //             }}
+    //             buttonTextAfterSelection={(selectedItem, index) => {
+    //               // text represented after item is selected
+    //               // if data array is an array of objects then return selectedItem.property to render after item is selected
+    //               return selectedItem
+    //             }}
+    //             rowTextForSelection={(item, index) => {
+    //               // text represented for each item in dropdown
+    //               // if data array is an array of objects then return item.property to represent item in dropdown
+    //               return item
+    //             }}
+    //             buttonStyle={styles.arrange}
+    //             buttonTextStyle={styles.arrangeText}
+    //             renderDropdownIcon={isOpened => {
+    //               return <Feather name={isOpened ? 'chevron-up' : 'chevron-down'} size={24} color="black" />
+    //             }}
+    //             dropdownIconPosition={'right'}
+    //             defaultValueByIndex={0}
+    //             dropdownStyle={{borderRadius: 18, }}
+    //             rowStyle={styles.rowStyle}
+    //             rowTextStyle={styles.arrangeText}
+    //             selectedRowStyle={{...styles.rowStyle, backgroundColor: "pink", }}
+    //           />
+    //           {/* <MaterialCommunityIcons name="view-grid-outline" size={30} color="black" /> */}
+    //       </View>
+    //       <ScrollView showsVerticalScrollIndicator={false}>
+    //         {loading ? (
+    //             <ActivityIndicator 
+    //               color="black" 
+    //               style={{marginTop: 100}} 
+    //               size="large"
+    //             />
+    //           ) : (
+    //             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+    //               {/* <TouchableOpacity onPress={autoScroll} >
+    //                 <BookmarkTile navigation={navigation} />
+    //               </TouchableOpacity>
+    //               <BookmarkTile navigation={navigation} /> */}
+    //               {bookmarks && bookmarks.map((bookmark, index) => (
+    //                 <TouchableOpacity 
+    //                   activeOpacity={1}
+    //                   onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
+    //                   key={index}
+    //                 >
+    //                   <BookmarkTile bookmark={bookmark} />
+    //                 </TouchableOpacity>
+    //               ))}
+    //             </View>
+    //           )}
+    //       </ScrollView>
+    //     </View>
+    //   );
+
+    //책 별로 정렬
     case 1:
       return (
         <View style={styles.container}>
@@ -174,76 +259,7 @@ const Bookmark = ({navigation}) => {
                   fontSize: 25,
                   fontWeight: "900",
               }}>
-                  Bookmark
-              </Text>
-
-              <SelectDropdown
-                data={categories}
-                onSelect={(selectedItem, index) => {
-                  setWhichCategory(index);
-                }}
-                buttonTextAfterSelection={(selectedItem, index) => {
-                  // text represented after item is selected
-                  // if data array is an array of objects then return selectedItem.property to render after item is selected
-                  return selectedItem
-                }}
-                rowTextForSelection={(item, index) => {
-                  // text represented for each item in dropdown
-                  // if data array is an array of objects then return item.property to represent item in dropdown
-                  return item
-                }}
-                buttonStyle={styles.arrange}
-                buttonTextStyle={styles.arrangeText}
-                renderDropdownIcon={isOpened => {
-                  return <Feather name={isOpened ? 'chevron-up' : 'chevron-down'} size={24} color="black" />
-                }}
-                dropdownIconPosition={'right'}
-                defaultValueByIndex={0}
-                dropdownStyle={{borderRadius: 18, }}
-                rowStyle={styles.rowStyle}
-                rowTextStyle={styles.arrangeText}
-                selectedRowStyle={{...styles.rowStyle, backgroundColor: "pink", }}
-              />
-              {/* <MaterialCommunityIcons name="view-grid-outline" size={30} color="black" /> */}
-          </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {loading ? (
-                <ActivityIndicator 
-                  color="black" 
-                  style={{marginTop: 100}} 
-                  size="large"
-                />
-              ) : (
-                <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                  {/* <TouchableOpacity onPress={autoScroll} >
-                    <BookmarkTile navigation={navigation} />
-                  </TouchableOpacity>
-                  <BookmarkTile navigation={navigation} /> */}
-                  {bookmarks && bookmarks.map((bookmark, index) => (
-                    <TouchableOpacity 
-                      activeOpacity={1}
-                      onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
-                      key={index}
-                    >
-                      <BookmarkTile bookmark={bookmark} />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-          </ScrollView>
-        </View>
-      );
-
-    //책 별로 정렬
-    case 2:
-      return (
-        <View style={styles.container}>
-          <View style={styles.header} >
-              <Text style={{
-                  fontSize: 25,
-                  fontWeight: "900",
-              }}>
-                  Bookmark
+                  Storage
               </Text>
 
               <SelectDropdown
@@ -279,17 +295,24 @@ const Bookmark = ({navigation}) => {
           </View>
           <ScrollView 
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
             // ref={(ref) => {
             //   console.log(true);
             //   setRef(ref);
             // }}
           >
             {loading ? (
-              <ActivityIndicator 
-                color="black" 
-                style={{marginTop: 100}} 
-                size="large"
-              />
+              // <ActivityIndicator 
+              //   color="black" 
+              //   style={{marginTop: 100}} 
+              //   size="large"
+              // />
+              null
             ) : (
               <>
                 {books && books.map((book, index) => (
@@ -302,7 +325,7 @@ const Bookmark = ({navigation}) => {
       );
 
     // 생성자 별로 정렬
-    case 3:
+    case 2:
       return (
         <View style={styles.container}>
           <View style={styles.header} >
@@ -310,7 +333,7 @@ const Bookmark = ({navigation}) => {
                   fontSize: 25,
                   fontWeight: "900",
               }}>
-                  Bookmark
+                  Storage
               </Text>
 
               <SelectDropdown
@@ -344,13 +367,22 @@ const Bookmark = ({navigation}) => {
                   <MaterialCommunityIcons name="square-outline" size={30} color="black" />
               </View> */}
           </View>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {loading ? (
-              <ActivityIndicator 
-                color="black" 
-                style={{marginTop: 100}} 
-                size="large"
+          <ScrollView 
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
               />
+            }
+          >
+            {loading ? (
+              // <ActivityIndicator 
+              //   color="black" 
+              //   style={{marginTop: 100}} 
+              //   size="large"
+              // />
+              null
             ) : (
               <>
                 {users && users.map((user, index) => (
@@ -365,6 +397,66 @@ const Bookmark = ({navigation}) => {
       );
   }
 }
+
+const BookList = ({book, navigation,}) => {
+  return (
+    <>
+      <TouchableOpacity 
+        activeOpacity={1} 
+        onPress={() => navigation.navigate('BookmarkBook', { book: book, bookId: book.book_id, })} 
+      >
+        <View style={styles.List} >
+          <View style={{ flexDirection: "row", alignItems: "center", }}>
+            <Image 
+              source={ book.book_cover !== null ? { uri: `http://3.38.62.105${book.book_cover}`} : bookCover} 
+              style={styles.bookImage}
+            />
+            <View style={{ marginHorizontal: 8, }}>
+              <Text style={styles.listTitle} >{book.book_title}</Text>
+              <Text style={styles.listAuthor}>{book.book_author}</Text>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: "row", alignItems: "center", marginHorizontal: 4,}}>
+              <Feather name="bookmark" size={18} color="#606060" />
+              <Text style={{ fontSize: 15, fontWeight: "500", color: "#606060", marginHorizontal: 4, }}>
+                  {book.count}
+              </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </>
+  )
+}
+
+const UserList = ({user, navigation,}) => {
+  return (
+    <>
+      <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('BookmarkUser', { user: user, userTag: user.user_tag, })} >
+        <View style={styles.List} >
+          <View style={{ flexDirection: "row", alignItems: "center", }}>
+            <Image 
+              source={ user.avatar !== null ? { uri: `http://3.38.62.105${user.avatar}`} : blankAvatar} 
+              style={styles.userImage} 
+            />
+            <View style={{ marginHorizontal: 8, }}>
+              <Text style={styles.listTitle} >{user.name}</Text>
+              <Text style={{...styles.listAuthor, color: "#008000", }} >{`@${user.user_tag}`}</Text>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: "row", alignItems: "center", marginHorizontal: 4,}}>
+              <Feather name="bookmark" size={18} color="#606060" />
+              <Text style={{ fontSize: 15, fontWeight: "500", color: "#606060", marginHorizontal: 4, }}>
+                  {user.count}
+              </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </>
+  )
+}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -404,33 +496,32 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 4,
     flexDirection: "row",
-    borderTopWidth: 0.3,
-    borderTopColor: "#808080",
+    borderBottomWidth: 0.3,
+    borderBottomColor: "#808080",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   bookImage: {
-    width: 50,
-    height: 50,
+    width: 92,
+    height: 92,
     resizeMode: "contain",
   },
   userImage: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     borderRadius: 50,
     resizeMode: "cover",
     marginVertical: 5,
     marginHorizontal: 8,
   },
   listTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "700",
-    paddingVertical: 8,
-    paddingHorizontal: 8,
   },
   listAuthor: {
-    fontSize: 10,
+    fontSize: 15,
     fontWeight: "400",
-    marginTop: -5,
-    paddingHorizontal: 8,
+    marginTop: 5,
   },
   bookMarkTileBox: {
     width: SCREEN_WIDTH * 0.5,
@@ -462,74 +553,3 @@ const styles = StyleSheet.create({
 
 export default Bookmark;
 
-const BookList = ({book, navigation,}) => {
-  const bookmarks = book.bookmarks;
-
-  return (
-    <>
-      {/* <TouchableOpacity 
-        activeOpacity={1} 
-        onPress={() => navigation.navigate('BookmarkBook')} 
-      > */}
-        <View style={styles.List} >
-            <Image 
-              source={ book.book_cover !== null ? { uri: `http://3.38.228.24${book.book_cover}`} : bookCover} 
-              style={styles.bookImage}
-            />
-            <View>
-              <Text style={styles.listTitle} >{book.book_title}</Text>
-              <Text style={styles.listAuthor}>{book.author}</Text>
-            </View>
-        </View>
-      {/* </TouchableOpacity> */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      >
-        {bookmarks.map((bookmark, index) => (
-          <TouchableOpacity 
-            activeOpacity={1}
-            onPress={() => navigation.navigate('BookmarkBookDetail', {book: book, index: index, })} 
-            key={index}
-          >
-            <BookmarkTile bookmark={bookmark} key={index} />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </>
-  )
-}
-
-const UserList = ({user, navigation,}) => {
-  const bookmarks = user.bookmarks;
-  return (
-    <>
-    {/* <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('BookmarkUser')} > */}
-      <View style={styles.List} >
-          <Image 
-            source={ user.avatar !== null ? { uri: `http://3.38.228.24${user.avatar}`} : blankAvatar} 
-            style={styles.userImage} 
-          />
-          <View>
-            <Text style={{...styles.listTitle, }} >{user.name}</Text>
-            <Text style={{...styles.listAuthor, color: "#008000", marginTop: -8, }} >{`@${user.watermark}`}</Text>
-          </View>
-      </View>
-    {/* </TouchableOpacity> */}
-    <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      >
-        {bookmarks.map((bookmark, index) => (
-          <TouchableOpacity 
-            activeOpacity={1}
-            onPress={() => navigation.navigate('BookmarkUserDetail', {user: user, index: index, })} 
-            key={index}
-          >
-            <BookmarkTile bookmark={bookmark} key={index} />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </>
-  )
-}

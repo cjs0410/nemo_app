@@ -5,6 +5,7 @@ import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, Blan
 import Api from "../lib/Api";
 import * as ImagePicker from 'expo-image-picker';
 import bookCover from '../assets/images/steve.jpeg';
+import emptyImage from '../assets/images/emptyImage.jpeg';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
@@ -22,7 +23,7 @@ const webViewProps = {
     originWhitelist: "*"
   };
 
-const CreateBookmark = ({navigation}) => {
+const CreateBookmark = ({navigation, route}) => {
     const { width } = useWindowDimensions();
     const [whatBook, setWhatBook] = useState('');
     const [bookTitle, setBookTitle] = useState('');
@@ -44,6 +45,7 @@ const CreateBookmark = ({navigation}) => {
     const [image, setImage] = useState(null);
     const [backgroundImage, setBackgroundImage] = useState(null);
     const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
+    const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
     const [newBookTitle, setNewBookTitle] = useState('');
     const [newBookAuthor, setNewBookAuthor] = useState('');
@@ -68,10 +70,17 @@ const CreateBookmark = ({navigation}) => {
     const [contentsByLine, setContentsByLine] = useState([]);
     const [contentsByCard, setContentsByCard] = useState([]);
 
+    const { ocrImage, } = route.params;
+    const [ ocrLoading, setOcrLoading ] = useState(false);
+    const { ocrText, setOcrText } = useState('');
+
 
     
     useEffect(() => {
         updateWatermark();
+        if (ocrImage !== null) {
+            fetchOCR(ocrImage);
+        }
     }, []);
 
     useEffect(() => {
@@ -114,24 +123,6 @@ const CreateBookmark = ({navigation}) => {
 
     const onChangeFront = (payload) => {
         setFrontContent(payload);
-        // const cardNum = parseInt(frontContent.length / 200) + 1;
-        // let copy = [];
-
-        // for ( let i = 0; i < cardNum; i++) {
-        //     copy = [...copy, payload.substring(i * 200, (i + 1) * 200)]
-        // }
-
-        // setContentsByNum(copy);
-
-
-        // if ((lineNum !== 0) && (lineNum % 9 === 0)) {
-        //     // console.log(cutIndex);
-        //     let lastIndex = frontContent.length - 1;
-        //     let indexCopy = [...cutIndex];
-        //     indexCopy[parseInt(lineNum / 9)] = lastIndex;
-
-        //     setCutIndex(indexCopy);
-        // }
     }
 
     const onTextLayout = (e) => {
@@ -241,6 +232,39 @@ const CreateBookmark = ({navigation}) => {
         }
         setLoading(false);
     };
+
+    const fetchOCR = async (ocrImage) => {
+        const formData = new FormData();
+        const filename = ocrImage.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename ?? '');
+        const type = match ? `image/${match[1]}` : `image`;
+        formData.append('image', {
+            uri: ocrImage,
+            type: type,
+            name: filename
+        });
+
+        try {
+            setOcrLoading(true);
+            await Api
+            .put('/api/v2/bookmark/ocr/', formData, 
+            {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                },
+            }
+            )
+            .then((res) => {
+                console.log(res.data);
+                // setOcrText(res.data.message);
+                setFrontContent(res.data.message);
+            })
+        } catch (err) {
+            console.error(err)
+        }
+        setOcrLoading(false);
+    };
+
 
     const CreateBook = async() => {
         const formData = new FormData();
@@ -390,6 +414,7 @@ const CreateBookmark = ({navigation}) => {
                     contentsByLine={contentsByLine}
                     setContentsByLine={setContentsByLine}
                     setContentsByCard={setContentsByCard}
+                    ocrLoading={ocrLoading}
                 />
                 
                 {/* <BlankCardFront 
@@ -535,29 +560,29 @@ const CreateBookmark = ({navigation}) => {
                     style={styles.TagAddBox} 
                     onPress={() => setInfoVisible(true)}    
                 >
-                    <Entypo name="edit" size={20} color="black" />
-                    <Text style={{ fontSize: 17, fontWeight: "500", marginHorizontal: 8, }} >설명 추가</Text>
+                    <Entypo name="edit" size={regWidth * 20} color="black" />
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >설명 추가</Text>
                 </Pressable>
                 <Pressable 
                     style={styles.TagAddBox} 
                     onPress={() => setTagVisible(true)}    
                 >
-                    <Feather name="hash" size={20} color="black" />
-                    <Text style={{ fontSize: 17, fontWeight: "500", marginHorizontal: 8, }} >태그 추가</Text>
+                    <Feather name="hash" size={regWidth * 20} color="black" />
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >태그 추가</Text>
                 </Pressable>
                 <Pressable 
                     style={styles.TagAddBox} 
                     onPress={() => setAlbumVisible(true)}    
                 >
-                    <Feather name='folder' size={20} color="black" />
-                    <Text style={{ fontSize: 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>
+                    <Feather name='folder' size={regWidth * 20} color="black" />
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>
                 </Pressable>
                 <Pressable 
                     style={styles.TagAddBox} 
                     onPress={() => setPreviewVisible(true)}    
                 >
-                    <Entypo name="edit" size={20} color="black" />
-                    <Text style={{ fontSize: 17, fontWeight: "500", marginHorizontal: 8, }} >미리보기</Text>
+                    <Entypo name="edit" size={regWidth * 20} color="black" />
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >미리보기</Text>
                 </Pressable>
                 <View style={{height: 200}} ></View>
             </ScrollView>
@@ -578,7 +603,7 @@ const CreateBookmark = ({navigation}) => {
                         }
                     }
                 />
-                <View style={styles.modal}>
+                <View style={{...styles.modal, height: regHeight * 440, }}>
                     <View style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
@@ -606,7 +631,7 @@ const CreateBookmark = ({navigation}) => {
                     <View style={styles.addBook}>
                         <View style={{ alignItems: 'center', }}>
                             <Image 
-                                source={image === null ? bookCover : { uri: image }} 
+                                source={image === null ? emptyImage : { uri: image }} 
                                 style={styles.bookCoverImage}
                             />
                             <TouchableOpacity
@@ -671,11 +696,11 @@ const CreateBookmark = ({navigation}) => {
                             //     setInfo('');
                             // }}
                         >
-                            <Text style={{fontSize: 15, fontWeight: "500", }} >
+                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", }} >
                                 취소
                             </Text>
                         </Pressable>
-                        <Text style={{fontSize: 16, fontWeight: "700", }} >
+                        <Text style={{fontSize: regWidth * 16, fontWeight: "700", }} >
                             북마크 설명 추가
                         </Text>
                         <Pressable
@@ -684,7 +709,7 @@ const CreateBookmark = ({navigation}) => {
                                 setInfoVisible(false);
                             }}
                         >
-                            <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }}>
                                 완료
                             </Text>
                         </Pressable>
@@ -707,6 +732,7 @@ const CreateBookmark = ({navigation}) => {
                 transparent={true}
                 visible={tagVisible}
             >
+
                 <Pressable 
                     style={[
                         StyleSheet.absoluteFill,
@@ -718,6 +744,10 @@ const CreateBookmark = ({navigation}) => {
                         }
                     }
                 />
+            {/* <KeyboardAvoidingView 
+                style={styles.modal}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            > */}
                 <View style={styles.modal}>
                     <View style={styles.modalHeader}>
                         <Pressable
@@ -727,18 +757,18 @@ const CreateBookmark = ({navigation}) => {
                             //     setTagVisible(false);
                             // }}
                         >
-                            <Text style={{fontSize: 15, fontWeight: "500", }} >
+                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", }} >
                                 취소
                             </Text>
                         </Pressable>
-                        <Text style={{fontSize: 16, fontWeight: "700", }} >
+                        <Text style={{fontSize: regWidth * 16, fontWeight: "700", }} >
                             태그 추가하기
                         </Text>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             onPress={() => setTagVisible(false)}
                         >
-                            <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }}>
                                 완료
                             </Text>
                         </Pressable>
@@ -747,7 +777,7 @@ const CreateBookmark = ({navigation}) => {
                         placeholder="태그를 입력하고 쉼표를 입력하여 등록하세요"
                         style={{
                             ...styles.modalInput,
-                            height: "25%",
+                            height: regHeight * 50,
                         }}
                         onChangeText={changeTag}
                         value={tagValue}
@@ -759,7 +789,7 @@ const CreateBookmark = ({navigation}) => {
                     >
                         {tags.map((tag, index) => (
                             <View style={styles.tagContainer} key={index}>
-                                <Text style={{ fontSize: 15, fontWeight: "500", color: "#9250FF", marginRight: 4,}}>
+                                <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#9250FF", marginRight: 4,}}>
                                     {`#${tag}`}
                                 </Text>
                                 <Pressable
@@ -774,6 +804,8 @@ const CreateBookmark = ({navigation}) => {
                     </View>
 
                 </View>
+            {/* </KeyboardAvoidingView> */}
+
             </Modal>
 
             <Modal
@@ -977,11 +1009,11 @@ const styles = StyleSheet.create({
     optionBox: {
         borderWidth: 1,
         borderColor: "black",
-        height: 30,
-        width: 30,
+        height: regWidth * 30,
+        width: regWidth * 30,
         justifyContent: "center",
         alignItems: "center",
-        marginHorizontal: 5,
+        marginHorizontal: regWidth * 5,
     },
     TagAddBox: {
         flexDirection: "row",
@@ -994,7 +1026,8 @@ const styles = StyleSheet.create({
     },
     modal: {
         width: '100%', 
-        height: '35%', 
+        // height: '35%',
+        height: regHeight * 250, 
         position: 'absolute', 
         // bottom: 0, 
         backgroundColor: 'white', 
@@ -1008,32 +1041,32 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     bookCoverImage: {
-        width: 80,
-        height: 80,
+        width: regWidth * 130,
+        height: regWidth * 130,
         resizeMode: "contain",
     },
     modalHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 55,
-        marginHorizontal: 18, 
+        marginTop: regHeight * 55,
+        marginHorizontal: regWidth * 18, 
     },
     modalInput: {
         backgroundColor: "#EEEEEE",
-        marginHorizontal: 22,
-        marginVertical: 22,
+        marginHorizontal: regWidth * 22,
+        marginVertical: regHeight * 22,
         borderRadius: 10,
         height: "25%",
-        paddingHorizontal: 8,
-        fontSize: 15,
+        paddingHorizontal: regWidth * 8,
+        fontSize: regWidth * 15,
         fontWeight:"500",
     },
     tagContainer: {
         backgroundColor: "#EEEEEE",
         borderRadius: 999,
-        paddingVertical: 8,
-        paddingHorizontal: 8, 
-        marginHorizontal: 8, 
+        paddingVertical: regHeight * 8,
+        paddingHorizontal: regWidth * 8, 
+        marginHorizontal: regWidth * 8, 
         flexDirection: "row", 
         alignItems: "center", 
         justifyContent: "center", 

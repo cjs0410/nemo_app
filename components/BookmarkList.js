@@ -1,5 +1,5 @@
-import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Animated, Pressable, } from "react-native";
+import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, FontAwesome, } from '@expo/vector-icons'; 
 import bookCover from '../assets/images/steve.jpeg';
 import RenderHtml from 'react-native-render-html';
@@ -15,7 +15,16 @@ const BookmarkList = (props) => {
     const bookmark = props.bookmark;
     const navigation = props.navigation;
     const { bookmarked, } = useSelector(bookmarkSelector);
+    const backgroundImageValue = useRef(new Animated.Value(0)).current;
 
+
+    const showBackgroundImage = () => {
+        Animated.timing(backgroundImageValue, {
+            toValue: 0.2,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
 
     return (
         <View style={styles.bookmarkContentsScrollBox}>
@@ -27,9 +36,13 @@ const BookmarkList = (props) => {
             >
                 {bookmark.backgroundimg !== null ? 
                     <View style={styles.backgroungImageContainer}>
-                        <Image 
+                        <Animated.Image 
                             source={{ uri: `http://3.38.62.105${bookmark.backgroundimg}` }}
-                            style={styles.backgroundImage}
+                            style={{
+                                ...styles.backgroundImage,
+                                opacity: backgroundImageValue,
+                            }}
+                            onLoadEnd={showBackgroundImage}
                         />
                     </View>
                     :
@@ -65,7 +78,13 @@ const BookmarkList = (props) => {
                     </Text>
                 </View>
                 <View style={styles.bookmarkContentsWatermark}>
-                    <Text style={{ fontSize: 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
+                    <Pressable
+                        onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })}
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    >
+                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
+                    </Pressable>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", }} >{bookmark.created_date.split('T')[0]}</Text>
                 </View>
             </View>
             
@@ -83,17 +102,17 @@ const styles = StyleSheet.create({
     bookmarkContentsBox: {
         flex: 1,
         backgroundColor: "#D9D9D9",
-        marginVertical: 5,
-        marginHorizontal: 13,
-        paddingVertical: 5,
+        marginVertical: regWidth * 5,
+        marginHorizontal: regWidth * 13,
+        paddingVertical: regWidth * 5,
         borderRadius: 2,
-        paddingHorizontal: 10,
+        paddingHorizontal: regWidth * 10,
     },
     bookmarkContentsBookCover: {
         // flex: 1,
         // backgroundColor: "red",
-        width: 40,
-        height: 40,
+        width: regWidth * 40,
+        height: regWidth * 40,
         resizeMode: "contain",
     },
     bookmarkContentsBook: {
@@ -105,12 +124,12 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsBookTitle: {
         fontWeight: "700",
-        fontSize: 15,
-        marginTop: 8,
+        fontSize: regWidth * 15,
+        marginTop: regHeight * 8,
     },
     bookmarkContentsBookChapter: {
         fontWeight: "400",
-        fontSize: 10,
+        fontSize: regWidth * 10,
     },
     bookmarkContentsBookChapterInput: {
         fontWeight: "400",
@@ -119,14 +138,14 @@ const styles = StyleSheet.create({
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
         flex: 1.5,
-        marginTop: 8,
+        marginTop: regHeight * 8,
         justifyContent: "center", 
     },
     bookmarkContentsText: {
         fontWeight: "500",
         // fontSize: 16,
         fontSize: regWidth * 16,
-        lineHeight: 28,
+        lineHeight: regWidth * 28,
     },
     bookmarkContentsInput: {
         // backgroundColor: "pink",
@@ -143,8 +162,8 @@ const styles = StyleSheet.create({
     },
     backgroungImageContainer: {
         position: "absolute",
-        width: SCREEN_WIDTH - 26,
-        height: SCREEN_WIDTH * 0.5 - 10,
+        width: SCREEN_WIDTH - regWidth * 26,
+        height: SCREEN_WIDTH * 0.5 - regWidth * 10,
         borderRadius: 2,
         backgroundColor: "#D9D9D9", 
         // zIndex: 10,

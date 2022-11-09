@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, } from "react-native";
+import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, RefreshControl, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import {
     useNavigation,
@@ -11,11 +11,13 @@ import { BookmarkList, AlbumList } from '../components';
 import Api from "../lib/Api";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import blankAvatar from '../assets/images/peopleicon.png';
+import emptyImage from '../assets/images/emptyImage.jpeg';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, scrapSelector } from '../modules/hooks';
 import { resetUserInfo } from '../modules/user';
 import { loadScraps } from "../modules/scraps";
+import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -130,7 +132,10 @@ const UserStorage = ({navigation}) => {
     const [loading, setLoading] = useState(false);
     const { accessToken, } = useSelector(userSelector);
     const [bookmarks, setBookmarks] = useState(null);
-    const [albums, setAlbums] = useState([1, 2, 3]);
+    const [albums, setAlbums] = useState(null);
+    const avatarValue = useRef(new Animated.Value(0)).current;
+    const [refreshing, setRefreshing] = useState(false);
+
 
     const [ headerHeight, setHeaderHeight ] = useState(0);
 
@@ -143,12 +148,24 @@ const UserStorage = ({navigation}) => {
     const ref = useRef();
     useScrollToTop(ref);
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchBookmarkList();
-            fetchProfile();
-        }, [])
-    );
+    useEffect(() => {
+        fetchBookmarkList();
+        fetchProfile();
+    }, []);
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         fetchBookmarkList();
+    //         fetchProfile();
+    //     }, [])
+    // );
+
+    const onRefresh = useCallback(async() => {
+        setRefreshing(true);
+        await fetchProfile()
+        .then(() => fetchBookmarkList())
+        .then(() => setRefreshing(false));
+    }, []);
 
     const fetchProfile = async() => {
         try {
@@ -216,7 +233,13 @@ const UserStorage = ({navigation}) => {
         setHeaderHeight(height);
     }, []);
 
-
+    const showAvatarImage = () => {
+        Animated.timing(avatarValue, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
 
 
     return (
@@ -227,8 +250,14 @@ const UserStorage = ({navigation}) => {
 
 
             <ScrollView
-                // showsVerticalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
                 ref={ref}
+                refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                }
             >
 
             {/* <Animated.View
@@ -248,29 +277,33 @@ const UserStorage = ({navigation}) => {
                         />
                         :
                         <>
-                            <Image 
+                            <Animated.Image 
                                 source={ profile.avatar !== null ? { uri: `http://3.38.62.105${profile.avatar}`} : blankAvatar} 
-                                style={styles.profileImage} 
+                                style={{
+                                    ...styles.profileImage,
+                                    opacity: avatarValue,
+                                }} 
+                                onLoadEnd={showAvatarImage}
                             />
                             <View style={{ marginHorizontal: 18, }}>
                                 <Text style={{
-                                    fontSize: 11,
+                                    fontSize: regWidth * 11,
                                     fontWeight: "500",
                                     color: "#008000",
                                 }}>{`@${profile.user_tag}`}</Text>
                                 <Text style={{
-                                    fontSize: 25,
+                                    fontSize: regWidth * 25,
                                     fontWeight: "900",
                                 }}>
                                     {profile.name}
                                 </Text>
                                 <View style={{ flexDirection: "row", marginTop: 8,}}>
                                     <View>
-                                        <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${profile.followers} Followers`}</Text>
+                                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", }} >{`${profile.followers} Followers`}</Text>
                                     </View>
-                                    <Entypo name="dot-single" size={15} color="black" style={{ marginHorizontal: 8, }} />
+                                    <Entypo name="dot-single" size={regWidth * 15} color="black" style={{ marginHorizontal: 8, }} />
                                     <View>
-                                        <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${profile.followings} Following`}</Text>
+                                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", }} >{`${profile.followings} Following`}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -284,14 +317,14 @@ const UserStorage = ({navigation}) => {
                         activeOpacity={1}
                         onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
                     >
-                        <Text style={{ fontSize: 15, fontWeight: "600", }} >프로필 수정</Text>
+                        <Text style={{ fontSize: regWidth * 15, fontWeight: "600", }} >프로필 수정</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
                         style={{...styles.editOrPost, backgroundColor: "#FF4040"}}
                         activeOpacity={1} 
                         onPress={() => navigation.navigate('CreateAlbumModal')} 
                     >
-                        <Text style={{ fontSize: 15, fontWeight: "600", color: "white", }} >새 앨범 생성하기</Text>
+                        <Text style={{ fontSize: regWidth * 15, fontWeight: "600", color: "white", }} >새 앨범 생성하기</Text>
                     </TouchableOpacity>
                 </View>
             {/* </Animated.View> */}
@@ -306,26 +339,26 @@ const UserStorage = ({navigation}) => {
 
                 <View style={{ flexDirection: "row", justifyContent: "center", }} >
                     <TouchableOpacity activeOpacity={1} onPress={mine}>
-                        <View style={{...styles.postByWho, borderBottomColor: isMine ? "red" : "white" }}>
-                            <Feather name="bookmark" size={24} color={isMine ? "red" : "black"} />
+                        <View style={{...styles.postByWho, borderBottomColor: isMine ? "red" : "#CBCBCB" }}>
+                            <Feather name="bookmark" size={regWidth * 24} color={isMine ? "red" : "#CBCBCB"} />
                             <Text style={{
-                                fontSize: 13,
+                                fontSize: regWidth * 13,
                                 fontWeight: "500",
                                 marginHorizontal: 4,
-                                color: isMine ? "red" : "black"
+                                color: isMine ? "red" : "#CBCBCB"
                             }}>
                                 {bookmarks ? bookmarks.length : null}
                             </Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={1} onPress={others}>
-                        <View style={{...styles.postByWho, borderBottomColor: !isMine ? "red" : "white" }}>
-                            <Feather name="folder" size={24} color={!isMine ? "red" : "black"} />
+                        <View style={{...styles.postByWho, borderBottomColor: !isMine ? "red" : "#CBCBCB" }}>
+                            <Feather name="folder" size={regWidth * 24} color={!isMine ? "red" : "#CBCBCB"} />
                             <Text style={{
-                                fontSize: 13,
+                                fontSize: regWidth * 13,
                                 fontWeight: "500",
                                 marginHorizontal: 4,
-                                color: !isMine ? "red" : "black"
+                                color: !isMine ? "red" : "#CBCBCB"
                             }}>
                                 {albums ? albums.length : null}
                             </Text>
@@ -346,7 +379,7 @@ const UserStorage = ({navigation}) => {
                                 {bookmarks && bookmarks.map((bookmark, index) => (
                                     <TouchableOpacity
                                         activeOpacity={1}
-                                        onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
+                                        onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, index: index, })} 
                                         key={index}
                                     >
                                         <BookmarkList bookmark={bookmark} navigation={navigation} />
@@ -361,7 +394,7 @@ const UserStorage = ({navigation}) => {
                         {loading ? 
                             <ActivityIndicator 
                                 color="black" 
-                                style={{marginTop: 100}} 
+                                style={{marginTop: regHeight * 100}} 
                                 size="large"
                             />
                             : 
@@ -370,7 +403,7 @@ const UserStorage = ({navigation}) => {
                                 {albums && albums.map((album, index) => (
                                     <TouchableOpacity
                                         activeOpacity={1}
-                                        // onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarked: bookmarked, index: index, })} 
+                                        onPress={() => navigation.navigate('AlbumProfile', { albumId: album.album_id, })} 
                                         key={index}
                                     >
                                         <AlbumList album={album} navigation={navigation} />
@@ -404,26 +437,26 @@ const styles = StyleSheet.create({
     },
     profileContainter: {
         //backgroundColor: "pink",
-        marginHorizontal: 20,
+        marginHorizontal: regWidth * 20,
         //paddingBottom: 30,
-        paddingBottom: 18,
+        paddingBottom: regHeight * 18,
         flexDirection: "row",
         // justifyContent: "space-between",
         alignItems: "center",
     },
     profileImage: {
-        width: 70,
-        height: 70,
+        width: regWidth * 70,
+        height: regWidth * 70,
         resizeMode: "cover",
         borderRadius: 50,
         // backgroundColor: "red",
         marginTop: 10,
     },
     editOrPost: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingHorizontal: regWidth * 20,
+        paddingVertical: regHeight *10,
         borderRadius: 10,
-        marginHorizontal: 8,
+        marginHorizontal: regWidth * 8,
         justifyContent: "center",
         alignItems: "center",
         width: "40%",

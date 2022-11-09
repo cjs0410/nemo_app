@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Text, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable } from "react-native";
+import { StyleSheet, View, ScrollView, Text, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import { Entypo } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons';
@@ -25,6 +25,25 @@ const BookmarkDetail = (props) => {
     const [current, setCurrent] = useState(0);
     const [contentsByNum, setContentsByNum] = useState([]);
     const value = useRef(new Animated.Value(0)).current;
+    const [isScrap, setIsScrap] = useState(bookmark.is_scrap);
+    const [scrapCount, setScrapCount] = useState(bookmark.scraps);
+    const [isLike, setIsLike] = useState(bookmark.is_like);
+    const [likeCount, setLikeCount] = useState(bookmark.likes);
+    const [userTag, setUserTag] = useState(null);
+
+    useEffect(() => {
+        // console.log(bookmark);
+        // fetchUserTag();
+    }, [])
+
+    const fetchUserTag = async() => {
+        try {
+            const accessToken = await AsyncStorage.getItem('access');
+            setUserTag(jwt_decode(accessToken).user_tag);
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     // useEffect(() => {
     //     const cardNum = parseInt(bookmark.contents.length / 200) + 1;
@@ -56,6 +75,38 @@ const BookmarkDetail = (props) => {
         }).start();
     }
 
+    const onLike = async() => {
+        try {
+            await Api
+            .post("/api/v2/bookmark/likes/", {
+                bookmark_id: bookmark.bookmark_id,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setIsLike(res.data.is_like);
+                setLikeCount(res.data.count);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const onScrap = async() => {
+        try {
+            await Api
+            .post("/api/v2/bookmark/scraps/", {
+                bookmark_id: bookmark.bookmark_id,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setIsScrap(res.data.is_scrap);
+                setScrapCount(res.data.count);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View style={styles.bookmarkContainer}>
             <View style={styles.bookmarkTop}>
@@ -70,14 +121,14 @@ const BookmarkDetail = (props) => {
                 />
                 <Pressable 
                     activeOpacity={1} 
-                    onPress={() => navigation.navigate('OtherProfile', { userTag: bookmark.user_tag, })} 
+                    onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })} 
                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                 >
                     <Text style={styles.bookmakrWriterName}>{bookmark.writer_name}</Text>
                 </Pressable>
                 <Entypo name="dot-single" size={10} color="#808080" />
                 <View>
-                    <Text style={styles.bookmarkDateText}>{bookmark.created_date}</Text>
+                    <Text style={styles.bookmarkDateText}>{bookmark.created_date.split('T')[0]}</Text>
                 </View>
             </View>
             <ScrollView
@@ -110,6 +161,7 @@ const BookmarkDetail = (props) => {
                         bookmark={bookmark} 
                         contents={content}
                         navigation={navigation} 
+                        index={index}
                         key={index} 
                     />
                 ))}
@@ -131,57 +183,68 @@ const BookmarkDetail = (props) => {
                 })} */}
                 {bookmark.contents.map((contents, index) => {
                     if (index === current) {
-                        return <Entypo name="dot-single" size={24} color="red" style={{ marginHorizontal: -4, }} key={index} />
+                        return <Entypo name="dot-single" size={regWidth * 24} color="red" style={{ marginHorizontal: -4, }} key={index} />
                     }
-                    return <Entypo name="dot-single" size={24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
+                    return <Entypo name="dot-single" size={regWidth * 24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
                 })}
             </View>
 
             <View style={styles.bookmarkInfo}>
-                <Text style={styles.bookmarkInfoText}>
-                    {bookmark.text} 
-                </Text>
-                <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 15, }}>
-                    {bookmark.tags.map((tag, index) => (
-                        <Text style={styles.bookmarkHashtag} key={index}>
-                            {`#${tag.tag}`}
-                        </Text>
-                    ))}
-                </View>
+                {bookmark.text.length !== 0 ? 
+                    <Text style={styles.bookmarkInfoText}>
+                        {bookmark.text} 
+                    </Text>
+                    :
+                    null
+                }
+                {bookmark.tags.length !== 0 ? 
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: regHeight * 15, }}>
+                        {bookmark.tags.map((tag, index) => (
+                            <Text style={styles.bookmarkHashtag} key={index}>
+                                {`#${tag.tag}`}
+                            </Text>
+                        ))}
+                    </View>
+                    :
+                    null
+                }
+
 
             </View>
 
             <View style={styles.bookmarkLikes}>
-                <TouchableOpacity 
+                <Pressable 
                     activeOpacity={1} 
                     style={{ flexDirection: "row", alignItems: "center", }}
-                    // onPress={onLike}
+                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    onPress={onLike}
                 >
                     <Entypo 
-                        // name={isLike ? "heart" : "heart-outlined"} 
-                        name="heart-outlined"
-                        size={24} 
+                        name={isLike ? "heart" : "heart-outlined"} 
+                        // name="heart-outlined"
+                        size={regWidth * 20} 
                         color="red" 
                     />
-                    <Text style={styles.bookmarkLikesText}>{bookmark.likes}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
+                    <Text style={styles.bookmarkLikesText}>{likeCount}</Text>
+                </Pressable>
+                <Pressable 
                     activeOpacity={1} 
                     style={{ 
                         flexDirection: "row", 
                         alignItems: "center", 
-                        marginHorizontal: 20,
+                        marginHorizontal: regWidth * 30,
                     }}
-                    // onPress={onScrap}
+                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    onPress={onScrap}
                 >
                     <Feather 
                         name="download" 
-                        size={24}
-                        color="black" 
+                        size={regWidth * 20}
+                        color={isScrap ? "red" : "black" }
                         // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
                     />
-                    <Text style={styles.bookmarkLikesText}>{bookmark.scraps}</Text>
-                </TouchableOpacity>
+                    <Text style={styles.bookmarkLikesText}>{scrapCount}</Text>
+                </Pressable>
                 {/* {watermark === post.nickname ?
                     null
                     :
@@ -211,67 +274,67 @@ const styles = StyleSheet.create({
     bookmarkContainer: {
         // backgroundColor: "grey",
         flex: 1,
-        paddingTop: 28,
-        paddingBottom: 18,
+        paddingTop: regHeight * 8,
+        paddingBottom: regHeight * 8,
         borderTopWidth: 0.3,
         borderTopColor: "#808080",
     },
 
     bookmarkTop: {
         flexDirection: "row",
-        paddingVertical: 10,
-        paddingHorizontal: 13,
+        paddingTop: regHeight * 24,
+        paddingHorizontal: regWidth * 13,
         alignItems: "center",
     },
     bookmarkWriterImage: {
-        width: 25,
-        height: 25,
+        width: regWidth * 25,
+        height: regWidth * 25,
         resizeMode: "cover",
         borderRadius: 50,
         // backgroundColor: "red",
     },
     bookmakrWriterName: {
         fontWeight: "700",
-        fontSize: 12.5,
-        paddingHorizontal: 5,
+        fontSize: regWidth * 12.5,
+        paddingHorizontal: regWidth * 5,
     },
     bookmarkDateText: {
         color: "#808080",
         fontWeight: "500",
-        fontSize: 10,
-        paddingHorizontal: 5,
+        fontSize: regWidth * 10,
+        paddingHorizontal: regWidth * 5,
     },
 
     bookmarkInfo: {
-        marginTop: 5,
-        paddingHorizontal: 13,
+        marginTop: regHeight * 5,
+        paddingHorizontal: regWidth * 13,
     },
     bookmarkInfoText: {
         fontWeight: "400",
-        fontSize: 14,
-        marginTop: 10,
+        fontSize: regWidth * 14,
+        marginTop: regHeight * 10,
     },
     bookmarkHashtag: {
         fontWeight: "400",
-        fontSize: 14,
+        fontSize: regWidth * 14,
         // marginTop: 15,
-        marginRight: 8,
+        marginRight: regWidth * 8,
         color: "#9250FF",
     },
 
 
     bookmarkLikes: {
-        marginTop: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 13,
+        marginTop: regHeight * 10,
+        paddingVertical: regHeight * 10,
+        paddingHorizontal: regWidth * 13,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
     },
     bookmarkLikesText: {
         fontWeight: "700",
-        fontSize: 15,
-        marginLeft: 5,
+        fontSize: regWidth * 15,
+        marginLeft: regWidth * 5,
     },
 })
 
