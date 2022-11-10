@@ -32,6 +32,7 @@ import {
   BookmarkUser,
   BookmarkUserDetail,
   UserStorage,
+  UserSetting,
   ProfilePosts,
   OtherProfile,
   PostDetail,
@@ -504,6 +505,7 @@ const ProfileScreen = () => {
       <ProfileStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
       <ProfileStack.Screen name="AlbumProfile" component={AlbumProfile} />
       <ProfileStack.Screen name="OtherProfile" component={OtherProfile} />
+      <ProfileStack.Screen name="UserSetting" component={UserSetting} />
     </ProfileStack.Navigator>
   )
 }

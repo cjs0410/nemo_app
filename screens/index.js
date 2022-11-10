@@ -10,6 +10,7 @@ export { default as BookmarkBookDetail } from './BookmarkBookDetail';
 export { default as BookmarkUser } from './BookmarkUser';
 export { default as BookmarkUserDetail } from './BookmarkUserDetail';
 export { default as UserStorage } from './UserStorage';
+export { default as UserSetting } from './UserSetting';
 export { default as Profile } from './Profile';
 export { default as ProfileEdit } from './ProfileEdit';
 export { default as ProfilePosts } from './ProfilePosts';

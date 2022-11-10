@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, RefreshControl, } from "react-native";
+import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, RefreshControl, Pressable, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import {
     useNavigation,
@@ -245,7 +245,12 @@ const UserStorage = ({navigation}) => {
     return (
         <View style={styles.container}>
             <View style={{...styles.header, justifyContent: "flex-end", }} >
-                <Feather name="settings" size={30} color="black" />
+                <Pressable
+                    onPress={() => navigation.navigate('UserSetting')}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Feather name="settings" size={30} color="black" />
+                </Pressable>
             </View>
 
 
