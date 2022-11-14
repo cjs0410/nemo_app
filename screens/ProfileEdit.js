@@ -7,12 +7,16 @@ import {
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import Api from "../lib/Api";
-import { useSelector, useDispatch } from 'react-redux';
 import * as ImagePicker from 'expo-image-picker';
+
+import { useSelector, useDispatch } from 'react-redux';
+import { userSelector } from '../modules/hooks';
+import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, setIsAlarm, } from '../modules/user';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const ProfileEdit = ({route, navigation}) => {
+    const dispatch = useDispatch();
     const { profile, } = route.params;
     const [loading, setLoading] = useState(false);
     // const [image, setImage] = useState(profile.avatar);
@@ -64,6 +68,7 @@ const ProfileEdit = ({route, navigation}) => {
 
     const onEdit = async() => {
         const formData = new FormData();
+        
         if (image !== null) {
             const filename = image.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');

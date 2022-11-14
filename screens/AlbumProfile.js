@@ -24,6 +24,7 @@ const AlbumProfile = ({route, navigation}) => {
     }, [])
 
     const fetchAlbum = async() => {
+        console.log(albumId);
         try {
             setLoading(true)
             await Api.post("/api/v4/album/view/", {
@@ -31,6 +32,7 @@ const AlbumProfile = ({route, navigation}) => {
             })
             .then((res) => {
                 console.log(res.data);
+                console.log(res.data.bookmarks);
                 setAlbumInfo(res.data);
             })
         } catch (err) {
@@ -152,7 +154,7 @@ const AlbumProfile = ({route, navigation}) => {
                             </TouchableOpacity> */}
                         </View>
 
-                        {/* {loading ? 
+                        {loading ? 
                             <ActivityIndicator 
                                 color="black" 
                                 style={{marginTop: 100}} 
@@ -172,8 +174,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 ))}
                                 </View>
                             </>
-                        } */}
-
+                        }
 
                     </ScrollView>
                 </>

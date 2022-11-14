@@ -381,15 +381,15 @@ const UserStorage = ({navigation}) => {
                             : 
                             <>
                                 <View>
-                                {bookmarks && bookmarks.map((bookmark, index) => (
-                                    <TouchableOpacity
-                                        activeOpacity={1}
-                                        onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, index: index, })} 
-                                        key={index}
-                                    >
-                                        <BookmarkList bookmark={bookmark} navigation={navigation} />
-                                    </TouchableOpacity>
-                                ))}
+                                    {bookmarks && bookmarks.map((bookmark, index) => (
+                                        <TouchableOpacity
+                                            activeOpacity={1}
+                                            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, index: index, })} 
+                                            key={index}
+                                        >
+                                            <BookmarkList bookmark={bookmark} navigation={navigation} />
+                                        </TouchableOpacity>
+                                    ))}
                                 </View>
                             </>
                         }
@@ -405,15 +405,15 @@ const UserStorage = ({navigation}) => {
                             : 
                             <>
                                 <View>
-                                {albums && albums.map((album, index) => (
-                                    <TouchableOpacity
-                                        activeOpacity={1}
-                                        onPress={() => navigation.navigate('AlbumProfile', { albumId: album.album_id, })} 
-                                        key={index}
-                                    >
-                                        <AlbumList album={album} navigation={navigation} />
-                                    </TouchableOpacity>
-                                ))}
+                                    {albums && albums.map((album, index) => (
+                                        <TouchableOpacity
+                                            activeOpacity={1}
+                                            onPress={() => navigation.navigate('AlbumProfile', { albumId: album.album_id, })} 
+                                            key={index}
+                                        >
+                                            <AlbumList album={album} navigation={navigation} />
+                                        </TouchableOpacity>
+                                    ))}
                                 </View>
                             </>
                         }

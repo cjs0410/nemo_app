@@ -3,6 +3,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  BaseButton,
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
 import jwt_decode from "jwt-decode";
 import Api from './lib/Api';
 import {
@@ -24,6 +28,7 @@ import {
   Login, 
   Home, 
   Search, 
+  AlarmScreen,
   PostModal, 
   Bookmark, 
   BookmarkNewDetail,
@@ -50,7 +55,7 @@ import { Feather, MaterialIcons } from '@expo/vector-icons';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from './modules/hooks';
-import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, } from './modules/user';
+import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, setIsAlarm, } from './modules/user';
 import blankAvatar from './assets/images/peopleicon.png';
 
 const Stack = createNativeStackNavigator();
@@ -72,16 +77,18 @@ Text.defaultProps.allowFontScaling = false;
 const appRedux = () => (
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <App />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <App />
+      </GestureHandlerRootView>
     </PersistGate>
   </Provider>
 );
 
 const App = () => {
   const dispatch = useDispatch();
-  const { decodedRefresh } = useSelector(userSelector);
+  const { decodedRefresh, avatar, isAlarm, } = useSelector(userSelector);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [avatar, setAvatar] = useState(null);
+  // const [avatar, setAvatar] = useState(null);
   // const [decodedRefresh, setDecodedRefresh] = useState(null);
 
 
@@ -125,6 +132,9 @@ const App = () => {
       .get("/api/v1/user/avatar/")
       .then((res) => {
         setAvatar(res.data.avatar);
+        console.log(res.data);
+        dispatch(setAvatar(res.data.avatar));
+        dispatch(setIsAlarm(res.data.alarm));
       })
     } catch (err) {
       console.error(err);
@@ -145,7 +155,8 @@ const App = () => {
 
   return (
       <NavigationContainer>
-        {!((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000))) ? (
+        {!((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000))) ? 
+        (
           <Stack.Navigator>
             <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false, }} />
             <Stack.Screen name="Join1" component={Join1} options={{ headerShown: false, }} />
@@ -154,7 +165,8 @@ const App = () => {
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false, }} />
           </Stack.Navigator>
         ) 
-        : (
+        : 
+        (
           <Tab.Navigator
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused, color, size }) => {
@@ -347,6 +359,7 @@ const HomeScreen = () => {
       <HomeStack.Screen name="BookProfile" component={BookProfile} />
       <HomeStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
       <HomeStack.Screen name="Profile" component={Profile} />
+      <HomeStack.Screen name="AlarmScreen" component={AlarmScreen} />
     </HomeStack.Navigator>
   )
 }

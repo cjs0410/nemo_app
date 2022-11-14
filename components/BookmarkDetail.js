@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable, Modal, } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable, Modal, Alert, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import { Entypo } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import bookCover from '../assets/images/steve.jpeg';
 import Card from './Card';
 import Api from '../lib/Api';
 import blankAvatar from '../assets/images/peopleicon.png';
+// import BottomSheet from '@gorhom/bottom-sheet';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { bookmarkSelector, scrapSelector } from '../modules/hooks';
@@ -33,7 +34,9 @@ const BookmarkDetail = (props) => {
     
     const [bookmarkModalVisible, setBookmarkModalVisible] = useState(false);
     const [reportVisible, setReportVisible] = useState(false);
+    const [albumModalVieible, setAlbumModalVisible] = useState(false);
     const modalValue = useRef(new Animated.Value(0)).current;
+    const [albums, setAlbums] = useState(null);
 
     useEffect(() => {
         // console.log(bookmark);
@@ -132,6 +135,46 @@ const BookmarkDetail = (props) => {
             })
         } catch (err) {
             console.error(err);
+        }
+    }
+
+    const fetchAlbumList = async() => {
+        try {
+            await Api
+            .get("/api/v4/album/list/")
+            .then((res) => {
+                console.log(res.data);
+                setAlbums(res.data);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const addToAlbum = async(albumId) => {
+        console.log(albumId);
+        try {
+            await Api
+            .post("/api/v4/album/addbookmark/", {
+                album_id: albumId,
+                bookmark_id: bookmark.bookmark_id,
+            })
+            .then((res) => {
+                setAlbumModalVisible(false);
+                console.log("added!");
+            })
+        } catch (err) {
+            if (err.response.status === 409) {
+                Alert.alert(
+                    "알림",
+                    "이미 해당 앨범에 북마크가 추가되어 있습니다.",
+                    [
+                        { text: "OK!" }
+                    ]
+                )
+            } else {
+                console.error(err);
+            }
         }
     }
 
@@ -314,7 +357,7 @@ const BookmarkDetail = (props) => {
                 </View>
             </View>
             <Modal
-                animationType="fade"
+                // animationType="fade"
                 transparent={true}
                 visible={bookmarkModalVisible}
             >
@@ -330,30 +373,6 @@ const BookmarkDetail = (props) => {
                         }
                     }
                 />
-                {reportVisible ?
-                    <KeyboardAvoidingView
-                        style={{
-                            ...styles.modal, 
-                            height: regHeight * 650, 
-                        }}
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    >
-                        <Entypo name="warning" size={24} color="red" />
-                            <TextInput 
-                                style={styles.reportInput}
-                                placeholder="신고 내용을 적어주세요."
-                                // onChangeText={(payload => setReportContents(payload))}
-                                multiline={true}
-                            />
-                        <TouchableOpacity 
-                            style={{...styles.menu, justifyContent: "center", backgroundColor: "red"}}
-                            activeOpacity={1}
-                            // onPress={report}
-                        >
-                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "white", }}>신고하기</Text>
-                        </TouchableOpacity>
-                    </KeyboardAvoidingView>
-                    :
                     <Animated.View 
                         style={{
                             ...styles.modal,
@@ -370,7 +389,10 @@ const BookmarkDetail = (props) => {
                         <TouchableOpacity 
                             style={styles.menu}
                             activeOpacity={1}
-                            onPress={() => setReportVisible(true)}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                setReportVisible(true);
+                            }}
                         >
                             <Entypo name="warning" size={24} color="red" />
                             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
@@ -413,16 +435,109 @@ const BookmarkDetail = (props) => {
                         <TouchableOpacity 
                             style={styles.menu}
                             activeOpacity={1}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                setAlbumModalVisible(true);
+                                fetchAlbumList();
+                            }}
                         >
                             {/* <Feather name="trash" size={24} color="black" /> */}
+                            <AntDesign name="pluscircleo" size={24} color="black" />
                             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
                                 앨범에 추가하기
                             </Text>
                         </TouchableOpacity>
 
                     </Animated.View>
-                }
 
+            </Modal>
+            <Modal
+                // animationType="fade"
+                transparent={true}
+                visible={reportVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setReportVisible(false);
+                        }
+                    }
+                />
+                <KeyboardAvoidingView
+                    style={{
+                        ...styles.modal, 
+                        height: regHeight * 650, 
+                    }}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
+                    <Entypo name="warning" size={24} color="red" />
+                        <TextInput 
+                            style={styles.reportInput}
+                            placeholder="신고 내용을 적어주세요."
+                            // onChangeText={(payload => setReportContents(payload))}
+                            multiline={true}
+                        />
+                    <TouchableOpacity 
+                        style={{...styles.menu, justifyContent: "center", backgroundColor: "red"}}
+                        activeOpacity={1}
+                        // onPress={report}
+                    >
+                        <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "white", }}>신고하기</Text>
+                    </TouchableOpacity>
+                </KeyboardAvoidingView>
+            </Modal>
+
+            <Modal
+                // animationType="fade"
+                transparent={true}
+                visible={albumModalVieible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setAlbumModalVisible(false);
+                        }
+                    }
+                />
+                <View
+                    style={{
+                        ...styles.modal, 
+                        height: regHeight * 650, 
+                    }}
+                >
+                    <Text style={{ fontSize: 16, fontWeight: "700", }}>
+                        저장할 앨범 찾기
+                    </Text>
+                    <ScrollView
+                        style={styles.albumListContainer}
+                    >
+                        {albums !== null && albums.map((album, index) => (
+                            <Pressable 
+                                style={styles.albumList}
+                                key={index}
+                                onPress={() => addToAlbum(album.album_id)}
+                            >
+                                <Image 
+                                    source={{ uri: `http://3.38.62.105${album.album_cover}`}}
+                                    style={styles.albumImage}
+                                />
+                                <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 8, }}>
+                                    {album.album_title}
+                                </Text>
+                            </Pressable>
+                        ))}
+
+
+                    </ScrollView>
+                </View>
             </Modal>
         </>
     );
@@ -529,6 +644,24 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: regHeight * 20,
         paddingHorizontal: regWidth * 10,
+    },
+    albumListContainer: {
+        backgroundColor: "#EEEEEE",
+        height: "80%",
+        width: "100%",
+        borderRadius: 10,
+        marginTop: 18,
+    },
+    albumList: {
+        borderBottomWidth: 0.3,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+    },
+    albumImage: {
+        width: 45,
+        height: 45,
     },
 })
 

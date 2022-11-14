@@ -8,6 +8,8 @@ const initialState = {
     refreshToken: null,
     decodedAccess: null,
     decodedRefresh: null,
+    avatar: null,
+    isAlarm: false,
 }
 
 export const userSlice = createSlice({
@@ -39,12 +41,19 @@ export const userSlice = createSlice({
         resetRefreshToken: (state) => {
             state.refreshToken = null;
             state.decodedRefresh = null;
-        }
+        },
+        setAvatar: (state, action) => {
+            state.avatar = action.payload;
+        },
+        setIsAlarm: (state, action) => {
+            state.isAlarm = action.payload;
+        },
     }
 })
 
 export const {
     setUserInfo, resetUserInfo, setAccessToken, setRefreshToken, resetRefreshToken,
+    setAvatar, setIsAlarm,
 } = userSlice.actions;
 
 export default userSlice.reducer;

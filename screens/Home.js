@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, FlatList, Text, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, } from "react-native";
+import { StyleSheet, View, ScrollView, FlatList, Text, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, Pressable, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
@@ -38,6 +38,8 @@ const Home = ({navigation}) => {
     const [loading, setLoading] = useState(false);
     const [avatar, setAvatar] = useState(null);
     const [loadFont, setLoadFont] = useState(false);
+    const { isAlarm, } = useSelector(userSelector);
+
     const ref = useRef();
     useScrollToTop(ref);
 
@@ -137,7 +139,29 @@ const Home = ({navigation}) => {
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Feather name="search" size={30} color="black" style={{ marginRight: 24, }}/>
-                    <Feather name="bell" size={28} color="black" />
+                    <Pressable
+                        onPress={() => navigation.navigate('AlarmScreen')}
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                        // style={{ backgroundColor: "pink"}}
+                    >
+                        <Feather name="bell" size={28} color="black" />
+                        {isAlarm ? 
+                            <View
+                                style={{
+                                    position: "absolute",
+                                    backgroundColor: "red",
+                                    borderRadius: 50,
+                                    height: 6,
+                                    width: 6,
+                                    right: 0,
+                                }}
+                            >
+                            </View>
+                            : 
+                            null
+                        }
+
+                    </Pressable>
                 </View>
                 {/* <TouchableOpacity 
                     activeOpacity={1} 
