@@ -5,6 +5,9 @@ import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from
 import Api from "../lib/Api";
 import blankAvatar from '../assets/images/peopleicon.png';
 import { BookmarkList, AlbumList } from '../components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwt_decode from "jwt-decode";
+import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -12,20 +15,36 @@ const {width:SCREEN_WIDTH} = Dimensions.get('window');
 const OtherProfile = ({navigation, route}) => {
     const [isMine, setIsMine] = useState(true);
     const [isFollow, setIsFollow] = useState(false);
+    const [followers, setFollowers] = useState(0);
     const { userTag, } = route.params;
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [bookmarks, setBookmarks] = useState(null);
     const [albums, setAlbums] = useState([1, 2, 3]);
     const avatarValue = useRef(new Animated.Value(0)).current;
+    const [myTag, setMyTag] = useState(null);
 
     useEffect(() => {
         fetchProfile();
         fetchBookmarkList();
+        fetchMyTag();
     }, []);
 
-    const follow = () => {
-        setIsFollow(!isFollow);
+    const onFollow = async() => {
+        // setIsFollow(!isFollow);
+        try {
+            await Api
+            .post("api/v1/user/follow/", {
+                user_tag: userTag,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setIsFollow(res.data.is_follow);
+                setFollowers(res.data.count);
+            })
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     const mine = () => {
@@ -41,7 +60,10 @@ const OtherProfile = ({navigation, route}) => {
             await Api
             .post("api/v1/user/profile/", { user_tag: userTag })
             .then((res) => {
+                console.log(res.data);
                 setProfile(res.data);
+                setIsFollow(res.data.is_follow);
+                setFollowers(res.data.followers);
             })
         } catch (err) {
             console.error(err);
@@ -70,6 +92,15 @@ const OtherProfile = ({navigation, route}) => {
             useNativeDriver: false,
         }).start();
     };
+
+    const fetchMyTag = async() => {
+        try {
+            const accessToken = await AsyncStorage.getItem('access');
+            setMyTag(jwt_decode(accessToken).user_tag);
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -128,7 +159,7 @@ const OtherProfile = ({navigation, route}) => {
                         </Text>
                         <View style={{ flexDirection: "row", marginTop: 15,}}>
                             <View>
-                                <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${profile.followers} Followers`}</Text>
+                                <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${followers} Followers`}</Text>
                             </View>
                             <Entypo name="dot-single" size={15} color="black" />
                             <View>
@@ -142,15 +173,20 @@ const OtherProfile = ({navigation, route}) => {
                 {/* <View style={styles.introduce} >
                     <Text style={{fontSize: 15, fontWeight: "350", }} >자기소개를 열심히 적어봅시다. 여기 자기소개에는 최대 두줄까지 적을 수가 있습니다. 잘 만들어서 써보세요.</Text>
                 </View> */}
-                <TouchableOpacity 
-                    activeOpacity={1}
-                    style={{...styles.followBtn, backgroundColor: isFollow ? "#DDDDDD" : "#FF4040"}}
-                    onPress={follow}
-                >
-                    <Text style={{ fontSize: 15, fontWeight: "500", color: isFollow ? "#808080" : "white", }}>
-                        { isFollow ? "팔로우 중" : "팔로우" }
-                    </Text>
-                </TouchableOpacity>
+                {myTag !== userTag && profile !== null ? 
+                    <TouchableOpacity 
+                        activeOpacity={1}
+                        style={{...styles.followBtn, backgroundColor: isFollow ? "#DDDDDD" : "#FF4040"}}
+                        onPress={onFollow}
+                    >
+                        <Text style={{ fontSize: 15, fontWeight: "500", color: isFollow ? "#808080" : "white", }}>
+                            { isFollow ? "팔로우 중" : "팔로우" }
+                        </Text>
+                    </TouchableOpacity>
+                    :
+                    null
+                }
+
 
                 <View style={{ flexDirection: "row", justifyContent: "center", }} >
                     <TouchableOpacity activeOpacity={1} onPress={mine}>
@@ -265,8 +301,9 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     followBtn: {
+        height: regWidth * 40,
         paddingHorizontal: 38,
-        paddingVertical: 10,
+        // paddingVertical: 10,
         borderRadius: 10,
         marginHorizontal: 15,
         justifyContent: "center",

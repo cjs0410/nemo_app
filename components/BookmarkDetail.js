@@ -37,7 +37,7 @@ const BookmarkDetail = (props) => {
 
     useEffect(() => {
         // console.log(bookmark);
-        // fetchUserTag();
+        fetchUserTag();
     }, [])
 
     const fetchUserTag = async() => {
@@ -269,23 +269,28 @@ const BookmarkDetail = (props) => {
                         />
                         <Text style={styles.bookmarkLikesText}>{likeCount}</Text>
                     </Pressable>
-                    <Pressable 
-                        activeOpacity={1} 
-                        style={{ 
-                            flexDirection: "row", 
-                            alignItems: "center", 
-                        }}
-                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                        onPress={onScrap}
-                    >
-                        <Feather 
-                            name="download" 
-                            size={regWidth * 20}
-                            color={isScrap ? "red" : "black" }
-                            // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
-                        />
-                        <Text style={styles.bookmarkLikesText}>{scrapCount}</Text>
-                    </Pressable>
+                    { userTag !== bookmark.user_tag ? 
+                        <Pressable 
+                            activeOpacity={1} 
+                            style={{ 
+                                flexDirection: "row", 
+                                alignItems: "center", 
+                            }}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={onScrap}
+                        >
+                            <Feather 
+                                name="download" 
+                                size={regWidth * 20}
+                                color={isScrap ? "red" : "black" }
+                                // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
+                            />
+                            <Text style={styles.bookmarkLikesText}>{scrapCount}</Text>
+                        </Pressable>
+                        :
+                        null
+                    }
+
                     {/* {watermark === post.nickname ?
                         null
                         :

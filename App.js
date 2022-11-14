@@ -89,7 +89,7 @@ const App = () => {
 
 
   useEffect(() => {
-    // fetchRefreshToken();
+    fetchRefreshToken();
     // console.log(decodedRefresh);
     fetchAvatar();
   }, [])
