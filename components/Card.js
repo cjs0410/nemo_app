@@ -525,7 +525,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
     )
 }
 
-const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, }) => {
+const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, }) => {
     const [whatBook, setWhatBook] = useState('');
     const [bookList, setBookList] = useState(null);
     // const [selectedBook, setSelectedBook] = useState(null);
@@ -580,7 +580,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
     const selectBook = (selected) => {
         setSelectedBook(selected);
         setBookTitle(selected.book_title);
-        // console.log(selected.book_id);
+        console.log(selected);
     }
 
     const deleteBook = () => {
@@ -609,7 +609,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
 
     const textInputLineNum = (e) => {
         // setLineNum(e.nativeEvent.lines.length);
-        console.log(e.nativeEvent.lines);
+        // console.log(e.nativeEvent.lines);
         const lines = e.nativeEvent.lines;
         setContentsByLine(
             lines.map((line) => line.text)
@@ -671,6 +671,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                     placeholder="챕터를 입력하세요"
                                     style={styles.postContentsBookChapterInput}
                                     onChangeText={onChangeChapter}
+                                    value={whatChapter}
                                 />
                             </View>
                         </View>

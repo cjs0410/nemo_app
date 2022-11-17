@@ -1,5 +1,5 @@
 import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable, Modal, Alert, } from "react-native";
-import React, { useEffect, useState, useRef, } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo, } from "react";
 import { Entypo } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
@@ -10,7 +10,12 @@ import bookCover from '../assets/images/steve.jpeg';
 import Card from './Card';
 import Api from '../lib/Api';
 import blankAvatar from '../assets/images/peopleicon.png';
-// import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetView, BottomSheetFooter } from '@gorhom/bottom-sheet';
+
+import {
+    BottomSheetModal,
+    BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { bookmarkSelector, scrapSelector } from '../modules/hooks';
@@ -151,6 +156,35 @@ const BookmarkDetail = (props) => {
         }
     }
 
+    const deleteBookmark = async() => {
+        Alert.alert("북마크를 삭제하시겠습니까?", "확인 버튼을 누르면 삭제됩니다.", [
+            {
+                text: "취소",
+                // onPress: () => {
+                //     setBookmarkModalVisible(false);
+                //     setReportVisible(false);
+                // }
+            },
+            {
+                text: "확인", 
+                onPress: async() => {
+                    try {
+                        console.log(bookmark.bookmark_id);
+                        await Api.post("/api/v2/bookmark/delete/", {
+                            bookmark_id: bookmark.bookmark_id,
+                        })
+                        .then((res) => {
+                            setBookmarkModalVisible(false);
+                            setReportVisible(false);
+                        })
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+            }
+        ]);
+    }
+
     const addToAlbum = async(albumId) => {
         console.log(albumId);
         try {
@@ -178,8 +212,34 @@ const BookmarkDetail = (props) => {
         }
     }
 
+    // // ref
+    // const bottomSheetModalRef = useRef();
+
+    // // variables
+    // const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+    // // callbacks
+    // const handlePresentModalPress = useCallback(() => {
+    //     bottomSheetModalRef.current.present();
+    // }, []);
+    // const handleSheetChanges = useCallback((index) => {
+    //     console.log('handleSheetChanges', index);
+    // }, []);
+
+    // const bottomSheetRef = useRef(null);
+
+    // const handleSnapPress = useCallback((index) => {
+    //     bottomSheetRef.current.present();
+    // }, []);
+
+    if (bookmark === null) {
+        return;
+    }
+
+
     return (
         <>
+        {/* <BottomSheetModalProvider> */}
             <View style={styles.bookmarkContainer}>
                 <View style={styles.bookmarkTop}>
                     <View style={{ flexDirection: "row", alignItems: "center", }}>
@@ -208,6 +268,11 @@ const BookmarkDetail = (props) => {
                         hitSlop={{ bottom: 30, left: 30, right: 30, top: 30 }}
                         onPress={() => setBookmarkModalVisible(true)}
                         // onPress={showOrUnshow}
+                        // onPress={handlePresentModalPress}
+                        // onPress={() => {
+                        //     setBookmarkModalVisible(true);
+                        //     handleSnapPress(1);
+                        // }}
                     >
                         <Entypo name="dots-three-horizontal" size={regWidth * 18} color="black" />
                     </Pressable>
@@ -397,19 +462,16 @@ const BookmarkDetail = (props) => {
                             <Entypo name="warning" size={24} color="red" />
                             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
                         </TouchableOpacity>
-                        {/* {bookmark.user_tag === userTag ? 
+                        {bookmark.user_tag === userTag ? 
                             <>
                                 <TouchableOpacity 
                                     style={styles.menu}
                                     activeOpacity={1}
                                     onPress={() => {
-                                        setModalVisible(false);
+                                        setBookmarkModalVisible(false);
                                         setReportVisible(false);
-                                        navigation.navigate('EditPost', { 
-                                            post: {
-                                                ...post, 
-                                                bookmarks: arranged,
-                                            }, 
+                                        navigation.navigate('EditBookmark', { 
+                                            bookmark: bookmark,
                                         });
                                     }}
                                 >
@@ -421,7 +483,7 @@ const BookmarkDetail = (props) => {
                                 <TouchableOpacity 
                                     style={styles.menu}
                                     activeOpacity={1}
-                                    onPress={deletePost}
+                                    onPress={deleteBookmark}
                                 >
                                     <Feather name="trash" size={24} color="black" />
                                     <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
@@ -431,7 +493,7 @@ const BookmarkDetail = (props) => {
                             </>
                             :
                             null
-                        } */}
+                        }
                         <TouchableOpacity 
                             style={styles.menu}
                             activeOpacity={1}
@@ -441,7 +503,6 @@ const BookmarkDetail = (props) => {
                                 fetchAlbumList();
                             }}
                         >
-                            {/* <Feather name="trash" size={24} color="black" /> */}
                             <AntDesign name="pluscircleo" size={24} color="black" />
                             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
                                 앨범에 추가하기
@@ -451,6 +512,175 @@ const BookmarkDetail = (props) => {
                     </Animated.View>
 
             </Modal>
+
+            {/* <Modal
+                animationType="fade"
+                transparent={true}
+                visible={bookmarkModalVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setBookmarkModalVisible(false);
+                            setReportVisible(false);
+                        }
+                    }
+                />
+                    <BottomSheet
+                        ref={bottomSheetRef}
+                        snapPoints={snapPoints}
+                        onChange={handleSheetChanges}
+                    >
+                    <BottomSheetView 
+                        style={{
+                            ...styles.modal,
+                            // transform: [
+                            //     {
+                            //         translateY: modalValue.interpolate({
+                            //             inputRange: [0, 1],
+                            //             outputRange: [0, 300]
+                            //         })
+                            //     }
+                            // ]
+                        }}
+                    >
+                        <TouchableOpacity 
+                            style={styles.menu}
+                            activeOpacity={1}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                setReportVisible(true);
+                            }}
+                        >
+                            <Entypo name="warning" size={24} color="red" />
+                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
+                        </TouchableOpacity>
+                        {bookmark.user_tag === userTag ? 
+                            <>
+                                <TouchableOpacity 
+                                    style={styles.menu}
+                                    activeOpacity={1}
+                                    onPress={() => {
+                                        setBookmarkModalVisible(false);
+                                        setReportVisible(false);
+                                        navigation.navigate('EditBookmark', { 
+                                            bookmark: bookmark,
+                                        });
+                                    }}
+                                >
+                                    <AntDesign name="edit" size={24} color="black" />
+                                    <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                        수정하기
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={styles.menu}
+                                    activeOpacity={1}
+                                    // onPress={deletePost}
+                                >
+                                    <Feather name="trash" size={24} color="black" />
+                                    <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                        삭제하기
+                                    </Text>
+                                </TouchableOpacity>
+                            </>
+                            :
+                            null
+                        }
+                        <TouchableOpacity 
+                            style={styles.menu}
+                            activeOpacity={1}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                setAlbumModalVisible(true);
+                                fetchAlbumList();
+                            }}
+                        >
+                            <AntDesign name="pluscircleo" size={24} color="black" />
+                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                앨범에 추가하기
+                            </Text>
+                        </TouchableOpacity>
+
+                    </BottomSheetView>
+                    </BottomSheet>
+            </Modal> */}
+
+
+                {/* <BottomSheetModal
+                    ref={bottomSheetModalRef}
+                    index={1}
+                    snapPoints={snapPoints}
+                    onChange={handleSheetChanges}
+                >
+                    <View
+                        style={styles.modal}
+                    >
+                        <TouchableOpacity 
+                            style={styles.menu}
+                            activeOpacity={1}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                setReportVisible(true);
+                            }}
+                        >
+                            <Entypo name="warning" size={24} color="red" />
+                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
+                        </TouchableOpacity>
+                        {bookmark.user_tag === userTag ? 
+                            <>
+                                <TouchableOpacity 
+                                    style={styles.menu}
+                                    activeOpacity={1}
+                                    onPress={() => {
+                                        setBookmarkModalVisible(false);
+                                        setReportVisible(false);
+                                        navigation.navigate('EditBookmark', { 
+                                            bookmark: bookmark,
+                                        });
+                                    }}
+                                >
+                                    <AntDesign name="edit" size={24} color="black" />
+                                    <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                        수정하기
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={styles.menu}
+                                    activeOpacity={1}
+                                    // onPress={deletePost}
+                                >
+                                    <Feather name="trash" size={24} color="black" />
+                                    <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                        삭제하기
+                                    </Text>
+                                </TouchableOpacity>
+                            </>
+                            :
+                            null
+                        }
+                        <TouchableOpacity 
+                            style={styles.menu}
+                            activeOpacity={1}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                setAlbumModalVisible(true);
+                                fetchAlbumList();
+                            }}
+                        >
+                            <AntDesign name="pluscircleo" size={24} color="black" />
+                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                앨범에 추가하기
+                            </Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </BottomSheetModal> */}
+
             <Modal
                 // animationType="fade"
                 transparent={true}
@@ -539,6 +769,7 @@ const BookmarkDetail = (props) => {
                     </ScrollView>
                 </View>
             </Modal>
+            {/* </BottomSheetModalProvider> */}
         </>
     );
 }
@@ -620,7 +851,7 @@ const styles = StyleSheet.create({
         bottom: 0, 
         backgroundColor: "white",
         borderRadius: 20,
-        padding: 35,
+        paddingTop: 12,
         alignItems: "center",
     },
     menu: {

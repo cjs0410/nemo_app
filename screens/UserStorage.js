@@ -15,7 +15,7 @@ import emptyImage from '../assets/images/emptyImage.jpeg';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, scrapSelector } from '../modules/hooks';
-import { resetUserInfo } from '../modules/user';
+import user, { resetUserInfo } from '../modules/user';
 import { loadScraps } from "../modules/scraps";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
@@ -303,13 +303,19 @@ const UserStorage = ({navigation}) => {
                                     {profile.name}
                                 </Text>
                                 <View style={{ flexDirection: "row", marginTop: 8,}}>
-                                    <View>
+                                    <Pressable
+                                        onPress={() => navigation.navigate('FollowScreen', { title: "팔로워", userTag: profile.user_tag, })}
+                                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                    >
                                         <Text style={{ fontSize: regWidth * 15, fontWeight: "500", }} >{`${profile.followers} Followers`}</Text>
-                                    </View>
+                                    </Pressable>
                                     <Entypo name="dot-single" size={regWidth * 15} color="black" style={{ marginHorizontal: 8, }} />
-                                    <View>
+                                    <Pressable
+                                        onPress={() => navigation.navigate('FollowScreen', { title: "팔로잉", userTag: profile.user_tag, })}
+                                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                    >
                                         <Text style={{ fontSize: regWidth * 15, fontWeight: "500", }} >{`${profile.followings} Following`}</Text>
-                                    </View>
+                                    </Pressable>
                                 </View>
                             </View>
                         </>

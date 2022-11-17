@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, setIsAlarm, } from '../modules/user';
 
-const AlarmScreen = () => {
+const AlarmScreen = ({navigation}) => {
     const dispatch = useDispatch();
     const [alarms, setAlarms] = useState(null);
     const ctg = ["BS", "FS", "BL", ];

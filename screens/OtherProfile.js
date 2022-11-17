@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, } from "react-native";
+import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, Pressable, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -158,13 +158,19 @@ const OtherProfile = ({navigation, route}) => {
                             {profile.name}
                         </Text>
                         <View style={{ flexDirection: "row", marginTop: 15,}}>
-                            <View>
+                            <Pressable
+                                onPress={() => navigation.push('FollowScreen', { title: "팔로워", userTag: profile.user_tag, })}
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            >
                                 <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${followers} Followers`}</Text>
-                            </View>
+                            </Pressable>
                             <Entypo name="dot-single" size={15} color="black" />
-                            <View>
+                            <Pressable
+                                onPress={() => navigation.push('FollowScreen', { title: "팔로잉", userTag: profile.user_tag, })}
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            >
                                 <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${profile.followings} Following`}</Text>
-                            </View>
+                            </Pressable>
                         </View>
                     </View>
                     </>
@@ -230,7 +236,7 @@ const OtherProfile = ({navigation, route}) => {
                                 {bookmarks && bookmarks.map((bookmark, index) => (
                                     <TouchableOpacity
                                         activeOpacity={1}
-                                        onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
+                                        onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
                                         key={index}
                                     >
                                         <BookmarkList bookmark={bookmark} navigation={navigation} />
@@ -254,6 +260,7 @@ const OtherProfile = ({navigation, route}) => {
                                 {albums && albums.map((album, index) => (
                                     <TouchableOpacity
                                         activeOpacity={1}
+                                        onPress={() => navigation.push('AlbumProfile', { albumId: album.album_id, })} 
                                         // onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarked: bookmarked, index: index, })} 
                                         key={index}
                                     >

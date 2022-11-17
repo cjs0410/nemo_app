@@ -27,3 +27,4 @@ npx expo install react-native-webview
 npm install --save-prod react-native-render-html
 npx expo install react-native-fast-image
 expo install react-native-gesture-handler
+npx expo install expo-updates

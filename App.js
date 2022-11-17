@@ -42,6 +42,7 @@ import {
   OtherProfile,
   PostDetail,
   CreateBookmark,
+  EditBookmark,
   CreatePost,
   EditPost,
   BookProfile,
@@ -49,6 +50,7 @@ import {
   ProfileEdit,
   CreateAlbumModal,
   AlbumProfile,
+  FollowScreen,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -88,6 +90,7 @@ const App = () => {
   const dispatch = useDispatch();
   const { decodedRefresh, avatar, isAlarm, } = useSelector(userSelector);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const isSignOut = !((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000)));
   // const [avatar, setAvatar] = useState(null);
   // const [decodedRefresh, setDecodedRefresh] = useState(null);
 
@@ -158,7 +161,14 @@ const App = () => {
         {!((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000))) ? 
         (
           <Stack.Navigator>
-            <Stack.Screen name="Welcome" component={Welcome} options={{ headerShown: false, }} />
+            <Stack.Screen 
+              name="Welcome" 
+              component={Welcome} 
+              options={{ 
+                headerShown: false, 
+                animationTypeForReplace: isSignOut ? 'pop' : 'push',
+              }} 
+            />
             <Stack.Screen name="Join1" component={Join1} options={{ headerShown: false, }} />
             <Stack.Screen name="Join2" component={Join2} options={{ headerShown: false, }} />
             <Stack.Screen name="Join3" component={Join3} options={{ headerShown: false, }} />
@@ -340,6 +350,14 @@ const HomeScreen = () => {
           animation: "fade",
         }}
       />
+      <HomeStack.Screen 
+        name="EditBookmark" 
+        component={EditBookmark}
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
+        }}
+      />
       <HomeStack.Screen name="OtherProfile" component={OtherProfile} />
       <HomeStack.Screen name="PostDetail" component={PostDetail} />
       <HomeStack.Screen 
@@ -360,6 +378,8 @@ const HomeScreen = () => {
       <HomeStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
       <HomeStack.Screen name="Profile" component={Profile} />
       <HomeStack.Screen name="AlarmScreen" component={AlarmScreen} />
+      <HomeStack.Screen name="FollowScreen" component={FollowScreen} />
+      <HomeStack.Screen name="AlbumProfile" component={AlbumProfile} />
     </HomeStack.Navigator>
   )
 }
@@ -416,6 +436,14 @@ const BookmarkScreen = () => {
           animation: "fade",
         }}
       />
+      <BookmarkStack.Screen 
+        name="EditBookmark" 
+        component={EditBookmark}
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
+        }}
+      />
       <BookmarkStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
       <BookmarkStack.Screen name="BookmarkBook" component={BookmarkBook} />
       <BookmarkStack.Screen name="BookmarkBookDetail" component={BookmarkBookDetail} />
@@ -438,6 +466,8 @@ const BookmarkScreen = () => {
         }}
       />
       <BookmarkStack.Screen name="OtherProfile" component={OtherProfile} />
+      <BookmarkStack.Screen name="FollowScreen" component={FollowScreen} />
+      <BookmarkStack.Screen name="AlbumProfile" component={AlbumProfile} />
     </BookmarkStack.Navigator>
   )
 }
@@ -461,6 +491,14 @@ const ProfileScreen = () => {
       <ProfileStack.Screen 
         name="CreateBookmark3" 
         component={CreateBookmark}
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
+        }}
+      />
+      <ProfileStack.Screen 
+        name="EditBookmark" 
+        component={EditBookmark}
         options={{
           presentation: "transparentModal",
           animation: "fade",
@@ -518,7 +556,15 @@ const ProfileScreen = () => {
       <ProfileStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
       <ProfileStack.Screen name="AlbumProfile" component={AlbumProfile} />
       <ProfileStack.Screen name="OtherProfile" component={OtherProfile} />
-      <ProfileStack.Screen name="UserSetting" component={UserSetting} />
+      <ProfileStack.Screen 
+        name="UserSetting" 
+        component={UserSetting}
+        // options={{
+        //   presentation: "modal",
+        //   // animation: "fade",
+        // }} 
+      />
+      <ProfileStack.Screen name="FollowScreen" component={FollowScreen} />
     </ProfileStack.Navigator>
   )
 }

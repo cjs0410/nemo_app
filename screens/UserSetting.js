@@ -9,8 +9,32 @@ import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, AntDesign, Ionicons, } from '@expo/vector-icons'; 
 import { BookmarkList, AlbumList } from '../components';
 import Api from "../lib/Api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { useSelector, useDispatch } from 'react-redux';
+import { resetRefreshToken, } from '../modules/user';
 
 const UserSetting = ({navigation}) => {
+    const dispatch = useDispatch();
+
+    const logout = async() => {
+        const refreshToken = await AsyncStorage.getItem('refresh');
+        try {
+            await Api
+            .post("/api/v1/user/logout/", {
+                refresh_token: refreshToken,
+            })
+            .then(async(res) => {
+                // navigation.popToTop();
+                await AsyncStorage.removeItem('access');
+                await AsyncStorage.removeItem('refresh');
+                dispatch(resetRefreshToken());
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header} >
@@ -33,18 +57,21 @@ const UserSetting = ({navigation}) => {
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </Pressable>
             </View>
-            <View style={styles.menuContainer}>
+            <Pressable 
+                style={styles.menuContainer}
+                onPress={logout}
+            >
                 <Text style={{ fontSize: 16, fontWeight: "500", }}>
                     로그아웃
                 </Text>
                 <Ionicons name="chevron-forward" size={24} color="black" />
-            </View>
-            <View style={styles.menuContainer}>
+            </Pressable>
+            {/* <View style={styles.menuContainer}>
                 <Text style={{ fontSize: 16, fontWeight: "500", }}>
                     탈퇴하기
                 </Text>
                 <Ionicons name="chevron-forward" size={24} color="black" />
-            </View>
+            </View> */}
         </View>
     )
 }

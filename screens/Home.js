@@ -15,6 +15,7 @@ import {
 } from '@react-navigation/native';
 import blankAvatar from '../assets/images/peopleicon.png';
 import * as Font from "expo-font";
+import * as Update from "expo-updates";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
@@ -34,11 +35,14 @@ const Home = ({navigation}) => {
     const [isReverse, setIsReverse] = useState(false);
     const [current, setCurrent] = useState(0);
     const [bookmarks, setBookmarks] = useState(null);
+    const [newBookmarkNum, setNewBookmarkNum] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [scrollLoading, setScrollLoading] = useState(false);
     const [avatar, setAvatar] = useState(null);
     const [loadFont, setLoadFont] = useState(false);
     const { isAlarm, } = useSelector(userSelector);
+    const [cursor, setCursor] = useState(1);
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -57,10 +61,15 @@ const Home = ({navigation}) => {
 
     const fetchBookmarks = async() => {
         try {
+            setScrollLoading(true);
             await Api
-            .get("/api/v1/user/")
+            .post("/api/v1/user/", {
+                cursor: cursor,
+            })
             .then(async(res) => {
+                // console.log(res.data);
                 setBookmarks(res.data);
+                setNewBookmarkNum(res.data.length);
                 const accessToken = await AsyncStorage.getItem('access');
                 const refreshToken = await AsyncStorage.getItem('refresh');
                 console.log(jwt_decode(accessToken));
@@ -69,6 +78,7 @@ const Home = ({navigation}) => {
         } catch (err) {
             console.error(err);
         }
+        setScrollLoading(false);
     }
 
     const renderBookmark = ({ item }) => (
@@ -83,6 +93,7 @@ const Home = ({navigation}) => {
 
     const onRefresh = useCallback(async() => {
         setRefreshing(true);
+        setCursor(1);
         await fetchBookmarks()
         .then(() => setRefreshing(false));
         // wait(2000).then(() => setRefreshing(false));
@@ -123,11 +134,45 @@ const Home = ({navigation}) => {
         )
     }
 
+    const getBookmarks = async() => {
+        if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
+            console.log('axios');
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("/api/v1/user/", {
+                    cursor: cursor + 1,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    setBookmarks([...bookmarks, ...res.data, ]);
+                    setNewBookmarkNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+            setCursor(cursor + 1);
+        }
+    }
+
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+            // console.log('inf');
+            
+        	getBookmarks();
+        }
+    }
+
 
     return (
         <View style={styles.container}>
             <View style={styles.header} >
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                <Pressable 
+                    style={{ flexDirection: "row", alignItems: "center", }}
+                    // onPress={() => Update.reloadAsync()}
+                >
                     <Ionicons name="layers-sharp" size={30} color="black" />
                     <Text style={{
                         fontFamily: "frank",
@@ -136,7 +181,7 @@ const Home = ({navigation}) => {
                     }}>
                         Nemo
                     </Text>
-                </View>
+                </Pressable>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Feather name="search" size={30} color="black" style={{ marginRight: 24, }}/>
                     <Pressable
@@ -198,8 +243,11 @@ const Home = ({navigation}) => {
 
             { bookmarks !== null ? 
                 <FlatList 
+                    onEndReached={onEndReached}
+                    onEndReachedThreshold={0}
+                    ListFooterComponent={scrollLoading && <ActivityIndicator />}
                     data={bookmarks}
-                    renderItem={renderBookmark}
+                    
                     keyExtractor={bookmark => bookmark.bookmark_id}
                     showsVerticalScrollIndicator={false}
                     ref={ref}
@@ -209,6 +257,8 @@ const Home = ({navigation}) => {
                           onRefresh={onRefresh}
                         />
                     }
+
+                    renderItem={renderBookmark}
                 />
                 :
                 null

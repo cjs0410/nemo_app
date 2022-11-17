@@ -23,3 +23,5 @@ export { default as EditPost } from './EditPost';
 export { default as BookProfile } from './BookProfile';
 export { default as CreateAlbumModal } from './CreateAlbumModal';
 export { default as AlbumProfile } from './AlbumProfile';
+export { default as FollowScreen } from './FollowScreen';
+export { default as EditBookmark } from './EditBookmark';
