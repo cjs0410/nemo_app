@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, } from "react-native";
 import React, { useEffect, useState } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
@@ -82,7 +82,7 @@ const BookProfile = ({route, navigation}) => {
         <View style={styles.container}>
             {bookInfo !== null ? 
                 <>
-                    <View style={styles.header}>
+                    <SafeAreaView style={styles.header}>
                         <TouchableOpacity onPress={() => navigation.goBack()} >
                             <Ionicons name="chevron-back" size={28} color="black" />
                         </TouchableOpacity>
@@ -102,7 +102,7 @@ const BookProfile = ({route, navigation}) => {
                         >
                             <Entypo name="dots-three-horizontal" size={regWidth * 28} color="black" />
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                     >
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "pink",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 10,
         paddingBottom: 8,
         flexDirection: "row",

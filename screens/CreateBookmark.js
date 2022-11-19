@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
@@ -142,6 +142,7 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const addBookmark = async() => {
+        navigation.goBack();
         const formData = new FormData();
         // console.log(contents);
         formData.append('book_id', selectedBook.book_id);
@@ -174,7 +175,7 @@ const CreateBookmark = ({navigation, route}) => {
             )
             .then((res) => {
                 console.log(res.data);
-                navigation.goBack();
+                
             })
         } catch (err) {
             console.error(err);
@@ -193,7 +194,7 @@ const CreateBookmark = ({navigation, route}) => {
     
           const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 1,
+            quality: 0.7,
           });
       
         //   console.log(result.uri);
@@ -347,6 +348,16 @@ const CreateBookmark = ({navigation, route}) => {
         }
     }
 
+    const submitTag = (e) => {
+        if (tagValue.length > 0) {
+            setTags([
+                ...tags,
+                tagValue,
+            ]);
+            setTagValue('');
+        }
+    }
+
     const deleteTag = (index) => {
         let copy = [...tags];
         copy.splice(index, 1);
@@ -381,7 +392,7 @@ const CreateBookmark = ({navigation, route}) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header} >
+            <SafeAreaView style={styles.header} >
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Text style={{ fontSize: 25, fontWeight: "900", marginRight: 15, }} >Create</Text>
                     <Feather name="bookmark" size={28} color="black" />
@@ -394,7 +405,7 @@ const CreateBookmark = ({navigation, route}) => {
                         <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000" }} >완료</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </SafeAreaView>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -627,7 +638,7 @@ const CreateBookmark = ({navigation, route}) => {
                     }
                 />
                 <View style={{...styles.modal, height: regHeight * 440, }}>
-                    <View style={styles.modalHeader}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             onPress={() => {
@@ -650,7 +661,7 @@ const CreateBookmark = ({navigation, route}) => {
                                 등록
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <View style={styles.addBook}>
                         <View style={{ alignItems: 'center', }}>
                             <Image 
@@ -710,7 +721,7 @@ const CreateBookmark = ({navigation, route}) => {
                     }
                 />
                 <View style={styles.modal}>
-                    <View style={styles.modalHeader}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
@@ -736,7 +747,7 @@ const CreateBookmark = ({navigation, route}) => {
                                 완료
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <TextInput 
                         placeholder="설명을 입력해주세요"
                         style={{
@@ -772,7 +783,7 @@ const CreateBookmark = ({navigation, route}) => {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             > */}
                 <View style={styles.modal}>
-                    <View style={styles.modalHeader}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
@@ -795,14 +806,15 @@ const CreateBookmark = ({navigation, route}) => {
                                 완료
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <TextInput 
-                        placeholder="태그를 입력하고 쉼표를 입력하여 등록하세요"
+                        placeholder="쉼표 혹은 엔터를 입력하여 태그를 등록하세요"
                         style={{
                             ...styles.modalInput,
                             height: regHeight * 50,
                         }}
                         onChangeText={changeTag}
+                        onSubmitEditing={submitTag}
                         value={tagValue}
                     />
                     <View style={{ flexDirection: "row", }}>
@@ -854,7 +866,7 @@ const CreateBookmark = ({navigation, route}) => {
                         bottom: 0,
                     }}
                 >
-                    <View style={{
+                    <SafeAreaView style={{
                         ...styles.modalHeader, 
                         marginTop: regHeight * 28,
                         justifyContent: "center",
@@ -873,7 +885,7 @@ const CreateBookmark = ({navigation, route}) => {
                         {/* <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
                             완료
                         </Text> */}
-                    </View>
+                    </SafeAreaView>
                     <View style={{ alignItems: "center", }}>
                         <ScrollView
                             style={styles.albumListContainer}
@@ -917,8 +929,8 @@ const CreateBookmark = ({navigation, route}) => {
                         }
                     }
                 />
-                <View style={{...styles.modal, height: "60%", }}>
-                    <View style={styles.modalHeader}>
+                <View style={{...styles.modal, height: regHeight * 480, }}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
@@ -939,7 +951,7 @@ const CreateBookmark = ({navigation, route}) => {
                                 닫기
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <ScrollView
                         pagingEnabled
                         horizontal
@@ -1039,7 +1051,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "red",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 20,
         paddingBottom: 8,
         flexDirection: "row",
@@ -1083,7 +1095,7 @@ const styles = StyleSheet.create({
     modal: {
         width: '100%', 
         // height: '35%',
-        height: regHeight * 250, 
+        height: regHeight * 220, 
         position: 'absolute', 
         // bottom: 0, 
         backgroundColor: 'white', 
@@ -1104,7 +1116,7 @@ const styles = StyleSheet.create({
     modalHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: regHeight * 55,
+        marginTop: regHeight * 10,
         marginHorizontal: regWidth * 18, 
     },
     modalInput: {

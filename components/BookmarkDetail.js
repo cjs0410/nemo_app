@@ -468,17 +468,7 @@ const BookmarkDetail = (props) => {
                             // ]
                         }}
                     >
-                        <TouchableOpacity 
-                            style={styles.menu}
-                            activeOpacity={1}
-                            onPress={() => {
-                                setBookmarkModalVisible(false);
-                                setReportVisible(true);
-                            }}
-                        >
-                            <Entypo name="warning" size={24} color="red" />
-                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
-                        </TouchableOpacity>
+
                         {bookmark.user_tag === userTag ? 
                             <>
                                 <TouchableOpacity 
@@ -509,7 +499,17 @@ const BookmarkDetail = (props) => {
                                 </TouchableOpacity>
                             </>
                             :
-                            null
+                            <TouchableOpacity 
+                                style={styles.menu}
+                                activeOpacity={1}
+                                onPress={() => {
+                                    setBookmarkModalVisible(false);
+                                    setReportVisible(true);
+                                }}
+                            >
+                                <Entypo name="warning" size={24} color="red" />
+                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
+                            </TouchableOpacity>
                         }
                         <TouchableOpacity 
                             style={styles.menu}

@@ -168,7 +168,6 @@ const AlbumProfile = ({route, navigation}) => {
     }
 
     const onSelectToDelete = (bookmark) => {
-        console.log(selectToDelete);
         if (selectToDelete.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1) {
             setSelectToDelete([
                 ...selectToDelete,
@@ -183,16 +182,17 @@ const AlbumProfile = ({route, navigation}) => {
 
     const onDeleteBookmarks = async() => {
         const bookmarkIds = selectToDelete.map((selectedBookmark) => (selectedBookmark.bookmark_id));
-        // console.log(selectToDelete);
+        console.log(selectToDelete);
 
         if (selectToDelete.length > 0) {
             try {
                 await Api
-                .post("", {
+                .post("api/v4/album/deletebookmark/", {
                     album_id: albumId,
-                    bookmarks: bookmarkIds,
+                    bookmark_id: bookmarkIds,
                 })
                 .then((res) => {
+                    console.log("delete");
                     fetchAlbum();
                 })
             } catch (err) {
@@ -302,7 +302,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 </Pressable>
                             </View>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginVertical: 12, }} >
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginHorizontal: 15, marginVertical: 12, }} >
                             <View style={{ flexDirection: "row", alignItems: "center", }}>
                                 {/* <Feather name="bookmark" size={30} color="#606060" /> */}
                                 <FontAwesome name="bookmark" size={30} color="#606060" />

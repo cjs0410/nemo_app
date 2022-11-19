@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator } from "react-native";
+import { StyleSheet, View, SafeAreaView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
@@ -35,7 +35,7 @@ const AlarmScreen = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
+            <SafeAreaView style={styles.header}>
                 <Pressable 
                     onPress={() => navigation.goBack()} 
                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
@@ -54,7 +54,7 @@ const AlarmScreen = ({navigation}) => {
                 >
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </Pressable>
-            </View>
+            </SafeAreaView>
             <ScrollView>
                 {alarms !== null && alarms.map((alarm, index) => (
                     <View style={styles.alarmList} key={index} >
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "pink",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 10,
         paddingBottom: 8,
         flexDirection: "row",

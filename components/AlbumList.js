@@ -27,7 +27,11 @@ const AlbumList = (props) => {
                     }} 
                     onLoadEnd={showAlbumCover}
                 />
-                <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 12, }}>
+                <Text 
+                    style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 12, width: "70%", }}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                >
                     {album.album_title}
                 </Text>
             </View>

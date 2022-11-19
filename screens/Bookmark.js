@@ -1,5 +1,6 @@
 import { 
   View, 
+  SafeAreaView,
   Text, 
   Button, 
   StyleSheet, 
@@ -106,7 +107,7 @@ const Bookmark = ({navigation}) => {
     case 0:
       return (
         <View style={styles.container}>
-          <View style={styles.header} >
+          <SafeAreaView style={styles.header} >
               <Text style={{
                   fontSize: 25,
                   fontWeight: "900",
@@ -144,7 +145,7 @@ const Bookmark = ({navigation}) => {
               {/* <TouchableOpacity activeOpacity={1} onPress={onArrange}>
                   <MaterialCommunityIcons name={ isTile ? "square-outline" : "view-grid-outline" } size={30} color="black" />
               </TouchableOpacity> */}
-          </View>
+          </SafeAreaView>
           <ScrollView 
             showsVerticalScrollIndicator={false}
             ref={ref}
@@ -254,7 +255,7 @@ const Bookmark = ({navigation}) => {
     case 1:
       return (
         <View style={styles.container}>
-          <View style={styles.header} >
+          <SafeAreaView style={styles.header} >
               <Text style={{
                   fontSize: 25,
                   fontWeight: "900",
@@ -292,7 +293,7 @@ const Bookmark = ({navigation}) => {
               {/* <View style={{ opacity: 0, }} >
                   <MaterialCommunityIcons name="square-outline" size={30} color="black" />
               </View> */}
-          </View>
+          </SafeAreaView>
           <ScrollView 
             showsVerticalScrollIndicator={false}
             refreshControl={
@@ -328,7 +329,7 @@ const Bookmark = ({navigation}) => {
     case 2:
       return (
         <View style={styles.container}>
-          <View style={styles.header} >
+          <SafeAreaView style={styles.header} >
               <Text style={{
                   fontSize: 25,
                   fontWeight: "900",
@@ -366,7 +367,7 @@ const Bookmark = ({navigation}) => {
               {/* <View style={{ opacity: 0, }} >
                   <MaterialCommunityIcons name="square-outline" size={30} color="black" />
               </View> */}
-          </View>
+          </SafeAreaView>
           <ScrollView 
             showsVerticalScrollIndicator={false}
             refreshControl={
@@ -465,7 +466,7 @@ const styles = StyleSheet.create({
   },
   header: {
     // backgroundColor: "red",
-    marginTop: 60,
+    marginVertical: 10,
     marginHorizontal: 20,
     paddingBottom: 8,
     flexDirection: "row",

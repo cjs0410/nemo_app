@@ -1,4 +1,4 @@
-import { View, KeyboardAvoidingView, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, Pressable, Modal, Alert, } from "react-native";
+import { View, SafeAreaView, KeyboardAvoidingView, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, Pressable, Modal, Alert, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -131,7 +131,7 @@ const OtherProfile = ({navigation, route}) => {
                     size="large"
                 />
                 :
-                <View style={styles.header} >
+                <SafeAreaView style={styles.header} >
                     <TouchableOpacity onPress={() => navigation.goBack()} >
                         <Ionicons name="chevron-back" size={28} color="black" />
                     </TouchableOpacity>
@@ -150,7 +150,7 @@ const OtherProfile = ({navigation, route}) => {
                     >
                         <Entypo name="dots-three-horizontal" size={regWidth * 28} color="black" />
                     </Pressable>
-                </View>
+                </SafeAreaView>
             }
 
 
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "pink",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 10,
         paddingBottom: 8,
         flexDirection: "row",

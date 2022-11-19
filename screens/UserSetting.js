@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, RefreshControl, Pressable, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, RefreshControl, Pressable, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import {
     useNavigation,
@@ -38,7 +38,7 @@ const UserSetting = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header} >
+            <SafeAreaView style={styles.header} >
                 <Pressable 
                     onPress={() => navigation.goBack()}
                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
@@ -57,7 +57,7 @@ const UserSetting = ({navigation}) => {
                 >
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </Pressable>
-            </View>
+            </SafeAreaView>
             <Pressable 
                 style={styles.menuContainer}
                 onPress={logout}
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "pink",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 20,
         // paddingBottom: 30,
         paddingBottom: 8,

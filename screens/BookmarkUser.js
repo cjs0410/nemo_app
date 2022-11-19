@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Pressable, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Pressable, } from "react-native";
 import React, { useEffect, useState } from "react";
 import SelectDropdown from 'react-native-select-dropdown'
 import { Entypo, Feather, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -40,7 +40,7 @@ const BookmarkUser = ({route, navigation}) => {
     
     return (
         <View style={styles.container}>
-            <View style={styles.header} >
+            <SafeAreaView style={styles.header} >
                 <TouchableOpacity onPress={() => navigation.goBack()} >
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </TouchableOpacity>
@@ -55,7 +55,7 @@ const BookmarkUser = ({route, navigation}) => {
                 >
                     <Entypo name="dots-three-horizontal" size={24} color="black" />
                 </Pressable>
-            </View>
+            </SafeAreaView>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.list} >
                     <View style={{ flexDirection: "row", alignItems: "center", }}>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "pink",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 10,
         paddingBottom: 8,
         flexDirection: "row",

@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Pressable, Animated, TouchableOpacity, Image, TextInput, ScrollView, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, Pressable, Animated, TouchableOpacity, Image, TextInput, ScrollView, } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useTheme } from '@react-navigation/native';
 import { useCardAnimation } from '@react-navigation/stack';
@@ -50,6 +50,8 @@ const CreateAlbumModal = ({ route, navigation }) => {
   };
 
   const makeAlbum = async() => {
+    navigation.goBack();
+    
     const formData = new FormData();
     const filename = image.split('/').pop();
     const match = /\.(\w+)$/.exec(filename ?? '');
@@ -73,7 +75,7 @@ const CreateAlbumModal = ({ route, navigation }) => {
       )
       .then((res) => {
         console.log("success")
-        navigation.goBack();
+        // navigation.navigate('ProfileScreen', { refresh: true, });
       })
     } catch (err) {
       console.error(err);
@@ -89,8 +91,8 @@ const CreateAlbumModal = ({ route, navigation }) => {
           ]}
           onPress={navigation.goBack}
         />
-        <View style={styles.containter}>
-            <View style={styles.modalHeader}>
+        <View style={styles.container}>
+            <SafeAreaView style={styles.modalHeader}>
                 <Pressable
                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     onPress={() => navigation.goBack()}
@@ -110,8 +112,8 @@ const CreateAlbumModal = ({ route, navigation }) => {
                       생성
                   </Text>
                 </Pressable>
-            </View>
-            <View style={styles.albumInputContainter}>
+            </SafeAreaView>
+            <View style={styles.albumInputContainer}>
                 <Pressable
                   onPress={pickImage}
                 >
@@ -120,26 +122,22 @@ const CreateAlbumModal = ({ route, navigation }) => {
                       style={styles.albumImage}
                   />
                 </Pressable>
-                <View 
-                    style={{ 
-                        width: "70%", 
-                        borderBottomWidth: 0.3,
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginTop: 18,
-                        flexDirection: "row",
-                    }}
+                <Pressable
+                  onPress={pickImage}
                 >
-                    <AntDesign name="edit" size={20} color="black" style={{opacity: 0}} />
-                    <TextInput 
-                        placeholder="새 앨범 이름"
-                        style={styles.albumNameInput}
-                        onChangeText={writeAlbumName}
-                    />
-                    <AntDesign name="edit" size={20} color="black" />
-                </View>
+                  <Text style={{ fontSize: 15, fontWeight: "500", color: "#FF4040", marginTop: 18, }}>
+                    앨범 사진 선택하기
+                  </Text>
+                </Pressable>
             </View>
-
+            <TextInput 
+              placeholder="앨범 이름을 입력하세요"
+              style={{
+                  ...styles.albumNameInput,
+                  height: regHeight * 50,
+              }}
+              onChangeText={writeAlbumName}
+            />
 
         </View>
       </View>
@@ -147,9 +145,9 @@ const CreateAlbumModal = ({ route, navigation }) => {
 }
 
 const styles = StyleSheet.create({
-  containter: {
+  container: {
     width: '100%', 
-    height: regHeight * 300, 
+    height: regHeight * 350, 
     position: 'absolute', 
     // bottom: 0, 
     backgroundColor: 'white', 
@@ -159,21 +157,27 @@ const styles = StyleSheet.create({
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 55,
+    marginTop: regHeight * 10,
     marginHorizontal: 18, 
   },
-  albumInputContainter: {
+  albumInputContainer: {
     alignItems: "center",
     marginTop: 18, 
   },
   albumImage: {
-    width: regWidth * 100,
-    height: regWidth * 100,
+    width: regWidth * 130,
+    height: regWidth * 130,
     resizeMode: "contain"
   },
   albumNameInput: {
-    fontSize: 15,
-    fontWeight: "500",
+    backgroundColor: "#EEEEEE",
+    marginHorizontal: regWidth * 22,
+    marginVertical: regHeight * 22,
+    borderRadius: 10,
+    height: "25%",
+    paddingHorizontal: regWidth * 8,
+    fontSize: regWidth * 15,
+    fontWeight:"500",
   },
   menu: {
     // backgroundColor: "pink",

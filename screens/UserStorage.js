@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, RefreshControl, Pressable, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, RefreshControl, Pressable, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import {
     useNavigation,
@@ -15,7 +15,7 @@ import emptyImage from '../assets/images/emptyImage.jpeg';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, scrapSelector } from '../modules/hooks';
-import user, { resetUserInfo } from '../modules/user';
+import user, { resetUserInfo, setAvatar, } from '../modules/user';
 import { loadScraps } from "../modules/scraps";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
@@ -123,7 +123,7 @@ const renderTabBar = (props) => (
 );
 
 
-const UserStorage = ({navigation}) => {
+const UserStorage = ({route, navigation}) => {
     const dispatch = useDispatch();
     const [isMine, setIsMine] = useState(true);
     const [profile, setProfile] = useState(null);
@@ -135,6 +135,8 @@ const UserStorage = ({navigation}) => {
     const [albums, setAlbums] = useState(null);
     const avatarValue = useRef(new Animated.Value(0)).current;
     const [refreshing, setRefreshing] = useState(false);
+    const [shouldRefresh, setShouldRefresh] = useState(false);
+    // const { refresh, } = route.params;
 
 
     const [ headerHeight, setHeaderHeight ] = useState(0);
@@ -153,10 +155,21 @@ const UserStorage = ({navigation}) => {
         fetchProfile();
     }, []);
 
-    // useFocusEffect(
-    //     useCallback(() => {
+    // useEffect(() => {
+    //     if (shouldRefresh === true) {
+    //         setShouldRefresh(false);
     //         fetchBookmarkList();
     //         fetchProfile();
+    //     }
+    // }, [shouldRefresh]);
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         console.log(route.params);
+    //         if (route.params !== undefined) {
+    //             console.log(route.params);
+    //             setShouldRefresh(route.params.refresh);
+    //         }
     //     }, [])
     // );
 
@@ -173,6 +186,7 @@ const UserStorage = ({navigation}) => {
             .get("api/v1/user/myprofile/")
             .then((res) => {
                 setProfile(res.data);
+                dispatch(setAvatar(res.data.avatar));
             })
         } catch (err) {
             console.error(err);
@@ -244,14 +258,14 @@ const UserStorage = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <View style={{...styles.header, justifyContent: "flex-end", }} >
+            <SafeAreaView style={{...styles.header, justifyContent: "flex-end", }} >
                 <Pressable
                     onPress={() => navigation.navigate('UserSetting')}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
                     <Feather name="settings" size={30} color="black" />
                 </Pressable>
-            </View>
+            </SafeAreaView>
 
 
             <ScrollView
@@ -442,14 +456,14 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-    //   backgroundColor: "pink",
-      marginTop: 60,
-      marginHorizontal: 20,
-    //   paddingBottom: 30,
+        //   backgroundColor: "pink",
+        marginVertical: 10,
+        marginHorizontal: 20,
+        //   paddingBottom: 30,
         paddingBottom: 8,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     profileContainer: {
         //backgroundColor: "pink",

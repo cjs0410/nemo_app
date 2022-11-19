@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, FlatList, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, Pressable, Modal, } from "react-native";
+import { StyleSheet, View, SafeAreaView, ScrollView, FlatList, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, Pressable, Modal, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
@@ -215,7 +215,7 @@ const Home = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header} >
+            <SafeAreaView style={styles.header} >
                 <Pressable 
                     style={{ flexDirection: "row", alignItems: "center", }}
                     // onPress={() => Update.reloadAsync()}
@@ -267,7 +267,7 @@ const Home = ({navigation}) => {
                 >
                     <Image source={ avatar !== null ? { uri: `http://3.38.228.24${avatar}`} : blankAvatar} style={styles.profileImage} />
                 </TouchableOpacity> */}
-            </View>
+            </SafeAreaView>
             {/* <ScrollView 
                 showsVerticalScrollIndicator={false}
                 ref={ref}
@@ -338,7 +338,7 @@ const Home = ({navigation}) => {
                         ...styles.modal, 
                         height: searchResultList !== null && searchResultList.length > 0 ? regHeight * 500 : regHeight * 180
                     }}>
-                    <View style={styles.modalHeader}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             onPress={() => {
@@ -362,7 +362,7 @@ const Home = ({navigation}) => {
                                 검색
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <TextInput 
                         placeholder="책 제목을 입력하세요"
                         style={styles.modalInput}
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "red",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 20,
         paddingBottom: 8,
         flexDirection: "row",
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     modalHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: regHeight * 55,
+        marginTop: regHeight * 10,
         marginHorizontal: regWidth * 18, 
     },
     modalInput: {

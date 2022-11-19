@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Touchable, Pressable } from "react-native";
+import { View, SafeAreaView, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Touchable, Pressable } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import {
     useNavigation,
@@ -37,7 +37,7 @@ const ProfileEdit = ({route, navigation}) => {
     
           const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 1,
+            quality: 0.7,
           });
       
           console.log(result.uri);
@@ -102,7 +102,7 @@ const ProfileEdit = ({route, navigation}) => {
 
     return(
         <View style={styles.container}>
-            <View style={styles.header} >
+            <SafeAreaView style={styles.header} >
                 <Pressable 
                     onPress={() => navigation.goBack()}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -125,7 +125,7 @@ const ProfileEdit = ({route, navigation}) => {
 
 
                 {/* <Feather name="settings" size={25} color="black" /> */}
-            </View>
+            </SafeAreaView>
                 {profile === null ? 
                     <ActivityIndicator 
                         color="white" 
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     },
     header: {
     //   backgroundColor: "pink",
-      marginTop: 60,
+      marginVertical: 10,
       marginHorizontal: 20,
       paddingBottom: 8,
       flexDirection: "row",
