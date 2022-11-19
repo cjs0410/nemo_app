@@ -1,5 +1,5 @@
-import { StyleSheet, View, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator } from "react-native";
-import React, { useEffect, useState, useRef, } from "react";
+import { StyleSheet, View, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, } from "react-native";
+import React, { useEffect, useState, useRef, useCallback, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import Api from '../lib/Api';
 import { BookmarkList, } from '../components';
+import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -19,26 +20,57 @@ const AlbumProfile = ({route, navigation}) => {
     const albumCoverValue = useRef(new Animated.Value(0)).current;
     const avatarValue = useRef(new Animated.Value(0)).current;
 
+    const [albumModalVisible, setAlbumModalVisible] = useState(false);
+    const [addModalVisible, setAddModalVisible] = useState(false);
+    const [bookmarks, setBookmarks] = useState(null);
+    const [selectedBookmarks, setSelectedBookmarks] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const [userTag, setUserTag] = useState(null);
+
+    const [bookmarkNumbering, setBookmarkNumbering] = useState(null);
+    const [orderedBookmarks, setOrderedBookmarks] = useState(null);
+
+    const [isDeleteMode, setIsDeleteMode] = useState(false);
+    const [selectToDelete, setSelectToDelete] = useState([]);
+
+
     useEffect(() => {
         fetchAlbum();
+        fetchUserTag();
     }, [])
 
     const fetchAlbum = async() => {
-        console.log(albumId);
+        // console.log(albumId);
         try {
             setLoading(true)
             await Api.post("/api/v4/album/view/", {
                 album_id: albumId,
             })
             .then((res) => {
-                console.log(res.data);
-                console.log(res.data.bookmarks);
+                // console.log(res.data);
+                // console.log(res.data.bookmarks);
                 setAlbumInfo(res.data);
+                setBookmarkNumbering(
+                    (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a)
+                )
+                const orderedNumbering = (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                setOrderedBookmarks(
+                    orderedNumbering.map((number) => res.data.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
+                )
             })
         } catch (err) {
             console.error(err);
         }
         setLoading(false);
+    }
+
+    const fetchUserTag = async() => {
+        try {
+            const accessToken = await AsyncStorage.getItem('access');
+            setUserTag(jwt_decode(accessToken).user_tag);
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     const showAlbumCover = () => {
@@ -57,17 +89,145 @@ const AlbumProfile = ({route, navigation}) => {
         }).start();
     }
 
+    const fetchBookmarks = async() => {
+        try {
+            await Api
+            .post("/api/v4/album/bookmarklist/", {
+                album_id: albumId,
+            })
+            .then((res) => {
+                setBookmarks(res.data);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const selectBookmark = (bookmark) => {
+        if (selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1) {
+            setSelectedBookmarks([
+                ...selectedBookmarks,
+                bookmark,
+            ]);
+        } else {
+            setSelectedBookmarks(
+                selectedBookmarks.filter(selectedBookmark => selectedBookmark.bookmark_id !== bookmark.bookmark_id)
+            )
+        }
+    }
+
+    const onAddBookmark = async() => {
+        const bookmarkIds = selectedBookmarks.map((selectedBookmark) => (selectedBookmark.bookmark_id));
+
+        try {
+            console.log(bookmarkIds);
+            console.log(albumId);
+            await Api
+            .post("/api/v4/album/insertbookmark/", {
+                bookmark_id: bookmarkIds,
+                album_id: albumId,
+            })
+            .then((res) => {
+                setAddModalVisible(false);
+                setSelectedBookmarks([]);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const onRefresh = useCallback(async() => {
+        setRefreshing(true);
+        await fetchAlbum()
+        .then(() => setRefreshing(false));
+        // wait(2000).then(() => setRefreshing(false));
+    }, []);
+
+    const deleteAlbum = async() => {
+        Alert.alert("앨범을 삭제하시겠습니까?", "확인 버튼을 누르면 삭제됩니다.", [
+            {
+                text: "취소",
+            },
+            {
+                text: "확인", 
+                onPress: async() => {
+                    try {
+                        await Api.post("/api/v4/album/delete/", {
+                            album_id: albumId,
+                        })
+                        .then((res) => {
+                            setAlbumModalVisible(false);
+                            navigation.goBack();
+                        })
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+            }
+        ]);
+    }
+
+    const onSelectToDelete = (bookmark) => {
+        console.log(selectToDelete);
+        if (selectToDelete.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1) {
+            setSelectToDelete([
+                ...selectToDelete,
+                bookmark,
+            ]);
+        } else {
+            setSelectToDelete(
+                selectToDelete.filter(selectedBookmark => selectedBookmark.bookmark_id !== bookmark.bookmark_id)
+            )
+        }
+    }
+
+    const onDeleteBookmarks = async() => {
+        const bookmarkIds = selectToDelete.map((selectedBookmark) => (selectedBookmark.bookmark_id));
+        // console.log(selectToDelete);
+
+        if (selectToDelete.length > 0) {
+            try {
+                await Api
+                .post("", {
+                    album_id: albumId,
+                    bookmarks: bookmarkIds,
+                })
+                .then((res) => {
+                    fetchAlbum();
+                })
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+    }
+
     return (
         <View style={styles.container}>
             {albumInfo !== null ? 
                 <>
                     <View style={styles.header}>
-                        <Pressable 
-                            onPress={() => navigation.goBack()}
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                        >
-                            <Ionicons name="chevron-back" size={28} color="black" />
-                        </Pressable>
+                        {isDeleteMode ? 
+                            <Pressable 
+                                onPress={() => {
+                                    setIsDeleteMode(false);
+                                    setSelectToDelete([]);
+                                }}
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            >
+                                <Text style={{ fontSize: 15, fontWeight: "500", color: "red", }}>
+                                    취소
+                                </Text>
+                            </Pressable>
+                            :
+                            <Pressable 
+                                onPress={() => navigation.goBack()}
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            >
+                                <Ionicons name="chevron-back" size={28} color="black" />
+                            </Pressable>
+                        }
+
                         <View style={{ alignItems: "center", }}>
                             <Text style={{
                                 fontSize: 16,
@@ -76,18 +236,44 @@ const AlbumProfile = ({route, navigation}) => {
                                 {albumInfo.album_title}
                             </Text>
                         </View>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                        >
-                            <Entypo name="dots-three-horizontal" size={24} color="black" />
-                        </Pressable>
+                        {isDeleteMode ? 
+                            <Pressable 
+                                onPress={() => {
+                                    setIsDeleteMode(false);
+                                    setSelectToDelete([]);
+                                    onDeleteBookmarks();
+                                }}
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            >
+                                <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000", }}>
+                                    완료
+                                </Text>
+                            </Pressable>
+                            :
+                            <Pressable
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                onPress={() => setAlbumModalVisible(true)}
+                                style={{
+                                    opacity: albumInfo.user_tag !== userTag ? 0 : 1,
+                                }}
+                                disabled={albumInfo.user_tag !== userTag ? true : false}
+                            >
+                                <Entypo name="dots-three-horizontal" size={24} color="black" />
+                            </Pressable>
+                        }
                     </View>
                     <ScrollView
                         showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                              refreshing={refreshing}
+                              onRefresh={onRefresh}
+                            />
+                        }
                     >
                         <View style={{ alignItems: "center", }}>
                             <Animated.Image 
-                                source={ albumInfo.album_cover !== null ? { uri: `http://3.38.62.105${albumInfo.album_cover}`} : bookCover} 
+                                source={ albumInfo.album_cover !== null ? { uri: albumInfo.album_cover} : bookCover} 
                                 style={{
                                     ...styles.AlbumCover,
                                     opacity: albumCoverValue,
@@ -99,7 +285,7 @@ const AlbumProfile = ({route, navigation}) => {
                             </Text>
                             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 3,}}>
                                 <Animated.Image 
-                                    source={ albumInfo.user_avatar !== null ? { uri: `http://3.38.62.105${albumInfo.user_avatar}`} : bookCover} 
+                                    source={ albumInfo.user_avatar !== null ? { uri: albumInfo.user_avatar} : bookCover} 
                                     style={{
                                         ...styles.profileImage,
                                         opacity: avatarValue,
@@ -118,8 +304,9 @@ const AlbumProfile = ({route, navigation}) => {
                         </View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 15, marginVertical: 12, }} >
                             <View style={{ flexDirection: "row", alignItems: "center", }}>
-                                <Feather name="bookmark" size={30} color="#606060" />
-                                <Text style={{ fontSize: 15, fontWeight: "500", color: "#606060", }}>
+                                {/* <Feather name="bookmark" size={30} color="#606060" /> */}
+                                <FontAwesome name="bookmark" size={30} color="#606060" />
+                                <Text style={{ fontSize: 15, fontWeight: "500", color: "#606060", marginHorizontal: 8, }}>
                                     {albumInfo.bookmark_count}
                                 </Text>
                             </View>
@@ -162,17 +349,33 @@ const AlbumProfile = ({route, navigation}) => {
                             />
                             : 
                             <>
-                                <View>
-                                {albumInfo.bookmarks !== null && albumInfo.bookmarks.map((bookmark, index) => (
-                                    <TouchableOpacity
-                                        activeOpacity={1}
-                                        onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: albumInfo.bookmarks, index: index, })} 
-                                        key={index}
-                                    >
-                                        <BookmarkList bookmark={bookmark} navigation={navigation} />
-                                    </TouchableOpacity>
-                                ))}
-                                </View>
+                                {isDeleteMode ? 
+                                    <View>
+                                        {albumInfo.bookmarks !== null && orderedBookmarks.map((bookmark, index) => (
+                                            <TouchableOpacity
+                                                activeOpacity={1}
+                                                onPress={() => onSelectToDelete(bookmark)}
+                                                style={{ opacity: selectToDelete.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1 ? 1 : 0.5 }}
+                                                key={index}
+                                            >
+                                                <UnTouchableBookmarkList bookmark={bookmark} navigation={navigation} />
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                    :
+                                    <View>
+                                        {albumInfo.bookmarks !== null && orderedBookmarks.map((bookmark, index) => (
+                                            <TouchableOpacity
+                                                activeOpacity={1}
+                                                onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: orderedBookmarks, index: index, })} 
+                                                key={index}
+                                            >
+                                                <BookmarkList bookmark={bookmark} navigation={navigation} />
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                }
+
                             </>
                         }
 
@@ -181,6 +384,136 @@ const AlbumProfile = ({route, navigation}) => {
                 : 
                 null
             }
+            <Modal
+                // animationType="fade"
+                transparent={true}
+                visible={albumModalVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setAlbumModalVisible(false);
+                        }
+                    }
+                />
+                    <Animated.View 
+                        style={{
+                            ...styles.modal,
+                        }}
+                    >
+                            <TouchableOpacity 
+                                style={styles.menu}
+                                activeOpacity={1}
+                                onPress={deleteAlbum}
+                            >
+                                <Feather name="trash" size={24} color="black" />
+                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                    앨범 삭제하기
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={styles.menu}
+                                activeOpacity={1}
+                                onPress={() => {
+                                    setIsDeleteMode(true);
+                                    setAlbumModalVisible(false);
+                                }}
+                            >
+                                <Feather name="trash" size={24} color="black" />
+                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                    북마크 삭제하기
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={styles.menu}
+                                activeOpacity={1}
+                                onPress={() => {
+                                    setAddModalVisible(true);
+                                    setAlbumModalVisible(false);
+                                    fetchBookmarks();
+                                }}
+                            >
+                                <AntDesign name="pluscircleo" size={24} color="black" />
+                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                    북마크 추가하기
+                                </Text>
+                            </TouchableOpacity>
+
+                    </Animated.View>
+            </Modal>
+            <Modal
+                // animationType="fade"
+                transparent={true}
+                visible={addModalVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setAddModalVisible(false);
+                        }
+                    }
+                />
+                    <Animated.View 
+                        style={{
+                            ...styles.addModal,
+                            height: regHeight * 650
+                        }}
+                    >
+                        <View style={styles.modalHeader}>
+                            <Pressable
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                onPress={() => {
+                                    setAddModalVisible(false);
+                                }}
+                            >
+                                <Text style={{ fontSize: 15, fontWeight: "500", }}>
+                                    취소
+                                </Text>
+                            </Pressable>
+                            <Text style={{ fontSize: 16, fontWeight: "700", }}>
+                                북마크 추가하기
+                            </Text>
+                            <Pressable
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                onPress={onAddBookmark}
+                            >
+                                <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                                    완료
+                                </Text>
+                            </Pressable>
+                        </View>
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {bookmarks !== null && bookmarks.map((bookmark, index) => (
+                                <Pressable
+                                    key={index}
+                                    onPress={() => selectBookmark(bookmark)}
+                                    style={{ opacity: selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1 ? 1 : 0.5 }}
+                                >
+                                    <UnTouchableBookmarkList bookmark={bookmark} navigation={navigation} />
+                                    {selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1 ?
+                                        null
+                                        :
+                                        <View style={styles.numbering}>
+                                            <Text style={{ fontSize: 16, fontWeight: "500", color: "white", }}>
+                                                {Number(selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id)) + 1}
+                                            </Text>
+                                        </View>
+                                    }
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                    </Animated.View>
+            </Modal>
         </View>
     )
 }
@@ -232,6 +565,61 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         flexDirection: "row",
         justifyContent: "center",
+    },
+    modal: {
+        position: "absolute",
+        width: "100%",
+        height: regHeight * 250,
+        bottom: 0, 
+        backgroundColor: "white",
+        borderRadius: 20,
+        paddingTop: 12,
+        alignItems: "center",
+    },
+    menu: {
+        backgroundColor: "#DDDDDD",
+        width: SCREEN_WIDTH - regWidth * 40,
+        height: regHeight * 40,
+        borderRadius: 5,
+        // paddingVertical: 8,
+        paddingHorizontal: regWidth * 13,
+        marginTop: regHeight * 18,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    addModal: {
+        width: '100%', 
+        // height: '35%',
+        height: regHeight * 180, 
+        position: 'absolute', 
+        bottom: 0, 
+        backgroundColor: 'white', 
+        borderRadius: 10, 
+        paddingTop: 10,
+        paddingBottom: 28,
+    },
+    modalHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginVertical: regHeight * 12,
+        marginHorizontal: regWidth * 18, 
+    },
+    numbering: {
+        position: "absolute",
+        backgroundColor: "#008000",
+        width: SCREEN_WIDTH * 0.1,
+        height: SCREEN_WIDTH * 0.1,
+        marginTop: 18,
+        right: 0,
+        marginRight: 22,
+        // marginLeft: SCREEN_WIDTH * 0.5 - 55,
+        borderRadius: 50,
+        borderWidth: 1,
+        borderColor: "white",
+        opacity: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
 })
 

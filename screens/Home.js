@@ -1,10 +1,9 @@
-import { StyleSheet, View, ScrollView, FlatList, Text, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, Pressable, } from "react-native";
+import { StyleSheet, View, ScrollView, FlatList, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, Pressable, Modal, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
 import bookCover from '../assets/images/steve.jpeg';
 import { BookmarkDetail } from '../components';
-import {colors, width, height} from '../config/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import Api from '../lib/Api';
@@ -16,6 +15,7 @@ import {
 import blankAvatar from '../assets/images/peopleicon.png';
 import * as Font from "expo-font";
 import * as Update from "expo-updates";
+import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
@@ -43,9 +43,18 @@ const Home = ({navigation}) => {
     const [loadFont, setLoadFont] = useState(false);
     const { isAlarm, } = useSelector(userSelector);
     const [cursor, setCursor] = useState(1);
+    const [searchModalVisible, setSearchModalVisible] = useState(false);
+
+    const [searchInput, setSearchInput] = useState('');
+    const debounceVal = useDebounce(searchInput);
+    const [searchResultList, setSearchResultList] = useState(null);
 
     const ref = useRef();
     useScrollToTop(ref);
+
+    useEffect(() => {
+        autoSearch();
+    }, [debounceVal]);
 
     useEffect(() => {
         fetchBookmarks();
@@ -53,11 +62,13 @@ const Home = ({navigation}) => {
         fetchFont();
     }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-            // fetchProfile();
-        }, [])
-    );
+
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         // fetchProfile();
+    //     }, [])
+    // );
 
     const fetchBookmarks = async() => {
         try {
@@ -127,16 +138,10 @@ const Home = ({navigation}) => {
         setLoadFont(true)
     }
 
-    if (!loadFont) {
-        return (
-            <View style={styles.container}>
-            </View>
-        )
-    }
+
 
     const getBookmarks = async() => {
         if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
-            console.log('axios');
             try {
                 setScrollLoading(true);
                 await Api
@@ -154,17 +159,59 @@ const Home = ({navigation}) => {
             setScrollLoading(false);
             setCursor(cursor + 1);
         }
-    }
+    };
 
 
     const onEndReached = () => {
     	if(!scrollLoading) {
-            // console.log('inf');
-            
         	getBookmarks();
+        }
+    };
+
+    const onChangeSearchInput = (payload) => {
+        setSearchInput(payload);
+    };
+
+    const autoSearch = async() => {
+        if (debounceVal.length > 0) {
+            try {
+                await Api.post("/api/v3/book/select/", {
+                    keyword: debounceVal,
+                })
+                .then((res) => {
+                    console.log(res.data);
+                    setSearchResultList(res.data);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const onSearch = async() => {
+        if (debounceVal.length > 0) {
+            try {
+                await Api
+                .post("/api/v3/book/select/", {
+                    keyword: debounceVal,
+                })
+                .then((res) => {
+                    console.log(res.data);
+                    setSearchResultList(res.data);
+                })
+            } catch (err) {
+                console.error(err);
+            }
         }
     }
 
+
+    if (!loadFont) {
+        return (
+            <View style={styles.container}>
+            </View>
+        )
+    };
 
     return (
         <View style={styles.container}>
@@ -183,7 +230,12 @@ const Home = ({navigation}) => {
                     </Text>
                 </Pressable>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Feather name="search" size={30} color="black" style={{ marginRight: 24, }}/>
+                    <Pressable
+                        onPress={() => setSearchModalVisible(true)}
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    >
+                        <Feather name="search" size={30} color="black" style={{ marginRight: 24, }}/>
+                    </Pressable>
                     <Pressable
                         onPress={() => navigation.navigate('AlarmScreen')}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
@@ -263,10 +315,122 @@ const Home = ({navigation}) => {
                 :
                 null
             }
-
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={searchModalVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setSearchModalVisible(false);
+                            setSearchInput('');
+                            setSearchResultList(null);
+                        }
+                    }
+                />
+                <View 
+                    style={{
+                        ...styles.modal, 
+                        height: searchResultList !== null && searchResultList.length > 0 ? regHeight * 500 : regHeight * 180
+                    }}>
+                    <View style={styles.modalHeader}>
+                        <Pressable
+                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            onPress={() => {
+                                setSearchModalVisible(false);
+                                setSearchInput('');
+                                setSearchResultList(null);
+                            }}
+                        >
+                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", }} >
+                                취소
+                            </Text>
+                        </Pressable>
+                        <Text style={{fontSize: regWidth * 16, fontWeight: "700", }} >
+                            책 검색
+                        </Text>
+                        <Pressable
+                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            onPress={onSearch}
+                        >
+                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }}>
+                                검색
+                            </Text>
+                        </Pressable>
+                    </View>
+                    <TextInput 
+                        placeholder="책 제목을 입력하세요"
+                        style={styles.modalInput}
+                        onChangeText={onChangeSearchInput}
+                        // multiline={true}
+                        value={searchInput}
+                    />
+                    {searchResultList !== null && searchResultList.length > 0? 
+                        <View style={styles.searchResultContainer}>
+                            <Text style={{ fontSize: 20, fontWeight: "500", }}>
+                                책
+                            </Text>
+                            <ScrollView style={styles.searchResult}>
+                                {searchResultList.map((searchResult, index) => (
+                                    <Pressable 
+                                        style={styles.resultList} 
+                                        onPress={() => 
+                                            {
+                                                setSearchModalVisible(false);
+                                                setSearchInput('');
+                                                setSearchResultList(null);
+                                                navigation.navigate('BookProfile', {
+                                                    bookId: searchResult.book_id, 
+                                                })
+                                            }
+                                        }
+                                        key={index}
+                                    >
+                                        <Image 
+                                            source={searchResult.book_cover !== null ? { uri: searchResult.book_cover } : bookCover}
+                                            style={styles.bookCoverImage}
+                                        />
+                                        <View style={{ marginHorizontal: 8, }}>
+                                            <Text style={{ fontSize: 18, fontWeight: "700", }}>
+                                                {searchResult.book_title}
+                                            </Text>
+                                            <Text style={{ fontSize: 15, fontWeight: "400", }}>
+                                                {searchResult.book_author}
+                                            </Text>
+                                        </View>
+                                    </Pressable>
+                                ))}
+                            </ScrollView>
+                        </View>
+                        :
+                        null
+                    }
+                </View>
+            </Modal>
         </View>
     );
 };
+
+function useDebounce(value, delay = 500) {
+    const [debounceVal, setDebounceVal] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebounceVal(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debounceVal;
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -349,6 +513,55 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         // backgroundColor: "red",
         // marginTop: 10,
+    },
+    modal: {
+        width: '100%', 
+        // height: '35%',
+        height: regHeight * 180, 
+        position: 'absolute', 
+        // bottom: 0, 
+        backgroundColor: 'white', 
+        borderRadius: 10, 
+        paddingTop: 10,
+    },
+    modalHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: regHeight * 55,
+        marginHorizontal: regWidth * 18, 
+    },
+    modalInput: {
+        backgroundColor: "#EEEEEE",
+        marginHorizontal: regWidth * 22,
+        marginTop: regHeight * 22,
+        borderRadius: 10,
+        height: regHeight * 50,
+        paddingHorizontal: regWidth * 8,
+        fontSize: regWidth * 15,
+        fontWeight:"500",
+    },
+    searchResultContainer: {
+        marginHorizontal: regWidth * 22,
+        marginTop: regHeight * 12,
+    },
+    searchResult: {
+        borderRadius: 10,
+        backgroundColor: "#EEEEEE",
+        height: regHeight * 280,
+        marginTop: regHeight * 8,
+    },
+    resultList: {
+        borderBottomWidth: 0.5,
+        borderBottomColor: "#CBCBCB",
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+    },
+    bookCoverImage: {
+        width: regWidth * 92,
+        height: regWidth * 92,
+        resizeMode: "contain",
     },
 })
 

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Touchable } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Touchable, Pressable } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import {
     useNavigation,
@@ -82,7 +82,7 @@ const ProfileEdit = ({route, navigation}) => {
 
         formData.append('user_tag', userTag);
         formData.append('name', name);
-        console.log(formData);
+        // console.log(formData);
         try {
             await Api.put('/api/v1/user/myprofile/edit/', formData, 
                 {
@@ -103,19 +103,25 @@ const ProfileEdit = ({route, navigation}) => {
     return(
         <View style={styles.container}>
             <View style={styles.header} >
-                <TouchableOpacity onPress={() => navigation.goBack()} >
+                <Pressable 
+                    onPress={() => navigation.goBack()}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
                     <Text style={{ fontSize: 15, fontWeight: "500", }}>
                         취소
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
                 <Text style={{ fontSize: 19, fontWeight: "700", }}>
                     프로필 수정
                 </Text>
-                <TouchableOpacity onPress={onEdit} >
+                <Pressable 
+                    onPress={onEdit}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
                     <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000", }}>
                         완료
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
 
                 {/* <Feather name="settings" size={25} color="black" /> */}
@@ -130,7 +136,7 @@ const ProfileEdit = ({route, navigation}) => {
                     <>
                         <View style={styles.imageEdit}>
                             <Image 
-                                source={image === null ? { uri: `http://3.38.62.105${profile.avatar}`} : { uri: image }} 
+                                source={image === null ? { uri: profile.avatar } : { uri: image }} 
                                 style={styles.profileImage}
                             />
                             <TouchableOpacity

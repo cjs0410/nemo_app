@@ -58,7 +58,7 @@ const BookmarkBook = ({route, navigation}) => {
                 <View style={styles.book} >
                     <View style={{ flexDirection: "row", alignItems: "center", }}>
                         <Image 
-                            source={ book.book_cover !== null ? { uri: `http://3.38.62.105${book.book_cover}`} : bookCover} 
+                            source={ book.book_cover !== null ? { uri: book.book_cover } : bookCover} 
                             style={styles.bookImage} 
                         />
                         <View style={{ marginHorizontal: 8, }}>

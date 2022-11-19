@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, Pressable, } from "react-native";
+import { View, KeyboardAvoidingView, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, Pressable, Modal, Alert, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -23,6 +23,10 @@ const OtherProfile = ({navigation, route}) => {
     const [albums, setAlbums] = useState([1, 2, 3]);
     const avatarValue = useRef(new Animated.Value(0)).current;
     const [myTag, setMyTag] = useState(null);
+
+    const [profileModalVisible, setProfileModalVisible] = useState(false);
+    const [reportVisible, setReportVisible] = useState(false);
+    const [reportContents, setReportContents] = useState('');
 
     useEffect(() => {
         fetchProfile();
@@ -102,6 +106,22 @@ const OtherProfile = ({navigation, route}) => {
         }
     }
 
+    const onReport = async() => {
+        try {
+            await Api
+            .post("/api/v2/bookmark/report/", {
+                user_tag: userTag,
+                report: reportContents,
+            })
+            .then((res) => {
+                setReportVisible(false);
+                Alert.alert("신고 접수", "신고가 접수되었습니다.");
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View style={styles.container}>
             {profile === null ? 
@@ -120,9 +140,16 @@ const OtherProfile = ({navigation, route}) => {
                             {profile.name}
                         </Text>
                     </View>
-                    <View style={{ opacity: 0, }} >
-                        <MaterialCommunityIcons name="square-outline" size={30} color="black" />
-                    </View>
+                    <Pressable
+                        hitSlop={{ bottom: 30, left: 30, right: 30, top: 30 }}
+                        style={{
+                            opacity: myTag !== userTag ? 1 : 0,
+                        }}
+                        disabled={myTag !== userTag ? false : true}
+                        onPress={() => setProfileModalVisible(true)}
+                    >
+                        <Entypo name="dots-three-horizontal" size={regWidth * 28} color="black" />
+                    </Pressable>
                 </View>
             }
 
@@ -136,44 +163,49 @@ const OtherProfile = ({navigation, route}) => {
                         size="large"
                     />
                     :
-                    <>
-                    <Animated.Image 
-                        source={ profile.avatar !== null ? { uri: `http://3.38.62.105${profile.avatar}`} : blankAvatar} 
-                        style={{
-                            ...styles.profileImage,
-                            opacity: avatarValue,
-                        }} 
-                        onLoadEnd={showAvatarImage} 
-                    />
-                    <View style={{ marginHorizontal: 18, }}>
-                        <Text style={{
-                            fontSize: 11,
-                            fontWeight: "500",
-                            color: "#008000",
-                        }}>{`@${profile.user_tag}`}</Text>
-                        <Text style={{
-                            fontSize: 25,
-                            fontWeight: "900",
-                        }}>
-                            {profile.name}
-                        </Text>
-                        <View style={{ flexDirection: "row", marginTop: 15,}}>
-                            <Pressable
-                                onPress={() => navigation.push('FollowScreen', { title: "팔로워", userTag: profile.user_tag, })}
-                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    <View style={{ flexDirection: "row", alignItems: "center", }}>
+                        <Animated.Image 
+                            source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
+                            style={{
+                                ...styles.profileImage,
+                                opacity: avatarValue,
+                            }} 
+                            onLoadEnd={showAvatarImage} 
+                        />
+                        <View style={{ marginHorizontal: 18, }}>
+                            <Text style={{
+                                fontSize: 11,
+                                fontWeight: "500",
+                                color: "#008000",
+                            }}>{`@${profile.user_tag}`}</Text>
+                            <Text 
+                                style={{
+                                    fontSize: regWidth * 25,
+                                    fontWeight: "900",
+                                    width: "70%",
+                                }}
+                                numberOfLines={2}
+                                ellipsizeMode='tail'
                             >
-                                <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${followers} Followers`}</Text>
-                            </Pressable>
-                            <Entypo name="dot-single" size={15} color="black" />
-                            <Pressable
-                                onPress={() => navigation.push('FollowScreen', { title: "팔로잉", userTag: profile.user_tag, })}
-                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            >
-                                <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${profile.followings} Following`}</Text>
-                            </Pressable>
+                                {profile.name}
+                            </Text>
+                            <View style={{ flexDirection: "row", marginTop: 8,}}>
+                                <Pressable
+                                    onPress={() => navigation.push('FollowScreen', { title: "팔로워", userTag: profile.user_tag, })}
+                                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                >
+                                    <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${followers} Followers`}</Text>
+                                </Pressable>
+                                <Entypo name="dot-single" size={15} color="black" />
+                                <Pressable
+                                    onPress={() => navigation.push('FollowScreen', { title: "팔로잉", userTag: profile.user_tag, })}
+                                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                >
+                                    <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${profile.followings} Following`}</Text>
+                                </Pressable>
+                            </View>
                         </View>
                     </View>
-                    </>
                 }
                 </View>
                 {/* <View style={styles.introduce} >
@@ -196,26 +228,26 @@ const OtherProfile = ({navigation, route}) => {
 
                 <View style={{ flexDirection: "row", justifyContent: "center", }} >
                     <TouchableOpacity activeOpacity={1} onPress={mine}>
-                        <View style={{...styles.postByWho, borderBottomColor: isMine ? "red" : "white" }}>
-                            <Feather name="bookmark" size={24} color={isMine ? "red" : "black"} />
+                        <View style={{...styles.postByWho, borderBottomColor: isMine ? "red" : "#CBCBCB" }}>
+                            <Feather name="bookmark" size={24} color={isMine ? "red" : "#CBCBCB"} />
                             <Text style={{
                                 fontSize: 13,
                                 fontWeight: "500",
                                 marginHorizontal: 4,
-                                color: isMine ? "red" : "black"
+                                color: isMine ? "red" : "#CBCBCB"
                             }}>
                                 {bookmarks ? bookmarks.length : null}
                             </Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={1} onPress={others}>
-                        <View style={{...styles.postByWho, borderBottomColor: !isMine ? "red" : "white" }}>
-                            <Feather name="folder" size={24} color={!isMine ? "red" : "black"} />
+                        <View style={{...styles.postByWho, borderBottomColor: !isMine ? "red" : "#CBCBCB" }}>
+                            <Feather name="folder" size={24} color={!isMine ? "red" : "#CBCBCB"} />
                             <Text style={{
                                 fontSize: 13,
                                 fontWeight: "500",
                                 marginHorizontal: 4,
-                                color: !isMine ? "red" : "black"
+                                color: !isMine ? "red" : "#CBCBCB"
                             }}>
                                 {albums ? albums.length : null}
                             </Text>
@@ -274,6 +306,85 @@ const OtherProfile = ({navigation, route}) => {
                 }
 
             </ScrollView>
+            <Modal
+                // animationType="fade"
+                transparent={true}
+                visible={profileModalVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setProfileModalVisible(false);
+                            setReportVisible(false);
+                        }
+                    }
+                />
+                    <Animated.View 
+                        style={{
+                            ...styles.modal,
+                        }}
+                    >
+                        {myTag !== userTag ? 
+                            <TouchableOpacity 
+                                style={styles.menu}
+                                activeOpacity={1}
+                                onPress={() => {
+                                    setProfileModalVisible(false);
+                                    setReportVisible(true);
+                                }}
+                            >
+                                <Entypo name="warning" size={24} color="red" />
+                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
+                            </TouchableOpacity>
+                            :
+                            null
+                        }
+
+                    </Animated.View>
+            </Modal>
+            <Modal
+                // animationType="fade"
+                transparent={true}
+                visible={reportVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setReportVisible(false);
+                        }
+                    }
+                />
+                <KeyboardAvoidingView
+                    style={{
+                        ...styles.modal, 
+                        height: regHeight * 650, 
+                    }}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
+                    <Entypo name="warning" size={24} color="red" />
+                        <TextInput 
+                            style={styles.reportInput}
+                            placeholder="신고 내용을 적어주세요."
+                            onChangeText={(payload => setReportContents(payload))}
+                            multiline={true}
+                        />
+                    <TouchableOpacity 
+                        style={{...styles.menu, justifyContent: "center", backgroundColor: "red"}}
+                        activeOpacity={1}
+                        onPress={onReport}
+                    >
+                        <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "white", }}>신고하기</Text>
+                    </TouchableOpacity>
+                </KeyboardAvoidingView>
+            </Modal>
         </View>
     );
 };
@@ -293,8 +404,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     profileInfo: {
-        marginHorizontal: 20,
-        paddingBottom: 30,
+        marginHorizontal: regWidth * 20,
+        paddingBottom: regHeight * 18,
         flexDirection: "row",
         // justifyContent: "space-between",
         alignItems: "center",
@@ -352,7 +463,39 @@ const styles = StyleSheet.create({
     postIconAndWriter: {
         flex: 0.3,
         alignItems: "flex-end",
-    }
+    },
+    modal: {
+        position: "absolute",
+        width: "100%",
+        height: regHeight * 150,
+        bottom: 0, 
+        backgroundColor: "white",
+        borderRadius: 20,
+        paddingTop: 12,
+        alignItems: "center",
+    },
+    menu: {
+        backgroundColor: "#DDDDDD",
+        width: SCREEN_WIDTH - regWidth * 40,
+        height: regHeight * 40,
+        borderRadius: 5,
+        // paddingVertical: 8,
+        paddingHorizontal: regWidth * 13,
+        marginTop: regHeight * 18,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    reportInput: {
+        width: SCREEN_WIDTH - regWidth * 40,
+        height: regHeight * 170,
+        backgroundColor: "#DDDDDD",
+        borderWidth: 1,
+        borderColor: "#FF4040",
+        borderRadius: 10,
+        marginTop: regHeight * 20,
+        paddingHorizontal: regWidth * 10,
+    },
 })
 
 export default OtherProfile;

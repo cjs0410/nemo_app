@@ -60,7 +60,7 @@ const BookmarkUser = ({route, navigation}) => {
                 <View style={styles.list} >
                     <View style={{ flexDirection: "row", alignItems: "center", }}>
                         <Image 
-                            source={ user.avatar !== null ? { uri: `http://3.38.62.105${user.avatar}`} : blankAvatar} 
+                            source={ user.avatar !== null ? { uri: user.avatar } : blankAvatar} 
                             style={styles.userImage} 
                         />
                         <View>

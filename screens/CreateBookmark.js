@@ -74,6 +74,9 @@ const CreateBookmark = ({navigation, route}) => {
     const [ ocrLoading, setOcrLoading ] = useState(false);
     const { ocrText, setOcrText } = useState('');
 
+    const [albums, setAlbums] = useState(null);
+    const [albumId, setAlbumId] = useState(null);
+
 
     
     useEffect(() => {
@@ -148,6 +151,7 @@ const CreateBookmark = ({navigation, route}) => {
         formData.append('hex', color);
         formData.append('text', info);
         formData.append('tags', JSON.stringify(tags));
+        formData.append('album_id', albumId);
         if (backgroundImage !== null) {
             const filename = backgroundImage.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -360,6 +364,19 @@ const CreateBookmark = ({navigation, route}) => {
         setCurrent(nextCurrent);
     };
 
+    const fetchAlbumList = async() => {
+        try {
+            await Api
+            .get("/api/v4/album/list/")
+            .then((res) => {
+                console.log(res.data);
+                setAlbums(res.data);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
 
 
     return (
@@ -556,6 +573,14 @@ const CreateBookmark = ({navigation, route}) => {
                     </Text>
                 </Pressable> */}
 
+                <View style={{ alignItems: "center", }}>
+                <Pressable 
+                    style={styles.previewBtn} 
+                    onPress={() => setPreviewVisible(true)}    
+                >
+                    <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, color: "#D3D3D3", }} >미리보기</Text>
+                </Pressable>
+                </View>
                 <Pressable 
                     style={styles.TagAddBox} 
                     onPress={() => setInfoVisible(true)}    
@@ -572,18 +597,16 @@ const CreateBookmark = ({navigation, route}) => {
                 </Pressable>
                 <Pressable 
                     style={styles.TagAddBox} 
-                    onPress={() => setAlbumVisible(true)}    
+                    onPress={() => {
+                        setAlbumVisible(true);
+                        fetchAlbumList();
+                    }
+                    }    
                 >
                     <Feather name='folder' size={regWidth * 20} color="black" />
                     <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>
                 </Pressable>
-                <Pressable 
-                    style={styles.TagAddBox} 
-                    onPress={() => setPreviewVisible(true)}    
-                >
-                    <Entypo name="edit" size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >미리보기</Text>
-                </Pressable>
+
                 <View style={{height: 200}} ></View>
             </ScrollView>
 
@@ -820,26 +843,60 @@ const CreateBookmark = ({navigation, route}) => {
                     ]}
                     onPress={()=>
                         {
-                            // setInfoVisible(false);
+                            setAlbumVisible(false);
                         }
                     }
                 />
-                <View style={styles.modal}>
-                    <View style={styles.modalHeader}>
-                        <Pressable
+                <View 
+                    style={{
+                        ...styles.modal,
+                        height: regHeight * 480, 
+                        bottom: 0,
+                    }}
+                >
+                    <View style={{
+                        ...styles.modalHeader, 
+                        marginTop: regHeight * 28,
+                        justifyContent: "center",
+                    }}>
+                        {/* <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             onPress={() => setAlbumVisible(false)}
                         >
                             <Text style={{fontSize: 15, fontWeight: "500", }} >
                                 취소
                             </Text>
-                        </Pressable>
+                        </Pressable> */}
                         <Text style={{fontSize: 16, fontWeight: "700", }} >
                             저장할 앨범 찾기
                         </Text>
-                        <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                        {/* <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
                             완료
-                        </Text>
+                        </Text> */}
+                    </View>
+                    <View style={{ alignItems: "center", }}>
+                        <ScrollView
+                            style={styles.albumListContainer}
+                        >
+                            {albums !== null && albums.map((album, index) => (
+                                <Pressable 
+                                    style={styles.albumList}
+                                    key={index}
+                                    onPress={() => {
+                                        setAlbumId(album.album_id);
+                                        setAlbumVisible(false);
+                                    }}
+                                >
+                                    <Image 
+                                        source={{ uri: album.album_cover }}
+                                        style={styles.albumImage}
+                                    />
+                                    <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 8, }}>
+                                        {album.album_title}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </ScrollView>
                     </View>
                 </View>
             </Modal>
@@ -1003,8 +1060,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between", 
         alignItems: "center",
         marginHorizontal: 8,
-        marginTop: 20,
-        marginBottom: 50,
+        marginVertical: 20,
     },
     optionBox: {
         borderWidth: 1,
@@ -1070,6 +1126,35 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         alignItems: "center", 
         justifyContent: "center", 
+    },
+    previewBtn: {
+        borderWidth: 2,
+        borderColor: "#D3D3D3",
+        borderRadius: 999,
+        width: regWidth * 99,
+        marginBottom: 28,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    albumListContainer: {
+        backgroundColor: "#EEEEEE",
+        width: regWidth * 350,
+        height: regHeight * 350,
+        borderRadius: 10,
+        marginTop: 18,
+    },
+    albumList: {
+        borderBottomWidth: 0.3,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+    },
+    albumImage: {
+        width: 45,
+        height: 45,
     },
 })
 

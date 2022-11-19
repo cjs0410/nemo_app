@@ -20,7 +20,7 @@ const AlbumList = (props) => {
         <View style={styles.AlbumListContainer}>
             <View style={{ flexDirection: "row", alignItems: "center", }}>
                 <Animated.Image 
-                    source={{ uri: `http://3.38.62.105${album.album_cover}`}} 
+                    source={{ uri: album.album_cover }} 
                     style={{
                         ...styles.AlbumImage,
                         opacity: albumCoverValue,

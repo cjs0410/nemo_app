@@ -408,7 +408,7 @@ const BookList = ({book, navigation,}) => {
         <View style={styles.List} >
           <View style={{ flexDirection: "row", alignItems: "center", }}>
             <Image 
-              source={ book.book_cover !== null ? { uri: `http://3.38.62.105${book.book_cover}`} : bookCover} 
+              source={ book.book_cover !== null ? { uri: book.book_cover } : bookCover} 
               style={styles.bookImage}
             />
             <View style={{ marginHorizontal: 8, }}>
@@ -436,7 +436,7 @@ const UserList = ({user, navigation,}) => {
         <View style={styles.List} >
           <View style={{ flexDirection: "row", alignItems: "center", }}>
             <Image 
-              source={ user.avatar !== null ? { uri: `http://3.38.62.105${user.avatar}`} : blankAvatar} 
+              source={ user.avatar !== null ? { uri: user.avatar } : blankAvatar} 
               style={styles.userImage} 
             />
             <View style={{ marginHorizontal: 8, }}>

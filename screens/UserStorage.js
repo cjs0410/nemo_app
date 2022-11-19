@@ -273,7 +273,7 @@ const UserStorage = ({navigation}) => {
                 }}
                 onLayout={headerOnLayout}
             > */}
-                <View style={styles.profileContainter} >
+                <View style={styles.profileContainer} >
                     {profile === null ? 
                         <ActivityIndicator 
                             color="white" 
@@ -281,9 +281,9 @@ const UserStorage = ({navigation}) => {
                             size="large"
                         />
                         :
-                        <>
+                        <View style={{ flexDirection: "row", alignItems: "center", }}>
                             <Animated.Image 
-                                source={ profile.avatar !== null ? { uri: `http://3.38.62.105${profile.avatar}`} : blankAvatar} 
+                                source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
                                 style={{
                                     ...styles.profileImage,
                                     opacity: avatarValue,
@@ -296,10 +296,15 @@ const UserStorage = ({navigation}) => {
                                     fontWeight: "500",
                                     color: "#008000",
                                 }}>{`@${profile.user_tag}`}</Text>
-                                <Text style={{
-                                    fontSize: regWidth * 25,
-                                    fontWeight: "900",
-                                }}>
+                                <Text 
+                                    style={{
+                                        fontSize: regWidth * 25,
+                                        fontWeight: "900",
+                                        width: "70%",
+                                    }}
+                                    numberOfLines={2}
+                                    ellipsizeMode='tail'
+                                >
                                     {profile.name}
                                 </Text>
                                 <View style={{ flexDirection: "row", marginTop: 8,}}>
@@ -318,7 +323,7 @@ const UserStorage = ({navigation}) => {
                                     </Pressable>
                                 </View>
                             </View>
-                        </>
+                        </View>
                     }
                 </View>
 
@@ -446,7 +451,7 @@ const styles = StyleSheet.create({
       justifyContent: "space-between",
       alignItems: "center",
     },
-    profileContainter: {
+    profileContainer: {
         //backgroundColor: "pink",
         marginHorizontal: regWidth * 20,
         //paddingBottom: 30,

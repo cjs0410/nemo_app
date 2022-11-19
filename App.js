@@ -242,7 +242,7 @@ const App = () => {
                 tabBarIcon: ({ focused }) => {
                   return (
                     <Image 
-                      source={ avatar !== null ? { uri: `http://3.38.62.105${avatar}`} : blankAvatar} 
+                      source={ avatar !== null ? { uri: avatar } : blankAvatar} 
                       style={{        
                         width: 33,
                         height: 33,

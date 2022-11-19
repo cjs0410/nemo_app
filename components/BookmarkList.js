@@ -37,7 +37,7 @@ const BookmarkList = (props) => {
                 {bookmark.backgroundimg !== null ? 
                     <View style={styles.backgroungImageContainer}>
                         <Animated.Image 
-                            source={{ uri: `http://3.38.62.105${bookmark.backgroundimg}` }}
+                            source={{ uri: bookmark.backgroundimg }}
                             style={{
                                 ...styles.backgroundImage,
                                 opacity: backgroundImageValue,
@@ -58,7 +58,7 @@ const BookmarkList = (props) => {
                     >
                         <View>
                             <Image 
-                                source={ bookmark.book_cover !== null ? { uri: `http://3.38.62.105${bookmark.book_cover}`} : bookCover} 
+                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : bookCover} 
                                 style={styles.bookmarkContentsBookCover}
                             />
                         </View>
@@ -84,6 +84,79 @@ const BookmarkList = (props) => {
                     >
                         <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
                     </Pressable>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", }} >{bookmark.created_date.split('T')[0]}</Text>
+                </View>
+            </View>
+            
+        </View>
+    );
+
+}
+
+const UnTouchableBookmarkList = (props) => {
+    const bookmark = props.bookmark;
+    const navigation = props.navigation;
+    const { bookmarked, } = useSelector(bookmarkSelector);
+    const backgroundImageValue = useRef(new Animated.Value(0)).current;
+
+
+    const showBackgroundImage = () => {
+        Animated.timing(backgroundImageValue, {
+            toValue: 0.2,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
+
+    return (
+        <View style={styles.bookmarkContentsScrollBox}>
+            <View 
+                style={{
+                    ...styles.bookmarkContentsBox, 
+                    backgroundColor: bookmark.hex === null ? "#D9D9D9" : bookmark.hex, 
+                }} 
+            >
+                {bookmark.backgroundimg !== null ? 
+                    <View style={styles.backgroungImageContainer}>
+                        <Animated.Image 
+                            source={{ uri: bookmark.backgroundimg }}
+                            style={{
+                                ...styles.backgroundImage,
+                                opacity: backgroundImageValue,
+                            }}
+                            onLoadEnd={showBackgroundImage}
+                        />
+                    </View>
+                    :
+                    null
+                }
+                <View style={styles.bookmarkContentsBook}>
+                    <View 
+                        style={{ flexDirection: "row" }}
+                    >
+                        <View>
+                            <Image 
+                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : bookCover} 
+                                style={styles.bookmarkContentsBookCover}
+                            />
+                        </View>
+                        <View>
+                            <Text style={styles.bookmarkContentsBookTitle}>{bookmark.book_title}</Text>
+                            <Text style={styles.bookmarkContentsBookChapter}>{bookmark.chapter_title}</Text>
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.bookmarkContentsTextBox}>
+                    <Text 
+                        style={styles.bookmarkContentsText}
+                        numberOfLines={3} 
+                        ellipsizeMode="tail"    
+                    >
+                        {bookmark.contents[0].join('')}
+                    </Text>
+                </View>
+                <View style={styles.bookmarkContentsWatermark}>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
                     <Text style={{ fontSize: regWidth * 11, fontWeight: "500", }} >{bookmark.created_date.split('T')[0]}</Text>
                 </View>
             </View>
@@ -189,4 +262,5 @@ const tagsStyles = {
     },
 };
 
+export {UnTouchableBookmarkList, };
 export default BookmarkList;

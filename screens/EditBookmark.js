@@ -87,7 +87,7 @@ const EditBookmark = ({navigation, route}) => {
         setWhatChapter(bookmark.chapter_title);
         setFrontContent(bookmark.contents.join(''));
         if (bookmark.backgroundimg !== null) {
-            setBackgroundImage(`http://3.38.62.105${bookmark.backgroundimg}`);
+            setBackgroundImage(bookmark.backgroundimg);
         }
         setColor(bookmark.hex);
         setInfo(bookmark.text);
@@ -173,7 +173,6 @@ const EditBookmark = ({navigation, route}) => {
         formData.append('bookmark_id', bookmark.bookmark_id);
 
         try {
-            console.log(formData);
             await Api.post("/api/v2/bookmark/edit/", formData,
                 {
                     headers: {

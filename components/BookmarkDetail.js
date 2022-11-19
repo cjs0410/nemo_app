@@ -39,7 +39,8 @@ const BookmarkDetail = (props) => {
     
     const [bookmarkModalVisible, setBookmarkModalVisible] = useState(false);
     const [reportVisible, setReportVisible] = useState(false);
-    const [albumModalVieible, setAlbumModalVisible] = useState(false);
+    const [reportContents, setReportContents] = useState('');
+    const [albumModalVisible, setAlbumModalVisible] = useState(false);
     const modalValue = useRef(new Animated.Value(0)).current;
     const [albums, setAlbums] = useState(null);
 
@@ -137,6 +138,22 @@ const BookmarkDetail = (props) => {
             .then((res) => {
                 setIsScrap(res.data.is_scrap);
                 setScrapCount(res.data.count);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const onReport = async() => {
+        try {
+            await Api
+            .post("/api/v2/bookmark/report/", {
+                bookmark_id: bookmark.bookmark_id,
+                report: reportContents,
+            })
+            .then((res) => {
+                setReportVisible(false);
+                Alert.alert("신고 접수", "신고가 접수되었습니다.");
             })
         } catch (err) {
             console.error(err);
@@ -244,7 +261,7 @@ const BookmarkDetail = (props) => {
                 <View style={styles.bookmarkTop}>
                     <View style={{ flexDirection: "row", alignItems: "center", }}>
                         <Animated.Image 
-                            source={ bookmark.avatar !== null ? { uri: `http://3.38.62.105${bookmark.avatar}`} : blankAvatar} 
+                            source={ bookmark.avatar !== null ? { uri: bookmark.avatar } : blankAvatar} 
                             style={{
                                 ...styles.bookmarkWriterImage,
                                 opacity: value,
@@ -708,13 +725,13 @@ const BookmarkDetail = (props) => {
                         <TextInput 
                             style={styles.reportInput}
                             placeholder="신고 내용을 적어주세요."
-                            // onChangeText={(payload => setReportContents(payload))}
+                            onChangeText={(payload => setReportContents(payload))}
                             multiline={true}
                         />
                     <TouchableOpacity 
                         style={{...styles.menu, justifyContent: "center", backgroundColor: "red"}}
                         activeOpacity={1}
-                        // onPress={report}
+                        onPress={onReport}
                     >
                         <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "white", }}>신고하기</Text>
                     </TouchableOpacity>
@@ -724,7 +741,7 @@ const BookmarkDetail = (props) => {
             <Modal
                 // animationType="fade"
                 transparent={true}
-                visible={albumModalVieible}
+                visible={albumModalVisible}
             >
                 <Pressable 
                     style={[
@@ -739,34 +756,39 @@ const BookmarkDetail = (props) => {
                 />
                 <View
                     style={{
-                        ...styles.modal, 
-                        height: regHeight * 650, 
+                        ...styles.addModal, 
+                        height: regHeight * 480, 
+                        bottom: 0,
                     }}
                 >
-                    <Text style={{ fontSize: 16, fontWeight: "700", }}>
-                        저장할 앨범 찾기
-                    </Text>
-                    <ScrollView
-                        style={styles.albumListContainer}
-                    >
-                        {albums !== null && albums.map((album, index) => (
-                            <Pressable 
-                                style={styles.albumList}
-                                key={index}
-                                onPress={() => addToAlbum(album.album_id)}
-                            >
-                                <Image 
-                                    source={{ uri: `http://3.38.62.105${album.album_cover}`}}
-                                    style={styles.albumImage}
-                                />
-                                <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 8, }}>
-                                    {album.album_title}
-                                </Text>
-                            </Pressable>
-                        ))}
+                    <View style={{ alignItems: "center", marginTop: regHeight * 28,}}>
+                        <Text style={{ fontSize: 16, fontWeight: "700", }}>
+                            저장할 앨범 찾기
+                        </Text>
+                    </View>
+                    <View style={{ alignItems: "center", }}>
+                        <ScrollView
+                            style={styles.albumListContainer}
+                        >
+                            {albums !== null && albums.map((album, index) => (
+                                <Pressable 
+                                    style={styles.albumList}
+                                    key={index}
+                                    onPress={() => addToAlbum(album.album_id)}
+                                >
+                                    <Image 
+                                        source={{ uri: album.album_cover }}
+                                        style={styles.albumImage}
+                                    />
+                                    <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 8, }}>
+                                        {album.album_title}
+                                    </Text>
+                                </Pressable>
+                            ))}
 
 
-                    </ScrollView>
+                        </ScrollView>
+                    </View>
                 </View>
             </Modal>
             {/* </BottomSheetModalProvider> */}
@@ -854,6 +876,16 @@ const styles = StyleSheet.create({
         paddingTop: 12,
         alignItems: "center",
     },
+    addModal: {
+        width: '100%', 
+        // height: '35%',
+        height: regHeight * 180, 
+        position: 'absolute', 
+        // bottom: 0, 
+        backgroundColor: 'white', 
+        borderRadius: 10, 
+        paddingTop: 10,
+    },
     menu: {
         backgroundColor: "#DDDDDD",
         width: SCREEN_WIDTH - regWidth * 40,
@@ -878,8 +910,8 @@ const styles = StyleSheet.create({
     },
     albumListContainer: {
         backgroundColor: "#EEEEEE",
-        height: "80%",
-        width: "100%",
+        width: regWidth * 350,
+        height: regHeight * 350,
         borderRadius: 10,
         marginTop: 18,
     },

@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, ActivityIndicator, } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, ActivityIndicator, Modal, } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome } from '@expo/vector-icons'; 
@@ -114,7 +114,7 @@ const Card = (props) => {
                 
                     <View style={styles.backgroungImageContainer}>
                         <Animated.Image 
-                            source={{ uri: `http://3.38.62.105${bookmark.backgroundimg}` }}
+                            source={{ uri: bookmark.backgroundimg }}
                             style={{
                                 ...styles.backgroundImage,
                                 opacity: backgroundImageValue,
@@ -138,7 +138,7 @@ const Card = (props) => {
                     >
                         <View>
                             <Animated.Image 
-                                source={ bookmark.book_cover !== null ? { uri: `http://3.38.62.105${bookmark.book_cover}`} : bookCover} 
+                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover} : bookCover} 
                                 style={{
                                     ...styles.postContentsBookCover,
                                     opacity: bookCoverValue,
@@ -244,8 +244,8 @@ const CardPreview = (props) => {
                     >
                         <View>
                             <Image 
-                                source={{ uri: `http://3.38.62.105${bookCover}` }} 
-                                // source={ selectedBook.book_cover !== null ? { uri: `http://3.38.62.105${selectedBook.book_cover}`} : bookCover} 
+                                source={{ uri: bookCover }} 
+                                // source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : bookCover} 
                                 style={styles.postContentsBookCover}
                             />
                         </View>
@@ -256,9 +256,14 @@ const CardPreview = (props) => {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.postContentsTextBox}>
-                    <Text style={styles.postContentsText}>
+                    {/* <Text style={styles.postContentsText}>
                         {contents.join('')}
-                    </Text>
+                    </Text> */}
+                    {contents.map((line, index) => (
+                        <Text style={styles.postContentsText} key={index}>
+                            {line.replace(/\n/g, '')}
+                        </Text> 
+                    ))}
                 </View>
                 {/* <RenderHtml 
                     style={styles.postContentsTextBox} 
@@ -390,7 +395,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
                         <View style={{ flexDirection: "row" }}>
                             <View>
                                 <Image 
-                                    source={ selectedBook.book_cover !== null ? { uri: `http://3.38.62.105${selectedBook.book_cover}`} : bookCover} 
+                                    source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : bookCover} 
                                     style={styles.postContentsBookCover} 
                                 />
                             </View>
@@ -438,7 +443,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
                                     key={index}
                                 >
                                     <Image 
-                                        source={ book.book_cover !== null ? { uri: `http://3.38.62.105${book.book_cover}`} : bookCover} 
+                                        source={ book.book_cover !== null ? { uri: book.book_cover} : bookCover} 
                                         style={styles.postContentsBookCover} 
                                     />
                                     <View>
@@ -661,7 +666,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                         <View style={{ flexDirection: "row", alignItems: "center", }}>
                             <View>
                                 <Image 
-                                    source={ selectedBook.book_cover !== null ? { uri: `http://3.38.62.105${selectedBook.book_cover}`} : bookCover} 
+                                    source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : bookCover} 
                                     style={styles.postContentsBookCover} 
                                 />
                             </View>
@@ -710,7 +715,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                     key={index}
                                 >
                                     <Image 
-                                        source={ book.book_cover !== null ? { uri: `http://3.38.62.105${book.book_cover}`} : bookCover} 
+                                        source={ book.book_cover !== null ? { uri: book.book_cover } : bookCover} 
                                         style={styles.postContentsBookCover} 
                                     />
                                     <View>

@@ -57,12 +57,16 @@ const AlarmScreen = ({navigation}) => {
             </View>
             <ScrollView>
                 {alarms !== null && alarms.map((alarm, index) => (
-                    <View style={styles.alarmList} key={index}>
+                    <View style={styles.alarmList} key={index} >
                         <Image 
-                            source={ alarm.avatar !== null ? { uri: `http://3.38.62.105${alarm.avatar}`} : blankAvatar} 
+                            source={ alarm.avatar !== null ? { uri: alarm.avatar } : blankAvatar} 
                             style={styles.alarmImage}
                         />
-                        <Text style={{ fontSize: 14, fontWeight: "500", marginHorizontal: 14, }}>
+                        <Text 
+                            style={{ fontSize: 14, fontWeight: "500", marginHorizontal: 14, width: "85%", }}
+                            numberOfLines={2}
+                            ellipsizeMode='tail'
+                        >
                             {`${alarm.from}님이 회원님${answer[ctg.indexOf(alarm.alarm)]}니다.`}
                         </Text>
                     </View>

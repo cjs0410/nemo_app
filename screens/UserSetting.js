@@ -12,7 +12,7 @@ import Api from "../lib/Api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { resetRefreshToken, } from '../modules/user';
+import { resetRefreshToken, resetAvatar, } from '../modules/user';
 
 const UserSetting = ({navigation}) => {
     const dispatch = useDispatch();
@@ -29,6 +29,7 @@ const UserSetting = ({navigation}) => {
                 await AsyncStorage.removeItem('access');
                 await AsyncStorage.removeItem('refresh');
                 dispatch(resetRefreshToken());
+                dispatch(resetAvatar());
             })
         } catch (err) {
             console.error(err);

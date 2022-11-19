@@ -45,6 +45,9 @@ export const userSlice = createSlice({
         setAvatar: (state, action) => {
             state.avatar = action.payload;
         },
+        resetAvatar: (state, action) => {
+            state.avatar = null;
+        },
         setIsAlarm: (state, action) => {
             state.isAlarm = action.payload;
         },
@@ -53,7 +56,7 @@ export const userSlice = createSlice({
 
 export const {
     setUserInfo, resetUserInfo, setAccessToken, setRefreshToken, resetRefreshToken,
-    setAvatar, setIsAlarm,
+    setAvatar, resetAvatar, setIsAlarm,
 } = userSlice.actions;
 
 export default userSlice.reducer;
