@@ -1,4 +1,4 @@
-import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable } from "react-native";
+import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -116,6 +116,7 @@ const App = () => {
             await AsyncStorage.setItem('refresh', res.data.refresh);
             await AsyncStorage.setItem('access', res.data.access);
             dispatch(setRefreshToken(res.data.refresh));
+            // fetchAvatar();
           } catch (err) {
             console.error(err);
           }
@@ -158,6 +159,9 @@ const App = () => {
 
   return (
       <NavigationContainer>
+        <StatusBar 
+          barStyle={'dark-content'}
+        />
         {!((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000))) ? 
         (
           <Stack.Navigator>

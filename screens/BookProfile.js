@@ -160,7 +160,7 @@ const BookProfile = ({route, navigation}) => {
                                         {bookInfo.bookmarks && bookInfo.bookmarks.map((bookmark, index) => (
                                             <TouchableOpacity
                                                 activeOpacity={1}
-                                                onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookInfo.bookmarks, index: index, })} 
+                                                onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookInfo.bookmarks, subTitle: bookInfo.book_title, title: "북마크", index: index, })} 
                                                 key={index}
                                             >
                                                 <BookmarkList bookmark={bookmark} navigation={navigation} />

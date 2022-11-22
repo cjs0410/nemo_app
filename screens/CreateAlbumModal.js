@@ -31,7 +31,7 @@ const CreateAlbumModal = ({ route, navigation }) => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         aspect: [1, 1],
         allowsEditing: true,
-        quality: 1,
+        quality: 0.7,
       });
 
       console.log(result.uri);

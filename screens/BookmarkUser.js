@@ -79,7 +79,7 @@ const BookmarkUser = ({route, navigation}) => {
                 {bookmarks && bookmarks.map((bookmark, index) => (
                     <TouchableOpacity
                       activeOpacity={1}
-                      onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, index: index, })} 
+                      onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, subTitle: user.name, title: "내 북마크", index: index, })} 
                       key={index}
                     >
                       <BookmarkList bookmark={bookmark} navigation={navigation} />

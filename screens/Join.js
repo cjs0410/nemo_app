@@ -1,9 +1,11 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Pressable } from "react-native";
+import React, { useEffect, useState, useRef, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
+import { AntDesign, Ionicons, } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Api from '../lib/Api';
+import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
@@ -15,6 +17,66 @@ const Join1 = ({ navigation }) => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [authNumber, setAuthNumber] = useState('');
     const [isAuth, setIsAuth] = useState('');
+    const [sendButton, setSendButton] = useState('인증번호 문자로 받기');
+    const [phoneNumberWarning, setPhoneNumberWarning] = useState('');
+    const [authWarning, setAuthWarning] = useState('');
+
+    const [min, setMin] = useState(3);
+    const [sec, setSec] = useState("00");
+    const time = useRef(180);
+    const timerId = useRef(null);
+    const [isCountDown, setIsCountDown] = useState(false);
+
+    // useEffect(() => {
+    //     timerId.current = setInterval(() => {
+    //         setMin(parseInt(time.current / 60));
+    //         setSec(time.current % 60);
+    //         time.current -= 1;
+    //     }, 1000);
+
+    //     return () => clearInterval(timerId.current);
+    // }, []);
+
+    useEffect(() => {
+        timeOut();
+    }, [sec]);
+    
+
+    const countDown = () => {
+        setIsCountDown(true);
+        timerId.current = setInterval(() => {
+            setMin(parseInt(time.current / 60));
+            if (time.current % 60 < 10) {
+                setSec(`0${time.current % 60}`);
+            } else {
+                setSec(time.current % 60);
+            }
+            
+            time.current -= 1;
+        }, 1000);
+
+        return () => {
+            clearInterval(timerId.current);
+            setIsCountDown(false);
+        };
+    }
+
+    const timeOut = async() => {
+        if (time.current <= 0) {
+            setIsCountDown(false);
+            setAuthWarning("인증 시간이 만료되었습니다.")
+            clearInterval(timerId.current);
+            setPhoneNumberWarning('');
+            try {
+                await Api
+                .post("/api/v1/user/timeout/", {
+                    phone_number: phoneNumber,
+                })
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
 
     const onChangePhoneNumber = (payload) => {
         setPhoneNumber(payload);
@@ -24,8 +86,10 @@ const Join1 = ({ navigation }) => {
         if (phoneNumber === "") {
             return;
         }
-
+        // countDown();
         try {
+            setSendButton('재전송');
+            setPhoneNumberWarning("인증번호가 전송되었습니다.")
             const response = await Api
             .post("/api/v1/user/send_sms/", {
                 phone_number: phoneNumber
@@ -53,47 +117,98 @@ const Join1 = ({ navigation }) => {
             .then((res) => {
                 console.log(res.data);
                 if (res.data) {
-                    navigation.navigate('Join2')
+                    navigation.navigate('Join2');
                 } else {
-                    alert('tlqkf!!!')
+                    setAuthWarning('이미 가입된 계정입니다.');
                 }
             })
         } catch (err) {
-            console.error(err);
-            alert('땡!!!')
+            // console.error(err);
+            setAuthWarning('잘못된 인증번호입니다.');
         }
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.header} >
-                <Text style={{
-                    fontSize: 30,
-                    fontWeight: "700",
-                    letterSpacing: -0.28,
-                }}>
-                    Roseeta
-                </Text>
+                <Pressable 
+                    onPress={() => navigation.goBack()} 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Ionicons name="chevron-back" size={28} color="black" />
+                </Pressable>
+                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                    <Ionicons name="layers-sharp" size={30} color="black" />
+                    <Text style={{
+                        fontSize: 30,
+                        fontWeight: "700",
+                        letterSpacing: -0.28,
+                    }}>
+                        Nemo
+                    </Text>
+                </View>
+                <Pressable 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    style={{ opacity: 0 }}
+                >
+                    <Ionicons name="chevron-back" size={28} color="black" />
+                </Pressable>
             </View>
             <View style={styles.introduce} >
-                <Text style={styles.introduceText}>전화번호 입력해라</Text>
+                <Text style={styles.introduceText}>전화번호를 입력하세요</Text>
                 <TextInput 
                     style={styles.input}
                     placeholder="전화번호"
                     onChangeText={onChangePhoneNumber}
+                    value={phoneNumber}
                 />
+                <Text style={styles.warning}>
+                    {phoneNumberWarning}
+                </Text>
                 <TouchableOpacity
                     onPress={requestPhoneNumber}
                     style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
                 >
-                    <Text style={{...styles.btnText, color: "white",}} >인증번호 문자로 받기</Text>
+                    <Text style={{...styles.btnText, color: "white",}} >{sendButton}</Text>
                 </TouchableOpacity>
 
-                <TextInput 
+                {/* <Text style={styles.introduceText}>인증번호를 입력하세요</Text> */}
+
+
+                <View
+                    style={{
+                        ...styles.introduceBtn, 
+                        backgroundColor: "#EEEEEE", 
+                        paddingHorizontal: regWidth * 10, 
+                        flexDirection: "row", 
+                        justifyContent: "space-between", 
+                        alignItems: "center", 
+                        marginTop: 18,
+                        marginBottom: 0,
+                    }}
+                >
+                    <TextInput 
+                        placeholder="문자 인증번호 5자리를 입력해주세요"
+                        onChangeText={onChangeAuthNumber}
+                    />
+                    {isCountDown ? 
+                        <Text style={{ fontSize: 12, fontWeight: "500", }}>
+                            {`${min}:${sec}`}
+                        </Text>
+                        :
+                        null
+                    }
+
+                </View>
+                {/* <TextInput 
                     style={styles.input}
-                    placeholder="문자 인증번호"
+                    placeholder="문자 인증번호 5자리를 입력해주세요"
                     onChangeText={onChangeAuthNumber}
-                />
+                /> */}
+                <Text style={{...styles.warning, color: "#FF4040", }}>
+                    {authWarning}
+                </Text>
+
                 <TouchableOpacity
                     onPress={requestAuthNumber}
                     style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
@@ -153,13 +268,22 @@ const Join2 = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.header} >
-                <Text style={{
-                    fontSize: 30,
-                    fontWeight: "700",
-                    letterSpacing: -0.28,
-                }}>
-                    Roseeta
-                </Text>
+                <Pressable 
+                    onPress={() => navigation.goBack()} 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Ionicons name="chevron-back" size={28} color="black" />
+                </Pressable>
+                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                    <Ionicons name="layers-sharp" size={30} color="black" />
+                    <Text style={{
+                        fontSize: 30,
+                        fontWeight: "700",
+                        letterSpacing: -0.28,
+                    }}>
+                        Nemo
+                    </Text>
+                </View>
             </View>
             <View style={styles.introduce} >
                 <Text style={styles.introduceText}>거의 다 왔습니다.</Text>
@@ -237,7 +361,8 @@ const styles = StyleSheet.create({
       marginHorizontal: 20,
       paddingBottom: 30,
       flexDirection: "row",
-      justifyContent: "center"
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     introduce: {
         marginTop: -18,
@@ -251,12 +376,13 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     introduceBtn: {
+        height: regHeight * 50,
         backgroundColor: "#EEEEEE",
-        paddingVertical: 10,
-        marginVertical: 7,
+        // paddingVertical: 10,
+        marginVertical: 10,
         alignContent: "center",
         justifyContent: "center",
-        borderRadius: 5,
+        borderRadius: 10,
     },
     btnText: {
         fontSize: 16,
@@ -264,11 +390,19 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     input: {
+        height: regHeight * 50,
         backgroundColor: "#EEEEEE",
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        marginTop: 24,
+        // paddingVertical: regHeight * 10,
+        paddingHorizontal: regWidth * 10,
+        borderRadius: 10,
+        marginTop: regHeight * 24,
+    },
+    warning: {
+        fontSize: regWidth * 12,
+        marginHorizontal: regWidth * 8,
+        fontWeight: "500",
+        // color: "#FF4040",
+        marginTop: regHeight * 12,
     },
   })
 

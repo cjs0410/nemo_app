@@ -14,7 +14,7 @@ const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const BookmarkNewDetail = ({route, navigation}) => {
     // const { bookmarks, } = useSelector(bookmarkSelector);
-    const { bookmarks, index } = route.params;
+    const { bookmarks, subTitle, title, index } = route.params;
     const [ref, setRef] = useState(null);
     const flatListRef = useRef();
 
@@ -39,7 +39,7 @@ const BookmarkNewDetail = ({route, navigation}) => {
                 </TouchableOpacity>
                 <View style={{ alignItems: "center", }}>
                     <Text style={{ fontSize: 10, fontWeight: "500", color: "#808080", }} >
-                        최신순
+                        {subTitle}
                     </Text>
                     <TouchableOpacity
                         // onPress={autoScroll}
@@ -48,7 +48,7 @@ const BookmarkNewDetail = ({route, navigation}) => {
                             fontSize: 16,
                             fontWeight: "500",
                         }}>
-                            내 북마크
+                            {title}
                         </Text>
                     </TouchableOpacity>
                 </View>

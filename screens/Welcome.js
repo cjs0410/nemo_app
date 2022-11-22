@@ -1,7 +1,11 @@
 import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import React, { useEffect, useState } from "react";
 // import favicon from '../assets/images/favicon.ico';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Ionicons, } from '@expo/vector-icons';
+import * as Font from "expo-font";
+import * as Update from "expo-updates";
+import {colors, regWidth, regHeight} from '../config/globalStyles';
+import Api from '../lib/Api';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -9,23 +13,24 @@ const Welcome = ({ navigation }) => {
     return (
       <View style={styles.container}>
         <View style={styles.header} >
+          <Ionicons name="layers-sharp" size={30} color="black" />
           <Text style={{
               fontSize: 30,
               fontWeight: "700",
               letterSpacing: -0.28,
           }}>
-              Roseeta
+              Nemo
           </Text>
         </View>
         <View style={styles.introduce} >
           <Text style={styles.introduceText}>
-            원하는 부분을
+            책 문장을
           </Text>
           <Text style={styles.introduceText}>
             언제 어디서나
           </Text>
           <Text style={styles.introduceText}>
-            북마크에 저장하고,
+            빠르게 저장하고,
           </Text>
           <Text style={styles.introduceText}>
             마음대로 분류하고,
@@ -63,10 +68,15 @@ const Welcome = ({ navigation }) => {
             onPress={() => navigation.navigate('Join1')}
             style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
           >
-            <AntDesign name="phone" size={18} color="white" />
-            <Text style={{...styles.btnText, color: "white", marginLeft: 8,}} >전화번호로 계속하기</Text>
+            <Text style={{...styles.btnText, color: "white", marginLeft: 8,}} >회원가입</Text>
           </TouchableOpacity>
-          <View style={{ flexDirection: "row", marginTop: 18, justifyContent: "center", }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Login')}
+            style={{...styles.introduceBtn, }}
+          >
+            <Text style={{...styles.btnText, color: "#FF4040", marginLeft: 8,}} >로그인</Text>
+          </TouchableOpacity>
+          {/* <View style={{ flexDirection: "row", marginTop: 18, justifyContent: "center", }}>
             <Text style={{ fontSize: 13, fontWeight: "500", textAlign: "center", }}>
               이미 가입하셨나요?
             </Text>
@@ -76,7 +86,7 @@ const Welcome = ({ navigation }) => {
             >
               <Text style={{ fontSize: 13, fontWeight: "700", color: "#FF0000", marginLeft: 10, textAlign: "center", }}>로그인</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </View>
     );
@@ -106,13 +116,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   introduceBtn: {
+    height: regHeight * 50,
     flexDirection: "row",
-    backgroundColor: "#EEEEEE",
     paddingVertical: 10,
     marginVertical: 7,
-    alignContent: "center",
+    alignItems: "center",
     justifyContent: "center",
-    borderRadius: 5,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#FF4040",
   },
   btnText: {
     fontSize: 16,

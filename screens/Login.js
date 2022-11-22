@@ -1,7 +1,8 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Ionicons, } from '@expo/vector-icons';
+import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
@@ -57,20 +58,35 @@ const Login = ({ navigation }) => {
     return (
       <View style={styles.container}>
         <View style={styles.header} >
-          <Text style={{
+          <Pressable 
+            onPress={() => navigation.goBack()} 
+            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+          >
+            <Ionicons name="chevron-back" size={28} color="black" />
+          </Pressable>
+          <View style={{ flexDirection: "row", alignItems: "center", }}>
+            <Ionicons name="layers-sharp" size={30} color="black" />
+            <Text style={{
               fontSize: 30,
               fontWeight: "700",
               letterSpacing: -0.28,
-          }}>
-              Roseeta
-          </Text>
+            }}>
+              Nemo
+            </Text>
+          </View>
+          <Pressable 
+              hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+              style={{ opacity: 0 }}
+          >
+              <Ionicons name="chevron-back" size={28} color="black" />
+          </Pressable>
         </View>
         <View style={styles.introduce} >
           <Text style={styles.introduceText}>
             로그인
           </Text>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => navigation.navigate('Join1')}
             style={styles.introduceBtn}
           >
@@ -83,13 +99,13 @@ const Login = ({ navigation }) => {
           >
             <AntDesign name="apple1" size={18} color="black" />
             <Text style={{...styles.btnText, marginLeft: 8,}} >Apple로 계속하기</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
+          {/* <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
             <View style={{ height: 0.5, width: SCREEN_WIDTH * 0.2, backgroundColor: "black"}}></View>
             <Text style={{ marginHorizontal: 10, fontSize: 13, fontWeight: "500", textAlign: "center", }}>또는</Text>
             <View style={{ height: 0.5, width: SCREEN_WIDTH * 0.2, backgroundColor: "black"}}></View>
-          </View>
+          </View> */}
 
           <TextInput 
             style={styles.input}
@@ -123,7 +139,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     paddingBottom: 30,
     flexDirection: "row",
-    justifyContent: "center"
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   introduce: {
     marginTop: -18,
@@ -131,31 +148,32 @@ const styles = StyleSheet.create({
     marginHorizontal: 38,
   },
   introduceText: {
-    fontSize: 24,
+    fontSize: regWidth * 24,
     fontWeight: "900",
-    marginTop: 35,
+    marginTop: regHeight * 150,
     textAlign: "center",
   },
   introduceBtn: {
-    flexDirection: "row",
+    height: regHeight * 50,
     backgroundColor: "#EEEEEE",
     paddingVertical: 10,
-    marginVertical: 7,
+    marginVertical: regHeight * 80,
     alignContent: "center",
     justifyContent: "center",
-    borderRadius: 5,
-  },
+    borderRadius: 10,
+},
   btnText: {
     fontSize: 16,
     fontWeight: "500",
     textAlign: "center",
   },
   input: {
+    height: regHeight * 50,
     backgroundColor: "#EEEEEE",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    marginTop: 24,
+    paddingVertical: regHeight * 10,
+    paddingHorizontal: regWidth * 10,
+    borderRadius: 10,
+    marginTop: regHeight * 24,
   },
 })
 

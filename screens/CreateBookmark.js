@@ -142,7 +142,7 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const addBookmark = async() => {
-        navigation.goBack();
+        
         const formData = new FormData();
         // console.log(contents);
         formData.append('book_id', selectedBook.book_id);
@@ -165,7 +165,7 @@ const CreateBookmark = ({navigation, route}) => {
         }
 
         try {
-            console.log(formData);
+            console.log(JSON.stringify(contentsByCard));
             await Api.post("/api/v2/bookmark/create/", formData,
                 {
                     headers: {
@@ -175,7 +175,7 @@ const CreateBookmark = ({navigation, route}) => {
             )
             .then((res) => {
                 console.log(res.data);
-                
+                navigation.goBack();
             })
         } catch (err) {
             console.error(err);

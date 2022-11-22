@@ -20,6 +20,7 @@ import {
 const PostModal = ({ route, navigation }) => {
   const { index } = route.params
   const [status, requestPermission] = ImagePicker.useCameraPermissions();
+  const [status2, requestPermission2] = ImagePicker.useMediaLibraryPermissions();
   const [loading, setLoading] = useState(false);
 
   // useFocusEffect(
@@ -40,7 +41,7 @@ const PostModal = ({ route, navigation }) => {
 
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: true,
+        // allowsMultipleSelection: true,
         quality: 1,
       });
   
@@ -49,7 +50,33 @@ const PostModal = ({ route, navigation }) => {
       if (!result.cancelled) {
         navigation.goBack();
         navigation.navigate(`CreateBookmark${index}`, {ocrImage: result.uri});
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
 
+  const pickImage = async () => {
+    try {
+      setLoading(true);
+      if (!status2.granted) {
+        const permission = await requestPermission2();
+        if (!permission.granted) {
+          return null;
+        }
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+      });
+
+      console.log(result.uri);
+
+      if (!result.cancelled) {
+        navigation.goBack();
+        navigation.navigate(`CreateBookmark${index}`, {ocrImage: result.uri});
       }
     } catch (error) {
       console.error(error);
@@ -111,10 +138,14 @@ const PostModal = ({ route, navigation }) => {
             <Feather name="edit" size={20} color="black" />
             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>직접 북마크 타이핑하기</Text>
           </TouchableOpacity>
-          <View style={styles.menu} >
+          <TouchableOpacity 
+            style={styles.menu} 
+            activeOpacity={1}
+            // onPress={pickImage}
+          >
             <Feather name="image" size={20} color="black" />
             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>앨범에서 북마크 가져오기</Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 

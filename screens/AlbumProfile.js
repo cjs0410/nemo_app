@@ -367,7 +367,7 @@ const AlbumProfile = ({route, navigation}) => {
                                         {albumInfo.bookmarks !== null && orderedBookmarks.map((bookmark, index) => (
                                             <TouchableOpacity
                                                 activeOpacity={1}
-                                                onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: orderedBookmarks, index: index, })} 
+                                                onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: orderedBookmarks, subTitle: albumInfo.album_title, title: "북마크", index: index, })} 
                                                 key={index}
                                             >
                                                 <BookmarkList bookmark={bookmark} navigation={navigation} />
