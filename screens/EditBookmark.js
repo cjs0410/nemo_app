@@ -85,7 +85,7 @@ const EditBookmark = ({navigation, route}) => {
             book_id: bookmark.book_id,
         });
         setWhatChapter(bookmark.chapter_title);
-        setFrontContent(bookmark.contents.join(''));
+        setFrontContent(bookmark.contents.flat().join(''));
         if (bookmark.backgroundimg !== null) {
             setBackgroundImage(bookmark.backgroundimg);
         }

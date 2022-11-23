@@ -141,7 +141,7 @@ const PostModal = ({ route, navigation }) => {
           <TouchableOpacity 
             style={styles.menu} 
             activeOpacity={1}
-            // onPress={pickImage}
+            onPress={pickImage}
           >
             <Feather name="image" size={20} color="black" />
             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>앨범에서 북마크 가져오기</Text>

@@ -75,7 +75,7 @@ const CreateBookmark = ({navigation, route}) => {
     const { ocrText, setOcrText } = useState('');
 
     const [albums, setAlbums] = useState(null);
-    const [albumId, setAlbumId] = useState(null);
+    const [albumId, setAlbumId] = useState('');
 
 
     
@@ -540,13 +540,13 @@ const CreateBookmark = ({navigation, route}) => {
                                 setBackgroundImage(null);
                             }}
                         />
-                        <TouchableOpacity 
+                        {/* <TouchableOpacity 
                             activeOpacity={1} 
                             style={styles.optionBox} 
                             onPress={pickBackgroundImage}
                         >
                             <MaterialIcons name="add-photo-alternate" size={24} color="black" />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
                 
@@ -611,8 +611,7 @@ const CreateBookmark = ({navigation, route}) => {
                     onPress={() => {
                         setAlbumVisible(true);
                         fetchAlbumList();
-                    }
-                    }    
+                    }}    
                 >
                     <Feather name='folder' size={regWidth * 20} color="black" />
                     <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>

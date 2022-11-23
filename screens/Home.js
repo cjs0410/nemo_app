@@ -42,7 +42,7 @@ const Home = ({navigation}) => {
     const [avatar, setAvatar] = useState(null);
     const [loadFont, setLoadFont] = useState(false);
     const { isAlarm, } = useSelector(userSelector);
-    const [cursor, setCursor] = useState(1);
+    const [cursor, setCursor] = useState('');
     const [searchModalVisible, setSearchModalVisible] = useState(false);
 
     const [searchInput, setSearchInput] = useState('');
@@ -75,7 +75,7 @@ const Home = ({navigation}) => {
             setScrollLoading(true);
             await Api
             .post("/api/v1/user/", {
-                cursor: cursor,
+                cursor: "",
             })
             .then(async(res) => {
                 // console.log(res.data);
@@ -104,7 +104,7 @@ const Home = ({navigation}) => {
 
     const onRefresh = useCallback(async() => {
         setRefreshing(true);
-        setCursor(1);
+        setCursor(0);
         await fetchBookmarks()
         .then(() => setRefreshing(false));
         // wait(2000).then(() => setRefreshing(false));
@@ -144,9 +144,10 @@ const Home = ({navigation}) => {
         if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
             try {
                 setScrollLoading(true);
+                console.log(bookmarks.at(-1).cursor);
                 await Api
                 .post("/api/v1/user/", {
-                    cursor: cursor + 1,
+                    cursor: bookmarks.at(-1).cursor,
                 })
                 .then((res) => {
                     // console.log([...bookmarks, ...res.data, ]);
@@ -157,7 +158,7 @@ const Home = ({navigation}) => {
                 console.error(err);
             }
             setScrollLoading(false);
-            setCursor(cursor + 1);
+            // setCursor(bookmarks.at(-1).cursor);
         }
     };
 

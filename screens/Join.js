@@ -86,7 +86,7 @@ const Join1 = ({ navigation }) => {
         if (phoneNumber === "") {
             return;
         }
-        // countDown();
+        countDown();
         try {
             setSendButton('재전송');
             setPhoneNumberWarning("인증번호가 전송되었습니다.")
@@ -284,6 +284,12 @@ const Join2 = ({ navigation }) => {
                         Nemo
                     </Text>
                 </View>
+                <Pressable 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    style={{ opacity: 0 }}
+                >
+                    <Ionicons name="chevron-back" size={28} color="black" />
+                </Pressable>
             </View>
             <View style={styles.introduce} >
                 <Text style={styles.introduceText}>거의 다 왔습니다.</Text>

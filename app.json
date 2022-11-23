@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nemo",
     "slug": "Nemo",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/Nemo1.png",
     "userInterfaceStyle": "light",

@@ -38,6 +38,7 @@ const Card = (props) => {
     // }, [bookmarked])
     useEffect(() => {
         fetchWatermark();
+        // console.log(props.contents);
     }, [])
 
     const onReverse = () => {

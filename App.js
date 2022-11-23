@@ -101,7 +101,7 @@ const App = () => {
   useEffect(() => {
     fetchRefreshToken();
     // console.log(decodedRefresh);
-    fetchAvatar();
+    // fetchAvatar();
   }, [])
 
   const fetchRefreshToken = async() => {
@@ -113,10 +113,11 @@ const App = () => {
         })
         .then(async(res) => {
           try {
+            console.log('reissue');
             await AsyncStorage.setItem('refresh', res.data.refresh);
             await AsyncStorage.setItem('access', res.data.access);
             dispatch(setRefreshToken(res.data.refresh));
-            // fetchAvatar();
+            fetchAvatar();
           } catch (err) {
             console.error(err);
           }
