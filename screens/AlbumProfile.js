@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef, useCallback, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
+import blankAvatar from '../assets/images/peopleicon.png';
 import bookCover from '../assets/images/steve.jpeg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
@@ -285,7 +286,7 @@ const AlbumProfile = ({route, navigation}) => {
                             </Text>
                             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 3,}}>
                                 <Animated.Image 
-                                    source={ albumInfo.user_avatar !== null ? { uri: albumInfo.user_avatar} : bookCover} 
+                                    source={ albumInfo.user_avatar !== null ? { uri: albumInfo.user_avatar} : blankAvatar} 
                                     style={{
                                         ...styles.profileImage,
                                         opacity: avatarValue,

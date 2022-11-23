@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
@@ -74,7 +74,8 @@ const EditBookmark = ({navigation, route}) => {
     const [ ocrLoading, setOcrLoading ] = useState(false);
     const { ocrText, setOcrText } = useState('');
 
-
+    const [albums, setAlbums] = useState(null);
+    const [albumId, setAlbumId] = useState('');
     
     useEffect(() => {
         updateWatermark();
@@ -340,13 +341,26 @@ const EditBookmark = ({navigation, route}) => {
         setCurrent(nextCurrent);
     };
 
+    const fetchAlbumList = async() => {
+        try {
+            await Api
+            .get("/api/v4/album/list/")
+            .then((res) => {
+                console.log(res.data);
+                setAlbums(res.data);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
 
     return (
         <View style={styles.container}>
-            <View style={styles.header} >
+            <SafeAreaView style={styles.header} >
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Text style={{ fontSize: 25, fontWeight: "900", marginRight: 15, }} >북마크 수정</Text>
+                    <Text style={{ fontSize: 25, fontWeight: "900", marginRight: 15, }} >Create</Text>
+                    <Feather name="bookmark" size={28} color="black" />
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -356,7 +370,7 @@ const EditBookmark = ({navigation, route}) => {
                         <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000" }} >완료</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </SafeAreaView>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -535,7 +549,14 @@ const EditBookmark = ({navigation, route}) => {
                         { frontContent }
                     </Text>
                 </Pressable> */}
-
+                <View style={{ alignItems: "center", }}>
+                    <Pressable 
+                        style={styles.previewBtn} 
+                        onPress={() => setPreviewVisible(true)}    
+                    >
+                        <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, color: "#D3D3D3", }} >미리보기</Text>
+                    </Pressable>
+                </View>
                 <Pressable 
                     style={styles.TagAddBox} 
                     onPress={() => setInfoVisible(true)}    
@@ -552,17 +573,13 @@ const EditBookmark = ({navigation, route}) => {
                 </Pressable>
                 <Pressable 
                     style={styles.TagAddBox} 
-                    onPress={() => setAlbumVisible(true)}    
+                    onPress={() => {
+                        setAlbumVisible(true);
+                        fetchAlbumList();
+                    }}    
                 >
                     <Feather name='folder' size={regWidth * 20} color="black" />
                     <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>
-                </Pressable>
-                <Pressable 
-                    style={styles.TagAddBox} 
-                    onPress={() => setPreviewVisible(true)}    
-                >
-                    <Entypo name="edit" size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >미리보기</Text>
                 </Pressable>
                 <View style={{height: 200}} ></View>
             </ScrollView>
@@ -584,7 +601,7 @@ const EditBookmark = ({navigation, route}) => {
                     }
                 />
                 <View style={{...styles.modal, height: regHeight * 440, }}>
-                    <View style={styles.modalHeader}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             onPress={() => {
@@ -607,7 +624,7 @@ const EditBookmark = ({navigation, route}) => {
                                 등록
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <View style={styles.addBook}>
                         <View style={{ alignItems: 'center', }}>
                             <Image 
@@ -667,7 +684,7 @@ const EditBookmark = ({navigation, route}) => {
                     }
                 />
                 <View style={styles.modal}>
-                    <View style={styles.modalHeader}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
@@ -693,7 +710,7 @@ const EditBookmark = ({navigation, route}) => {
                                 완료
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <TextInput 
                         placeholder="설명을 입력해주세요"
                         style={{
@@ -729,7 +746,7 @@ const EditBookmark = ({navigation, route}) => {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             > */}
                 <View style={styles.modal}>
-                    <View style={styles.modalHeader}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
@@ -752,7 +769,7 @@ const EditBookmark = ({navigation, route}) => {
                                 완료
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <TextInput 
                         placeholder="태그를 입력하고 쉼표를 입력하여 등록하세요"
                         style={{
@@ -800,26 +817,60 @@ const EditBookmark = ({navigation, route}) => {
                     ]}
                     onPress={()=>
                         {
-                            // setInfoVisible(false);
+                            setAlbumVisible(false);
                         }
                     }
                 />
-                <View style={styles.modal}>
-                    <View style={styles.modalHeader}>
-                        <Pressable
+                <View 
+                    style={{
+                        ...styles.modal,
+                        height: regHeight * 480, 
+                        bottom: 0,
+                    }}
+                >
+                    <SafeAreaView style={{
+                        ...styles.modalHeader, 
+                        marginTop: regHeight * 28,
+                        justifyContent: "center",
+                    }}>
+                        {/* <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             onPress={() => setAlbumVisible(false)}
                         >
                             <Text style={{fontSize: 15, fontWeight: "500", }} >
                                 취소
                             </Text>
-                        </Pressable>
+                        </Pressable> */}
                         <Text style={{fontSize: 16, fontWeight: "700", }} >
                             저장할 앨범 찾기
                         </Text>
-                        <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                        {/* <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
                             완료
-                        </Text>
+                        </Text> */}
+                    </SafeAreaView>
+                    <View style={{ alignItems: "center", }}>
+                        <ScrollView
+                            style={styles.albumListContainer}
+                        >
+                            {albums !== null && albums.map((album, index) => (
+                                <Pressable 
+                                    style={styles.albumList}
+                                    key={index}
+                                    onPress={() => {
+                                        setAlbumId(album.album_id);
+                                        setAlbumVisible(false);
+                                    }}
+                                >
+                                    <Image 
+                                        source={{ uri: album.album_cover }}
+                                        style={styles.albumImage}
+                                    />
+                                    <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 8, }}>
+                                        {album.album_title}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </ScrollView>
                     </View>
                 </View>
             </Modal>
@@ -840,8 +891,8 @@ const EditBookmark = ({navigation, route}) => {
                         }
                     }
                 />
-                <View style={{...styles.modal, height: "60%", }}>
-                    <View style={styles.modalHeader}>
+                <View style={{...styles.modal, height: regHeight * 480, }}>
+                    <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
@@ -862,7 +913,7 @@ const EditBookmark = ({navigation, route}) => {
                                 닫기
                             </Text>
                         </Pressable>
-                    </View>
+                    </SafeAreaView>
                     <ScrollView
                         pagingEnabled
                         horizontal
@@ -962,7 +1013,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "red",
-        marginTop: 60,
+        marginVertical: 10,
         marginHorizontal: 20,
         paddingBottom: 8,
         flexDirection: "row",
@@ -1007,7 +1058,7 @@ const styles = StyleSheet.create({
     modal: {
         width: '100%', 
         // height: '35%',
-        height: regHeight * 250, 
+        height: regHeight * 220, 
         position: 'absolute', 
         // bottom: 0, 
         backgroundColor: 'white', 
@@ -1028,7 +1079,7 @@ const styles = StyleSheet.create({
     modalHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: regHeight * 55,
+        marginTop: regHeight * 10,
         marginHorizontal: regWidth * 18, 
     },
     modalInput: {
@@ -1050,6 +1101,35 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         alignItems: "center", 
         justifyContent: "center", 
+    },
+    previewBtn: {
+        borderWidth: 2,
+        borderColor: "#D3D3D3",
+        borderRadius: 999,
+        width: regWidth * 99,
+        marginBottom: 28,
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    albumListContainer: {
+        backgroundColor: "#EEEEEE",
+        width: regWidth * 350,
+        height: regHeight * 350,
+        borderRadius: 10,
+        marginTop: 18,
+    },
+    albumList: {
+        borderBottomWidth: 0.3,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+    },
+    albumImage: {
+        width: 45,
+        height: 45,
     },
 })
 

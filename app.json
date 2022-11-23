@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nemo",
     "slug": "Nemo",
-    "version": "1.0.1",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/Nemo1.png",
     "userInterfaceStyle": "light",
@@ -26,7 +26,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.cjs0410.Nemo"
+      "package": "com.cjs0410.Nemo",
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/Nemo1.png"

@@ -165,7 +165,7 @@ const CreateBookmark = ({navigation, route}) => {
         }
 
         try {
-            console.log(JSON.stringify(contentsByCard));
+            console.log(formData);
             await Api.post("/api/v2/bookmark/create/", formData,
                 {
                     headers: {
@@ -585,12 +585,12 @@ const CreateBookmark = ({navigation, route}) => {
                 </Pressable> */}
 
                 <View style={{ alignItems: "center", }}>
-                <Pressable 
-                    style={styles.previewBtn} 
-                    onPress={() => setPreviewVisible(true)}    
-                >
-                    <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, color: "#D3D3D3", }} >미리보기</Text>
-                </Pressable>
+                    <Pressable 
+                        style={styles.previewBtn} 
+                        onPress={() => setPreviewVisible(true)}    
+                    >
+                        <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, color: "#D3D3D3", }} >미리보기</Text>
+                    </Pressable>
                 </View>
                 <Pressable 
                     style={styles.TagAddBox} 
