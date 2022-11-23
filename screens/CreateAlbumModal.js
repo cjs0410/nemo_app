@@ -9,9 +9,14 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 import * as ImagePicker from 'expo-image-picker';
 import Api from "../lib/Api";
 
+import { useSelector, useDispatch } from 'react-redux';
+import { userSelector } from '../modules/hooks';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+
 
 const CreateAlbumModal = ({ route, navigation }) => {
 //   const { index } = route.params;
+  const dispatch = useDispatch();
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
@@ -74,7 +79,8 @@ const CreateAlbumModal = ({ route, navigation }) => {
         }
       )
       .then((res) => {
-        console.log("success")
+        console.log("success");
+        dispatch(setShouldUserRefresh(true));
         // navigation.navigate('ProfileScreen', { refresh: true, });
       })
     } catch (err) {

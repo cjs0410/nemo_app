@@ -11,7 +11,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, setIsAlarm, } from '../modules/user';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -93,6 +93,9 @@ const ProfileEdit = ({route, navigation}) => {
             )
             .then((res) => {
                 navigation.goBack();
+                dispatch(setShouldHomeRefresh(true));
+                dispatch(setShouldStorageRefresh(true));
+                dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
             console.error(err);

@@ -17,6 +17,7 @@ const Login = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
+  const [warning, setWarning] = useState('');
 
   const onChangeId = (payload) => {
     setId(payload);
@@ -50,7 +51,13 @@ const Login = ({ navigation }) => {
 
       })
     } catch (err) {
-      console.error(err);
+      // console.error(err);
+      if (err.response.status === 401) {
+        setWarning('잘못된 비밀번호입니다');
+      }
+      if (err.response.status === 404) {
+        setWarning('존재하지 않는 계정입니다');
+      }
     }
     setLoading(false);
   }
@@ -118,6 +125,9 @@ const Login = ({ navigation }) => {
             placeholder="비밀번호를 입력해주세요"
             secureTextEntry={true}
           />
+          <Text style={{...styles.warning, color: "#FF4040", }}>
+            {warning}
+          </Text>
           <TouchableOpacity
             onPress={onLogin}
             style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
@@ -174,6 +184,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: regWidth * 10,
     borderRadius: 10,
     marginTop: regHeight * 24,
+  },
+  warning: {
+    fontSize: regWidth * 12,
+    marginHorizontal: regWidth * 8,
+    fontWeight: "500",
+    // color: "#FF4040",
+    marginTop: regHeight * 12,
   },
 })
 

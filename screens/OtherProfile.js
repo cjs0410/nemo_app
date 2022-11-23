@@ -9,10 +9,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { userSelector } from '../modules/hooks';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 
 const OtherProfile = ({navigation, route}) => {
+    const dispatch = useDispatch();
     const [isMine, setIsMine] = useState(true);
     const [isFollow, setIsFollow] = useState(false);
     const [followers, setFollowers] = useState(0);
@@ -42,9 +47,10 @@ const OtherProfile = ({navigation, route}) => {
                 user_tag: userTag,
             })
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 setIsFollow(res.data.is_follow);
                 setFollowers(res.data.count);
+                dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -64,7 +70,7 @@ const OtherProfile = ({navigation, route}) => {
             await Api
             .post("api/v1/user/profile/", { user_tag: userTag })
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 setProfile(res.data);
                 setIsFollow(res.data.is_follow);
                 setFollowers(res.data.followers);

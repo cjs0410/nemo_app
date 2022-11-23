@@ -15,7 +15,7 @@ import emptyImage from '../assets/images/emptyImage.jpeg';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, scrapSelector } from '../modules/hooks';
-import user, { resetUserInfo, setAvatar, } from '../modules/user';
+import user, { resetUserInfo, setAvatar, setShouldUserRefresh, } from '../modules/user';
 import { loadScraps } from "../modules/scraps";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
@@ -130,12 +130,12 @@ const UserStorage = ({route, navigation}) => {
     const [postTiles, setPostTiles] = useState(null);
     const [scrapTiles, setScrapTiles] = useState(null);
     const [loading, setLoading] = useState(false);
-    const { accessToken, } = useSelector(userSelector);
+    const { accessToken, shouldUserRefresh, } = useSelector(userSelector);
     const [bookmarks, setBookmarks] = useState(null);
     const [albums, setAlbums] = useState(null);
     const avatarValue = useRef(new Animated.Value(0)).current;
     const [refreshing, setRefreshing] = useState(false);
-    const [shouldRefresh, setShouldRefresh] = useState(false);
+    // const [shouldRefresh, setShouldRefresh] = useState(false);
     // const { refresh, } = route.params;
 
 
@@ -154,6 +154,14 @@ const UserStorage = ({route, navigation}) => {
         fetchBookmarkList();
         fetchProfile();
     }, []);
+
+    useEffect(() => {
+        if (shouldUserRefresh === true) {
+            fetchBookmarkList();
+            fetchProfile();
+            dispatch(setShouldUserRefresh(false));
+        }
+    }, [shouldUserRefresh]);
 
     // useEffect(() => {
     //     if (shouldRefresh === true) {

@@ -14,7 +14,7 @@ import HTML from 'react-native-render-html';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { resetUserInfo } from '../modules/user';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -184,6 +184,9 @@ const EditBookmark = ({navigation, route}) => {
             .then((res) => {
                 console.log(res.data);
                 navigation.goBack();
+                dispatch(setShouldHomeRefresh(true));
+                dispatch(setShouldStorageRefresh(true));
+                dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
             console.error(err);

@@ -21,11 +21,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { bookmarkSelector, scrapSelector } from '../modules/hooks';
 import { addBookmark } from '../modules/bookmarks';
 import { addScrap, deleteScrap } from '../modules/scraps';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const BookmarkDetail = (props) => {
+    const dispatch = useDispatch();
     const bookmark = props.bookmark;
     const navigation = props.navigation;
     const [current, setCurrent] = useState(0);
@@ -138,6 +140,7 @@ const BookmarkDetail = (props) => {
             .then((res) => {
                 setIsScrap(res.data.is_scrap);
                 setScrapCount(res.data.count);
+                dispatch(setShouldStorageRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -193,6 +196,9 @@ const BookmarkDetail = (props) => {
                         .then((res) => {
                             setBookmarkModalVisible(false);
                             setReportVisible(false);
+                            dispatch(setShouldHomeRefresh(true));
+                            dispatch(setShouldStorageRefresh(true));
+                            dispatch(setShouldUserRefresh(true));
                         })
                     } catch (err) {
                         console.error(err);

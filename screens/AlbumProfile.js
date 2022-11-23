@@ -12,9 +12,14 @@ import { BookmarkList, } from '../components';
 import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { userSelector } from '../modules/hooks';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const AlbumProfile = ({route, navigation}) => {
+    const dispatch = useDispatch();
     const { albumId, } = route.params;
     const [loading, setLoading] = useState(false);
     const [albumInfo, setAlbumInfo] = useState(null);
@@ -131,6 +136,8 @@ const AlbumProfile = ({route, navigation}) => {
             .then((res) => {
                 setAddModalVisible(false);
                 setSelectedBookmarks([]);
+                fetchAlbum();
+                dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -159,6 +166,7 @@ const AlbumProfile = ({route, navigation}) => {
                         .then((res) => {
                             setAlbumModalVisible(false);
                             navigation.goBack();
+                            dispatch(setShouldUserRefresh(true));
                         })
                     } catch (err) {
                         console.error(err);
@@ -195,6 +203,7 @@ const AlbumProfile = ({route, navigation}) => {
                 .then((res) => {
                     console.log("delete");
                     fetchAlbum();
+                    dispatch(setShouldUserRefresh(true));
                 })
             } catch (err) {
                 console.error(err);

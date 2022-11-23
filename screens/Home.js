@@ -19,7 +19,7 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
-import { resetUserInfo, setRefreshToken, resetRefreshToken, } from '../modules/user';
+import { resetUserInfo, setRefreshToken, resetRefreshToken, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -41,7 +41,7 @@ const Home = ({navigation}) => {
     const [scrollLoading, setScrollLoading] = useState(false);
     const [avatar, setAvatar] = useState(null);
     const [loadFont, setLoadFont] = useState(false);
-    const { isAlarm, } = useSelector(userSelector);
+    const { isAlarm, shouldHomeRefresh, } = useSelector(userSelector);
     const [cursor, setCursor] = useState('');
     const [searchModalVisible, setSearchModalVisible] = useState(false);
 
@@ -61,6 +61,13 @@ const Home = ({navigation}) => {
         // fetchProfile();
         fetchFont();
     }, []);
+
+    useEffect(() => {
+        if (shouldHomeRefresh === true) {
+            fetchBookmarks();
+            dispatch(setShouldHomeRefresh(false));
+        }
+    }, [shouldHomeRefresh]);
 
 
 

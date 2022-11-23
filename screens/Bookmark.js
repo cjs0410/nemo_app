@@ -28,7 +28,7 @@ import userImage from '../assets/images/userImage.jpeg';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
-import { resetUserInfo } from '../modules/user';
+import { resetUserInfo, setShouldStorageRefresh, } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 import blankAvatar from '../assets/images/peopleicon.png';
 
@@ -40,7 +40,7 @@ const Bookmark = ({navigation}) => {
   const alignment = ["new", "book", "user", ];
   const [whichCategory, setWhichCategory] = useState(0);
   const [isTile, setIsTile] = useState(true);
-  const { accessToken, } = useSelector(userSelector);
+  const { accessToken, shouldStorageRefresh, } = useSelector(userSelector);
   const { bookmarked, } = useSelector(bookmarkSelector);
 
   const [books, setBooks] = useState(null);
@@ -59,7 +59,16 @@ const Bookmark = ({navigation}) => {
   // );
   useEffect(() => {
     fetchBookmarks();
-  }, [whichCategory])
+  }, [whichCategory]);
+
+  useEffect(() => {
+    if (shouldStorageRefresh === true) {
+      fetchBookmarks();
+      dispatch(setShouldStorageRefresh(false));
+    }
+  }, [shouldStorageRefresh]);
+
+
 
   const onArrange = () => {
     setIsTile(!isTile);

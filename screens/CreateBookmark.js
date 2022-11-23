@@ -14,7 +14,7 @@ import HTML from 'react-native-render-html';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { resetUserInfo } from '../modules/user';
+import { resetUserInfo, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -24,6 +24,7 @@ const webViewProps = {
   };
 
 const CreateBookmark = ({navigation, route}) => {
+    const dispatch = useDispatch();
     const { width } = useWindowDimensions();
     const [whatBook, setWhatBook] = useState('');
     const [bookTitle, setBookTitle] = useState('');
@@ -142,7 +143,7 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const addBookmark = async() => {
-        
+        navigation.goBack();
         const formData = new FormData();
         // console.log(contents);
         formData.append('book_id', selectedBook.book_id);
@@ -175,7 +176,10 @@ const CreateBookmark = ({navigation, route}) => {
             )
             .then((res) => {
                 console.log(res.data);
-                navigation.goBack();
+                
+                dispatch(setShouldHomeRefresh(true));
+                dispatch(setShouldStorageRefresh(true));
+                dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
             console.error(err);

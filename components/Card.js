@@ -1217,7 +1217,7 @@ const styles = StyleSheet.create({
     postContentsText: {
         fontWeight: "500",
         // fontSize: SCREEN_WIDTH * 0.041,
-        fontSize: regWidth * 16,
+        fontSize: regWidth * 15,
         lineHeight: regWidth * 28,
     },
     postContentsInput: {

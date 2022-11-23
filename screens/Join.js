@@ -228,12 +228,49 @@ const Join2 = ({ navigation }) => {
     const [nickname, setNickname] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [isPsw, setIsPsw] = useState(false);
     const [passwordCheck, setPasswordCheck] = useState('');
+    const [isPswCheck, setIsPswCheck] = useState(false);
+    const [passwordWarning, setPasswordWarning] = useState('');
+    const [passwordCheckWarning, setPasswordCheckWarning] = useState('');
+    const [joinWarning, setJoinWarning] = useState('');
 
     const onChangeNickname = (payload) => setNickname(payload);
     const onChangeUsername = (payload) => setUsername(payload);
-    const onChangePassword = (payload) => setPassword(payload);
-    const onChangePasswordCheck = (payload) => setPasswordCheck(payload);
+
+    const onChangePassword = (payload) => {
+        const pswRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/
+        setPassword(payload);
+
+        if (!pswRegex.test(payload) && payload.length > 0) {
+            setPasswordWarning('숫자+영문자+특수문자 조합으로 8자리 이상 입력해주세요!');
+            setIsPsw(false);
+        } else {
+            setPasswordWarning('');
+            setIsPsw(true);
+        }
+
+        if (passwordCheck.length === 0 || (payload === passwordCheck)) {
+            setPasswordCheckWarning('');
+            setIsPswCheck(true);
+        } else {
+            setPasswordCheckWarning('비밀번호가 일치하지 않습니다.');
+            setIsPswCheck(false);
+        }
+    }
+
+    const onChangePasswordCheck = (payload) => {
+        setPasswordCheck(payload);
+        if (password === payload || payload.length === 0) {
+            setPasswordCheckWarning('');
+            setIsPswCheck(true);
+        } else {
+            setPasswordCheckWarning('비밀번호가 일치하지 않습니다.');
+            setIsPswCheck(false);
+        }
+    };
+
+    const buttonActive = isPsw && isPswCheck === true;
 
     const onJoin = async() => {
         if (loading) {
@@ -260,7 +297,9 @@ const Join2 = ({ navigation }) => {
                 navigation.navigate('Join3');
             })
         } catch (err) {
-        console.error(err);
+            if (err.response.status === 400) {
+                setJoinWarning('같은 아이디가 이미 존재합니다');
+            }
         }
         setLoading(false);
     }
@@ -298,29 +337,46 @@ const Join2 = ({ navigation }) => {
                     placeholder="사용하실 닉네임을 입력해주세요"
                     onChangeText={onChangeNickname}
                 />
+                <Text style={{...styles.warning, color: "#FF4040", }}>
+                    {""}
+                </Text>
                 <TextInput 
                     style={styles.input}
-                    placeholder="아이디를 입력해주세요"
+                    placeholder="아이디를 입력해주세요(유저 태그로 )"
                     onChangeText={onChangeUsername}
                 />
+                <Text style={{...styles.warning, color: "#FF4040", }}>
+                    {""}
+                </Text>
                 <TextInput 
                     style={styles.input}
                     placeholder="비밀번호를 입력해주세요"
                     onChangeText={onChangePassword}
                     secureTextEntry={true}
                 />
+                <Text style={{...styles.warning, color: "#FF4040", }}>
+                    {passwordWarning}
+                </Text>
                 <TextInput 
                     style={styles.input}
                     placeholder="비밀번호 확인"
                     onChangeText={onChangePasswordCheck}
                     secureTextEntry={true}
                 />
-                <TouchableOpacity
+                <Text style={{...styles.warning, color: "#FF4040", }}>
+                    {passwordCheckWarning}
+                </Text>
+
+                <Pressable
                     onPress={onJoin}
                     style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
+                    disabled={!buttonActive}
                 >
                     <Text style={{...styles.btnText, color: "white",}} >가입하기</Text>
-                </TouchableOpacity>
+                </Pressable>
+                <Text style={{...styles.warning, color: "#FF4040", }}>
+                    {joinWarning}
+                </Text>
                 
             </View>
         </View>
@@ -401,14 +457,14 @@ const styles = StyleSheet.create({
         // paddingVertical: regHeight * 10,
         paddingHorizontal: regWidth * 10,
         borderRadius: 10,
-        marginTop: regHeight * 24,
+        marginTop: regHeight * 12,
     },
     warning: {
         fontSize: regWidth * 12,
         marginHorizontal: regWidth * 8,
         fontWeight: "500",
         // color: "#FF4040",
-        marginTop: regHeight * 12,
+        marginTop: regHeight * 8,
     },
   })
 
