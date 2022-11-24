@@ -88,7 +88,7 @@ const CreateBookmark = ({navigation, route}) => {
     }, []);
 
     useEffect(() => {
-        const cardNum = parseInt(contentsByLine.length / 9) + 1;
+        const cardNum = Math.ceil(contentsByLine.length / 9);
         let copy = [];
 
         for ( let i = 0; i < cardNum; i++) {
@@ -929,6 +929,7 @@ const CreateBookmark = ({navigation, route}) => {
                     onPress={()=>
                         {
                             setPreviewVisible(false);
+                            setCurrent(0);
                         }
                     }
                 />
@@ -937,7 +938,10 @@ const CreateBookmark = ({navigation, route}) => {
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
-                            // onPress={() => setPreviewVisible(false)}
+                            onPress={() => {
+                                setPreviewVisible(false);
+                                setCurrent(0);
+                            }}
                         >
                             <Text style={{fontSize: 15, fontWeight: "500", }} >
                                 닫기
@@ -948,7 +952,6 @@ const CreateBookmark = ({navigation, route}) => {
                         </Text>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            onPress={() => setPreviewVisible(false)}
                         >
                             <Text style={{fontSize: 15, fontWeight: "500", }} >
                                 닫기

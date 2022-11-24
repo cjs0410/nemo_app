@@ -33,6 +33,9 @@ const Card = (props) => {
     const backgroundImageValue = useRef(new Animated.Value(0)).current;
     const bookCoverValue = useRef(new Animated.Value(0)).current;
 
+    const [lineList, setLineList] = useState([]);
+    const [fontSize, setFontSize] = useState(16);
+
     // useEffect(() => {
     //     fetchBookmarking();
     // }, [bookmarked])
@@ -40,6 +43,12 @@ const Card = (props) => {
         fetchWatermark();
         // console.log(props.contents);
     }, [])
+
+    useEffect(() => {
+        if (lineList.length === contents.length && lineList.indexOf(2) !== -1) {
+            setFontSize(fontSize - 1);
+        }
+    }, [lineList])
 
     const onReverse = () => {
         setIsReverse(!isReverse);
@@ -98,6 +107,16 @@ const Card = (props) => {
             duration: 300,
             useNativeDriver: false,
         }).start();
+    }
+
+    const textLineNum = (e) => {
+        // console.log(e.nativeEvent.lines.length);
+        const currentList = e.nativeEvent.lines.length;
+        setLineList(
+            [...lineList, currentList]
+        );
+        // console.log(lineList);
+
     }
 
 
@@ -188,7 +207,14 @@ const Card = (props) => {
                         {contents.join()}
                     </Text> */}
                     {contents.map((line, index) => (
-                        <Text style={styles.postContentsText} key={index}>
+                        <Text 
+                            style={{
+                                ...styles.postContentsText,
+                                fontSize: regWidth * fontSize,
+                            }} 
+                            onTextLayout={textLineNum}
+                            key={index}
+                        >
                             {line.replace(/\n/g, '')}
                         </Text> 
                     ))}
@@ -210,7 +236,7 @@ const Card = (props) => {
 const CardPreview = (props) => {
     const { bookTitle, whatChapter, bookCover, contents, hex, backgroundImage, watermark, index } = props;
     useEffect(() => {
-        console.log(contents);
+        // console.log(contents);
     }, [])
 
     return (
@@ -595,23 +621,23 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
         setWhatBook('');
     }
 
-    const textInputHeight = (e) => {
-        console.log(e.nativeEvent.lines.length);
-        // console.log(SCREEN_0.041);
-        // const newHeight = e.nativeEvent.layout.height;
+    // const textInputHeight = (e) => {
+    //     console.log(e.nativeEvent.lines.length);
+    //     // console.log(SCREEN_0.041);
+    //     // const newHeight = e.nativeEvent.layout.height;
 
-        // console.log(newHeight, inputContainerHeight);
+    //     // console.log(newHeight, inputContainerHeight);
 
-        // setInputHeight(newHeight);
-        // if ((inputContainerHeight !== 0) && ((newHeight + 28) > inputContainerHeight)) {
-        //     console.log("over!");
-        //     setExtraHeight(extraHeight + 28)
-        // }
-    }
-    const textInputContainterHeight = (e) => {
-        // console.log(e.nativeEvent.layout);
-        setInputContainerHeight(e.nativeEvent.layout.height);
-    }
+    //     // setInputHeight(newHeight);
+    //     // if ((inputContainerHeight !== 0) && ((newHeight + 28) > inputContainerHeight)) {
+    //     //     console.log("over!");
+    //     //     setExtraHeight(extraHeight + 28)
+    //     // }
+    // }
+    // const textInputContainterHeight = (e) => {
+    //     // console.log(e.nativeEvent.layout);
+    //     setInputContainerHeight(e.nativeEvent.layout.height);
+    // }
 
     const textInputLineNum = (e) => {
         // setLineNum(e.nativeEvent.lines.length);
@@ -1217,7 +1243,7 @@ const styles = StyleSheet.create({
     postContentsText: {
         fontWeight: "500",
         // fontSize: SCREEN_WIDTH * 0.041,
-        fontSize: regWidth * 15,
+        fontSize: regWidth * 16,
         lineHeight: regWidth * 28,
     },
     postContentsInput: {

@@ -1,4 +1,4 @@
-import { StyleSheet, View, SafeAreaView, ScrollView, FlatList, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, Pressable, Modal, } from "react-native";
+import { StyleSheet, View, SafeAreaView, ScrollView, FlatList, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, ActivityIndicator, RefreshControl, Pressable, Modal, StatusBar, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
@@ -151,10 +151,10 @@ const Home = ({navigation}) => {
         if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
             try {
                 setScrollLoading(true);
-                console.log(bookmarks.at(-1).cursor);
+                console.log(bookmarks[bookmarks.length - 1].cursor);
                 await Api
                 .post("/api/v1/user/", {
-                    cursor: bookmarks.at(-1).cursor,
+                    cursor: bookmarks[bookmarks.length - 1].cursor,
                 })
                 .then((res) => {
                     // console.log([...bookmarks, ...res.data, ]);
@@ -304,7 +304,7 @@ const Home = ({navigation}) => {
             { bookmarks !== null ? 
                 <FlatList 
                     onEndReached={onEndReached}
-                    onEndReachedThreshold={0}
+                    onEndReachedThreshold={0.3}
                     ListFooterComponent={scrollLoading && <ActivityIndicator />}
                     data={bookmarks}
                     

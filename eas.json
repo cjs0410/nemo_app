@@ -16,7 +16,7 @@
     "production": {
       "android": {
         "serviceAccountKeyPath": "../Desktop/pc-api-9130713831191943933-249-1616f22b615d.json",
-        "track": "alpha",
+        "track": "internal",
         "releaseStatus": "completed"
       }
     }

@@ -75,6 +75,8 @@ const persistor = persistStore(store);
 
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
+TextInput.defaultProps = TextInput.defaultProps || {};
+TextInput.defaultProps.allowFontScaling = false;
 
 const appRedux = () => (
   <Provider store={store}>
@@ -113,7 +115,6 @@ const App = () => {
         })
         .then(async(res) => {
           try {
-            console.log('reissue');
             await AsyncStorage.setItem('refresh', res.data.refresh);
             await AsyncStorage.setItem('access', res.data.access);
             dispatch(setRefreshToken(res.data.refresh));
@@ -160,9 +161,7 @@ const App = () => {
 
   return (
       <NavigationContainer>
-        <StatusBar 
-          barStyle={'dark-content'}
-        />
+        <StatusBar />
         {!((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000))) ? 
         (
           <Stack.Navigator>

@@ -4,6 +4,7 @@ import {
     useNavigation,
     useFocusEffect,
 } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import Api from "../lib/Api";
@@ -11,7 +12,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import { setRefreshToken, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -91,7 +92,12 @@ const ProfileEdit = ({route, navigation}) => {
                     },
                 }
             )
-            .then((res) => {
+            .then(async(res) => {
+                console.log(res.data);
+                await AsyncStorage.setItem('refresh', res.data.refresh);
+                await AsyncStorage.setItem('access', res.data.access);
+                dispatch(setRefreshToken(res.data.refresh));
+
                 navigation.goBack();
                 dispatch(setShouldHomeRefresh(true));
                 dispatch(setShouldStorageRefresh(true));
