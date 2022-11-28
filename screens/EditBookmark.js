@@ -24,6 +24,7 @@ const webViewProps = {
   };
 
 const EditBookmark = ({navigation, route}) => {
+    const dispatch = useDispatch();
     const { width } = useWindowDimensions();
     const [whatBook, setWhatBook] = useState('');
     const [bookTitle, setBookTitle] = useState('');
@@ -327,6 +328,16 @@ const EditBookmark = ({navigation, route}) => {
         }
     }
 
+    const submitTag = (e) => {
+        if (tagValue.length > 0) {
+            setTags([
+                ...tags,
+                tagValue,
+            ]);
+            setTagValue('');
+        }
+    }
+
     const deleteTag = (index) => {
         let copy = [...tags];
         copy.splice(index, 1);
@@ -362,8 +373,7 @@ const EditBookmark = ({navigation, route}) => {
         <View style={styles.container}>
             <SafeAreaView style={styles.header} >
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Text style={{ fontSize: 25, fontWeight: "900", marginRight: 15, }} >Create</Text>
-                    <Feather name="bookmark" size={28} color="black" />
+                    <Text style={{ fontSize: 25, fontWeight: "900", marginRight: 15, }} >북마크 수정</Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -509,13 +519,13 @@ const EditBookmark = ({navigation, route}) => {
                                 setBackgroundImage(null);
                             }}
                         />
-                        <TouchableOpacity 
+                        {/* <TouchableOpacity 
                             activeOpacity={1} 
                             style={styles.optionBox} 
                             onPress={pickBackgroundImage}
                         >
                             <MaterialIcons name="add-photo-alternate" size={24} color="black" />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
                 
@@ -774,12 +784,13 @@ const EditBookmark = ({navigation, route}) => {
                         </Pressable>
                     </SafeAreaView>
                     <TextInput 
-                        placeholder="태그를 입력하고 쉼표를 입력하여 등록하세요"
+                        placeholder="쉼표 혹은 엔터를 입력하여 태그를 등록하세요"
                         style={{
                             ...styles.modalInput,
                             height: regHeight * 50,
                         }}
                         onChangeText={changeTag}
+                        onSubmitEditing={submitTag}
                         value={tagValue}
                     />
                     <View style={{ flexDirection: "row", }}>
@@ -891,6 +902,7 @@ const EditBookmark = ({navigation, route}) => {
                     onPress={()=>
                         {
                             setPreviewVisible(false);
+                            setCurrent(0);
                         }
                     }
                 />
@@ -899,7 +911,10 @@ const EditBookmark = ({navigation, route}) => {
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                             style={{ opacity: 0 }}
-                            // onPress={() => setPreviewVisible(false)}
+                            onPress={() => {
+                                setPreviewVisible(false);
+                                setCurrent(0);
+                            }}
                         >
                             <Text style={{fontSize: 15, fontWeight: "500", }} >
                                 닫기
@@ -910,7 +925,7 @@ const EditBookmark = ({navigation, route}) => {
                         </Text>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            onPress={() => setPreviewVisible(false)}
+                            style={{ opacity: 0, }}
                         >
                             <Text style={{fontSize: 15, fontWeight: "500", }} >
                                 닫기

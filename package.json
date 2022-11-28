@@ -43,7 +43,9 @@
     "react-redux": "^8.0.5",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22",
     "redux-persist": "^6.0.0",
-    "expo-updates": "~0.14.7"
+    "expo-updates": "~0.14.7",
+    "react-native-view-shot": "3.3.0",
+    "expo-sharing": "~10.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

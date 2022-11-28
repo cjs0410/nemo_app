@@ -28,3 +28,6 @@ npm install --save-prod react-native-render-html
 npx expo install react-native-fast-image
 expo install react-native-gesture-handler
 npx expo install expo-updates
+expo install react-native-view-shot
+npx expo install react-native-view-shot
+npx expo install expo-sharing

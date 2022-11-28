@@ -952,6 +952,7 @@ const CreateBookmark = ({navigation, route}) => {
                         </Text>
                         <Pressable
                             hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            style={{ opacity: 0, }}
                         >
                             <Text style={{fontSize: 15, fontWeight: "500", }} >
                                 닫기

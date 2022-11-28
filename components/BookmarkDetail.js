@@ -11,6 +11,8 @@ import Card from './Card';
 import Api from '../lib/Api';
 import blankAvatar from '../assets/images/peopleicon.png';
 import BottomSheet, { BottomSheetView, BottomSheetFooter } from '@gorhom/bottom-sheet';
+import ViewShot from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
 
 import {
     BottomSheetModal,
@@ -28,6 +30,7 @@ const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const BookmarkDetail = (props) => {
     const dispatch = useDispatch();
+    const captureRef = useRef();
     const bookmark = props.bookmark;
     const navigation = props.navigation;
     const [current, setCurrent] = useState(0);
@@ -50,6 +53,10 @@ const BookmarkDetail = (props) => {
         // console.log(bookmark);
         fetchUserTag();
     }, [])
+
+    // useEffect(() => {
+    //     console.log(captureRef);
+    // }, [captureRef]);
 
     const fetchUserTag = async() => {
         try {
@@ -235,6 +242,15 @@ const BookmarkDetail = (props) => {
         }
     }
 
+    const onCapture = () => {
+        captureRef.current.capture().then((uri) => {
+        console.log("do something with ", uri);
+        Sharing.shareAsync("file://" + uri);
+        }),
+        (error) => console.error("Oops, snapshot failed", error);
+    };
+
+
     // // ref
     // const bottomSheetModalRef = useRef();
 
@@ -300,6 +316,11 @@ const BookmarkDetail = (props) => {
                         <Entypo name="dots-three-horizontal" size={regWidth * 18} color="black" />
                     </Pressable>
                 </View>
+                <ViewShot
+                            ref={captureRef}
+                            options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}
+                            // key={index}
+                        >
                 <ScrollView
                     pagingEnabled
                     showsHorizontalScrollIndicator={false}
@@ -307,6 +328,7 @@ const BookmarkDetail = (props) => {
                     // onScrollEndDrag={handleCurrentChange}
                     onScroll={handleCurrentChange}
                     scrollEventThrottle={16}
+                    scrollEnabled={bookmark.contents.length === 1 ? false : true}
                 >
                     {/* {bookmark.nemos.map((nemo, index) => (
                         <Card 
@@ -326,37 +348,37 @@ const BookmarkDetail = (props) => {
                         />
                     ))} */}
                     {bookmark.contents.map((content, index) => (
+                        // <ViewShot
+                        //     ref={captureRef}
+                        //     options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}
+                        //     key={index}
+                        // >
                         <Card 
                             bookmark={bookmark} 
                             contents={content}
                             navigation={navigation} 
                             index={index}
+                            captureRef={captureRef}
                             key={index} 
                         />
+                        // </ViewShot>
                     ))}
                     
                 </ScrollView>
+                </ViewShot>
+                {bookmark.contents.length === 1 ? 
+                    null
+                    :
+                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: -12, }}>
+                        {bookmark.contents.map((contents, index) => {
+                            if (index === current) {
+                                return <Entypo name="dot-single" size={regWidth * 24} color="red" style={{ marginHorizontal: -4, }} key={index} />
+                            }
+                            return <Entypo name="dot-single" size={regWidth * 24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
+                        })}
+                    </View>
+                }
 
-                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: -12, }}>
-                    {/* {bookmark.nemos.map((nemo, index) => {
-                        if ((nemo.numbering - 1) === current) {
-                            return <Entypo name="dot-single" size={24} color="red" style={{ marginHorizontal: -4, }} key={index} />
-                        }
-                        return <Entypo name="dot-single" size={24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
-                    })} */}
-                    {/* {contentsByNum.map((contents, index) => {
-                        if (index === current) {
-                            return <Entypo name="dot-single" size={24} color="#FF4040" style={{ marginHorizontal: -4, }} key={index} />
-                        }
-                        return <Entypo name="dot-single" size={24} color="#808080" style={{ marginHorizontal: -4, }} key={index} />
-                    })} */}
-                    {bookmark.contents.map((contents, index) => {
-                        if (index === current) {
-                            return <Entypo name="dot-single" size={regWidth * 24} color="red" style={{ marginHorizontal: -4, }} key={index} />
-                        }
-                        return <Entypo name="dot-single" size={regWidth * 24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
-                    })}
-                </View>
 
                 <View style={styles.bookmarkInfo}>
                     {bookmark.text.length !== 0 ? 
@@ -474,6 +496,34 @@ const BookmarkDetail = (props) => {
                             // ]
                         }}
                     >
+                        <TouchableOpacity 
+                            style={styles.menu}
+                            activeOpacity={1}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                setAlbumModalVisible(true);
+                                fetchAlbumList();
+                            }}
+                        >
+                            <AntDesign name="pluscircleo" size={24} color="black" />
+                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                앨범에 추가하기
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.menu}
+                            activeOpacity={1}
+                            onPress={() => {
+                                setBookmarkModalVisible(false);
+                                onCapture();
+                            }}
+                        >
+                            {/* <AntDesign name="pluscircleo" size={24} color="black" /> */}
+                            <Entypo name="share-alternative" size={24} color="black" />
+                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
+                                캡쳐 후 공유하기
+                            </Text>
+                        </TouchableOpacity>
 
                         {bookmark.user_tag === userTag ? 
                             <>
@@ -517,20 +567,7 @@ const BookmarkDetail = (props) => {
                                 <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
                             </TouchableOpacity>
                         }
-                        <TouchableOpacity 
-                            style={styles.menu}
-                            activeOpacity={1}
-                            onPress={() => {
-                                setBookmarkModalVisible(false);
-                                setAlbumModalVisible(true);
-                                fetchAlbumList();
-                            }}
-                        >
-                            <AntDesign name="pluscircleo" size={24} color="black" />
-                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
-                                앨범에 추가하기
-                            </Text>
-                        </TouchableOpacity>
+
 
                     </Animated.View>
 

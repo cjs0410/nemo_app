@@ -19,7 +19,7 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
-import { resetUserInfo, setRefreshToken, resetRefreshToken, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import { resetUserInfo, setRefreshToken, resetRefreshToken, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, setIsAlarm, } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -58,6 +58,7 @@ const Home = ({navigation}) => {
 
     useEffect(() => {
         fetchBookmarks();
+        fetchNewAlarm();
         // fetchProfile();
         fetchFont();
     }, []);
@@ -65,6 +66,7 @@ const Home = ({navigation}) => {
     useEffect(() => {
         if (shouldHomeRefresh === true) {
             fetchBookmarks();
+            fetchNewAlarm();
             dispatch(setShouldHomeRefresh(false));
         }
     }, [shouldHomeRefresh]);
@@ -99,6 +101,19 @@ const Home = ({navigation}) => {
         setScrollLoading(false);
     }
 
+    const fetchNewAlarm = async() => {
+        try {
+            await Api
+            .get("/api/v1/user/new_alarm/")
+            .then((res) => {
+                console.log(res.data);
+                dispatch(setIsAlarm(res.data.alarm));
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const renderBookmark = ({ item }) => (
         <BookmarkDetail bookmark={item} navigation={navigation} />
     )
@@ -113,6 +128,7 @@ const Home = ({navigation}) => {
         setRefreshing(true);
         setCursor(0);
         await fetchBookmarks()
+        .then(async() => fetchNewAlarm())
         .then(() => setRefreshing(false));
         // wait(2000).then(() => setRefreshing(false));
     }, []);

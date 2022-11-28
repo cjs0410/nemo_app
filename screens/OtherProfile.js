@@ -188,7 +188,7 @@ const OtherProfile = ({navigation, route}) => {
                                 style={{
                                     fontSize: regWidth * 25,
                                     fontWeight: "900",
-                                    width: "70%",
+                                    width: regWidth * 245,
                                 }}
                                 numberOfLines={2}
                                 ellipsizeMode='tail'

@@ -57,7 +57,7 @@ import { Feather, MaterialIcons } from '@expo/vector-icons';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from './modules/hooks';
-import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, setIsAlarm, } from './modules/user';
+import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, resetAvatar, setIsAlarm, } from './modules/user';
 import blankAvatar from './assets/images/peopleicon.png';
 
 const Stack = createNativeStackNavigator();
@@ -109,6 +109,8 @@ const App = () => {
   const fetchRefreshToken = async() => {
     const refreshToken = await AsyncStorage.getItem('refresh');
     if (refreshToken !== null) {
+      // console.log(refreshToken);
+      // console.log("reissue!");
       try {
         await Api.post("/api/v1/user/reissue/", {
           refresh_token: refreshToken,
@@ -124,7 +126,15 @@ const App = () => {
           }
         })
       } catch (err) {
-        console.error(err);
+        
+        if (err.response.status === 404) {
+          await AsyncStorage.removeItem('access');
+          await AsyncStorage.removeItem('refresh');
+          dispatch(resetRefreshToken());
+          dispatch(resetAvatar());
+        } else {
+          console.error(err);
+        }
       }
     }
       // await AsyncStorage.removeItem('access');
@@ -140,7 +150,7 @@ const App = () => {
         setAvatar(res.data.avatar);
         console.log(res.data);
         dispatch(setAvatar(res.data.avatar));
-        dispatch(setIsAlarm(res.data.alarm));
+        // dispatch(setIsAlarm(res.data.alarm));
       })
     } catch (err) {
       console.error(err);

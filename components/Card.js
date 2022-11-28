@@ -28,6 +28,7 @@ const Card = (props) => {
     // const nemo = props.nemo;
     const contents = props.contents;
     const index = props.index;
+    const captureRef = props.captureRef;
     const [bookmarking, setBookmarking] = useState(bookmark.bookmarking);
     const [watermark, setWatermark] = useState('');
     const backgroundImageValue = useRef(new Animated.Value(0)).current;
@@ -228,7 +229,6 @@ const Card = (props) => {
                     </Pressable>
                 </View>
             </View>
-            
         </View>
     );
 }
@@ -708,12 +708,17 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                             </View>
                         </View>
                     }
-                    <TouchableOpacity
-                        activeOpacity={1}
-                        onPress={deleteBook}
-                    >
-                        <Feather name="x" size={24} color="black" />
-                    </TouchableOpacity>
+                    {bookList !== null && selectedBook === null ? 
+                        <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={deleteBook}
+                        >
+                            <Feather name="x" size={24} color="black" />
+                        </TouchableOpacity>
+                        :
+                        null
+                    }
+
                 </View>
                 {bookList !== null && selectedBook === null ? 
                     <>
@@ -721,12 +726,19 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                         <View style={{...styles.searchList, backgroundColor: color, }}>
                             <TouchableOpacity
                                 activeOpacity={1}
-                                style={{...styles.searchBlock, justifyContent: "center", }}
+                                style={{
+                                    ...styles.searchBlock,
+                                    justifyContent: "center",
+                                    paddingTop: 18,
+                                }}
                                 onPress={() => setModalVisible(true)}
                             >
-                                <Text style={{color: "green", fontSize: 20, fontWeight: "700", }}>
-                                    책 등록하기
-                                </Text>
+                                <AntDesign name="pluscircleo" size={24} color="black" />
+                                <View>
+                                    <Text style={{ fontSize: 16, fontWeight: "700", marginHorizontal: 12, }}>
+                                        책 등록하기
+                                    </Text>
+                                </View>
                             </TouchableOpacity>
                         </View>
                         :
@@ -755,6 +767,22 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                     </View>
                                 </TouchableOpacity>
                             ))}
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                style={{
+                                    ...styles.searchBlock,
+                                    justifyContent: "center",
+                                    paddingTop: 18,
+                                }}
+                                onPress={() => setModalVisible(true)}
+                            >
+                                <AntDesign name="pluscircleo" size={24} color="black" />
+                                <View>
+                                    <Text style={{ fontSize: 16, fontWeight: "700", marginHorizontal: 12, }}>
+                                        책 등록하기
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
                         </ScrollView>
                     }
                     </>
@@ -1197,6 +1225,7 @@ const styles = StyleSheet.create({
         // flex: 1,
         height: SCREEN_WIDTH,
         width: SCREEN_WIDTH,
+        backgroundColor: "white",
     },
     postContentsBox: {
         flex: 1,
@@ -1288,6 +1317,7 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         alignItems: "center", 
         paddingVertical: regHeight * 6,
+        paddingHorizontal: regWidth * 8,
     },
     backgroungImageContainer: {
         position: "absolute",

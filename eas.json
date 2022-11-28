@@ -18,6 +18,12 @@
         "serviceAccountKeyPath": "../Desktop/pc-api-9130713831191943933-249-1616f22b615d.json",
         "track": "internal",
         "releaseStatus": "completed"
+      },
+      "ios": {
+        "appleId": "ginkgosky@hanmail.net",
+        "ascAppId": "125769427",
+        "appleTeamId": "L8GLRJ2FTU",
+        "appName": "Nemo - 책을 기억하는 최고의 방법"
       }
     }
   }
