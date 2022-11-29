@@ -78,7 +78,7 @@ const CreateBookmark = ({navigation, route}) => {
     const [albums, setAlbums] = useState(null);
     const [albumId, setAlbumId] = useState('');
 
-
+    const [align, setAlign] = useState('normal');
     
     useEffect(() => {
         updateWatermark();
@@ -447,6 +447,7 @@ const CreateBookmark = ({navigation, route}) => {
                     setContentsByLine={setContentsByLine}
                     setContentsByCard={setContentsByCard}
                     ocrLoading={ocrLoading}
+                    align={align}
                 />
                 
                 {/* <BlankCardFront 
@@ -498,7 +499,11 @@ const CreateBookmark = ({navigation, route}) => {
                     <View style={{ flexDirection: "row", }} >
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#D9D9D9"}}
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#D9D9D9",
+                                borderColor: color === "#D9D9D9" ? "#FF4040" : "black"
+                            }}
                             onPress={() => {
                                 selectColor("#D9D9D9");
                                 setBackgroundImage(null);
@@ -506,7 +511,11 @@ const CreateBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#FFCECE"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#FFCECE",
+                                borderColor: color === "#FFCECE" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#FFCECE");
                                 setBackgroundImage(null);
@@ -514,7 +523,11 @@ const CreateBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#FFF0BC"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#FFF0BC",
+                                borderColor: color === "#FFF0BC" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#FFF0BC");
                                 setBackgroundImage(null);
@@ -522,7 +535,11 @@ const CreateBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#BDFFD0"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#BDFFD0",
+                                borderColor: color === "#BDFFD0" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#BDFFD0");
                                 setBackgroundImage(null);
@@ -530,7 +547,11 @@ const CreateBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#8BB7EA"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#8BB7EA",
+                                borderColor: color === "#8BB7EA" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#8BB7EA");
                                 setBackgroundImage(null);
@@ -538,7 +559,11 @@ const CreateBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#D2BDFF"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#D2BDFF",
+                                borderColor: color === "#D2BDFF" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#D2BDFF");
                                 setBackgroundImage(null);
@@ -552,6 +577,26 @@ const CreateBookmark = ({navigation, route}) => {
                             <MaterialIcons name="add-photo-alternate" size={24} color="black" />
                         </TouchableOpacity> */}
                     </View>
+                    {/* <View style={{ flexDirection: "row", }} >
+                        <Pressable 
+                            style={{
+                                ...styles.optionBox,
+                                borderColor: align === "normal" ? "#FF4040" : "black",
+                            }} 
+                            onPress={() => setAlign('normal')}
+                        >
+                            <Feather name="align-justify" size={24} color={align === "normal" ? "#FF4040" : "black"} />
+                        </Pressable>
+                        <Pressable 
+                            style={{
+                                ...styles.optionBox,
+                                borderColor: align === "center" ? "#FF4040" : "black",
+                            }}
+                            onPress={() => setAlign('center')}
+                        >
+                            <Feather name="align-center" size={24} color={align === "center" ? "#FF4040" : "black"} />
+                        </Pressable>
+                    </View> */}
                 </View>
                 
                 {/* <WebView
@@ -989,6 +1034,7 @@ const CreateBookmark = ({navigation, route}) => {
                                 backgroundImage={backgroundImage}
                                 watermark={watermark} 
                                 index={index}
+                                align={align}
                                 key={index}
                             />
                         ))}

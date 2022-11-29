@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Pressable } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Pressable, Image, Animated, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
@@ -6,6 +6,7 @@ import { AntDesign, Ionicons, } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Api from '../lib/Api';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import NemoLogo from '../assets/images/NemoTrans.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
@@ -26,6 +27,7 @@ const Join1 = ({ navigation }) => {
     const time = useRef(180);
     const timerId = useRef(null);
     const [isCountDown, setIsCountDown] = useState(false);
+    const logoValue = useRef(new Animated.Value(0)).current;
 
     // useEffect(() => {
     //     timerId.current = setInterval(() => {
@@ -41,6 +43,13 @@ const Join1 = ({ navigation }) => {
         timeOut();
     }, [sec]);
     
+    const showLogo = () => {
+        Animated.timing(logoValue, {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver: false,
+        }).start();
+    }
 
     const countDown = () => {
         setIsCountDown(true);
@@ -138,11 +147,19 @@ const Join1 = ({ navigation }) => {
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </Pressable>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Ionicons name="layers-sharp" size={30} color="black" />
+                    <Animated.Image 
+                        source={NemoLogo}
+                        style={{
+                            ...styles.LogoImage,
+                            opacity: logoValue,
+                        }}
+                        onLoadEnd={showLogo}
+                    />
                     <Text style={{
                         fontSize: 30,
                         fontWeight: "700",
                         letterSpacing: -0.28,
+                        marginHorizontal: 8,
                     }}>
                         Nemo
                     </Text>
@@ -234,6 +251,7 @@ const Join2 = ({ navigation }) => {
     const [passwordWarning, setPasswordWarning] = useState('');
     const [passwordCheckWarning, setPasswordCheckWarning] = useState('');
     const [joinWarning, setJoinWarning] = useState('');
+    const logoValue = useRef(new Animated.Value(0)).current;
 
     const onChangeNickname = (payload) => setNickname(payload);
     const onChangeUsername = (payload) => setUsername(payload);
@@ -303,6 +321,14 @@ const Join2 = ({ navigation }) => {
         }
         setLoading(false);
     }
+    
+    const showLogo = () => {
+        Animated.timing(logoValue, {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver: false,
+        }).start();
+    }
 
     return (
         <View style={styles.container}>
@@ -314,11 +340,19 @@ const Join2 = ({ navigation }) => {
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </Pressable>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Ionicons name="layers-sharp" size={30} color="black" />
+                    <Animated.Image 
+                        source={NemoLogo}
+                        style={{
+                            ...styles.LogoImage,
+                            opacity: logoValue,
+                        }}
+                        onLoadEnd={showLogo}
+                    />
                     <Text style={{
                         fontSize: 30,
                         fontWeight: "700",
                         letterSpacing: -0.28,
+                        marginHorizontal: 8,
                     }}>
                         Nemo
                     </Text>
@@ -425,6 +459,11 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+    },
+    LogoImage: {
+        width: regWidth * 30,
+        height: regWidth * 30,
+        resizeMode: "contain",
     },
     introduce: {
         marginTop: -18,

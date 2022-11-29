@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from '@react-navigation/native';
 import { useCardAnimation } from '@react-navigation/stack';
 import { Feather, AntDesign } from '@expo/vector-icons';
-import blankAlbumImg from '../assets/images/blankAlbumImage.png';
 import emptyImage from '../assets/images/emptyImage.jpeg';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import * as ImagePicker from 'expo-image-picker';

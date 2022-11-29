@@ -16,6 +16,7 @@ import blankAvatar from '../assets/images/peopleicon.png';
 import * as Font from "expo-font";
 import * as Update from "expo-updates";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import NemoLogo from '../assets/images/NemoTrans.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
@@ -48,6 +49,8 @@ const Home = ({navigation}) => {
     const [searchInput, setSearchInput] = useState('');
     const debounceVal = useDebounce(searchInput);
     const [searchResultList, setSearchResultList] = useState(null);
+
+    const logoValue = useRef(new Animated.Value(0)).current;
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -229,6 +232,14 @@ const Home = ({navigation}) => {
         }
     }
 
+    const showLogo = () => {
+        Animated.timing(logoValue, {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver: false,
+        }).start();
+    }
+
 
     if (!loadFont) {
         return (
@@ -244,11 +255,19 @@ const Home = ({navigation}) => {
                     style={{ flexDirection: "row", alignItems: "center", }}
                     // onPress={() => Update.reloadAsync()}
                 >
-                    <Ionicons name="layers-sharp" size={30} color="black" />
+                    <Animated.Image 
+                        source={NemoLogo}
+                        style={{
+                            ...styles.LogoImage,
+                            opacity: logoValue,
+                        }}
+                        onLoadEnd={showLogo}
+                    />
                     <Text style={{
                         fontFamily: "frank",
                         fontSize: 30,
                         fontWeight: "900",
+                        marginHorizontal: regWidth * 8,
                     }}>
                         Nemo
                     </Text>
@@ -469,6 +488,11 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+    },
+    LogoImage: {
+        width: regWidth * 30,
+        height: regWidth * 30,
+        resizeMode: "contain",
     },
     post: {
         // backgroundColor: "grey",

@@ -1,5 +1,5 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, Image, Animated, } from "react-native";
+import React, { useEffect, useState, useRef, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { setUserInfo, setRefreshToken, } from '../modules/user';
 import Api from '../lib/Api';
+import NemoLogo from '../assets/images/NemoTrans.png';
 
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -18,6 +19,15 @@ const Login = ({ navigation }) => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [warning, setWarning] = useState('');
+  const logoValue = useRef(new Animated.Value(0)).current;
+
+  const showLogo = () => {
+      Animated.timing(logoValue, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: false,
+      }).start();
+  }
 
   const onChangeId = (payload) => {
     setId(payload);
@@ -72,11 +82,19 @@ const Login = ({ navigation }) => {
             <Ionicons name="chevron-back" size={28} color="black" />
           </Pressable>
           <View style={{ flexDirection: "row", alignItems: "center", }}>
-            <Ionicons name="layers-sharp" size={30} color="black" />
+            <Animated.Image 
+              source={NemoLogo}
+              style={{
+                  ...styles.LogoImage,
+                  opacity: logoValue,
+              }}
+              onLoadEnd={showLogo}
+            />
             <Text style={{
               fontSize: 30,
               fontWeight: "700",
               letterSpacing: -0.28,
+              marginHorizontal: 8,
             }}>
               Nemo
             </Text>
@@ -151,6 +169,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  LogoImage: {
+    width: regWidth * 30,
+    height: regWidth * 30,
+    resizeMode: "contain",
   },
   introduce: {
     marginTop: -18,

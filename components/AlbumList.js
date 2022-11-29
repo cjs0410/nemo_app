@@ -2,7 +2,6 @@ import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, Touchabl
 import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, FontAwesome, } from '@expo/vector-icons'; 
 import bookCover from '../assets/images/steve.jpeg';
-import blankAlbumImg from '../assets/images/blankAlbumImage.png';
 
 const AlbumList = (props) => {
     const album = props.album;

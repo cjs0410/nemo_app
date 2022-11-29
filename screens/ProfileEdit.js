@@ -6,6 +6,7 @@ import {
 } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import writerImage from '../assets/images/userImage.jpeg';
+import blankAvatar from '../assets/images/peopleicon.png';
 import { Entypo, Feather, MaterialIcons, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import Api from "../lib/Api";
 import * as ImagePicker from 'expo-image-picker';
@@ -25,6 +26,9 @@ const ProfileEdit = ({route, navigation}) => {
     const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
     const [userTag, setUserTag] = useState(profile.user_tag);
     const [name, setName] = useState(profile.name);
+    const [imageSoruce, setImageSource] = useState(
+        profile.avatar === null ? blankAvatar : {uri: profile.avatar}
+    )
 
     const pickImage = async () => {
         try {
@@ -45,6 +49,7 @@ const ProfileEdit = ({route, navigation}) => {
       
           if (!result.cancelled) {
             setImage(result.uri);
+            setImageSource({uri: result.uri});
           }
         } catch (error) {
           console.error(error);
@@ -79,11 +84,14 @@ const ProfileEdit = ({route, navigation}) => {
                 type: type,
                 name: filename
             });
-        }
+        } 
+        // else {
+        //     formData.append('avatar', blankAvatar)
+        // }
 
         formData.append('user_tag', userTag);
         formData.append('name', name);
-        // console.log(formData);
+        console.log(formData);
         try {
             await Api.put('/api/v1/user/myprofile/edit/', formData, 
                 {
@@ -93,7 +101,7 @@ const ProfileEdit = ({route, navigation}) => {
                 }
             )
             .then(async(res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 await AsyncStorage.setItem('refresh', res.data.refresh);
                 await AsyncStorage.setItem('access', res.data.access);
                 dispatch(setRefreshToken(res.data.refresh));
@@ -144,19 +152,37 @@ const ProfileEdit = ({route, navigation}) => {
                     :
                     <>
                         <View style={styles.imageEdit}>
-                            <Image 
-                                source={image === null ? { uri: profile.avatar } : { uri: image }} 
-                                style={styles.profileImage}
-                            />
-                            <TouchableOpacity
+                            <Pressable
+                                onPress={pickImage}
+                            >
+                                <Image 
+                                    // source={image === null ? { uri: profile.avatar === null ? blankAvatar : profile.avatar } : { uri: image }} 
+                                    // source={image === null ? profile.avatar === null ? blankAvatar : { uri: profile.avatar } : { uri: image }} 
+                                    // source={profile.avatar === null ? blankAvatar : (image === null ? { uri: profile.avatar } : { uri: image })} 
+                                    source={imageSoruce}
+                                    style={styles.profileImage}
+                                />
+                            </Pressable>
+                            <Pressable
                                 style={{ marginTop: 15, }}
                                 activeOpacity={1}
                                 onPress={pickImage}
+                                hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                             >
                                 <Text style={{ fontSize: 15, fontWeight: "500", color: "#FF4040", }}>
                                     프로필 사진 바꾸기
                                 </Text>
-                            </TouchableOpacity>
+                            </Pressable>
+                            <Pressable
+                                style={{ marginTop: 22, }}
+                                activeOpacity={1}
+                                onPress={() => setImageSource(blankAvatar)}
+                                hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            >
+                                <Text style={{ fontSize: 15, fontWeight: "500", color: "#FF4040", }}>
+                                    프로필 기본 이미지로 설정
+                                </Text>
+                            </Pressable>
                         </View>
                         <View style={styles.profileEdit}>
                             <Text style={{ fontSize: 15, fontWeight: "500", }}>

@@ -20,23 +20,32 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "NemoAppStore",
-      "buildNumber": "5"
+      "buildNumber": "7"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/androidLogo.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.cjs0410.Nemo",
-      "versionCode": 14
+      "versionCode": 17
     },
     "web": {
-      "favicon": "./assets/Nemo1.png"
+      "favicon": "./assets/NemoLogo.png"
     },
     "extra": {
       "eas": {
         "projectId": "6766055e-b480-4c96-b75e-c5d0ea859d23"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "사진 텍스트 변환을 이용해서 북마크를 작성할 수 있도록 하거나 프로필(앨범) 사진을 설정하기 위해 사진에 접근합니다. 이외의 용도로 사용되지 않습니다.",
+          "cameraPermission": "사진 텍스트 변환을 이용해서 북마크를 작성할 수 있도록 하기 위해 카메라에 접근합니다. 이외의 용도로 사용되지 않습니다."
+        }
+      ]
+    ]
   }
 }

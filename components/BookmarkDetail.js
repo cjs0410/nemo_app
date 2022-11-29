@@ -372,9 +372,9 @@ const BookmarkDetail = (props) => {
                     <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: -12, }}>
                         {bookmark.contents.map((contents, index) => {
                             if (index === current) {
-                                return <Entypo name="dot-single" size={regWidth * 24} color="red" style={{ marginHorizontal: -4, }} key={index} />
+                                return <Entypo name="dot-single" size={regWidth * 24} color="red" style={{ marginHorizontal: -regWidth * 6, }} key={index} />
                             }
-                            return <Entypo name="dot-single" size={regWidth * 24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
+                            return <Entypo name="dot-single" size={regWidth * 24} color="grey" style={{ marginHorizontal: -regWidth * 6, }} key={index} />
                         })}
                     </View>
                 }

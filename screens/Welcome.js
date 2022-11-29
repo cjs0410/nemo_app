@@ -1,23 +1,42 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions, Image, Animated, } from "react-native";
+import React, { useEffect, useState, useRef, } from "react";
 // import favicon from '../assets/images/favicon.ico';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
 import * as Font from "expo-font";
 import * as Update from "expo-updates";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import Api from '../lib/Api';
+import NemoLogo from '../assets/images/NemoTrans.png';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const Welcome = ({ navigation }) => {
+  const logoValue = useRef(new Animated.Value(0)).current;
+
+  const showLogo = () => {
+      Animated.timing(logoValue, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: false,
+      }).start();
+  }
+
     return (
       <View style={styles.container}>
         <View style={styles.header} >
-          <Ionicons name="layers-sharp" size={30} color="black" />
+          <Animated.Image 
+            source={NemoLogo}
+            style={{
+                ...styles.LogoImage,
+                opacity: logoValue,
+            }}
+            onLoadEnd={showLogo}
+          />
           <Text style={{
               fontSize: 30,
               fontWeight: "700",
               letterSpacing: -0.28,
+              marginHorizontal: 8,
           }}>
               Nemo
           </Text>
@@ -103,6 +122,11 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     flexDirection: "row",
     justifyContent: "center"
+  },
+  LogoImage: {
+    width: regWidth * 30,
+    height: regWidth * 30,
+    resizeMode: "contain",
   },
   introduce: {
     marginTop: -18,

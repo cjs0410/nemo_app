@@ -197,7 +197,10 @@ const Card = (props) => {
                         </Text>
                     </Pressable> */}
                 </View>
-                <View style={styles.postContentsTextBox}>
+                <View style={{
+                    ...styles.postContentsTextBox,
+                    // alignItems: "center",
+                }}>
                     {/* <RenderHtml 
                         // style={styles.postContentsTextBox} 
                         contentWidth={SCREEN_WIDTH}
@@ -234,7 +237,7 @@ const Card = (props) => {
 }
 
 const CardPreview = (props) => {
-    const { bookTitle, whatChapter, bookCover, contents, hex, backgroundImage, watermark, index } = props;
+    const { bookTitle, whatChapter, bookCover, contents, hex, backgroundImage, watermark, index, align, } = props;
     useEffect(() => {
         // console.log(contents);
     }, [])
@@ -282,7 +285,10 @@ const CardPreview = (props) => {
                         </View>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.postContentsTextBox}>
+                <View style={{
+                    ...styles.postContentsTextBox, 
+                    // alignItems: align === "center" ? "center" : "flex-start",
+                }}>
                     {/* <Text style={styles.postContentsText}>
                         {contents.join('')}
                     </Text> */}
@@ -557,7 +563,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
     )
 }
 
-const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, }) => {
+const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, align, }) => {
     const [whatBook, setWhatBook] = useState('');
     const [bookList, setBookList] = useState(null);
     // const [selectedBook, setSelectedBook] = useState(null);
@@ -571,6 +577,10 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
     useEffect(() => {
         fetchBook();
     }, [debounceVal]);
+
+    useEffect(() => {
+        console.log(align);
+    }, [align]);
 
 
     const onChangeWhatBook = (payload) => {
@@ -686,6 +696,8 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                     onChangeText={onChangeWhatBook}
                                     onSubmitEditing={bookSearch}
                                     value={whatBook}
+                                    // multiline={true}
+                                    // textAlign={align === "center" ? "center" : "left"}
                                 />
                             </ScrollView>
                         </>
@@ -792,7 +804,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                 <View 
                     style={{
                         ...styles.postContentsInput,
-                        borderWidth: isFocus ? 0.5 : 0
+                        borderWidth: isFocus ? 0.5 : 0,
                     }} 
                 >
                     {ocrLoading ? 
@@ -810,10 +822,14 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                             <TextInput 
                                 style={{         
                                     fontWeight: "500",
-                                    // fontSize: SCREEN_0.041,
                                     fontSize: regWidth * 16,
                                     lineHeight: regWidth * 28,
                                     // paddingHorizontal: 8,
+                                    // backgroundColor: "pink",
+                                    // width: "100%",
+                                    // height: "100%",
+                                    // textAlign: align === "center" ? "center" : "left",
+                                    // alignSelf: align === "center" ? "center" : "flex-start",
                                 }} 
                                 placeholder="북마크를 입력하세요"
                                 multiline={true}
@@ -821,6 +837,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                 onFocus={() => setIsFocus(true)}
                                 onBlur={() => setIsFocus(false)}
                                 value={frontContent}
+                                // textAlign={align === "center" ? "center" : "left"}
                             />
                             <ScrollView
                                 style={{
@@ -1280,7 +1297,7 @@ const styles = StyleSheet.create({
         flex: 4,
         marginTop: regWidth * 8,
         justifyContent: "center",
-        textAlignVertical: "top",
+        // textAlignVertical: "top",
         
     },
     richTextEditorStyle: {
