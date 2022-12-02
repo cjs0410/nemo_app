@@ -101,61 +101,59 @@ const App = () => {
 
 
   useEffect(() => {
-    fetchRefreshToken();
-    // console.log(decodedRefresh);
+    // fetchRefreshToken();
     // fetchAvatar();
   }, [])
 
-  const fetchRefreshToken = async() => {
-    const refreshToken = await AsyncStorage.getItem('refresh');
-    if (refreshToken !== null) {
-      // console.log(refreshToken);
-      // console.log("reissue!");
-      try {
-        await Api.post("/api/v1/user/reissue/", {
-          refresh_token: refreshToken,
-        })
-        .then(async(res) => {
-          try {
-            await AsyncStorage.setItem('refresh', res.data.refresh);
-            await AsyncStorage.setItem('access', res.data.access);
-            dispatch(setRefreshToken(res.data.refresh));
-            fetchAvatar();
-          } catch (err) {
-            console.error(err);
-          }
-        })
-      } catch (err) {
+  // const fetchRefreshToken = async() => {
+  //   const refreshToken = await AsyncStorage.getItem('refresh');
+  //   if (refreshToken !== null) {
+  //     try {
+  //       await Api.post("/api/v1/user/reissue/", {
+  //         refresh_token: refreshToken,
+  //       })
+  //       .then(async(res) => {
+  //         try {
+  //           await AsyncStorage.setItem('refresh', res.data.refresh);
+  //           await AsyncStorage.setItem('access', res.data.access);
+  //           dispatch(setRefreshToken(res.data.refresh));
+  //           fetchAvatar();
+  //         } catch (err) {
+  //           console.error(err);
+  //         }
+  //       })
+  //     } catch (err) {
         
-        if (err.response.status === 404) {
-          await AsyncStorage.removeItem('access');
-          await AsyncStorage.removeItem('refresh');
-          dispatch(resetRefreshToken());
-          dispatch(resetAvatar());
-        } else {
-          console.error(err);
-        }
-      }
-    }
-      // await AsyncStorage.removeItem('access');
-      // await AsyncStorage.removeItem('refresh');
-      // dispatch(resetRefreshToken());
-  }
+  //       if (err.response.status === 404) {
+  //         await AsyncStorage.removeItem('access');
+  //         await AsyncStorage.removeItem('refresh');
+  //         dispatch(resetRefreshToken());
+  //         dispatch(resetAvatar());
+  //       } else {
+  //         console.error(err);
+  //       }
+  //     }
+  //   }
+  //     // await AsyncStorage.removeItem('access');
+  //     // await AsyncStorage.removeItem('refresh');
+  //     // dispatch(resetRefreshToken());
+  // }
 
-  const fetchAvatar = async() => {
-    try {
-      await Api
-      .get("/api/v1/user/avatar/")
-      .then((res) => {
-        setAvatar(res.data.avatar);
-        console.log(res.data);
-        dispatch(setAvatar(res.data.avatar));
-        // dispatch(setIsAlarm(res.data.alarm));
-      })
-    } catch (err) {
-      console.error(err);
-    }
-  }
+  // const fetchAvatar = async() => {
+  //   try {
+  //     await Api
+  //     .get("/api/v1/user/avatar/")
+  //     .then((res) => {
+  //       // setAvatar(res.data.avatar);
+  //       // console.log(res.data);
+  //       console.log("avatar!");
+  //       dispatch(setAvatar(res.data.avatar));
+  //       // dispatch(setIsAlarm(res.data.alarm));
+  //     })
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }
 
   // return(
   //   <NavigationContainer>

@@ -126,7 +126,7 @@ const Join1 = ({ navigation }) => {
             .then((res) => {
                 console.log(res.data);
                 if (res.data) {
-                    navigation.navigate('Join2');
+                    navigation.navigate('Join2', { phoneNumber: phoneNumber, });
                 } else {
                     setAuthWarning('이미 가입된 계정입니다.');
                 }
@@ -238,9 +238,10 @@ const Join1 = ({ navigation }) => {
     );
   }
   
-const Join2 = ({ navigation }) => {
+const Join2 = ({ navigation, route }) => {
     const axios = require('axios').default;
     const dispatch = useDispatch();
+    const { phoneNumber, } = route.params;
     const [loading, setLoading] = useState(false);
     const [nickname, setNickname] = useState('');
     const [username, setUsername] = useState('');
@@ -297,11 +298,13 @@ const Join2 = ({ navigation }) => {
 
         try {
             setLoading(true);
+            console.log(phoneNumber);
             await Api
             .post("/api/v1/user/register/", {
                 name: nickname,
                 username: username,
                 password: password,
+                phone_number: phoneNumber,
             })
             .then(async(res) => {
                 console.log(res.data);
@@ -376,7 +379,7 @@ const Join2 = ({ navigation }) => {
                 </Text>
                 <TextInput 
                     style={styles.input}
-                    placeholder="아이디를 입력해주세요(유저 태그로 )"
+                    placeholder="아이디를 입력해주세요(초기 유저 태그로 사용됩니다)"
                     onChangeText={onChangeUsername}
                 />
                 <Text style={{...styles.warning, color: "#FF4040", }}>

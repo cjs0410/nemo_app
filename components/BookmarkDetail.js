@@ -409,7 +409,7 @@ const BookmarkDetail = (props) => {
                         style={{ 
                             flexDirection: "row", 
                             alignItems: "center", 
-                            width: regWidth * 80,
+                            width: regWidth * 60,
                         }}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         onPress={onLike}

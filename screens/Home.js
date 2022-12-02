@@ -20,7 +20,7 @@ import NemoLogo from '../assets/images/NemoTrans.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
-import { resetUserInfo, setRefreshToken, resetRefreshToken, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, setIsAlarm, } from '../modules/user';
+import { resetUserInfo, setRefreshToken, resetRefreshToken, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, setIsAlarm, resetAvatar, setAvatar, } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -40,7 +40,7 @@ const Home = ({navigation}) => {
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [scrollLoading, setScrollLoading] = useState(false);
-    const [avatar, setAvatar] = useState(null);
+    // const [avatar, setAvatar] = useState(null);
     const [loadFont, setLoadFont] = useState(false);
     const { isAlarm, shouldHomeRefresh, } = useSelector(userSelector);
     const [cursor, setCursor] = useState('');
@@ -56,20 +56,23 @@ const Home = ({navigation}) => {
     useScrollToTop(ref);
 
     useEffect(() => {
+        fetchRefreshToken();
+    }, [])
+
+    useEffect(() => {
         autoSearch();
     }, [debounceVal]);
 
     useEffect(() => {
         fetchBookmarks();
-        fetchNewAlarm();
-        // fetchProfile();
+        // fetchNewAlarm();
         fetchFont();
     }, []);
 
     useEffect(() => {
         if (shouldHomeRefresh === true) {
             fetchBookmarks();
-            fetchNewAlarm();
+            // fetchNewAlarm();
             dispatch(setShouldHomeRefresh(false));
         }
     }, [shouldHomeRefresh]);
@@ -82,6 +85,52 @@ const Home = ({navigation}) => {
     //     }, [])
     // );
 
+    const fetchRefreshToken = async() => {
+        const refreshToken = await AsyncStorage.getItem('refresh');
+        if (refreshToken !== null) {
+            try {
+            await Api.post("/api/v1/user/reissue/", {
+                refresh_token: refreshToken,
+            })
+            .then(async(res) => {
+                try {
+                await AsyncStorage.setItem('refresh', res.data.refresh);
+                await AsyncStorage.setItem('access', res.data.access);
+                dispatch(setRefreshToken(res.data.refresh));
+                fetchAvatar();
+                console.log("reissue!");
+                } catch (err) {
+                console.error(err);
+                }
+            })
+            } catch (err) {
+                if (err.response.status === 404) {
+                    await AsyncStorage.removeItem('access');
+                    await AsyncStorage.removeItem('refresh');
+                    dispatch(resetRefreshToken());
+                    dispatch(resetAvatar());
+                } else {
+                    console.error(err);
+                }
+            }
+        }
+    }
+    
+    const fetchAvatar = async() => {
+        try {
+            await Api
+            .get("/api/v1/user/avatar/")
+            .then((res) => {
+                // setAvatar(res.data.avatar);
+                console.log("avatar!");
+                // console.log(res.data);
+                dispatch(setAvatar(res.data.avatar));
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const fetchBookmarks = async() => {
         try {
             setScrollLoading(true);
@@ -90,13 +139,15 @@ const Home = ({navigation}) => {
                 cursor: "",
             })
             .then(async(res) => {
-                // console.log(res.data);
+                console.log("bookmark!");
                 setBookmarks(res.data);
                 setNewBookmarkNum(res.data.length);
                 const accessToken = await AsyncStorage.getItem('access');
                 const refreshToken = await AsyncStorage.getItem('refresh');
-                console.log(jwt_decode(accessToken));
-                console.log(jwt_decode(refreshToken).exp, jwt_decode(accessToken).exp, (Date.now() / 1000));
+                // console.log(jwt_decode(accessToken));
+                // console.log(jwt_decode(refreshToken).exp, jwt_decode(accessToken).exp, (Date.now() / 1000));
+
+                fetchNewAlarm();
             })
         } catch (err) {
             console.error(err);
@@ -109,7 +160,7 @@ const Home = ({navigation}) => {
             await Api
             .get("/api/v1/user/new_alarm/")
             .then((res) => {
-                console.log(res.data);
+                console.log("alarm!");
                 dispatch(setIsAlarm(res.data.alarm));
             })
         } catch (err) {
@@ -131,14 +182,10 @@ const Home = ({navigation}) => {
         setRefreshing(true);
         setCursor(0);
         await fetchBookmarks()
-        .then(async() => fetchNewAlarm())
+        // .then(async() => fetchNewAlarm())
         .then(() => setRefreshing(false));
         // wait(2000).then(() => setRefreshing(false));
     }, []);
-
-    // const renderItem = ({ post }) => {
-    //     <Post post={post} navigation={navigation} />
-    // }
 
 
     const fetchProfile = async() => {
@@ -170,7 +217,7 @@ const Home = ({navigation}) => {
         if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
             try {
                 setScrollLoading(true);
-                console.log(bookmarks[bookmarks.length - 1].cursor);
+                // console.log(bookmarks[bookmarks.length - 1].cursor);
                 await Api
                 .post("/api/v1/user/", {
                     cursor: bookmarks[bookmarks.length - 1].cursor,
