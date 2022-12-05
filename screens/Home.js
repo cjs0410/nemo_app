@@ -64,7 +64,7 @@ const Home = ({navigation}) => {
     }, [debounceVal]);
 
     useEffect(() => {
-        fetchBookmarks();
+        // fetchBookmarks();
         // fetchNewAlarm();
         fetchFont();
     }, []);
@@ -94,11 +94,14 @@ const Home = ({navigation}) => {
             })
             .then(async(res) => {
                 try {
-                await AsyncStorage.setItem('refresh', res.data.refresh);
-                await AsyncStorage.setItem('access', res.data.access);
-                dispatch(setRefreshToken(res.data.refresh));
-                fetchAvatar();
-                console.log("reissue!");
+                    console.log("reissue!");
+                    await AsyncStorage.setItem('refresh', res.data.refresh);
+                    await AsyncStorage.setItem('access', res.data.access);
+                    dispatch(setRefreshToken(res.data.refresh));
+                    fetchAvatar();
+
+                    fetchBookmarks();
+                    fetchNewAlarm();
                 } catch (err) {
                 console.error(err);
                 }
@@ -147,7 +150,7 @@ const Home = ({navigation}) => {
                 // console.log(jwt_decode(accessToken));
                 // console.log(jwt_decode(refreshToken).exp, jwt_decode(accessToken).exp, (Date.now() / 1000));
 
-                fetchNewAlarm();
+                // fetchNewAlarm();
             })
         } catch (err) {
             console.error(err);

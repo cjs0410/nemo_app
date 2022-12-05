@@ -1,4 +1,4 @@
-import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, ActivityIndicator } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
@@ -79,6 +79,8 @@ const CreateBookmark = ({navigation, route}) => {
     const [albumId, setAlbumId] = useState('');
 
     const [align, setAlign] = useState('normal');
+
+    const [createBookLoading, setCreateBookLoading] = useState(false);
     
     useEffect(() => {
         updateWatermark();
@@ -277,6 +279,7 @@ const CreateBookmark = ({navigation, route}) => {
 
     const CreateBook = async() => {
         const formData = new FormData();
+        setCreateBookLoading(true);
         if (image !== null) {
             const filename = image.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -309,6 +312,7 @@ const CreateBookmark = ({navigation, route}) => {
         } catch (err) {
             console.error(err);
         }
+        setCreateBookLoading(false);
     }
 
     const addCard = () => {
@@ -700,15 +704,22 @@ const CreateBookmark = ({navigation, route}) => {
                         <Text style={{fontSize: 16, fontWeight: "700", }} >
                             책 등록하기
                         </Text>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            activeOpacity={1}
-                            onPress={CreateBook}
-                        >
-                            <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
-                                등록
-                            </Text>
-                        </Pressable>
+                        {createBookLoading ? 
+                            <ActivityIndicator 
+                                color="#008000"
+                            />
+                            :
+                            <Pressable
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                activeOpacity={1}
+                                onPress={CreateBook}
+                            >
+                                <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                                    등록
+                                </Text>
+                            </Pressable>
+                        }
+
                     </SafeAreaView>
                     <View style={styles.addBook}>
                         <View style={{ alignItems: 'center', }}>

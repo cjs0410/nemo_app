@@ -98,7 +98,7 @@ const EditBookmark = ({navigation, route}) => {
     }, []);
 
     useEffect(() => {
-        const cardNum = parseInt(contentsByLine.length / 9) + 1;
+        const cardNum = Math.ceil(contentsByLine.length / 9);
         let copy = [];
 
         for ( let i = 0; i < cardNum; i++) {

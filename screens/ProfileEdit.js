@@ -26,9 +26,15 @@ const ProfileEdit = ({route, navigation}) => {
     const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
     const [userTag, setUserTag] = useState(profile.user_tag);
     const [name, setName] = useState(profile.name);
+    const [isChange, setIsChange] = useState(false);
+    const [editLoading, setEditLoading] = useState(false);
     const [imageSoruce, setImageSource] = useState(
         profile.avatar === null ? blankAvatar : {uri: profile.avatar}
     )
+
+    useEffect(() => {
+        console.log(isChange);
+    }, [isChange]);
 
     const pickImage = async () => {
         try {
@@ -42,7 +48,7 @@ const ProfileEdit = ({route, navigation}) => {
     
           const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 0.7,
+            quality: 0.4,
           });
       
           console.log(result.uri);
@@ -50,6 +56,7 @@ const ProfileEdit = ({route, navigation}) => {
           if (!result.cancelled) {
             setImage(result.uri);
             setImageSource({uri: result.uri});
+            setIsChange(true);
           }
         } catch (error) {
           console.error(error);
@@ -74,7 +81,7 @@ const ProfileEdit = ({route, navigation}) => {
 
     const onEdit = async() => {
         const formData = new FormData();
-        
+        setEditLoading(true);
         if (image !== null) {
             const filename = image.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -91,6 +98,7 @@ const ProfileEdit = ({route, navigation}) => {
 
         formData.append('user_tag', userTag);
         formData.append('name', name);
+        formData.append('is_change', isChange);
         console.log(formData);
         try {
             await Api.put('/api/v1/user/myprofile/edit/', formData, 
@@ -114,6 +122,7 @@ const ProfileEdit = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
+        setEditLoading(false);
     }
 
 
@@ -131,14 +140,21 @@ const ProfileEdit = ({route, navigation}) => {
                 <Text style={{ fontSize: 19, fontWeight: "700", }}>
                     프로필 수정
                 </Text>
-                <Pressable 
-                    onPress={onEdit}
-                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                >
-                    <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000", }}>
-                        완료
-                    </Text>
-                </Pressable>
+                {editLoading ? 
+                    <ActivityIndicator 
+                        color="#008000"
+                    />
+                    :
+                    <Pressable 
+                        onPress={onEdit}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    >
+                        <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000", }}>
+                            완료
+                        </Text>
+                    </Pressable>
+                }
+
 
 
                 {/* <Feather name="settings" size={25} color="black" /> */}
@@ -176,7 +192,12 @@ const ProfileEdit = ({route, navigation}) => {
                             <Pressable
                                 style={{ marginTop: 22, }}
                                 activeOpacity={1}
-                                onPress={() => setImageSource(blankAvatar)}
+                                onPress={() => {
+                                    if (imageSoruce !== blankAvatar) {
+                                        setImageSource(blankAvatar);
+                                        setIsChange(true);
+                                    }
+                                }}
                                 hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                             >
                                 <Text style={{ fontSize: 15, fontWeight: "500", color: "#FF4040", }}>

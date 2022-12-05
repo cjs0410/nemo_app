@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nemo",
     "slug": "Nemo",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/NemoLogo.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "NemoAppStore",
-      "buildNumber": "9"
+      "buildNumber": "10"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +28,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.cjs0410.Nemo",
-      "versionCode": 19
+      "versionCode": 21
     },
     "web": {
       "favicon": "./assets/NemoLogo.png"
