@@ -94,14 +94,15 @@ const Home = ({navigation}) => {
             })
             .then(async(res) => {
                 try {
-                    console.log("reissue!");
-                    await AsyncStorage.setItem('refresh', res.data.refresh);
-                    await AsyncStorage.setItem('access', res.data.access);
+                    console.log("reissue!", res.data.refresh);
+                    await AsyncStorage.setItem('refresh', res.data.refresh)
+                    .then(async() => await AsyncStorage.setItem('access', res.data.access))
+                    .then(() => {
+                        fetchAvatar();
+                        fetchBookmarks();
+                        fetchNewAlarm();
+                    })
                     dispatch(setRefreshToken(res.data.refresh));
-                    fetchAvatar();
-
-                    fetchBookmarks();
-                    fetchNewAlarm();
                 } catch (err) {
                 console.error(err);
                 }
@@ -120,12 +121,13 @@ const Home = ({navigation}) => {
     }
     
     const fetchAvatar = async() => {
+        const refreshToken = await AsyncStorage.getItem('refresh');
         try {
             await Api
             .get("/api/v1/user/avatar/")
             .then((res) => {
                 // setAvatar(res.data.avatar);
-                console.log("avatar!");
+                console.log("avatar!", refreshToken);
                 // console.log(res.data);
                 dispatch(setAvatar(res.data.avatar));
             })
@@ -135,6 +137,7 @@ const Home = ({navigation}) => {
     }
 
     const fetchBookmarks = async() => {
+        const refreshToken = await AsyncStorage.getItem('refresh');
         try {
             setScrollLoading(true);
             await Api
@@ -142,11 +145,11 @@ const Home = ({navigation}) => {
                 cursor: "",
             })
             .then(async(res) => {
-                console.log("bookmark!");
+                console.log("bookmark!", refreshToken);
                 setBookmarks(res.data);
                 setNewBookmarkNum(res.data.length);
-                const accessToken = await AsyncStorage.getItem('access');
-                const refreshToken = await AsyncStorage.getItem('refresh');
+                // const accessToken = await AsyncStorage.getItem('access');
+                // const refreshToken = await AsyncStorage.getItem('refresh');
                 // console.log(jwt_decode(accessToken));
                 // console.log(jwt_decode(refreshToken).exp, jwt_decode(accessToken).exp, (Date.now() / 1000));
 
@@ -159,11 +162,12 @@ const Home = ({navigation}) => {
     }
 
     const fetchNewAlarm = async() => {
+        const refreshToken = await AsyncStorage.getItem('refresh');
         try {
             await Api
             .get("/api/v1/user/new_alarm/")
             .then((res) => {
-                console.log("alarm!");
+                console.log("alarm!", refreshToken);
                 dispatch(setIsAlarm(res.data.alarm));
             })
         } catch (err) {
