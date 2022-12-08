@@ -86,6 +86,7 @@ const OtherProfile = ({navigation, route}) => {
             await Api
             .post("api/v1/user/otherlist/", { user_tag: userTag })
             .then((res) => {
+                // console.log(res.data.bookmarks);
                 setBookmarks(res.data.bookmarks.reverse());
                 setAlbums(res.data.albums);
             })
@@ -343,8 +344,8 @@ const OtherProfile = ({navigation, route}) => {
                                     setReportVisible(true);
                                 }}
                             >
-                                <Entypo name="warning" size={24} color="red" />
-                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
+                                <Entypo name="warning" size={24} color="black" />
+                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>신고</Text>
                             </TouchableOpacity>
                             :
                             null

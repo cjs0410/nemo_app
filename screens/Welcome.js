@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions, Image, Animated, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, Image, Animated, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 // import favicon from '../assets/images/favicon.ico';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
@@ -23,7 +23,7 @@ const Welcome = ({ navigation }) => {
 
     return (
       <View style={styles.container}>
-        <View style={styles.header} >
+        <SafeAreaView style={styles.header} >
           <Animated.Image 
             source={NemoLogo}
             style={{
@@ -40,7 +40,7 @@ const Welcome = ({ navigation }) => {
           }}>
               Nemo
           </Text>
-        </View>
+        </SafeAreaView>
         <View style={styles.introduce} >
           <Text style={styles.introduceText}>
             책 문장을
@@ -117,9 +117,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   header: {
-    marginTop: 65,
-    marginHorizontal: 20,
-    paddingBottom: 30,
+    marginTop: regHeight * 58,
+    marginHorizontal: regWidth * 20,
+    paddingBottom: regHeight * 30,
     flexDirection: "row",
     justifyContent: "center"
   },
@@ -129,21 +129,21 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   introduce: {
-    marginTop: -18,
+    marginTop: -regHeight * 18,
     justifyContent: "center",
-    marginHorizontal: 38,
+    marginHorizontal: regWidth * 38,
   },
   introduceText: {
-    fontSize: 24,
+    fontSize: regWidth * 24,
     fontWeight: "900",
-    marginTop: 35,
+    marginTop: regHeight * 35,
     textAlign: "center",
   },
   introduceBtn: {
     height: regHeight * 50,
     flexDirection: "row",
-    paddingVertical: 10,
-    marginVertical: 7,
+    paddingVertical: regHeight * 10,
+    marginVertical: regHeight * 7,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     borderColor: "#FF4040",
   },
   btnText: {
-    fontSize: 16,
+    fontSize: regWidth * 16,
     fontWeight: "500",
     textAlign: "center",
   }

@@ -11,7 +11,7 @@ import { BookmarkList, AlbumList } from '../components';
 import Api from "../lib/Api";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import blankAvatar from '../assets/images/peopleicon.png';
-import emptyImage from '../assets/images/emptyImage.jpeg';
+import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, scrapSelector } from '../modules/hooks';
@@ -413,17 +413,38 @@ const UserStorage = ({route, navigation}) => {
                             />
                             : 
                             <>
-                                <View>
-                                    {bookmarks && bookmarks.map((bookmark, index) => (
-                                        <TouchableOpacity
-                                            activeOpacity={1}
-                                            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: profile.name, title: "북마크", index: index, })} 
-                                            key={index}
+                                { bookmarks && bookmarks.length !== 0 ? 
+                                    <View>
+                                        {bookmarks && bookmarks.map((bookmark, index) => (
+                                            <TouchableOpacity
+                                                activeOpacity={1}
+                                                onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: profile.name, title: "북마크", index: index, })} 
+                                                key={index}
+                                            >
+                                                <BookmarkList bookmark={bookmark} navigation={navigation} />
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                    :
+                                    <View
+                                        style={{
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginTop: regHeight * 200,
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                            fontSize: regWidth * 20,
+                                            fontWeight: "500",
+                                            color: "grey",
+                                            }}
                                         >
-                                            <BookmarkList bookmark={bookmark} navigation={navigation} />
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
+                                            북마크를 생성해보세요
+                                        </Text>
+                                    </View>
+                                }
+
                             </>
                         }
                     </>
@@ -437,17 +458,38 @@ const UserStorage = ({route, navigation}) => {
                             />
                             : 
                             <>
-                                <View>
-                                    {albums && albums.map((album, index) => (
-                                        <TouchableOpacity
-                                            activeOpacity={1}
-                                            onPress={() => navigation.navigate('AlbumProfile', { albumId: album.album_id, })} 
-                                            key={index}
+                                { albums && albums.length !== 0 ? 
+                                    <View>
+                                        {albums && albums.map((album, index) => (
+                                            <TouchableOpacity
+                                                activeOpacity={1}
+                                                onPress={() => navigation.navigate('AlbumProfile', { albumId: album.album_id, })} 
+                                                key={index}
+                                            >
+                                                <AlbumList album={album} navigation={navigation} />
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                    :
+                                    <View
+                                        style={{
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginTop: regHeight * 200,
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                            fontSize: regWidth * 20,
+                                            fontWeight: "500",
+                                            color: "grey",
+                                            }}
                                         >
-                                            <AlbumList album={album} navigation={navigation} />
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
+                                            앨범을 생성해보세요
+                                        </Text>
+                                    </View>
+                                }
+
                             </>
                         }
                     </>

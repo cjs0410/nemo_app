@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
-import bookCover from '../assets/images/steve.jpeg';
+import blankBookCover from '../assets/images/blankBookImage.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import Api from '../lib/Api';
@@ -123,10 +123,10 @@ const Card = (props) => {
 
 
     return (
-        <View style={styles.postContentsScrollBox}>
+        <View style={styles.bookmarkContentsScrollBox}>
             <View 
                 style={{
-                    ...styles.postContentsBox, 
+                    ...styles.bookmarkContentsBox, 
                     // backgroundColor: bookmark.hex, 
                     backgroundColor: bookmark.hex === null ? "#D9D9D9" : bookmark.hex, 
                 }} 
@@ -148,7 +148,7 @@ const Card = (props) => {
                     null
                 }
                 <View style={{
-                    ...styles.postContentsBook,
+                    ...styles.bookmarkContentsBook,
                 }}>
                     <TouchableOpacity 
                         activeOpacity={1}
@@ -159,17 +159,29 @@ const Card = (props) => {
                     >
                         <View>
                             <Animated.Image 
-                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover} : bookCover} 
+                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover} : blankBookCover} 
                                 style={{
-                                    ...styles.postContentsBookCover,
+                                    ...styles.bookmarkContentsBookCover,
                                     opacity: bookCoverValue,
                                 }}
                                 onLoadEnd={showBookCover}
                             />
                         </View>
                         <View>
-                            <Text style={styles.postContentsBookTitle}>{bookmark.book_title}</Text>
-                            <Text style={styles.postContentsBookChapter}>{bookmark.chapter_title}</Text>
+                            <Text 
+                                style={styles.bookmarkContentsBookTitle}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
+                                {bookmark.book_title}
+                            </Text>
+                            <Text 
+                                style={styles.bookmarkContentsBookChapter}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
+                                {bookmark.chapter_title}
+                            </Text>
                         </View>
                     </TouchableOpacity>
                     {/* <Pressable 
@@ -198,22 +210,22 @@ const Card = (props) => {
                     </Pressable> */}
                 </View>
                 <View style={{
-                    ...styles.postContentsTextBox,
+                    ...styles.bookmarkContentsTextBox,
                     // alignItems: "center",
                 }}>
                     {/* <RenderHtml 
-                        // style={styles.postContentsTextBox} 
+                        // style={styles.bookmarkContentsTextBox} 
                         contentWidth={SCREEN_WIDTH}
                         source={{ html: nemo.contents }}
                         tagsStyles={tagsStyles}
                     /> */}
-                    {/* <Text style={styles.postContentsText}>
+                    {/* <Text style={styles.bookmarkContentsText}>
                         {contents.join()}
                     </Text> */}
                     {contents.map((line, index) => (
                         <Text 
                             style={{
-                                ...styles.postContentsText,
+                                ...styles.bookmarkContentsText,
                                 fontSize: regWidth * fontSize,
                             }} 
                             onTextLayout={textLineNum}
@@ -243,10 +255,10 @@ const CardPreview = (props) => {
     }, [])
 
     return (
-        <View style={styles.postContentsScrollBox}>
+        <View style={styles.bookmarkContentsScrollBox}>
             <View 
                 style={{
-                    ...styles.postContentsBox, 
+                    ...styles.bookmarkContentsBox, 
                     // backgroundColor: bookmark.hex, 
                     backgroundColor: hex === null ? "#D9D9D9" : hex, 
                 }} 
@@ -265,7 +277,7 @@ const CardPreview = (props) => {
                     null
                 }
                 <View style={{
-                    ...styles.postContentsBook,
+                    ...styles.bookmarkContentsBook,
                     opacity: (index === 0) ? 1 : 0
                 }}>
                     <TouchableOpacity 
@@ -276,30 +288,30 @@ const CardPreview = (props) => {
                             <Image 
                                 source={{ uri: bookCover }} 
                                 // source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : bookCover} 
-                                style={styles.postContentsBookCover}
+                                style={styles.bookmarkContentsBookCover}
                             />
                         </View>
                         <View>
-                            <Text style={styles.postContentsBookTitle}>{bookTitle}</Text>
-                            <Text style={styles.postContentsBookChapter}>{whatChapter}</Text>
+                            <Text style={styles.bookmarkContentsBookTitle}>{bookTitle}</Text>
+                            <Text style={styles.bookmarkContentsBookChapter}>{whatChapter}</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
                 <View style={{
-                    ...styles.postContentsTextBox, 
+                    ...styles.bookmarkContentsTextBox, 
                     // alignItems: align === "center" ? "center" : "flex-start",
                 }}>
-                    {/* <Text style={styles.postContentsText}>
+                    {/* <Text style={styles.bookmarkContentsText}>
                         {contents.join('')}
                     </Text> */}
                     {contents.map((line, index) => (
-                        <Text style={styles.postContentsText} key={index}>
+                        <Text style={styles.bookmarkContentsText} key={index}>
                             {line.replace(/\n/g, '')}
                         </Text> 
                     ))}
                 </View>
                 {/* <RenderHtml 
-                    style={styles.postContentsTextBox} 
+                    style={styles.bookmarkContentsTextBox} 
                     contentWidth={SCREEN_WIDTH}
                     source={{ html: nemo.contents }}
                     // tagsStyles={tagsStyles}
@@ -386,14 +398,14 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
 
     return (
         <Pressable
-            style={{...styles.postContentsScrollBox, }}
+            style={{...styles.bookmarkContentsScrollBox, }}
             onPress={() => {
                 editorRef.current.dismissKeyboard();
                 // setIsFocused(false);
             }}
         >
             <View style={{
-                ...styles.postContentsBox,  
+                ...styles.bookmarkContentsBox,  
                 // backgroundColor: color
                 backgroundColor: color === null ? "#D9D9D9" : color, 
             }}>
@@ -408,7 +420,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
                     null
                 }
 
-                <View style={styles.postContentsBook}>
+                <View style={styles.bookmarkContentsBook}>
                     {selectedBook === null ? 
                         <>
                             <Feather name="search" size={20} color="grey" />
@@ -428,15 +440,15 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
                         <View style={{ flexDirection: "row" }}>
                             <View>
                                 <Image 
-                                    source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : bookCover} 
-                                    style={styles.postContentsBookCover} 
+                                    source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : blankBookCover} 
+                                    style={styles.bookmarkContentsBookCover} 
                                 />
                             </View>
                             <View>
-                                <Text style={styles.postContentsBookTitle}>{selectedBook.book_title}</Text>
+                                <Text style={styles.bookmarkContentsBookTitle}>{selectedBook.book_title}</Text>
                                 <TextInput 
                                     placeholder="챕터를 입력하세요"
-                                    style={styles.postContentsBookChapterInput}
+                                    style={styles.bookmarkContentsBookChapterInput}
                                     onChangeText={onChangeChapter}
                                 />
                             </View>
@@ -476,8 +488,8 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
                                     key={index}
                                 >
                                     <Image 
-                                        source={ book.book_cover !== null ? { uri: book.book_cover} : bookCover} 
-                                        style={styles.postContentsBookCover} 
+                                        source={ book.book_cover !== null ? { uri: book.book_cover} : blankBookCover} 
+                                        style={styles.bookmarkContentsBookCover} 
                                     />
                                     <View>
                                         <Text style={{ fontSize: 16, fontWeight: "700", }}>
@@ -498,7 +510,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
                     null
                 }
                 <View 
-                    style={styles.postContentsInput} 
+                    style={styles.bookmarkContentsInput} 
                 >
                     {/* text input만 사용하는 코드(가변) */}
                     {/* <ScrollView
@@ -578,9 +590,9 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
         fetchBook();
     }, [debounceVal]);
 
-    useEffect(() => {
-        console.log(align);
-    }, [align]);
+    // useEffect(() => {
+    //     console.log(align);
+    // }, [align]);
 
 
     const onChangeWhatBook = (payload) => {
@@ -663,12 +675,12 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
     return (
         <View
             style={{
-                ...styles.postContentsScrollBox, 
+                ...styles.bookmarkContentsScrollBox, 
                 // height: extraHeight,
             }}
         >
             <View style={{
-                ...styles.postContentsBox,  
+                ...styles.bookmarkContentsBox,  
                 // backgroundColor: color
                 backgroundColor: color === null ? "#D9D9D9" : color, 
             }}>
@@ -683,7 +695,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                     null
                 }
 
-                <View style={styles.postContentsBook}>
+                <View style={styles.bookmarkContentsBook}>
                     {selectedBook === null ? 
                         <>
                             <Feather name="search" size={20} color="grey" />
@@ -705,17 +717,22 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                         <View style={{ flexDirection: "row", alignItems: "center", }}>
                             <View>
                                 <Image 
-                                    source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : bookCover} 
-                                    style={styles.postContentsBookCover} 
+                                    source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : blankBookCover} 
+                                    style={styles.bookmarkContentsBookCover} 
                                 />
                             </View>
                             <View>
-                                <Text style={styles.postContentsBookTitle}>{selectedBook.book_title}</Text>
+                                <Text 
+                                    style={styles.bookmarkContentsBookTitle}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                >{selectedBook.book_title}</Text>
                                 <TextInput 
                                     placeholder="챕터를 입력하세요"
-                                    style={styles.postContentsBookChapterInput}
+                                    style={styles.bookmarkContentsBookChapterInput}
                                     onChangeText={onChangeChapter}
                                     value={whatChapter}
+                                    maxLength={regWidth * 22}
                                 />
                             </View>
                         </View>
@@ -766,8 +783,8 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                     key={index}
                                 >
                                     <Image 
-                                        source={ book.book_cover !== null ? { uri: book.book_cover } : bookCover} 
-                                        style={styles.postContentsBookCover} 
+                                        source={ book.book_cover !== null ? { uri: book.book_cover } : blankBookCover} 
+                                        style={styles.bookmarkContentsBookCover} 
                                     />
                                     <View>
                                         <Text style={{ fontSize: 16, fontWeight: "700", }}>
@@ -791,7 +808,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                 <AntDesign name="pluscircleo" size={24} color="black" />
                                 <View>
                                     <Text style={{ fontSize: 16, fontWeight: "700", marginHorizontal: 12, }}>
-                                        책 등록하기
+                                        새로운 책 등록하기
                                     </Text>
                                 </View>
                             </TouchableOpacity>
@@ -803,7 +820,7 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                 }
                 <View 
                     style={{
-                        ...styles.postContentsInput,
+                        ...styles.bookmarkContentsInput,
                         borderWidth: isFocus ? 0.5 : 0,
                     }} 
                 >
@@ -896,9 +913,9 @@ function useDebounce(value, delay = 500) {
 
 const AddBlankCardBack = ({ color, backgroundImage}) => {
     return (
-        <View style={{...styles.postContentsScrollBox, height: 76,}}>
+        <View style={{...styles.bookmarkContentsScrollBox, height: 76,}}>
             <View style={{
-                ...styles.postContentsBox, 
+                ...styles.bookmarkContentsBox, 
                 justifyContent: "center", 
                 alignItems: "center", 
                 backgroundColor: color === null ? "#D9D9D9" : color, 
@@ -941,14 +958,14 @@ const BlankCardBack = ({ color, onChangeBack, watermark, richText, setIsFocused,
 
     return (
         <Pressable
-            style={{...styles.postContentsScrollBox, }}
+            style={{...styles.bookmarkContentsScrollBox, }}
             onPress={() => {
                 editorRef.current.dismissKeyboard();
                 // setIsFocused(false);
             }}
         >
         <View style={{
-            ...styles.postContentsBox, 
+            ...styles.bookmarkContentsBox, 
             backgroundColor: color === null ? "#D9D9D9" : color,  
         }}>
             {backgroundImage !== null ? 
@@ -961,7 +978,7 @@ const BlankCardBack = ({ color, onChangeBack, watermark, richText, setIsFocused,
                 :
                 null
             }
-            <View style={{...styles.postContentsBook, justifyContent: "flex-end", alignItems: "center" }}>
+            <View style={{...styles.bookmarkContentsBook, justifyContent: "flex-end", alignItems: "center" }}>
                 <TouchableOpacity 
                     activeOpacity={0.8} 
                     onPress={() => {
@@ -973,7 +990,7 @@ const BlankCardBack = ({ color, onChangeBack, watermark, richText, setIsFocused,
                 </TouchableOpacity>
             </View>
             <View 
-                style={styles.postContentsInput} 
+                style={styles.bookmarkContentsInput} 
             >
                 <View 
                     style={{flexDirection: "column-reverse"}}
@@ -1043,17 +1060,17 @@ const BlankCardBack = ({ color, onChangeBack, watermark, richText, setIsFocused,
         //     </TouchableOpacity>
         //     :
         //     <Pressable 
-        //         style={{...styles.postContentsScrollBox, }}
+        //         style={{...styles.bookmarkContentsScrollBox, }}
         //         onPress={() => richText.current.dismissKeyboard()}
         //     >
-        //         <View style={{...styles.postContentsBox, backgroundColor: color, }}>
-        //             <View style={{...styles.postContentsBook, justifyContent: "flex-end", alignItems: "center" }}>
+        //         <View style={{...styles.bookmarkContentsBox, backgroundColor: color, }}>
+        //             <View style={{...styles.bookmarkContentsBook, justifyContent: "flex-end", alignItems: "center" }}>
         //                 <TouchableOpacity activeOpacity={0.8} onPress={onAddBack} >
         //                     <Text style={{ fontSize: 15, fontWeight: "500", }}>취소</Text>
         //                 </TouchableOpacity>
         //             </View>
         //             <View 
-        //                 style={styles.postContentsInput} 
+        //                 style={styles.bookmarkContentsInput} 
         //             >
         //                 <View style={{flexDirection: "column-reverse"}}>
         //                     <RichEditor
@@ -1159,25 +1176,25 @@ const CardForCreate = (props) => {
     }
 
     return (
-        <View style={styles.postContentsScrollBox}>
+        <View style={styles.bookmarkContentsScrollBox}>
             <TouchableOpacity 
                 activeOpacity={1} 
-                style={{...styles.postContentsBox, backgroundColor: bookmark.hex, }} 
+                style={{...styles.bookmarkContentsBox, backgroundColor: bookmark.hex, }} 
                 onPress={onReverse}
             >
-                <View style={styles.postContentsBook}>
+                <View style={styles.bookmarkContentsBook}>
                     <View
                         style={{ flexDirection: "row" }}
                     >
                         <View>
                             <Image 
-                                source={ bookmark.book_cover !== null ? { uri: `http://3.38.228.24${bookmark.book_cover}`} : bookCover} 
-                                style={styles.postContentsBookCover}
+                                source={ bookmark.book_cover !== null ? { uri: `http://3.38.228.24${bookmark.book_cover}`} : blankBookCover} 
+                                style={styles.bookmarkContentsBookCover}
                             />
                         </View>
                         <View>
-                            <Text style={styles.postContentsBookTitle}>{bookmark.book_title}</Text>
-                            <Text style={styles.postContentsBookChapter}>{bookmark.chapter_title}</Text>
+                            <Text style={styles.bookmarkContentsBookTitle}>{bookmark.book_title}</Text>
+                            <Text style={styles.bookmarkContentsBookChapter}>{bookmark.chapter_title}</Text>
                         </View>
                     </View>
                     <View 
@@ -1194,8 +1211,8 @@ const CardForCreate = (props) => {
                         </Text>
                     </View>
                 </View>
-                <View style={styles.postContentsTextBox}>
-                    <Text style={styles.postContentsText}>
+                <View style={styles.bookmarkContentsTextBox}>
+                    <Text style={styles.bookmarkContentsText}>
                         {bookmark.contents}
                     </Text>
                 </View>
@@ -1206,10 +1223,10 @@ const CardForCreate = (props) => {
 
             {isReverse ? 
                 <TouchableOpacity activeOpacity={1} style={{...styles.backCard, backgroundColor: bookmark.hex, }} onPress={onReverse} >
-                    <View style={styles.postContentsBook}>
+                    <View style={styles.bookmarkContentsBook}>
                     </View>
-                    <View style={styles.postContentsTextBox}>
-                        <Text style={styles.postContentsText}>
+                    <View style={styles.bookmarkContentsTextBox}>
+                        <Text style={styles.bookmarkContentsText}>
                             {bookmark.back_contents}
                         </Text>
                     </View>
@@ -1238,13 +1255,13 @@ export {CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, Blank
 export default Card;
 
 const styles = StyleSheet.create({
-    postContentsScrollBox: {
+    bookmarkContentsScrollBox: {
         // flex: 1,
         height: SCREEN_WIDTH,
         width: SCREEN_WIDTH,
         backgroundColor: "white",
     },
-    postContentsBox: {
+    bookmarkContentsBox: {
         flex: 1,
         // backgroundColor: "#D9D9D9",
         marginVertical: regWidth * 13,
@@ -1253,46 +1270,48 @@ const styles = StyleSheet.create({
         borderRadius: 2,
         paddingHorizontal: regWidth * 10,
     },
-    postContentsBookCover: {
+    bookmarkContentsBookCover: {
         // flex: 1,
         // backgroundColor: "red",
         width: regWidth * 40,
         height: regWidth * 40,
         resizeMode: "contain",
     },
-    postContentsBook: {
+    bookmarkContentsBook: {
         // backgroundColor: "pink",
         flex: 0.6,
         flexDirection: "row", 
         justifyContent: "space-between",
         alignItems: "center",
     },
-    postContentsBookTitle: {
+    bookmarkContentsBookTitle: {
         fontWeight: "700",
         fontSize: regWidth * 15,
         marginTop: regWidth * 8,
+        width: regWidth * 250,
     },
-    postContentsBookChapter: {
+    bookmarkContentsBookChapter: {
         fontWeight: "400",
         fontSize: regWidth * 10,
+        width: regWidth * 230,
     },
-    postContentsBookChapterInput: {
+    bookmarkContentsBookChapterInput: {
         fontWeight: "400",
         fontSize: regWidth * 15,
     },
-    postContentsTextBox: {
+    bookmarkContentsTextBox: {
         // backgroundColor: "pink",
         flex: 4,
         marginTop: regHeight * 8,
         justifyContent: "center", 
     },
-    postContentsText: {
+    bookmarkContentsText: {
         fontWeight: "500",
         // fontSize: SCREEN_WIDTH * 0.041,
         fontSize: regWidth * 16,
         lineHeight: regWidth * 28,
     },
-    postContentsInput: {
+    bookmarkContentsInput: {
         // backgroundColor: "pink",
         flex: 4,
         marginTop: regWidth * 8,

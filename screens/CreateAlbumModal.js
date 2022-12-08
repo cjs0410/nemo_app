@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from '@react-navigation/native';
 import { useCardAnimation } from '@react-navigation/stack';
 import { Feather, AntDesign } from '@expo/vector-icons';
-import emptyImage from '../assets/images/emptyImage.jpeg';
+import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import * as ImagePicker from 'expo-image-picker';
 import Api from "../lib/Api";
@@ -123,7 +123,7 @@ const CreateAlbumModal = ({ route, navigation }) => {
                   onPress={pickImage}
                 >
                   <Image 
-                      source={image !== null ? { uri: image } : emptyImage}
+                      source={image !== null ? { uri: image } : emptyAlbumImage}
                       style={styles.albumImage}
                   />
                 </Pressable>

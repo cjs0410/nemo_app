@@ -51,6 +51,7 @@ import {
   CreateAlbumModal,
   AlbumProfile,
   FollowScreen,
+  LikeUsers,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -359,7 +360,7 @@ const HomeScreen = () => {
         component={CreateBookmark}
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          // animation: "fade",
         }}
       />
       <HomeStack.Screen 
@@ -367,7 +368,7 @@ const HomeScreen = () => {
         component={EditBookmark}
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          // animation: "fade",
         }}
       />
       <HomeStack.Screen name="OtherProfile" component={OtherProfile} />
@@ -392,6 +393,7 @@ const HomeScreen = () => {
       <HomeStack.Screen name="AlarmScreen" component={AlarmScreen} />
       <HomeStack.Screen name="FollowScreen" component={FollowScreen} />
       <HomeStack.Screen name="AlbumProfile" component={AlbumProfile} />
+      <HomeStack.Screen name="LikeUsers" component={LikeUsers} />
     </HomeStack.Navigator>
   )
 }
@@ -417,7 +419,7 @@ const SearchScreen = () => {
         component={CreateBookmark}
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          // animation: "fade",
         }}
       />
     </SearchStack.Navigator>
@@ -445,7 +447,7 @@ const BookmarkScreen = () => {
         component={CreateBookmark}
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          // animation: "fade",
         }}
       />
       <BookmarkStack.Screen 
@@ -453,7 +455,7 @@ const BookmarkScreen = () => {
         component={EditBookmark}
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          // animation: "fade",
         }}
       />
       <BookmarkStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
@@ -480,6 +482,7 @@ const BookmarkScreen = () => {
       <BookmarkStack.Screen name="OtherProfile" component={OtherProfile} />
       <BookmarkStack.Screen name="FollowScreen" component={FollowScreen} />
       <BookmarkStack.Screen name="AlbumProfile" component={AlbumProfile} />
+      <BookmarkStack.Screen name="LikeUsers" component={LikeUsers} />
     </BookmarkStack.Navigator>
   )
 }
@@ -505,7 +508,7 @@ const ProfileScreen = () => {
         component={CreateBookmark}
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          // animation: "fade",
         }}
       />
       <ProfileStack.Screen 
@@ -513,7 +516,7 @@ const ProfileScreen = () => {
         component={EditBookmark}
         options={{
           presentation: "transparentModal",
-          animation: "fade",
+          // animation: "fade",
         }}
       />
       <ProfileStack.Screen 
@@ -577,6 +580,7 @@ const ProfileScreen = () => {
         // }} 
       />
       <ProfileStack.Screen name="FollowScreen" component={FollowScreen} />
+      <ProfileStack.Screen name="LikeUsers" component={LikeUsers} />
     </ProfileStack.Navigator>
   )
 }

@@ -23,7 +23,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import { Card, BookmarkTile, BookmarkList, } from '../components';
 import Api from "../lib/Api";
 
-import bookCover from '../assets/images/steve.jpeg'
+import blankBookCover from '../assets/images/blankBookImage.png';
 import userImage from '../assets/images/userImage.jpeg';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -31,6 +31,7 @@ import { userSelector, bookmarkSelector } from '../modules/hooks';
 import { resetUserInfo, setShouldStorageRefresh, } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 import blankAvatar from '../assets/images/peopleicon.png';
+import { regHeight, regWidth } from "../config/globalStyles";
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -146,10 +147,10 @@ const Bookmark = ({navigation}) => {
                 }}
                 dropdownIconPosition={'right'}
                 defaultValueByIndex={0}
-                dropdownStyle={{borderRadius: 18, }}
+                dropdownStyle={{borderRadius: 18, marginTop: -regHeight * 34, }}
                 rowStyle={styles.rowStyle}
                 rowTextStyle={styles.arrangeText}
-                selectedRowStyle={{...styles.rowStyle, backgroundColor: "pink", }}
+                selectedRowStyle={{...styles.rowStyle, backgroundColor: "white", }}
               />
               {/* <TouchableOpacity activeOpacity={1} onPress={onArrange}>
                   <MaterialCommunityIcons name={ isTile ? "square-outline" : "view-grid-outline" } size={30} color="black" />
@@ -174,17 +175,38 @@ const Bookmark = ({navigation}) => {
               null
             ) : (
               <>
-                <View>
-                  {bookmarks && bookmarks.map((bookmark, index) => (
-                    <TouchableOpacity
-                      activeOpacity={1}
-                      onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, subTitle: "최신순", title: "내 북마크", index: index, })} 
-                      key={index}
+                { bookmarks && bookmarks.length !== 0 ? 
+                  <View>
+                    {bookmarks && bookmarks.map((bookmark, index) => (
+                      <TouchableOpacity
+                        activeOpacity={1}
+                        onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarks: bookmarks, subTitle: "최신순", title: "내 북마크", index: index, })} 
+                        key={index}
+                      >
+                        <BookmarkList bookmark={bookmark} navigation={navigation} />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  :
+                  <View
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: regHeight * 300,
+                      }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: regWidth * 20,
+                        fontWeight: "500",
+                        color: "grey",
+                      }}
                     >
-                      <BookmarkList bookmark={bookmark} navigation={navigation} />
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                      북마크를 스크랩해보세요
+                    </Text>
+                  </View>
+                }
+
               </>
             )}
           </ScrollView>
@@ -294,10 +316,10 @@ const Bookmark = ({navigation}) => {
                 }}
                 dropdownIconPosition={'right'}
                 defaultValueByIndex={0}
-                dropdownStyle={{borderRadius: 18, }}
+                dropdownStyle={{borderRadius: 18, marginTop: -regHeight * 34, }}
                 rowStyle={styles.rowStyle}
                 rowTextStyle={styles.arrangeText}
-                selectedRowStyle={{...styles.rowStyle, backgroundColor: "pink", }}
+                selectedRowStyle={{...styles.rowStyle, backgroundColor: "white", }}
               />
               {/* <View style={{ opacity: 0, }} >
                   <MaterialCommunityIcons name="square-outline" size={30} color="black" />
@@ -325,9 +347,32 @@ const Bookmark = ({navigation}) => {
               null
             ) : (
               <>
-                {books && books.map((book, index) => (
-                  <BookList book={book} navigation={navigation} key={index} />
-                ))}
+                { books && books.length !== 0 ? 
+                  <>
+                    {books && books.map((book, index) => (
+                      <BookList book={book} navigation={navigation} key={index} />
+                    ))}
+                  </>
+                  :
+                  <View
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: regHeight * 300,
+                      }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: regWidth * 20,
+                        fontWeight: "500",
+                        color: "grey",
+                      }}
+                    >
+                      북마크를 스크랩해보세요
+                    </Text>
+                  </View>
+                }
+
               </>
             )}
           </ScrollView>
@@ -368,10 +413,10 @@ const Bookmark = ({navigation}) => {
                 }}
                 dropdownIconPosition={'right'}
                 defaultValueByIndex={0}
-                dropdownStyle={{ borderRadius: 18, }}
+                dropdownStyle={{ borderRadius: 18, marginTop: -regHeight * 34, }}
                 rowStyle={styles.rowStyle}
                 rowTextStyle={styles.arrangeText}
-                selectedRowStyle={{...styles.rowStyle, backgroundColor: "pink", }}
+                selectedRowStyle={{...styles.rowStyle, backgroundColor: "white", }}
               />
               {/* <View style={{ opacity: 0, }} >
                   <MaterialCommunityIcons name="square-outline" size={30} color="black" />
@@ -395,12 +440,33 @@ const Bookmark = ({navigation}) => {
               null
             ) : (
               <>
-                {users && users.map((user, index) => (
-
-                    <UserList user={user} navigation={navigation} key={index} />
-                  
-                ))}
+                { users && users.length !== 0 ? 
+                  <>
+                    {users && users.map((user, index) => (
+                        <UserList user={user} navigation={navigation} key={index} />
+                    ))}
+                  </>
+                  :
+                  <View
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: regHeight * 300,
+                      }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: regWidth * 20,
+                        fontWeight: "500",
+                        color: "grey",
+                      }}
+                    >
+                      북마크를 스크랩해보세요
+                    </Text>
+                  </View>
+                }
               </>
+
             )}
           </ScrollView>
         </View>
@@ -418,11 +484,17 @@ const BookList = ({book, navigation,}) => {
         <View style={styles.List} >
           <View style={{ flexDirection: "row", alignItems: "center", }}>
             <Image 
-              source={ book.book_cover !== null ? { uri: book.book_cover } : bookCover} 
+              source={ book.book_cover !== null ? { uri: book.book_cover } : blankBookCover} 
               style={styles.bookImage}
             />
             <View style={{ marginHorizontal: 8, }}>
-              <Text style={styles.listTitle} >{book.book_title}</Text>
+              <Text 
+                style={styles.listTitle}
+                numberOfLines={2}
+                ellipsizeMode='tail'
+              >
+                {book.book_title}
+              </Text>
               <Text style={styles.listAuthor}>{book.book_author}</Text>
             </View>
           </View>
@@ -450,7 +522,13 @@ const UserList = ({user, navigation,}) => {
               style={styles.userImage} 
             />
             <View style={{ marginHorizontal: 8, }}>
-              <Text style={styles.listTitle} >{user.name}</Text>
+              <Text 
+                style={styles.listTitle} 
+                numberOfLines={2}
+                ellipsizeMode='tail'
+              >
+                {user.name}
+              </Text>
               <Text style={{...styles.listAuthor, color: "#008000", }} >{`@${user.user_tag}`}</Text>
             </View>
           </View>
@@ -512,8 +590,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   bookImage: {
-    width: 92,
-    height: 92,
+    width: regWidth * 92,
+    height: regWidth * 92,
     resizeMode: "contain",
   },
   userImage: {
@@ -525,13 +603,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   listTitle: {
-    fontSize: 18,
+    fontSize: regWidth * 18,
     fontWeight: "700",
+    width: regWidth * 230,
   },
   listAuthor: {
-    fontSize: 15,
+    fontSize: regWidth * 15,
     fontWeight: "400",
-    marginTop: 5,
+    marginTop: regHeight * 8,
   },
   bookMarkTileBox: {
     width: SCREEN_WIDTH * 0.5,

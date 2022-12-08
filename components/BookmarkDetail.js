@@ -49,10 +49,18 @@ const BookmarkDetail = (props) => {
     const modalValue = useRef(new Animated.Value(0)).current;
     const [albums, setAlbums] = useState(null);
 
+    const [pushLike, setPushLike] = useState(false);
+    const [pushScrap, setPushScrap] = useState(false);
+
     useEffect(() => {
         // console.log(bookmark);
         fetchUserTag();
+        // console.log(bookmark.is_like);
     }, [])
+
+    // useEffect(() => {
+    //     console.log(pushLike);
+    // }, [pushLike]);
 
     // useEffect(() => {
     //     console.log(captureRef);
@@ -124,6 +132,7 @@ const BookmarkDetail = (props) => {
 
 
     const onLike = async() => {
+        setPushLike(true);
         try {
             await Api
             .post("/api/v2/bookmark/likes/", {
@@ -132,6 +141,9 @@ const BookmarkDetail = (props) => {
             .then((res) => {
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.count);
+                dispatch(setShouldHomeRefresh(true));
+                dispatch(setShouldStorageRefresh(true));
+                dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -139,6 +151,7 @@ const BookmarkDetail = (props) => {
     }
 
     const onScrap = async() => {
+        setPushScrap(true);
         try {
             await Api
             .post("/api/v2/bookmark/scraps/", {
@@ -196,7 +209,7 @@ const BookmarkDetail = (props) => {
                 text: "확인", 
                 onPress: async() => {
                     try {
-                        console.log(bookmark.bookmark_id);
+                        // console.log(bookmark.bookmark_id);
                         await Api.post("/api/v2/bookmark/delete/", {
                             bookmark_id: bookmark.bookmark_id,
                         })
@@ -409,20 +422,66 @@ const BookmarkDetail = (props) => {
                         style={{ 
                             flexDirection: "row", 
                             alignItems: "center", 
-                            width: regWidth * 60,
+                            width: regWidth * 35,
                         }}
-                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        hitSlop={{ bottom: 60, left: 60, right: 60, top: 60 }}
                         onPress={onLike}
                     >
                         <Entypo 
-                            name={isLike ? "heart" : "heart-outlined"} 
+                            // name={ !pushLike ? (bookmark.is_like ? "heart" : "heart-outlined") : (isLike ? "heart" : "heart-outlined") } 
+                            name={bookmark.is_like ? "heart" : "heart-outlined"}
                             // name="heart-outlined"
-                            size={regWidth * 20} 
+                            size={regWidth * 22} 
                             color="red" 
                         />
-                        <Text style={styles.bookmarkLikesText}>{likeCount}</Text>
                     </Pressable>
-                    { userTag !== bookmark.user_tag ? 
+                    <Pressable 
+                        activeOpacity={1} 
+                        style={{ 
+                            flexDirection: "row", 
+                            alignItems: "center", 
+                            width: regWidth * 50,
+                        }}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        onPress={() => navigation.navigate('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
+                    >
+                        <Text style={styles.bookmarkLikesText}>
+                            {/* { !pushLike ? bookmark.likes : likeCount } */}
+                            {bookmark.likes}
+                        </Text>
+                    </Pressable>
+                    <Pressable 
+                        activeOpacity={1} 
+                        style={{ 
+                            flexDirection: "row", 
+                            alignItems: "center", 
+                        }}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        onPress={onScrap}
+                        disabled={userTag === bookmark.user_tag}
+                    >
+                        <Feather 
+                            name="download" 
+                            size={regWidth * 22}
+                            // color={ userTag === bookmark.user_tag ? "#008000" : (!pushScrap ? (bookmark.is_scrap ? "red" : "black") : (isScrap ? "red" : "black")) }
+                            color={ userTag === bookmark.user_tag ? "#008000" : (bookmark.is_scrap ? "red" : "black") }
+                            style={{
+                                width: regWidth * 35,
+                            }}
+                            // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
+                        />
+                        <Text 
+                            style={{
+                                ...styles.bookmarkLikesText, 
+                                color: userTag === bookmark.user_tag ? "#008000" : "black",
+                            }}
+                        >
+                            {/* { !pushScrap ? bookmark.scraps : scrapCount } */}
+                            { bookmark.scraps }
+                        </Text>
+                    </Pressable>
+
+                    {/* { userTag !== bookmark.user_tag ? 
                         <Pressable 
                             activeOpacity={1} 
                             style={{ 
@@ -442,7 +501,8 @@ const BookmarkDetail = (props) => {
                         </Pressable>
                         :
                         null
-                    }
+                    } */}
+
 
                     {/* {watermark === post.nickname ?
                         null
@@ -563,8 +623,8 @@ const BookmarkDetail = (props) => {
                                     setReportVisible(true);
                                 }}
                             >
-                                <Entypo name="warning" size={24} color="red" />
-                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
+                                <Entypo name="warning" size={24} color="black" />
+                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>신고</Text>
                             </TouchableOpacity>
                         }
 

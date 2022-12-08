@@ -25,3 +25,4 @@ export { default as CreateAlbumModal } from './CreateAlbumModal';
 export { default as AlbumProfile } from './AlbumProfile';
 export { default as FollowScreen } from './FollowScreen';
 export { default as EditBookmark } from './EditBookmark';
+export { default as LikeUsers } from './LikeUsers';

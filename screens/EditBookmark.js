@@ -1,11 +1,11 @@
-import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, Alert, ActivityIndicator, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
 import Api from "../lib/Api";
 import * as ImagePicker from 'expo-image-picker';
 import bookCover from '../assets/images/steve.jpeg';
-import emptyImage from '../assets/images/emptyImage.jpeg';
+import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
@@ -77,6 +77,11 @@ const EditBookmark = ({navigation, route}) => {
 
     const [albums, setAlbums] = useState(null);
     const [albumId, setAlbumId] = useState('');
+
+    const [createBookLoading, setCreateBookLoading] = useState(false);
+    const [editBookmarkLoading, setEditBookmarkLoading] = useState(false);
+
+    const isEmpty = (frontContent.length === 0) || (selectedBook === null);
     
     useEffect(() => {
         updateWatermark();
@@ -153,45 +158,56 @@ const EditBookmark = ({navigation, route}) => {
     }
 
     const editBookmark = async() => {
-        const formData = new FormData();
-        // console.log(contents);
-        formData.append('book_id', selectedBook.book_id);
-        formData.append('chapter_title', whatChapter);
-        // formData.append('nemos', JSON.stringify(contents));
-        formData.append('contents', JSON.stringify(contentsByCard));
-        formData.append('hex', color);
-        formData.append('text', info);
-        formData.append('tags', JSON.stringify(tags));
-        if (backgroundImage !== null) {
-            const filename = backgroundImage.split('/').pop();
-            const match = /\.(\w+)$/.exec(filename ?? '');
-            const type = match ? `image/${match[1]}` : `image`;
-            formData.append('backgroundimg', {
-                uri: backgroundImage,
-                type: type,
-                name: filename
-            });
-        }
-        formData.append('bookmark_id', bookmark.bookmark_id);
-
-        try {
-            await Api.post("/api/v2/bookmark/edit/", formData,
-                {
-                    headers: {
-                        'content-type': 'multipart/form-data',
+        if (isEmpty === false) {
+            setEditBookmarkLoading(true);
+            const formData = new FormData();
+            // console.log(contents);
+            formData.append('book_id', selectedBook.book_id);
+            formData.append('chapter_title', whatChapter);
+            // formData.append('nemos', JSON.stringify(contents));
+            formData.append('contents', JSON.stringify(contentsByCard));
+            formData.append('hex', color);
+            formData.append('text', info);
+            formData.append('tags', JSON.stringify(tags));
+            if (backgroundImage !== null) {
+                const filename = backgroundImage.split('/').pop();
+                const match = /\.(\w+)$/.exec(filename ?? '');
+                const type = match ? `image/${match[1]}` : `image`;
+                formData.append('backgroundimg', {
+                    uri: backgroundImage,
+                    type: type,
+                    name: filename
+                });
+            }
+            formData.append('bookmark_id', bookmark.bookmark_id);
+    
+            try {
+                await Api.post("/api/v2/bookmark/edit/", formData,
+                    {
+                        headers: {
+                            'content-type': 'multipart/form-data',
+                        },
                     },
+                )
+                .then((res) => {
+                    // console.log(res.data);
+                    navigation.goBack();
+                    dispatch(setShouldHomeRefresh(true));
+                    dispatch(setShouldStorageRefresh(true));
+                    dispatch(setShouldUserRefresh(true));
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setEditBookmarkLoading(false);
+        } else {
+            Alert.alert("북마크를 완성해주세요", "네모를 완성해주세요!", [
+                {
+                    text: "확인",
                 },
-            )
-            .then((res) => {
-                console.log(res.data);
-                navigation.goBack();
-                dispatch(setShouldHomeRefresh(true));
-                dispatch(setShouldStorageRefresh(true));
-                dispatch(setShouldUserRefresh(true));
-            })
-        } catch (err) {
-            console.error(err);
+            ]);
         }
+
     }
 
     const pickImage = async () => {
@@ -253,6 +269,7 @@ const EditBookmark = ({navigation, route}) => {
 
     const CreateBook = async() => {
         const formData = new FormData();
+        setCreateBookLoading(true);
         if (image !== null) {
             const filename = image.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -277,7 +294,7 @@ const EditBookmark = ({navigation, route}) => {
                 }
             )
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 // navigation.goBack();
                 setSelectedBook(res.data);
                 setModalVisible(false);
@@ -285,6 +302,7 @@ const EditBookmark = ({navigation, route}) => {
         } catch (err) {
             console.error(err);
         }
+        setCreateBookLoading(false);
     }
 
     const addCard = () => {
@@ -368,20 +386,41 @@ const EditBookmark = ({navigation, route}) => {
         }
     }
 
+    const exit = () => {
+        Alert.alert("북마크 수정을 취소하시겠습니까?", "확인 버튼을 누르면 취소됩니다.", [
+            {
+                text: "취소",
+            },
+            {
+                text: "확인", 
+                onPress: () => navigation.goBack()
+            }
+        ]);
+    }
+
 
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.header} >
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Text style={{ fontSize: 25, fontWeight: "900", marginRight: 15, }} >북마크 수정</Text>
+                    <Text style={{ fontSize: regWidth * 25, fontWeight: "900", marginRight: regWidth * 8, }} >북마크 수정</Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={{ fontSize: 15, fontWeight: "500", marginRight: 25, }} >취소</Text>
+                    <TouchableOpacity onPress={exit}>
+                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", marginRight: regWidth * 32, }} >취소</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={editBookmark}>
-                        <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000" }} >완료</Text>
-                    </TouchableOpacity>
+                    {editBookmarkLoading ? 
+                        <ActivityIndicator 
+                            color="#008000"
+                        />
+                        :
+                        <Pressable
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={editBookmark}
+                        >
+                            <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }} >완료</Text>
+                        </Pressable>
+                    }
                 </View>
             </SafeAreaView>
 
@@ -473,7 +512,11 @@ const EditBookmark = ({navigation, route}) => {
                     <View style={{ flexDirection: "row", }} >
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#D9D9D9"}}
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#D9D9D9",
+                                borderColor: color === "#D9D9D9" ? "#FF4040" : "black"
+                            }}
                             onPress={() => {
                                 selectColor("#D9D9D9");
                                 setBackgroundImage(null);
@@ -481,7 +524,11 @@ const EditBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#FFCECE"}} 
+                            style={{
+                                ...styles.optionBox,
+                                backgroundColor: "#FFCECE",
+                                borderColor: color === "#FFCECE" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#FFCECE");
                                 setBackgroundImage(null);
@@ -489,7 +536,11 @@ const EditBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#FFF0BC"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#FFF0BC",
+                                borderColor: color === "#FFF0BC" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#FFF0BC");
                                 setBackgroundImage(null);
@@ -497,15 +548,23 @@ const EditBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#BDFFD0"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#A0D88D",
+                                borderColor: color === "#A0D88D" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
-                                selectColor("#BDFFD0");
+                                selectColor("#A0D88D");
                                 setBackgroundImage(null);
                             }}
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#8BB7EA"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#8BB7EA",
+                                borderColor: color === "#8BB7EA" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#8BB7EA");
                                 setBackgroundImage(null);
@@ -513,7 +572,11 @@ const EditBookmark = ({navigation, route}) => {
                         />
                         <TouchableOpacity 
                             activeOpacity={1} 
-                            style={{...styles.optionBox, backgroundColor: "#D2BDFF"}} 
+                            style={{
+                                ...styles.optionBox, 
+                                backgroundColor: "#D2BDFF",
+                                borderColor: color === "#D2BDFF" ? "#FF4040" : "black"
+                            }} 
                             onPress={() => {
                                 selectColor("#D2BDFF");
                                 setBackgroundImage(null);
@@ -628,20 +691,26 @@ const EditBookmark = ({navigation, route}) => {
                         <Text style={{fontSize: 16, fontWeight: "700", }} >
                             책 등록하기
                         </Text>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            activeOpacity={1}
-                            onPress={CreateBook}
-                        >
-                            <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
-                                등록
-                            </Text>
-                        </Pressable>
+                        {createBookLoading ? 
+                            <ActivityIndicator 
+                                color="#008000"
+                            />
+                            :
+                            <Pressable
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                activeOpacity={1}
+                                onPress={CreateBook}
+                            >
+                                <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                                    등록
+                                </Text>
+                            </Pressable>
+                        }
                     </SafeAreaView>
                     <View style={styles.addBook}>
                         <View style={{ alignItems: 'center', }}>
                             <Image 
-                                source={image === null ? emptyImage : { uri: image }} 
+                                source={image === null ? emptyAlbumImage : { uri: image }} 
                                 style={styles.bookCoverImage}
                             />
                             <TouchableOpacity

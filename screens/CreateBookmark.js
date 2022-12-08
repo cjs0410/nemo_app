@@ -1,11 +1,11 @@
-import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, ActivityIndicator } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, ActivityIndicator, Alert, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
 import Api from "../lib/Api";
 import * as ImagePicker from 'expo-image-picker';
 import bookCover from '../assets/images/steve.jpeg';
-import emptyImage from '../assets/images/emptyImage.jpeg';
+import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
@@ -81,7 +81,10 @@ const CreateBookmark = ({navigation, route}) => {
     const [align, setAlign] = useState('normal');
 
     const [createBookLoading, setCreateBookLoading] = useState(false);
+    const [createBookmarkLoading, setCreateBookmarkLoading] = useState(false);
     
+    const isEmpty = (frontContent.length === 0) || (selectedBook === null);
+
     useEffect(() => {
         updateWatermark();
         if (ocrImage !== null) {
@@ -145,47 +148,58 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const addBookmark = async() => {
-        navigation.goBack();
-        const formData = new FormData();
-        // console.log(contents);
-        formData.append('book_id', selectedBook.book_id);
-        formData.append('chapter_title', whatChapter);
-        // formData.append('nemos', JSON.stringify(contents));
-        formData.append('contents', JSON.stringify(contentsByCard));
-        formData.append('hex', color);
-        formData.append('text', info);
-        formData.append('tags', JSON.stringify(tags));
-        formData.append('album_id', albumId);
-        if (backgroundImage !== null) {
-            const filename = backgroundImage.split('/').pop();
-            const match = /\.(\w+)$/.exec(filename ?? '');
-            const type = match ? `image/${match[1]}` : `image`;
-            formData.append('backgroundimg', {
-                uri: backgroundImage,
-                type: type,
-                name: filename
-            });
+        if (isEmpty === false) {
+            setCreateBookmarkLoading(true);
+            const formData = new FormData();
+            // console.log(contents);
+            formData.append('book_id', selectedBook.book_id);
+            formData.append('chapter_title', whatChapter);
+            // formData.append('nemos', JSON.stringify(contents));
+            formData.append('contents', JSON.stringify(contentsByCard));
+            formData.append('hex', color);
+            formData.append('text', info);
+            formData.append('tags', JSON.stringify(tags));
+            formData.append('album_id', albumId);
+            if (backgroundImage !== null) {
+                const filename = backgroundImage.split('/').pop();
+                const match = /\.(\w+)$/.exec(filename ?? '');
+                const type = match ? `image/${match[1]}` : `image`;
+                formData.append('backgroundimg', {
+                    uri: backgroundImage,
+                    type: type,
+                    name: filename
+                });
+            }
+    
+            try {
+                console.log(formData);
+                await Api.post("/api/v2/bookmark/create/", formData,
+                    {
+                        headers: {
+                            'content-type': 'multipart/form-data',
+                        },
+                    },
+                )
+                .then((res) => {
+                    console.log(res.data);
+                    navigation.goBack();
+                    dispatch(setShouldHomeRefresh(true));
+                    dispatch(setShouldStorageRefresh(true));
+                    dispatch(setShouldUserRefresh(true));
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setCreateBookmarkLoading(false);
+        } else {
+            Alert.alert("북마크를 완성해주세요", "네모를 완성해주세요!", [
+                {
+                    text: "확인",
+                },
+            ]);
         }
 
-        try {
-            console.log(formData);
-            await Api.post("/api/v2/bookmark/create/", formData,
-                {
-                    headers: {
-                        'content-type': 'multipart/form-data',
-                    },
-                },
-            )
-            .then((res) => {
-                console.log(res.data);
-                
-                dispatch(setShouldHomeRefresh(true));
-                dispatch(setShouldStorageRefresh(true));
-                dispatch(setShouldUserRefresh(true));
-            })
-        } catch (err) {
-            console.error(err);
-        }
+
     }
 
     const pickImage = async () => {
@@ -396,22 +410,46 @@ const CreateBookmark = ({navigation, route}) => {
         }
     }
 
+    const exit = () => {
+        Alert.alert("북마크 생성을 취소하시겠습니까?", "확인 버튼을 누르면 취소됩니다.", [
+            {
+                text: "취소",
+            },
+            {
+                text: "확인", 
+                onPress: () => navigation.goBack()
+            }
+        ]);
+    }
+
 
 
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.header} >
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Text style={{ fontSize: 25, fontWeight: "900", marginRight: 15, }} >Create</Text>
+                    <Text style={{ fontSize: regWidth * 25, fontWeight: "900", marginRight: regWidth * 8, }} >Create</Text>
                     <Feather name="bookmark" size={28} color="black" />
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={{ fontSize: 15, fontWeight: "500", marginRight: 25, }} >취소</Text>
+                    <TouchableOpacity onPress={exit}>
+                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", marginRight: regWidth * 32, }} >취소</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={addBookmark}>
-                        <Text style={{ fontSize: 15, fontWeight: "500", color: "#008000" }} >완료</Text>
-                    </TouchableOpacity>
+                    {/* <TouchableOpacity onPress={addBookmark}>
+                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }} >완료</Text>
+                    </TouchableOpacity> */}
+                    {createBookmarkLoading ? 
+                        <ActivityIndicator 
+                            color="#008000"
+                        />
+                        :
+                        <Pressable
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={addBookmark}
+                        >
+                            <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }} >완료</Text>
+                        </Pressable>
+                    }
                 </View>
             </SafeAreaView>
 
@@ -541,11 +579,11 @@ const CreateBookmark = ({navigation, route}) => {
                             activeOpacity={1} 
                             style={{
                                 ...styles.optionBox, 
-                                backgroundColor: "#BDFFD0",
-                                borderColor: color === "#BDFFD0" ? "#FF4040" : "black"
+                                backgroundColor: "#A0D88D",
+                                borderColor: color === "#A0D88D" ? "#FF4040" : "black"
                             }} 
                             onPress={() => {
-                                selectColor("#BDFFD0");
+                                selectColor("#A0D88D");
                                 setBackgroundImage(null);
                             }}
                         />
@@ -724,7 +762,7 @@ const CreateBookmark = ({navigation, route}) => {
                     <View style={styles.addBook}>
                         <View style={{ alignItems: 'center', }}>
                             <Image 
-                                source={image === null ? emptyImage : { uri: image }} 
+                                source={image === null ? emptyAlbumImage : { uri: image }} 
                                 style={styles.bookCoverImage}
                             />
                             <TouchableOpacity

@@ -2,7 +2,7 @@ import { StyleSheet, View, SafeAreaView, ScrollView, FlatList, Text, TextInput, 
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
-import bookCover from '../assets/images/steve.jpeg';
+import blankBookCover from '../assets/images/blankBookImage.png';
 import { BookmarkDetail } from '../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
@@ -16,7 +16,7 @@ import blankAvatar from '../assets/images/peopleicon.png';
 import * as Font from "expo-font";
 import * as Update from "expo-updates";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
-import NemoLogo from '../assets/images/NemoTrans.png';
+import NemoLogo from '../assets/images/NemoLogo(small).png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
@@ -52,6 +52,8 @@ const Home = ({navigation}) => {
 
     const logoValue = useRef(new Animated.Value(0)).current;
 
+    const [reRender, setReRender] = useState(false);
+
     const ref = useRef();
     useScrollToTop(ref);
 
@@ -72,11 +74,14 @@ const Home = ({navigation}) => {
     useEffect(() => {
         if (shouldHomeRefresh === true) {
             fetchBookmarks();
-            // fetchNewAlarm();
+            fetchNewAlarm();
             dispatch(setShouldHomeRefresh(false));
         }
     }, [shouldHomeRefresh]);
 
+    // useEffect(() => {
+    //     console.log(bookmarks);
+    // }, [bookmarks]);
 
 
     // useFocusEffect(
@@ -94,7 +99,7 @@ const Home = ({navigation}) => {
             })
             .then(async(res) => {
                 try {
-                    console.log("reissue!", res.data.refresh);
+                    // console.log("reissue!", res.data.refresh);
                     await AsyncStorage.setItem('refresh', res.data.refresh)
                     .then(async() => await AsyncStorage.setItem('access', res.data.access))
                     .then(() => {
@@ -121,13 +126,12 @@ const Home = ({navigation}) => {
     }
     
     const fetchAvatar = async() => {
-        const refreshToken = await AsyncStorage.getItem('refresh');
+        // const refreshToken = await AsyncStorage.getItem('refresh');
         try {
             await Api
             .get("/api/v1/user/avatar/")
             .then((res) => {
-                // setAvatar(res.data.avatar);
-                console.log("avatar!", refreshToken);
+                // console.log("avatar!", refreshToken);
                 // console.log(res.data);
                 dispatch(setAvatar(res.data.avatar));
             })
@@ -137,37 +141,33 @@ const Home = ({navigation}) => {
     }
 
     const fetchBookmarks = async() => {
-        const refreshToken = await AsyncStorage.getItem('refresh');
+        // const refreshToken = await AsyncStorage.getItem('refresh');
         try {
-            setScrollLoading(true);
+            // setScrollLoading(true);
+            setCursor("");
             await Api
             .post("/api/v1/user/", {
                 cursor: "",
             })
-            .then(async(res) => {
-                console.log("bookmark!", refreshToken);
-                setBookmarks(res.data);
+            .then((res) => {
+                // console.log(Object.assign([], res.data));
+                setBookmarks(() => [...res.data]);
                 setNewBookmarkNum(res.data.length);
-                // const accessToken = await AsyncStorage.getItem('access');
-                // const refreshToken = await AsyncStorage.getItem('refresh');
-                // console.log(jwt_decode(accessToken));
-                // console.log(jwt_decode(refreshToken).exp, jwt_decode(accessToken).exp, (Date.now() / 1000));
 
-                // fetchNewAlarm();
             })
         } catch (err) {
             console.error(err);
         }
-        setScrollLoading(false);
+        // setScrollLoading(false);
     }
 
     const fetchNewAlarm = async() => {
-        const refreshToken = await AsyncStorage.getItem('refresh');
+        // const refreshToken = await AsyncStorage.getItem('refresh');
         try {
             await Api
             .get("/api/v1/user/new_alarm/")
             .then((res) => {
-                console.log("alarm!", refreshToken);
+                // console.log("alarm!", refreshToken);
                 dispatch(setIsAlarm(res.data.alarm));
             })
         } catch (err) {
@@ -175,9 +175,17 @@ const Home = ({navigation}) => {
         }
     }
 
-    const renderBookmark = ({ item }) => (
+    const renderBookmark = useCallback(({ item }) => (
         <BookmarkDetail bookmark={item} navigation={navigation} />
-    )
+    ), [])
+    // const renderBookmark = useCallback(({ item }) => {
+    //     console.log(item);
+    //     return(
+    //         <BookmarkDetail bookmark={item} navigation={navigation} />
+    //     )
+    // }, [])
+
+    const keyExtractor = (bookmark, index) => bookmark.bookmark_id
 
 
     const onProfile = () => {
@@ -188,11 +196,27 @@ const Home = ({navigation}) => {
     const onRefresh = useCallback(async() => {
         setRefreshing(true);
         setCursor(0);
+
         await fetchBookmarks()
-        // .then(async() => fetchNewAlarm())
+        .then(async() => await fetchNewAlarm())
         .then(() => setRefreshing(false));
-        // wait(2000).then(() => setRefreshing(false));
+        // wait(1500).then(() => {
+        //     setRefreshing(false);
+        //     console.log(bookmarks, 2);
+        // });
     }, []);
+
+    // const onRefresh = async() => {
+    //     setRefreshing(true);
+    //     setCursor(0);
+    //     // setReRender(!reRender);
+    //     // setBookmarks([]);
+    //     // setNewBookmarkNum(0);
+    //     await fetchBookmarks()
+    //     .then(async() => await fetchNewAlarm())
+    //     // .then(() => setRefreshing(false));
+    //     wait(1000).then(() => setRefreshing(false));
+    // };
 
 
     const fetchProfile = async() => {
@@ -224,7 +248,7 @@ const Home = ({navigation}) => {
         if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
             try {
                 setScrollLoading(true);
-                // console.log(bookmarks[bookmarks.length - 1].cursor);
+                setCursor(bookmarks[bookmarks.length - 1].cursor);
                 await Api
                 .post("/api/v1/user/", {
                     cursor: bookmarks[bookmarks.length - 1].cursor,
@@ -307,7 +331,7 @@ const Home = ({navigation}) => {
             <SafeAreaView style={styles.header} >
                 <Pressable 
                     style={{ flexDirection: "row", alignItems: "center", }}
-                    // onPress={() => Update.reloadAsync()}
+                    // onPress={() => setReRender(!reRender)}
                 >
                     <Animated.Image 
                         source={NemoLogo}
@@ -317,25 +341,25 @@ const Home = ({navigation}) => {
                         }}
                         onLoadEnd={showLogo}
                     />
-                    <Text style={{
+                    {/* <Text style={{
                         fontFamily: "frank",
-                        fontSize: 30,
+                        fontSize: regWidth * 30,
                         fontWeight: "900",
                         marginHorizontal: regWidth * 8,
                     }}>
                         Nemo
-                    </Text>
+                    </Text> */}
                 </Pressable>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Pressable
                         onPress={() => setSearchModalVisible(true)}
-                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     >
                         <Feather name="search" size={30} color="black" style={{ marginRight: 24, }}/>
                     </Pressable>
                     <Pressable
                         onPress={() => navigation.navigate('AlarmScreen')}
-                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         // style={{ backgroundColor: "pink"}}
                     >
                         <Feather name="bell" size={28} color="black" />
@@ -345,8 +369,8 @@ const Home = ({navigation}) => {
                                     position: "absolute",
                                     backgroundColor: "red",
                                     borderRadius: 50,
-                                    height: 6,
-                                    width: 6,
+                                    height: regWidth * 6,
+                                    width: regWidth * 6,
                                     right: 0,
                                 }}
                             >
@@ -396,22 +420,19 @@ const Home = ({navigation}) => {
                     onEndReachedThreshold={0.3}
                     ListFooterComponent={scrollLoading && <ActivityIndicator />}
                     data={bookmarks}
+                    renderItem={renderBookmark}
+
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
                     
-                    keyExtractor={bookmark => bookmark.bookmark_id}
+                    keyExtractor={keyExtractor}
                     showsVerticalScrollIndicator={false}
                     ref={ref}
-                    refreshControl={
-                        <RefreshControl
-                          refreshing={refreshing}
-                          onRefresh={onRefresh}
-                        />
-                    }
-
-                    renderItem={renderBookmark}
                 />
                 :
                 null
             }
+
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -437,7 +458,7 @@ const Home = ({navigation}) => {
                     }}>
                     <SafeAreaView style={styles.modalHeader}>
                         <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                             onPress={() => {
                                 setSearchModalVisible(false);
                                 setSearchInput('');
@@ -452,7 +473,7 @@ const Home = ({navigation}) => {
                             책 검색
                         </Text>
                         <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                             onPress={onSearch}
                         >
                             <Text style={{fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }}>
@@ -489,14 +510,31 @@ const Home = ({navigation}) => {
                                         key={index}
                                     >
                                         <Image 
-                                            source={searchResult.book_cover !== null ? { uri: searchResult.book_cover } : bookCover}
+                                            source={searchResult.book_cover !== null ? { uri: searchResult.book_cover } : blankBookCover}
                                             style={styles.bookCoverImage}
                                         />
-                                        <View style={{ marginHorizontal: 8, }}>
-                                            <Text style={{ fontSize: 18, fontWeight: "700", }}>
+                                        <View style={{ marginHorizontal: regWidth * 8, }}>
+                                            <Text 
+                                                style={{ 
+                                                    fontSize: regWidth * 18, 
+                                                    fontWeight: "700", 
+                                                    width: regWidth * 180, 
+                                                }}
+                                                numberOfLines={2}
+                                                ellipsizeMode='tail'
+                                            >
                                                 {searchResult.book_title}
                                             </Text>
-                                            <Text style={{ fontSize: 15, fontWeight: "400", }}>
+                                            <Text 
+                                                style={{ 
+                                                    fontSize: regWidth * 15, 
+                                                    fontWeight: "400", 
+                                                    width: regWidth * 180,
+                                                    marginTop: regHeight * 8,
+                                                }}
+                                                numberOfLines={1}
+                                                ellipsizeMode='tail'
+                                            >
                                                 {searchResult.book_author}
                                             </Text>
                                         </View>
@@ -536,86 +574,19 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "red",
-        marginVertical: 10,
+        marginVertical: regHeight * 10,
         marginHorizontal: 20,
-        paddingBottom: 8,
+        paddingBottom: regHeight * 8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
     LogoImage: {
-        width: regWidth * 30,
-        height: regWidth * 30,
+        width: regWidth * 120,
+        height: regWidth * 40,
         resizeMode: "contain",
     },
-    post: {
-        // backgroundColor: "grey",
-        paddingTop: 28,
-        paddingBottom: 18,
-        borderTopWidth: 0.3,
-        borderTopColor: "#808080",
-    },
 
-    postWriter: {
-        flexDirection: "row",
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        alignItems: "center",
-    },
-    postWriterImage: {
-        width: 25,
-        height: 25,
-        resizeMode: "cover",
-        borderRadius: 50,
-        backgroundColor: "red",
-    },
-    postWriterText: {
-        fontWeight: "700",
-        fontSize: 12.5,
-        paddingHorizontal: 5,
-    },
-    postDateText: {
-        color: "#808080",
-        fontWeight: "500",
-        fontSize: 10,
-        paddingHorizontal: 5,
-    },
-
-    postTitle: {
-        paddingTop: 10,
-        paddingHorizontal: 10,
-    },
-    postTitleText: {
-        fontWeight: "700",
-        fontSize: 20,
-    },
-    postTitleInfoText: {
-        fontWeight: "400",
-        fontSize: 13,
-        marginTop: 10,
-    },
-
-
-    postLikes: {
-        marginTop: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-    postLikesText: {
-        fontWeight: "700",
-        fontSize: 15,
-    },
-    profileImage: {
-        width: 30,
-        height: 30,
-        resizeMode: "cover",
-        borderRadius: 50,
-        // backgroundColor: "red",
-        // marginTop: 10,
-    },
     modal: {
         width: '100%', 
         // height: '35%',

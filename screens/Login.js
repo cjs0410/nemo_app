@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, Image, Animated, } from "react-native";
+import { View, SafeAreaView, ScrollView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, Image, Animated, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
@@ -74,7 +74,7 @@ const Login = ({ navigation }) => {
 
     return (
       <View style={styles.container}>
-        <View style={styles.header} >
+        <SafeAreaView style={styles.header} >
           <Pressable 
             onPress={() => navigation.goBack()} 
             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -105,54 +105,57 @@ const Login = ({ navigation }) => {
           >
               <Ionicons name="chevron-back" size={28} color="black" />
           </Pressable>
-        </View>
-        <View style={styles.introduce} >
-          <Text style={styles.introduceText}>
-            로그인
-          </Text>
+        </SafeAreaView>
+        <ScrollView
+          scrollEnabled={false}
+        >
+          <View style={styles.introduce} >
+            <Text style={styles.introduceText}>
+              로그인
+            </Text>
 
-          {/* <TouchableOpacity
-            onPress={() => navigation.navigate('Join1')}
-            style={styles.introduceBtn}
-          >
-            <AntDesign name="google" size={18} color="black" />
-            <Text style={{...styles.btnText, marginLeft: 8,}} >Google로 계속하기</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Join1')}
-            style={styles.introduceBtn}
-          >
-            <AntDesign name="apple1" size={18} color="black" />
-            <Text style={{...styles.btnText, marginLeft: 8,}} >Apple로 계속하기</Text>
-          </TouchableOpacity> */}
+            {/* <TouchableOpacity
+              onPress={() => navigation.navigate('Join1')}
+              style={styles.introduceBtn}
+            >
+              <AntDesign name="google" size={18} color="black" />
+              <Text style={{...styles.btnText, marginLeft: 8,}} >Google로 계속하기</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Join1')}
+              style={styles.introduceBtn}
+            >
+              <AntDesign name="apple1" size={18} color="black" />
+              <Text style={{...styles.btnText, marginLeft: 8,}} >Apple로 계속하기</Text>
+            </TouchableOpacity> */}
 
-          {/* <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
-            <View style={{ height: 0.5, width: SCREEN_WIDTH * 0.2, backgroundColor: "black"}}></View>
-            <Text style={{ marginHorizontal: 10, fontSize: 13, fontWeight: "500", textAlign: "center", }}>또는</Text>
-            <View style={{ height: 0.5, width: SCREEN_WIDTH * 0.2, backgroundColor: "black"}}></View>
-          </View> */}
-
-          <TextInput 
-            style={styles.input}
-            onChangeText={onChangeId}
-            placeholder="아이디를 입력해주세요"
-          />
-          <TextInput 
-            style={styles.input}
-            onChangeText={onChangePassword}
-            placeholder="비밀번호를 입력해주세요"
-            secureTextEntry={true}
-          />
-          <Text style={{...styles.warning, color: "#FF4040", }}>
-            {warning}
-          </Text>
-          <TouchableOpacity
-            onPress={onLogin}
-            style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
-          >
-            <Text style={{...styles.btnText, color: "white",}} >로그인하기</Text>
-          </TouchableOpacity>
-        </View>
+            {/* <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
+              <View style={{ height: 0.5, width: SCREEN_WIDTH * 0.2, backgroundColor: "black"}}></View>
+              <Text style={{ marginHorizontal: 10, fontSize: 13, fontWeight: "500", textAlign: "center", }}>또는</Text>
+              <View style={{ height: 0.5, width: SCREEN_WIDTH * 0.2, backgroundColor: "black"}}></View>
+            </View> */}
+            <TextInput 
+              style={styles.input}
+              onChangeText={onChangeId}
+              placeholder="아이디를 입력해주세요"
+            />
+            <TextInput 
+              style={styles.input}
+              onChangeText={onChangePassword}
+              placeholder="비밀번호를 입력해주세요"
+              secureTextEntry={true}
+            />
+            <Text style={{...styles.warning, color: "#FF4040", }}>
+              {warning}
+            </Text>
+            <TouchableOpacity
+              onPress={onLogin}
+              style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
+            >
+              <Text style={{...styles.btnText, color: "white",}} >로그인하기</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
     );
 }
@@ -163,9 +166,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   header: {
-    marginTop: 65,
-    marginHorizontal: 20,
-    paddingBottom: 30,
+    marginTop: regHeight * 58,
+    marginHorizontal: regWidth * 20,
+    paddingBottom: regHeight * 30,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -176,9 +179,9 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   introduce: {
-    marginTop: -18,
+    // marginTop: -regHeight * 18,
     justifyContent: "center",
-    marginHorizontal: 38,
+    marginHorizontal: regWidth * 38,
   },
   introduceText: {
     fontSize: regWidth * 24,
@@ -189,14 +192,14 @@ const styles = StyleSheet.create({
   introduceBtn: {
     height: regHeight * 50,
     backgroundColor: "#EEEEEE",
-    paddingVertical: 10,
+    paddingVertical: regHeight * 10,
     marginVertical: regHeight * 80,
     alignContent: "center",
     justifyContent: "center",
     borderRadius: 10,
 },
   btnText: {
-    fontSize: 16,
+    fontSize: regWidth * 16,
     fontWeight: "500",
     textAlign: "center",
   },

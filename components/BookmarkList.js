@@ -1,7 +1,7 @@
 import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Animated, Pressable, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, FontAwesome, } from '@expo/vector-icons'; 
-import bookCover from '../assets/images/steve.jpeg';
+import blankBookCover from '../assets/images/blankBookImage.png';
 import RenderHtml from 'react-native-render-html';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -58,7 +58,7 @@ const BookmarkList = (props) => {
                     >
                         <View>
                             <Image 
-                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : bookCover} 
+                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : blankBookCover} 
                                 style={styles.bookmarkContentsBookCover}
                             />
                         </View>
@@ -136,7 +136,7 @@ const UnTouchableBookmarkList = (props) => {
                     >
                         <View>
                             <Image 
-                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : bookCover} 
+                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : blankBookCover} 
                                 style={styles.bookmarkContentsBookCover}
                             />
                         </View>
