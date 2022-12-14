@@ -1,4 +1,6 @@
 export { default as Card } from './Card';
+export { default as InputCard } from './InputCard';
+export { default as InvisibleCard } from './InvisibleCard';
 export { default as Post } from './Post';
 export { default as BookmarkTile } from './BookmarkTile';
 export { default as BookmarkList } from './BookmarkList';

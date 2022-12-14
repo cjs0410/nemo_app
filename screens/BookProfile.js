@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
-import bookCover from '../assets/images/steve.jpeg';
+import blankBookCover from '../assets/images/blankBookImage.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import Api from '../lib/Api';
@@ -108,7 +108,7 @@ const BookProfile = ({route, navigation}) => {
                     >
                         <View style={{ alignItems: "center", borderBottomWidth: 0.2, }}>
                             <Image 
-                                source={ bookInfo.book_cover !== null ? { uri: bookInfo.book_cover } : bookCover} 
+                                source={ bookInfo.book_cover !== null ? { uri: bookInfo.book_cover } : blankBookCover} 
                                 style={styles.bookImage}
                             />
                             <Text style={{ fontSize: 20, fontWeight: "700", marginVertical: 10,}}>

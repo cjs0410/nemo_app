@@ -13,6 +13,11 @@ import blankAvatar from '../assets/images/peopleicon.png';
 import BottomSheet, { BottomSheetView, BottomSheetFooter } from '@gorhom/bottom-sheet';
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
+import {
+    useNavigation,
+    useFocusEffect,
+    useScrollToTop,
+} from '@react-navigation/native';
 
 import {
     BottomSheetModal,
@@ -20,7 +25,7 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { bookmarkSelector, scrapSelector } from '../modules/hooks';
+import { userSelector, bookmarkSelector, scrapSelector } from '../modules/hooks';
 import { addBookmark } from '../modules/bookmarks';
 import { addScrap, deleteScrap } from '../modules/scraps';
 import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
@@ -31,6 +36,7 @@ const {width:SCREEN_WIDTH} = Dimensions.get('window');
 const BookmarkDetail = (props) => {
     const dispatch = useDispatch();
     const captureRef = useRef();
+    const { isStaff, } = useSelector(userSelector);
     const bookmark = props.bookmark;
     const navigation = props.navigation;
     const [current, setCurrent] = useState(0);
@@ -58,6 +64,16 @@ const BookmarkDetail = (props) => {
         // console.log(bookmark.is_like);
     }, [])
 
+    useFocusEffect(
+        useCallback(() => {
+            // console.log("a");
+            // setPushLike(false);
+            // setIsLike(bookmark.is_like);
+            // setLikeCount(bookmark.likes);
+            fetchFactor();
+        }, [])
+    )
+
     // useEffect(() => {
     //     console.log(pushLike);
     // }, [pushLike]);
@@ -70,6 +86,24 @@ const BookmarkDetail = (props) => {
         try {
             const accessToken = await AsyncStorage.getItem('access');
             setUserTag(jwt_decode(accessToken).user_tag);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const fetchFactor = async() => {
+        try {
+            await Api
+            .post("/api/v2/bookmark/detail/", {
+                bookmark_id: bookmark.bookmark_id,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                setIsLike(res.data.is_like);
+                setLikeCount(res.data.like);
+                setIsScrap(res.data.is_scrap);
+                setScrapCount(res.data.scrap);
+            })
         } catch (err) {
             console.error(err);
         }
@@ -141,7 +175,7 @@ const BookmarkDetail = (props) => {
             .then((res) => {
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.count);
-                dispatch(setShouldHomeRefresh(true));
+                // dispatch(setShouldHomeRefresh(true));
                 dispatch(setShouldStorageRefresh(true));
                 dispatch(setShouldUserRefresh(true));
             })
@@ -422,17 +456,19 @@ const BookmarkDetail = (props) => {
                         style={{ 
                             flexDirection: "row", 
                             alignItems: "center", 
-                            width: regWidth * 35,
+                            // width: regWidth * 35,
+                            paddingRight: regWidth * 8,
+                            paddingLeft: regWidth * 13,
+                            paddingVertical: regHeight * 8,
                         }}
-                        hitSlop={{ bottom: 60, left: 60, right: 60, top: 60 }}
+                        hitSlop={{ bottom: 20, left: 60, right: 60, top: 20 }}
                         onPress={onLike}
                     >
                         <Entypo 
                             // name={ !pushLike ? (bookmark.is_like ? "heart" : "heart-outlined") : (isLike ? "heart" : "heart-outlined") } 
-                            name={bookmark.is_like ? "heart" : "heart-outlined"}
-                            // name="heart-outlined"
-                            size={regWidth * 22} 
-                            color="red" 
+                            name={isLike ? "heart" : "heart-outlined"}
+                            size={regWidth * 26} 
+                            color={isLike ? "red" : "black"}
                         />
                     </Pressable>
                     <Pressable 
@@ -440,14 +476,15 @@ const BookmarkDetail = (props) => {
                         style={{ 
                             flexDirection: "row", 
                             alignItems: "center", 
-                            width: regWidth * 50,
+                            width: regWidth * 60,
+                            paddingVertical: regHeight * 8,
                         }}
-                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                        onPress={() => navigation.navigate('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                        onPress={() => navigation.push('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
                     >
                         <Text style={styles.bookmarkLikesText}>
                             {/* { !pushLike ? bookmark.likes : likeCount } */}
-                            {bookmark.likes}
+                            { `${likeCount}` }
                         </Text>
                     </Pressable>
                     <Pressable 
@@ -455,6 +492,8 @@ const BookmarkDetail = (props) => {
                         style={{ 
                             flexDirection: "row", 
                             alignItems: "center", 
+                            paddingVertical: regHeight * 8,
+
                         }}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         onPress={onScrap}
@@ -462,22 +501,22 @@ const BookmarkDetail = (props) => {
                     >
                         <Feather 
                             name="download" 
-                            size={regWidth * 22}
+                            size={regWidth * 25}
                             // color={ userTag === bookmark.user_tag ? "#008000" : (!pushScrap ? (bookmark.is_scrap ? "red" : "black") : (isScrap ? "red" : "black")) }
-                            color={ userTag === bookmark.user_tag ? "#008000" : (bookmark.is_scrap ? "red" : "black") }
+                            color={ userTag === bookmark.user_tag ? "#C9C9C9" : (isScrap ? "#298CFF" : "black") }
                             style={{
-                                width: regWidth * 35,
+                                width: regWidth * 30,
                             }}
                             // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
                         />
                         <Text 
                             style={{
                                 ...styles.bookmarkLikesText, 
-                                color: userTag === bookmark.user_tag ? "#008000" : "black",
+                                color: userTag === bookmark.user_tag ? "#C9C9C9" : "black",
                             }}
                         >
                             {/* { !pushScrap ? bookmark.scraps : scrapCount } */}
-                            { bookmark.scraps }
+                            { scrapCount }
                         </Text>
                     </Pressable>
 
@@ -585,7 +624,7 @@ const BookmarkDetail = (props) => {
                             </Text>
                         </TouchableOpacity>
 
-                        {bookmark.user_tag === userTag ? 
+                        {(bookmark.user_tag === userTag) || (isStaff === true) ? 
                             <>
                                 <TouchableOpacity 
                                     style={styles.menu}
@@ -957,8 +996,8 @@ const styles = StyleSheet.create({
         // backgroundColor: "pink",
         // width: "40%",
         marginTop: regHeight * 10,
-        paddingVertical: regHeight * 10,
-        paddingHorizontal: regWidth * 13,
+        paddingVertical: regHeight * 4,
+        // paddingHorizontal: regWidth * 13,
         flexDirection: "row",
         alignItems: "center",
         // justifyContent: "space-between",

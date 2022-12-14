@@ -45,7 +45,7 @@ const LikeUsers = ({route, navigation}) => {
                             fontSize: 16,
                             fontWeight: "500",
                         }}>
-                            좋아요한 유저
+                            좋아요
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -63,7 +63,7 @@ const LikeUsers = ({route, navigation}) => {
 const UserList = ({user, navigation,}) => {
     return (
       <>
-        <Pressable activeOpacity={1} onPress={() => navigation.navigate('OtherProfile', { userTag: user.user_tag, })} >
+        <Pressable activeOpacity={1} onPress={() => navigation.push('OtherProfile', { userTag: user.user_tag, })} >
           <View style={styles.List} >
             <View style={{ flexDirection: "row", alignItems: "center", }}>
               <Image 

@@ -18,8 +18,15 @@ import { resetRefreshToken, resetAvatar, } from '../modules/user';
 const UserSetting = ({navigation}) => {
     const dispatch = useDispatch();
     const [withDrawModalVisible, setWithDrawModalVisible] = useState(false);
+    const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+    const [newPwdModalVisible, setNewPwdModalVisible] = useState(false);
     const [password, setPassword] = useState('');
+    const [newPassword1, setNewPassword1] = useState('');
+    const [newPassword2, setNewPassword2] = useState('');
     const [warning, setWarning] = useState('');
+
+    const onChangeNewPassword1 = (payload) => setNewPassword1(payload);
+    const onChangeNewPassword2 = (payload) => setNewPassword2(payload);
 
     const logout = async() => {
         const refreshToken = await AsyncStorage.getItem('refresh');
@@ -64,6 +71,38 @@ const UserSetting = ({navigation}) => {
         }
     }
 
+    const verifyPassword = async() => {
+        try {
+            await Api
+            .post("/api/v1/user/verify_password/", {
+                current_password: password,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setPasswordModalVisible(false);
+                setNewPwdModalVisible(true);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const changePassword = async() => {
+        try {
+            await Api
+            .post("/api/v1/user/change_password/", {
+                new_password1: newPassword1,
+                new_password2: newPassword2,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setNewPwdModalVisible(false);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.header} >
@@ -88,6 +127,15 @@ const UserSetting = ({navigation}) => {
             </SafeAreaView>
             <Pressable 
                 style={styles.menuContainer}
+                onPress={() => setPasswordModalVisible(true)}
+            >
+                <Text style={{ fontSize: 16, fontWeight: "500", }}>
+                    비밀번호 변경
+                </Text>
+                <Ionicons name="chevron-forward" size={24} color="black" />
+            </Pressable>
+            <Pressable 
+                style={styles.menuContainer}
                 onPress={logout}
             >
                 <Text style={{ fontSize: 16, fontWeight: "500", }}>
@@ -110,6 +158,145 @@ const UserSetting = ({navigation}) => {
                 </Text>
                 <Ionicons name="chevron-forward" size={24} color="black" />
             </View> */}
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={passwordModalVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setPasswordModalVisible(false);
+                            setWarning('');
+                        }
+                    }
+                />
+                <View 
+                    style={{
+                        ...styles.modal, 
+                        // height: regHeight * 380, 
+                    }}
+                >
+                    <SafeAreaView style={styles.modalHeader}>
+                        <Pressable
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={() => {
+                                setPasswordModalVisible(false);
+                                setWarning('');
+                            }}
+                        >
+                            <Text style={{fontSize: 15, fontWeight: "500", }} >
+                                취소
+                            </Text>
+                        </Pressable>
+                        <Text style={{fontSize: 16, fontWeight: "700", }} >
+                            비밀번호 변경
+                        </Text>
+                        <Pressable
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={verifyPassword}
+                        >
+                            <Text style={{fontSize: 15, fontWeight: "500", color: "#008000", }}>
+                                다음
+                            </Text>
+                        </Pressable>
+                    </SafeAreaView>
+                    <TextInput 
+                        placeholder="기존 비밀번호"
+                        style={{
+                            ...styles.modalInput,
+                            height: regHeight * 50,
+                        }}
+                        secureTextEntry={true}
+                        onChangeText={setPassword}
+                        // onSubmitEditing={submitTag}
+                        // value={tagValue}
+                    />
+                    <Text style={styles.warning}>
+                        {warning}
+                    </Text>
+                </View>
+            </Modal>
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={newPwdModalVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setNewPwdModalVisible(false);
+                            setWarning('');
+                        }
+                    }
+                />
+                <View 
+                    style={{
+                        ...styles.modal, 
+                        height: regHeight * 300, 
+                    }}
+                >
+                    <SafeAreaView style={styles.modalHeader}>
+                        <Pressable
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={() => {
+                                setNewPwdModalVisible(false);
+                                setWarning('');
+                            }}
+                        >
+                            <Text style={{fontSize: 15, fontWeight: "500", }} >
+                                취소
+                            </Text>
+                        </Pressable>
+                        <Text style={{fontSize: 16, fontWeight: "700", }} >
+                            비밀번호 변경
+                        </Text>
+                        <Pressable
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={changePassword}
+                        >
+                            <Text style={{fontSize: 15, fontWeight: "500", color: "#008000", }}>
+                                다음
+                            </Text>
+                        </Pressable>
+                    </SafeAreaView>
+                    <TextInput 
+                        placeholder="새 비밀번호"
+                        style={{
+                            ...styles.modalInput,
+                            height: regHeight * 50,
+                        }}
+                        secureTextEntry={true}
+                        onChangeText={onChangeNewPassword1}
+                        // onSubmitEditing={submitTag}
+                        // value={tagValue}
+                    />
+                    <TextInput 
+                        placeholder="새 비밀번호 확인"
+                        style={{
+                            ...styles.modalInput,
+                            height: regHeight * 50,
+                        }}
+                        secureTextEntry={true}
+                        onChangeText={onChangeNewPassword2}
+                        // onSubmitEditing={submitTag}
+                        // value={tagValue}
+                    />
+                    <Text style={styles.warning}>
+                        {warning}
+                    </Text>
+                </View>
+            </Modal>
+
             <Modal
                 animationType="fade"
                 transparent={true}

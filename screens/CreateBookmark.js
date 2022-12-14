@@ -1,7 +1,8 @@
-import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, ActivityIndicator, Alert, } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, ActivityIndicator, Alert, ImageBackground, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
-import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, } from '@expo/vector-icons'; 
+import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, FontAwesome, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
+import { InputCard, InvisibleCard, } from '../components';
 import Api from "../lib/Api";
 import * as ImagePicker from 'expo-image-picker';
 import bookCover from '../assets/images/steve.jpeg';
@@ -11,11 +12,14 @@ import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
 import RenderHtml from 'react-native-render-html';
 import HTML from 'react-native-render-html';
+import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { resetUserInfo, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+
+// import { ImageManipulatorView } from 'expo-image-manipulator-view'
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -40,6 +44,7 @@ const CreateBookmark = ({navigation, route}) => {
     const [infoVisible, setInfoVisible] = useState(false);
     const [tagVisible, setTagVisible] = useState(false);
     const [albumVisible, setAlbumVisible] = useState(false);
+    const [tempVisible, setTempVisible] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
 
     const [loading, setLoading] = useState(false);
@@ -73,6 +78,7 @@ const CreateBookmark = ({navigation, route}) => {
 
     const { ocrImage, } = route.params;
     const [ ocrLoading, setOcrLoading ] = useState(false);
+    const [croppedImage, setCroppedImage] = useState(null);
     const { ocrText, setOcrText } = useState('');
 
     const [albums, setAlbums] = useState(null);
@@ -82,8 +88,78 @@ const CreateBookmark = ({navigation, route}) => {
 
     const [createBookLoading, setCreateBookLoading] = useState(false);
     const [createBookmarkLoading, setCreateBookmarkLoading] = useState(false);
+    const [tempSaveLoading, setTempSaveLoading] = useState(false);
+
+    const [tempBookmarks, setTempBookmarks] = useState(null);
     
     const isEmpty = (frontContent.length === 0) || (selectedBook === null);
+
+
+/////////////////////////////////////////////WYSIWYG 테스트////////////////////////////////////////////////////////////////////////
+
+    // const [totalContents, setTotalContents] = useState([]);
+    // const [contentsByLine2, setContentsByLine2] = useState([]);
+    // const [contentsByCard2, setContentsByCard2] = useState([]);
+    // const [inputRefs, setInputRefs] = useState([]);
+    // const firstInputRef = useRef();
+    // const inputRef = useRef([]);
+    // const [ref, setRef] = useState(null);
+
+    // useEffect(() => {
+    //     setInputRefs([
+    //         firstInputRef
+    //     ])
+    // }, [])
+
+    // useEffect(() => {
+    //     // const cardNum = Math.ceil(contentsByLine2.length / 9);
+    //     const cardNum = parseInt(contentsByLine2.length / 9) + 1;
+    //     let copy = [];
+
+    //     for ( let i = 0; i < cardNum; i++) {
+    //         copy = [...copy, contentsByLine2.slice(i * 9, (i + 1) * 9)]
+    //     }
+    //     setContentsByCard2(copy);
+    // }, [contentsByLine2]);
+
+    // const onChangeTotalContents = (payload, index) => {
+    //     const text = payload.replace(" ", "\u00A0");
+    //     let copy = [...totalContents];
+    //     copy[index] = text;
+
+    //     setTotalContents(copy);
+    // }
+
+    // const onNextCard = (index) => {
+    //     // console.log(contentsByCard2[index].length);
+    //     if (contentsByCard2[index].length === 9) {
+    //         console.log(index);
+    //         const next = inputRef.current[index + 1];
+    //         if (next) {
+    //             next.focus();
+    //         }
+    //         ref.scrollTo({ x: 0, y: SCREEN_WIDTH * (index + 1), animated: true });
+    //     }
+    // }
+
+    // const onKeyPress = (e, index) => {
+    //     const key = e.nativeEvent.key;
+    //     if (key === "Backspace") {
+    //         console.log("back");
+    //         if ((index !== 0) && (contentsByCard2[index].length === 0)) {
+    //             const prev = inputRef.current[index - 1];
+    //             if (prev) {
+    //                 prev.focus();
+    //             }
+    //             ref.scrollTo({ x: 0, y: SCREEN_WIDTH * (index - 1), animated: true });
+    //         }
+    //     }
+    //     if (key === ' ') {
+    //         console.log("space");
+    //     }
+    // }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         updateWatermark();
@@ -131,7 +207,8 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const onChangeFront = (payload) => {
-        setFrontContent(payload);
+        // setFrontContent(payload);
+        setFrontContent(payload.replace(" ", "\u00A0"));
     }
 
     const onTextLayout = (e) => {
@@ -147,7 +224,7 @@ const CreateBookmark = ({navigation, route}) => {
         setColor(selectedColor);
     }
 
-    const addBookmark = async() => {
+    const onAddBookmark = async() => {
         if (isEmpty === false) {
             setCreateBookmarkLoading(true);
             const formData = new FormData();
@@ -410,7 +487,7 @@ const CreateBookmark = ({navigation, route}) => {
         }
     }
 
-    const exit = () => {
+    const onExit = () => {
         Alert.alert("북마크 생성을 취소하시겠습니까?", "확인 버튼을 누르면 취소됩니다.", [
             {
                 text: "취소",
@@ -422,7 +499,104 @@ const CreateBookmark = ({navigation, route}) => {
         ]);
     }
 
+    const onTempCreate = async() => {
+        const formData = new FormData();
+        setTempSaveLoading(true);
+        formData.append('book_id', selectedBook.book_id);
+        formData.append('chapter_title', whatChapter);
+        // formData.append('nemos', JSON.stringify(contents));
+        formData.append('contents', JSON.stringify(contentsByCard));
+        formData.append('hex', color);
+        formData.append('text', info);
+        formData.append('tags', JSON.stringify(tags));
+        formData.append('album_id', albumId);
+        // if (backgroundImage !== null) {
+        //     const filename = backgroundImage.split('/').pop();
+        //     const match = /\.(\w+)$/.exec(filename ?? '');
+        //     const type = match ? `image/${match[1]}` : `image`;
+        //     formData.append('backgroundimg', {
+        //         uri: backgroundImage,
+        //         type: type,
+        //         name: filename
+        //     });
+        // }
 
+        try {
+            await Api
+            .post("/api/v2/bookmark/temp_create/", formData,
+                {
+                    headers: {
+                        'content-type': 'multipart/form-data',
+                    },
+                },
+            )
+            .then((res) => {
+                console.log(res.data);
+                navigation.goBack();
+            })
+
+        } catch (err) {
+            console.error(err);
+        }
+        setTempSaveLoading(false);
+    }
+
+    const fetchTempBookmarks = async() => {
+        try {
+            await Api
+            .post("/api/v2/bookmark/temp_list/")
+            .then((res) => {
+                console.log(res.data);
+                setTempBookmarks(res.data);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const onApplyTempBookmark = (bookmark) => {
+        console.log(bookmark);
+        setSelectedBook({
+            book_cover: bookmark.book_cover,
+            book_title: bookmark.book_title,
+            book_id: bookmark.book_id,
+        });
+        setWhatChapter(bookmark.chapter_title);
+        setFrontContent(bookmark.contents.flat().join(''));
+        if (bookmark.backgroundimg !== null) {
+            setBackgroundImage(bookmark.backgroundimg);
+        }
+        setColor(bookmark.hex);
+        setInfo(bookmark.text);
+        setTags(bookmark.tags.map((tag) => tag.tag));
+    }
+
+    // if (ocrImage !== null) {
+    //     return (
+    //         <View style={styles.container}>
+    //             <ImageBackground
+    //                 resizeMode="contain"
+    //                 style={{
+    //                     justifyContent: 'center', 
+    //                     padding: 20, 
+    //                     alignItems: 'center', 
+    //                     height: "100%", 
+    //                     width: "100%", 
+    //                     backgroundColor: 'black',
+    //                 }}
+    //                 source={{ ocrImage }}
+    //             >
+    //                 {/* <Button title="Open Image Editor" onPress={() => this.setState({ isVisible: true })} /> */}
+    //                 <ImageManipulatorView
+    //                     photo={{ ocrImage }}
+    //                     isVisible="true"
+    //                     onPictureChoosed={(uri) => setCroppedImage(uri)}
+    //                     //   onToggleModal={this.onToggleModal}
+    //                 />
+    //             </ImageBackground>
+    //         </View>
+    //     )
+    // }
 
     return (
         <View style={styles.container}>
@@ -432,12 +606,25 @@ const CreateBookmark = ({navigation, route}) => {
                     <Feather name="bookmark" size={28} color="black" />
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <TouchableOpacity onPress={exit}>
-                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", marginRight: regWidth * 32, }} >취소</Text>
-                    </TouchableOpacity>
-                    {/* <TouchableOpacity onPress={addBookmark}>
-                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }} >완료</Text>
-                    </TouchableOpacity> */}
+                    <Pressable 
+                        onPress={onExit}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    >
+                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", marginRight: regWidth * 32, color: "#FF4040", }} >취소</Text>
+                    </Pressable>
+                    {tempSaveLoading ? 
+                        <ActivityIndicator 
+                            color="black"
+                        />
+                        :
+                        <Pressable 
+                            onPress={onTempCreate}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        >
+                            <Text style={{ fontSize: regWidth * 15, fontWeight: "500", marginRight: regWidth * 32, }} >임시저장</Text>
+                        </Pressable>
+                    }
+
                     {createBookmarkLoading ? 
                         <ActivityIndicator 
                             color="#008000"
@@ -445,7 +632,7 @@ const CreateBookmark = ({navigation, route}) => {
                         :
                         <Pressable
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                            onPress={addBookmark}
+                            onPress={onAddBookmark}
                         >
                             <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }} >완료</Text>
                         </Pressable>
@@ -455,24 +642,12 @@ const CreateBookmark = ({navigation, route}) => {
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                // ref={(ref) => {
+                //     setRef(ref);
+                // }}
             >
-                {/* <ScrollView
-                    pagingEnabled
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                >
-                    {contentsByNum.map((contents, index) => (
-                        <CardPreview 
-                            contents={contents}
-                            hex={color}
-                            backgroundImage={backgroundImage}
-                            bookCover={bookCover}
-                            watermark={watermark} 
-                            index={index}
-                            key={index}
-                        />
-                    ))}
-                </ScrollView> */}
+                {/*********************************************** NO WYSIWYG *******************************************************/}
+
                 <BlankCardChangable 
                     color={color} 
                     setBookTitle={setBookTitle} 
@@ -491,7 +666,10 @@ const CreateBookmark = ({navigation, route}) => {
                     ocrLoading={ocrLoading}
                     align={align}
                 />
-                
+
+                {/*********************************************** NO WYSIWYG *******************************************************/}
+
+
                 {/* <BlankCardFront 
                     color={color} 
                     setBookTitle={setBookTitle} 
@@ -536,7 +714,207 @@ const CreateBookmark = ({navigation, route}) => {
                 />
             </Pressable> */}
 
-                
+
+            {/*********************************************** WYSIWYG *******************************************************/}
+
+                {/* <InputCard 
+                    color={color} 
+                    setBookTitle={setBookTitle} 
+                    selectedBook={selectedBook}
+                    setSelectedBook={setSelectedBook}
+                    onChangeChapter={onChangeChapter} 
+                    watermark={watermark} 
+                    setModalVisible={setModalVisible}
+                    backgroundImage={backgroundImage}
+                    setContentsByLine={setContentsByLine2}
+                    ocrLoading={ocrLoading}
+                    align={align}
+
+                    onChangeTotalContents={onChangeTotalContents}
+                    cardContents={totalContents}
+                /> */}
+                {/* {contentsByCard2.length < 2 ? 
+                    <InputCard 
+                        color={color} 
+                        setBookTitle={setBookTitle} 
+                        selectedBook={selectedBook}
+                        setSelectedBook={setSelectedBook}
+                        onChangeChapter={onChangeChapter} 
+                        watermark={watermark} 
+                        setModalVisible={setModalVisible}
+                        backgroundImage={backgroundImage}
+                        setContentsByLine={setContentsByLine2}
+                        ocrLoading={ocrLoading}
+                        align={align}
+
+                        onChangeTotalContents={onChangeTotalContents}
+                        cardContents={totalContents[0]}
+                        totalContents={totalContents}
+                        contentsByCard2={contentsByCard2}
+                        onNextCard={onNextCard}
+                        inputRef={inputRef}
+                        index={0}
+                    />
+                    :
+                    <ScrollView
+                        // pagingEnabled
+                        // horizontal
+                        showsHorizontalScrollIndicator={false}
+                        ref={(ref) => {
+                            setRef(ref);
+                        }}
+                    >
+                        {contentsByCard2.map((contents, index) => (
+                            <InputCard 
+                                color={color} 
+                                setBookTitle={setBookTitle} 
+                                selectedBook={selectedBook}
+                                setSelectedBook={setSelectedBook}
+                                onChangeChapter={onChangeChapter} 
+                                watermark={watermark} 
+                                setModalVisible={setModalVisible}
+                                backgroundImage={backgroundImage}
+                                setContentsByLine={setContentsByLine2}
+                                ocrLoading={ocrLoading}
+                                align={align}
+
+                                onChangeTotalContents={onChangeTotalContents}
+                                cardContents={totalContents[index]}
+                                totalContents={totalContents}
+                                contentsByCard2={contentsByCard2}
+                                onNextCard={onNextCard}
+                                inputRef={inputRef}
+                                index={index}
+                                key={index}
+                            />
+                        ))}
+                    </ScrollView>
+                } */}
+
+                {/* {contentsByCard2.length < 2 ? 
+                    <InputCard 
+                        color={color} 
+                        setBookTitle={setBookTitle} 
+                        selectedBook={selectedBook}
+                        setSelectedBook={setSelectedBook}
+                        onChangeChapter={onChangeChapter} 
+                        watermark={watermark} 
+                        setModalVisible={setModalVisible}
+                        backgroundImage={backgroundImage}
+                        setContentsByLine={setContentsByLine2}
+                        ocrLoading={ocrLoading}
+                        align={align}
+
+                        onChangeTotalContents={onChangeTotalContents}
+                        cardContents={totalContents[0]}
+                        totalContents={totalContents}
+                        contentsByCard2={contentsByCard2}
+                        onNextCard={onNextCard}
+                        inputRef={inputRef}
+                        index={0}
+                    />
+                    :
+                    <>
+                        {contentsByCard2.map((contents, index) => (
+                            <InputCard 
+                                color={color} 
+                                setBookTitle={setBookTitle} 
+                                selectedBook={selectedBook}
+                                setSelectedBook={setSelectedBook}
+                                onChangeChapter={onChangeChapter} 
+                                watermark={watermark} 
+                                setModalVisible={setModalVisible}
+                                backgroundImage={backgroundImage}
+                                setContentsByLine={setContentsByLine2}
+                                ocrLoading={ocrLoading}
+                                align={align}
+
+                                onChangeTotalContents={onChangeTotalContents}
+                                cardContents={totalContents[index]}
+                                totalContents={totalContents}
+                                contentsByCard2={contentsByCard2}
+                                onNextCard={onNextCard}
+                                inputRef={inputRef}
+                                index={index}
+                                key={index}
+                            />
+                        ))}
+                    </>
+                } */}
+
+                {/* <InputCard 
+                    color={color} 
+                    setBookTitle={setBookTitle} 
+                    selectedBook={selectedBook}
+                    setSelectedBook={setSelectedBook}
+                    onChangeChapter={onChangeChapter} 
+                    watermark={watermark} 
+                    setModalVisible={setModalVisible}
+                    backgroundImage={backgroundImage}
+                    setContentsByLine={setContentsByLine2}
+                    ocrLoading={ocrLoading}
+                    align={align}
+
+                    onChangeTotalContents={onChangeTotalContents}
+                    cardContents={totalContents[0]}
+                    totalContents={totalContents}
+                    // contentsByCard2={contentsByCard2}
+                    contentsByCard2={contentsByCard2.length === 0 ? [[]]: contentsByCard2}
+                    onNextCard={onNextCard}
+                    onKeyPress={onKeyPress}
+                    inputRef={inputRef}
+                    index={0}
+                />
+
+                {contentsByCard2.slice(1).map((contents, index) => (
+                    <InputCard 
+                        color={color} 
+                        setBookTitle={setBookTitle} 
+                        selectedBook={selectedBook}
+                        setSelectedBook={setSelectedBook}
+                        onChangeChapter={onChangeChapter} 
+                        watermark={watermark} 
+                        setModalVisible={setModalVisible}
+                        backgroundImage={backgroundImage}
+                        setContentsByLine={setContentsByLine2}
+                        ocrLoading={ocrLoading}
+                        align={align}
+
+                        onChangeTotalContents={onChangeTotalContents}
+                        cardContents={totalContents[index + 1]}
+                        totalContents={totalContents}
+                        contentsByCard2={contentsByCard2}
+                        onNextCard={onNextCard}
+                        onKeyPress={onKeyPress}
+                        inputRef={inputRef}
+                        index={index + 1}
+                        key={index}
+                    />
+                ))}
+
+
+                <InvisibleCard 
+                    color={color} 
+                    setBookTitle={setBookTitle} 
+                    selectedBook={selectedBook}
+                    setSelectedBook={setSelectedBook}
+                    onChangeChapter={onChangeChapter} 
+                    frontContent={contents.join('')}
+                    
+                    onChangeFront={onChangeFront} 
+                    watermark={watermark} 
+                    setModalVisible={setModalVisible}
+                    backgroundImage={backgroundImage}
+                    setLineNum={setLineNum}
+                    setContentsByLine={setContentsByLine2}
+                    ocrLoading={ocrLoading}
+                    align={align}
+
+                    totalContents={totalContents}
+                /> */}
+
+                {/*********************************************** WYSIWYG *******************************************************/}
+
                 <View style={styles.optionBar}>
                     <View style={{ flexDirection: "row", }} >
                         <TouchableOpacity 
@@ -680,7 +1058,7 @@ const CreateBookmark = ({navigation, route}) => {
                         style={styles.previewBtn} 
                         onPress={() => setPreviewVisible(true)}    
                     >
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, color: "#D3D3D3", }} >미리보기</Text>
+                        <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, }} >미리보기</Text>
                     </Pressable>
                 </View>
                 <Pressable 
@@ -706,6 +1084,17 @@ const CreateBookmark = ({navigation, route}) => {
                 >
                     <Feather name='folder' size={regWidth * 20} color="black" />
                     <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>
+                </Pressable>
+
+                <Pressable 
+                    style={styles.TagAddBox} 
+                    onPress={() => {
+                        setTempVisible(true);
+                        fetchTempBookmarks();
+                    }}    
+                >
+                    <FontAwesome name="save" size={regWidth * 20} color="black" />
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >임시저장 목록</Text>
                 </Pressable>
 
                 <View style={{height: 200}} ></View>
@@ -1013,6 +1402,68 @@ const CreateBookmark = ({navigation, route}) => {
             <Modal
                 animationType="fade"
                 transparent={true}
+                visible={tempVisible}
+            >
+                <Pressable 
+                    style={[
+                        StyleSheet.absoluteFill,
+                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+                    ]}
+                    onPress={()=>
+                        {
+                            setTempVisible(false);
+                        }
+                    }
+                />
+                <View 
+                    style={{
+                        ...styles.modal,
+                        height: regHeight * 650, 
+                        paddingBottom: 28,
+                        bottom: 0,
+                    }}
+                >
+                    <SafeAreaView style={{
+                        ...styles.modalHeader, 
+                        marginTop: regHeight * 12,
+                        justifyContent: "center",
+                    }}>
+                        {/* <Pressable
+                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            onPress={() => setAlbumVisible(false)}
+                        >
+                            <Text style={{fontSize: 15, fontWeight: "500", }} >
+                                취소
+                            </Text>
+                        </Pressable> */}
+                        <Text style={{fontSize: 16, fontWeight: "700", }} >
+                            임시저장 목록
+                        </Text>
+                        {/* <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
+                            완료
+                        </Text> */}
+                    </SafeAreaView>
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {tempBookmarks !== null && tempBookmarks.map((bookmark, index) => (
+                                <Pressable 
+                                    key={index}
+                                    onPress={() => {
+                                        onApplyTempBookmark(bookmark);
+                                        setTempVisible(false);
+                                    }}
+                                >
+                                    <UnTouchableBookmarkList bookmark={bookmark} navigation={navigation} />
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
                 visible={previewVisible}
             >
                 <Pressable 
@@ -1243,7 +1694,7 @@ const styles = StyleSheet.create({
     },
     previewBtn: {
         borderWidth: 2,
-        borderColor: "#D3D3D3",
+        // borderColor: "#D3D3D3",
         borderRadius: 999,
         width: regWidth * 99,
         marginBottom: 28,

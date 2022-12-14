@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { setUserInfo, setRefreshToken, } from '../modules/user';
 import Api from '../lib/Api';
-import NemoLogo from '../assets/images/NemoTrans.png';
+import NemoLogo from '../assets/images/NemoLogo(small).png';
 
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -24,7 +24,7 @@ const Login = ({ navigation }) => {
   const showLogo = () => {
       Animated.timing(logoValue, {
           toValue: 1,
-          duration: 150,
+          duration: 100,
           useNativeDriver: false,
       }).start();
   }
@@ -90,14 +90,6 @@ const Login = ({ navigation }) => {
               }}
               onLoadEnd={showLogo}
             />
-            <Text style={{
-              fontSize: 30,
-              fontWeight: "700",
-              letterSpacing: -0.28,
-              marginHorizontal: 8,
-            }}>
-              Nemo
-            </Text>
           </View>
           <Pressable 
               hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -138,6 +130,7 @@ const Login = ({ navigation }) => {
               style={styles.input}
               onChangeText={onChangeId}
               placeholder="아이디를 입력해주세요"
+              autoCapitalize="none"
             />
             <TextInput 
               style={styles.input}
@@ -174,8 +167,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   LogoImage: {
-    width: regWidth * 30,
-    height: regWidth * 30,
+    width: regWidth * 120,
+    height: regWidth * 40,
     resizeMode: "contain",
   },
   introduce: {

@@ -6,7 +6,7 @@ import { AntDesign, Ionicons, } from '@expo/vector-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Api from '../lib/Api';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
-import NemoLogo from '../assets/images/NemoTrans.png';
+import NemoLogo from '../assets/images/NemoLogo(small).png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
@@ -48,7 +48,7 @@ const Join1 = ({ navigation }) => {
     const showLogo = () => {
         Animated.timing(logoValue, {
             toValue: 1,
-            duration: 150,
+            duration: 100,
             useNativeDriver: false,
         }).start();
     }
@@ -97,7 +97,7 @@ const Join1 = ({ navigation }) => {
         if (phoneNumber === "") {
             return;
         }
-        countDown();
+        // countDown();
         try {
             setSendButton('재전송');
             const response = await Api
@@ -165,14 +165,6 @@ const Join1 = ({ navigation }) => {
                         }}
                         onLoadEnd={showLogo}
                     />
-                    <Text style={{
-                        fontSize: 30,
-                        fontWeight: "700",
-                        letterSpacing: -0.28,
-                        marginHorizontal: 8,
-                    }}>
-                        Nemo
-                    </Text>
                 </View>
                 <Pressable 
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -181,9 +173,9 @@ const Join1 = ({ navigation }) => {
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </Pressable>
             </SafeAreaView>
-            <ScrollView
+            {/* <ScrollView
                 scrollEnabled={false}
-            >
+            > */}
                 <View style={styles.introduce} >
                     <Text style={styles.introduceText}>전화번호를 입력하세요</Text>
                     <TextInput 
@@ -191,6 +183,7 @@ const Join1 = ({ navigation }) => {
                         placeholder="전화번호"
                         onChangeText={onChangePhoneNumber}
                         value={phoneNumber}
+                        keyboardType="numeric"
                     />
                     <Text style={{ ...styles.warning, color: warningColor, }}>
                         {phoneNumberWarning}
@@ -220,6 +213,7 @@ const Join1 = ({ navigation }) => {
                         <TextInput 
                             placeholder="문자 인증번호 5자리를 입력해주세요"
                             onChangeText={onChangeAuthNumber}
+                            keyboardType="numeric"
                         />
                         {isCountDown ? 
                             <Text style={{ fontSize: 12, fontWeight: "500", }}>
@@ -247,7 +241,7 @@ const Join1 = ({ navigation }) => {
                     </TouchableOpacity>
                     
                 </View>
-            </ScrollView>
+            {/* </ScrollView> */}
         </View>
     );
   }
@@ -349,7 +343,7 @@ const Join2 = ({ navigation, route }) => {
     const showLogo = () => {
         Animated.timing(logoValue, {
             toValue: 1,
-            duration: 150,
+            duration: 100,
             useNativeDriver: false,
         }).start();
     }
@@ -393,14 +387,6 @@ const Join2 = ({ navigation, route }) => {
                         }}
                         onLoadEnd={showLogo}
                     />
-                    <Text style={{
-                        fontSize: 30,
-                        fontWeight: "700",
-                        letterSpacing: -0.28,
-                        marginHorizontal: 8,
-                    }}>
-                        Nemo
-                    </Text>
                 </View>
                 <Pressable 
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -418,6 +404,7 @@ const Join2 = ({ navigation, route }) => {
                         style={styles.input}
                         placeholder="사용하실 닉네임을 입력해주세요"
                         onChangeText={onChangeNickname}
+                        autoCapitalize="none"
                     />
                     <Text style={{...styles.warning, color: "#FF4040", }}>
                         {""}
@@ -426,6 +413,7 @@ const Join2 = ({ navigation, route }) => {
                         style={styles.input}
                         placeholder="아이디를 입력해주세요(초기 유저 태그로 사용됩니다)"
                         onChangeText={onChangeUsername}
+                        autoCapitalize="none"
                     />
                     <Text style={{...styles.warning, color: warningColor, }}>
                         {usernameWarning}
@@ -526,8 +514,8 @@ const styles = StyleSheet.create({
       alignItems: "center",
     },
     LogoImage: {
-        width: regWidth * 30,
-        height: regWidth * 30,
+        width: regWidth * 120,
+        height: regWidth * 40,
         resizeMode: "contain",
     },
     introduce: {

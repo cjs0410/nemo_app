@@ -40,6 +40,7 @@ const Card = (props) => {
     // useEffect(() => {
     //     fetchBookmarking();
     // }, [bookmarked])
+
     useEffect(() => {
         fetchWatermark();
         // console.log(props.contents);
@@ -47,9 +48,10 @@ const Card = (props) => {
 
     useEffect(() => {
         if (lineList.length === contents.length && lineList.indexOf(2) !== -1) {
-            setFontSize(fontSize - 1);
+            setFontSize(fontSize - 0.1);
+            setLineList([]);
         }
-    }, [lineList])
+    }, [lineList]);
 
     const onReverse = () => {
         setIsReverse(!isReverse);
@@ -643,24 +645,6 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
         setWhatBook('');
     }
 
-    // const textInputHeight = (e) => {
-    //     console.log(e.nativeEvent.lines.length);
-    //     // console.log(SCREEN_0.041);
-    //     // const newHeight = e.nativeEvent.layout.height;
-
-    //     // console.log(newHeight, inputContainerHeight);
-
-    //     // setInputHeight(newHeight);
-    //     // if ((inputContainerHeight !== 0) && ((newHeight + 28) > inputContainerHeight)) {
-    //     //     console.log("over!");
-    //     //     setExtraHeight(extraHeight + 28)
-    //     // }
-    // }
-    // const textInputContainterHeight = (e) => {
-    //     // console.log(e.nativeEvent.layout);
-    //     setInputContainerHeight(e.nativeEvent.layout.height);
-    // }
-
     const textInputLineNum = (e) => {
         // setLineNum(e.nativeEvent.lines.length);
         // console.log(e.nativeEvent.lines);
@@ -668,7 +652,6 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
         setContentsByLine(
             lines.map((line) => line.text)
         )
-
         // console.log(e.nativeEvent.lines.length, frontContent[frontContent.length-1]);
     }
 
@@ -726,7 +709,9 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                     style={styles.bookmarkContentsBookTitle}
                                     numberOfLines={1}
                                     ellipsizeMode="tail"
-                                >{selectedBook.book_title}</Text>
+                                >
+                                    {selectedBook.book_title}
+                                </Text>
                                 <TextInput 
                                     placeholder="챕터를 입력하세요"
                                     style={styles.bookmarkContentsBookChapterInput}
@@ -873,7 +858,6 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                         color: "blue",
                                         fontSize: regWidth * 16,
                                         lineHeight: 28,
-
                                     }} 
                                     onTextLayout={textInputLineNum}
                                 >

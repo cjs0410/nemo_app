@@ -31,3 +31,10 @@ npx expo install expo-updates
 expo install react-native-view-shot
 npx expo install react-native-view-shot
 npx expo install expo-sharing
+
+npm install react-native-expo-image-cropper
+npm i expo-image-crop
+npx expo install expo-image-manipulator
+expo install expo-file-system
+expo install expo-permissions
+npm install expo-image-manipulator-view

@@ -21,11 +21,13 @@ import { PersistGate } from "redux-persist/integration/react";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Join1, Join2, Join3} from "./screens/Join";
+import { FindId, FindId2, } from "./screens/FindId";
 import { SubmitPost } from "./screens/CreatePost";
 import { SubmitEditedPost } from "./screens/EditPost";
 import { 
   Welcome, 
   Login, 
+  FindPassword,
   Home, 
   Search, 
   AlarmScreen,
@@ -186,6 +188,9 @@ const App = () => {
             <Stack.Screen name="Join2" component={Join2} options={{ headerShown: false, }} />
             <Stack.Screen name="Join3" component={Join3} options={{ headerShown: false, }} />
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false, }} />
+            <Stack.Screen name="FindId" component={FindId} options={{ headerShown: false, }} />
+            <Stack.Screen name="FindId2" component={FindId2} options={{ headerShown: false, }} />
+            <Stack.Screen name="FindPassword" component={FindPassword} options={{ headerShown: false, }} />
           </Stack.Navigator>
         ) 
         : 
@@ -229,13 +234,13 @@ const App = () => {
               component={HomeScreen} 
               options={{ headerShown: false, }} 
             />
-            {/* <Tab.Screen 
+            <Tab.Screen 
               name="Search" 
               component={SearchScreen}
               options={{
                 headerShown: false,
               }}
-            /> */}
+            />
             <Tab.Screen 
               name="Post" 
               component={PostScreen}
@@ -422,6 +427,37 @@ const SearchScreen = () => {
           // animation: "fade",
         }}
       />
+      <SearchStack.Screen 
+        name="EditBookmark" 
+        component={EditBookmark}
+        options={{
+          presentation: "transparentModal",
+          // animation: "fade",
+        }}
+      />
+      <SearchStack.Screen name="OtherProfile" component={OtherProfile} />
+      <SearchStack.Screen name="PostDetail" component={PostDetail} />
+      <SearchStack.Screen 
+        name="EditPost" 
+        component={EditPost}
+        options={{
+          presentation: "transparentModal",
+        }}
+      />
+      <SearchStack.Screen 
+        name="SubmitEditedPost" 
+        component={SubmitEditedPost}
+        options={{
+          presentation: "transparentModal",
+        }}
+      />
+      <SearchStack.Screen name="BookProfile" component={BookProfile} />
+      <SearchStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
+      <SearchStack.Screen name="Profile" component={Profile} />
+      <SearchStack.Screen name="AlarmScreen" component={AlarmScreen} />
+      <SearchStack.Screen name="FollowScreen" component={FollowScreen} />
+      <SearchStack.Screen name="AlbumProfile" component={AlbumProfile} />
+      <SearchStack.Screen name="LikeUsers" component={LikeUsers} />
     </SearchStack.Navigator>
   )
 }

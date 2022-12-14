@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, Image, Animated, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, Image, Animated, Pressable, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 // import favicon from '../assets/images/favicon.ico';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
@@ -6,7 +6,7 @@ import * as Font from "expo-font";
 import * as Update from "expo-updates";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import Api from '../lib/Api';
-import NemoLogo from '../assets/images/NemoTrans.png';
+import NemoLogo from '../assets/images/NemoLogo(small).png';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -32,14 +32,6 @@ const Welcome = ({ navigation }) => {
             }}
             onLoadEnd={showLogo}
           />
-          <Text style={{
-              fontSize: 30,
-              fontWeight: "700",
-              letterSpacing: -0.28,
-              marginHorizontal: 8,
-          }}>
-              Nemo
-          </Text>
         </SafeAreaView>
         <View style={styles.introduce} >
           <Text style={styles.introduceText}>
@@ -95,6 +87,57 @@ const Welcome = ({ navigation }) => {
           >
             <Text style={{...styles.btnText, color: "#FF4040", marginLeft: 8,}} >로그인</Text>
           </TouchableOpacity>
+
+          <View 
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: regHeight * 8,
+            }}
+          >
+            <Pressable
+              style={{
+                marginHorizontal: regWidth * 8,
+              }}
+              onPress={() => navigation.navigate('FindId')}
+            >
+              <Text
+                style={{
+                  fontSize: regWidth * 15,
+                  fontWeight: "400",
+                  color: "grey",
+                }}
+              >
+                아이디 찾기
+              </Text>
+            </Pressable>
+            {/* <Text
+              style={{
+                fontSize: regWidth * 15,
+                fontWeight: "400",
+                color: "grey",
+              }}
+            >
+              |
+            </Text>
+            <Pressable
+              style={{
+                marginHorizontal: regWidth * 8,
+              }}
+              onPress={() => navigation.navigate('FindPassword')}
+            >
+              <Text
+                style={{
+                  fontSize: regWidth * 15,
+                  fontWeight: "400",
+                  color: "grey",
+                }}
+              >
+                비밀번호 찾기
+              </Text>
+            </Pressable> */}
+          </View>
           {/* <View style={{ flexDirection: "row", marginTop: 18, justifyContent: "center", }}>
             <Text style={{ fontSize: 13, fontWeight: "500", textAlign: "center", }}>
               이미 가입하셨나요?
@@ -124,8 +167,8 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   LogoImage: {
-    width: regWidth * 30,
-    height: regWidth * 30,
+    width: regWidth * 120,
+    height: regWidth * 40,
     resizeMode: "contain",
   },
   introduce: {

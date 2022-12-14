@@ -20,7 +20,18 @@ import NemoLogo from '../assets/images/NemoLogo(small).png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
-import { resetUserInfo, setRefreshToken, resetRefreshToken, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, setIsAlarm, resetAvatar, setAvatar, } from '../modules/user';
+import { 
+    resetUserInfo, 
+    setRefreshToken, 
+    resetRefreshToken, 
+    setShouldHomeRefresh, 
+    setShouldStorageRefresh, 
+    setShouldUserRefresh, 
+    setIsAlarm, 
+    resetAvatar, 
+    setAvatar, 
+    setIsStaff, 
+} from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -48,11 +59,19 @@ const Home = ({navigation}) => {
 
     const [searchInput, setSearchInput] = useState('');
     const debounceVal = useDebounce(searchInput);
-    const [searchResultList, setSearchResultList] = useState(null);
+    const [bookSearchResultList, setBookSearchResultList] = useState(null);
+    const [userSearchResultList, setUserSearchResultList] = useState(null);
+    const [albumSearchResultList, setAlbumSearchResultList] = useState(null);
+    const isSearchListNonEmpty = 
+        (bookSearchResultList !== null && bookSearchResultList.length > 0)
+        || (userSearchResultList !== null && userSearchResultList.length > 0)
+        || (albumSearchResultList !== null && albumSearchResultList.length > 0);
 
     const logoValue = useRef(new Animated.Value(0)).current;
 
     const [reRender, setReRender] = useState(false);
+
+    const [ctg, setCtg] = useState("book");
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -63,7 +82,7 @@ const Home = ({navigation}) => {
 
     useEffect(() => {
         autoSearch();
-    }, [debounceVal]);
+    }, [debounceVal, ctg]);
 
     useEffect(() => {
         // fetchBookmarks();
@@ -100,6 +119,7 @@ const Home = ({navigation}) => {
             .then(async(res) => {
                 try {
                     // console.log("reissue!", res.data.refresh);
+                    // console.log(res.data);
                     await AsyncStorage.setItem('refresh', res.data.refresh)
                     .then(async() => await AsyncStorage.setItem('access', res.data.access))
                     .then(() => {
@@ -108,8 +128,10 @@ const Home = ({navigation}) => {
                         fetchNewAlarm();
                     })
                     dispatch(setRefreshToken(res.data.refresh));
+                    // console.log(res.data.is_staff);
+                    dispatch(setIsStaff(res.data.is_staff));
                 } catch (err) {
-                console.error(err);
+                    console.error(err);
                 }
             })
             } catch (err) {
@@ -178,12 +200,6 @@ const Home = ({navigation}) => {
     const renderBookmark = useCallback(({ item }) => (
         <BookmarkDetail bookmark={item} navigation={navigation} />
     ), [])
-    // const renderBookmark = useCallback(({ item }) => {
-    //     console.log(item);
-    //     return(
-    //         <BookmarkDetail bookmark={item} navigation={navigation} />
-    //     )
-    // }, [])
 
     const keyExtractor = (bookmark, index) => bookmark.bookmark_id
 
@@ -205,18 +221,6 @@ const Home = ({navigation}) => {
         //     console.log(bookmarks, 2);
         // });
     }, []);
-
-    // const onRefresh = async() => {
-    //     setRefreshing(true);
-    //     setCursor(0);
-    //     // setReRender(!reRender);
-    //     // setBookmarks([]);
-    //     // setNewBookmarkNum(0);
-    //     await fetchBookmarks()
-    //     .then(async() => await fetchNewAlarm())
-    //     // .then(() => setRefreshing(false));
-    //     wait(1000).then(() => setRefreshing(false));
-    // };
 
 
     const fetchProfile = async() => {
@@ -280,12 +284,22 @@ const Home = ({navigation}) => {
     const autoSearch = async() => {
         if (debounceVal.length > 0) {
             try {
-                await Api.post("/api/v3/book/select/", {
+                await Api.post("/api/v5/search/", {
                     keyword: debounceVal,
+                    ctg: ctg,
                 })
                 .then((res) => {
                     console.log(res.data);
-                    setSearchResultList(res.data);
+                    if (ctg === "book") {
+                        setBookSearchResultList(res.data);
+                    }
+                    if (ctg === "user") {
+                        setUserSearchResultList(res.data);
+                    }
+                    if (ctg === "album") {
+                        setAlbumSearchResultList(res.data);
+                    }
+                    
                 })
             } catch (err) {
                 console.error(err);
@@ -297,12 +311,21 @@ const Home = ({navigation}) => {
         if (debounceVal.length > 0) {
             try {
                 await Api
-                .post("/api/v3/book/select/", {
+                .post("/api/v5/search/", {
                     keyword: debounceVal,
+                    ctg: ctg,
                 })
                 .then((res) => {
-                    console.log(res.data);
-                    setSearchResultList(res.data);
+                    // console.log(res.data);
+                    if (ctg === "book") {
+                        setBookSearchResultList(res.data);
+                    }
+                    if (ctg === "user") {
+                        setUserSearchResultList(res.data);
+                    }
+                    if (ctg === "album") {
+                        setAlbumSearchResultList(res.data);
+                    }
                 })
             } catch (err) {
                 console.error(err);
@@ -316,6 +339,14 @@ const Home = ({navigation}) => {
             duration: 150,
             useNativeDriver: false,
         }).start();
+    }
+
+    const exitSearch = () => {
+        setSearchModalVisible(false);
+        setSearchInput('');
+        setBookSearchResultList(null);
+        setUserSearchResultList(null);
+        setAlbumSearchResultList(null);
     }
 
 
@@ -351,12 +382,12 @@ const Home = ({navigation}) => {
                     </Text> */}
                 </Pressable>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Pressable
+                    {/* <Pressable
                         onPress={() => setSearchModalVisible(true)}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     >
                         <Feather name="search" size={30} color="black" style={{ marginRight: 24, }}/>
-                    </Pressable>
+                    </Pressable> */}
                     <Pressable
                         onPress={() => navigation.navigate('AlarmScreen')}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -447,22 +478,23 @@ const Home = ({navigation}) => {
                         {
                             setSearchModalVisible(false);
                             setSearchInput('');
-                            setSearchResultList(null);
+                            setBookSearchResultList(null);
+                            setUserSearchResultList(null);
+                            setAlbumSearchResultList(null);
                         }
                     }
                 />
                 <View 
                     style={{
                         ...styles.modal, 
-                        height: searchResultList !== null && searchResultList.length > 0 ? regHeight * 500 : regHeight * 180
+                        // height: bookSearchResultList !== null && bookSearchResultList.length > 0 ? regHeight * 500 : regHeight * 180
+                        height: isSearchListNonEmpty ? regHeight * 500 : regHeight * 200
                     }}>
                     <SafeAreaView style={styles.modalHeader}>
                         <Pressable
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                             onPress={() => {
-                                setSearchModalVisible(false);
-                                setSearchInput('');
-                                setSearchResultList(null);
+                                exitSearch();
                             }}
                         >
                             <Text style={{fontSize: regWidth * 15, fontWeight: "500", }} >
@@ -470,7 +502,7 @@ const Home = ({navigation}) => {
                             </Text>
                         </Pressable>
                         <Text style={{fontSize: regWidth * 16, fontWeight: "700", }} >
-                            책 검색
+                            검색
                         </Text>
                         <Pressable
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -482,74 +514,239 @@ const Home = ({navigation}) => {
                         </Pressable>
                     </SafeAreaView>
                     <TextInput 
-                        placeholder="책 제목을 입력하세요"
+                        placeholder="키워드를 입력하세요"
                         style={styles.modalInput}
                         onChangeText={onChangeSearchInput}
                         // multiline={true}
                         value={searchInput}
                     />
-                    {searchResultList !== null && searchResultList.length > 0? 
-                        <View style={styles.searchResultContainer}>
-                            <Text style={{ fontSize: 20, fontWeight: "500", }}>
-                                책
-                            </Text>
+                    <View style={styles.searchResultContainer}>
+                        <View style={{ flexDirection: "row", alignItems: "center", }}>
+                            <Pressable
+                                onPress={() => setCtg("book")}
+                                hitSlop={{ bottom: 50, left: 50, right: 50, top: 50 }}
+                                style={{
+                                    ...styles.ctgContainer,
+                                    marginLeft: 0,
+                                }}
+                            >
+                                <Text 
+                                    style={{ 
+                                        fontSize: 18, 
+                                        fontWeight: "500", 
+                                        color: ctg === "book" ? "red" : "black",
+                                        // marginHorizontal: regWidth * 20,
+                                    }}
+                                >
+                                    책
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={() => setCtg("user")}
+                                hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                                style={styles.ctgContainer}
+                            >
+                                <Text 
+                                    style={{ 
+                                        fontSize: 18, 
+                                        fontWeight: "500", 
+                                        color: ctg === "user" ? "red" : "black",
+                                        // marginHorizontal: regWidth * 40,
+                                    }}
+                                >
+                                    유저
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={() => setCtg("album")}
+                                hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                                style={styles.ctgContainer}
+                            >
+                                <Text 
+                                    style={{ 
+                                        fontSize: 18, 
+                                        fontWeight: "500", 
+                                        color: ctg === "album" ? "red" : "black",
+                                    }}
+                                >
+                                    앨범
+                                </Text>
+                            </Pressable>
+                        </View>
+                        {/* {bookSearchResultList !== null && bookSearchResultList.length > 0 ?  */}
+                        {bookSearchResultList !== null && bookSearchResultList.length > 0 && ctg === "book" ?
                             <ScrollView style={styles.searchResult}>
-                                {searchResultList.map((searchResult, index) => (
-                                    <Pressable 
-                                        style={styles.resultList} 
-                                        onPress={() => 
-                                            {
-                                                setSearchModalVisible(false);
-                                                setSearchInput('');
-                                                setSearchResultList(null);
-                                                navigation.navigate('BookProfile', {
-                                                    bookId: searchResult.book_id, 
-                                                })
-                                            }
-                                        }
-                                        key={index}
-                                    >
-                                        <Image 
-                                            source={searchResult.book_cover !== null ? { uri: searchResult.book_cover } : blankBookCover}
-                                            style={styles.bookCoverImage}
-                                        />
-                                        <View style={{ marginHorizontal: regWidth * 8, }}>
-                                            <Text 
-                                                style={{ 
-                                                    fontSize: regWidth * 18, 
-                                                    fontWeight: "700", 
-                                                    width: regWidth * 180, 
-                                                }}
-                                                numberOfLines={2}
-                                                ellipsizeMode='tail'
-                                            >
-                                                {searchResult.book_title}
-                                            </Text>
-                                            <Text 
-                                                style={{ 
-                                                    fontSize: regWidth * 15, 
-                                                    fontWeight: "400", 
-                                                    width: regWidth * 180,
-                                                    marginTop: regHeight * 8,
-                                                }}
-                                                numberOfLines={1}
-                                                ellipsizeMode='tail'
-                                            >
-                                                {searchResult.book_author}
-                                            </Text>
-                                        </View>
-                                    </Pressable>
+                                {bookSearchResultList.map((searchResult, index) => (
+                                    <BookList book={searchResult} exitSearch={exitSearch} navigation={navigation} key={index} />
                                 ))}
                             </ScrollView>
-                        </View>
-                        :
-                        null
-                    }
+                            :
+                            null
+                        }
+                        {userSearchResultList !== null && userSearchResultList.length > 0 && ctg === "user" ? 
+                            <ScrollView style={styles.searchResult}>
+                                {userSearchResultList.map((searchResult, index) => (
+                                    <UserList user={searchResult} exitSearch={exitSearch} navigation={navigation} key={index} />
+                                ))}
+                            </ScrollView>
+                            :
+                            null
+                        }
+                        {albumSearchResultList !== null && albumSearchResultList.length > 0 && ctg === "album" ?
+                            <ScrollView style={styles.searchResult}>
+                                {albumSearchResultList.map((searchResult, index) => (
+                                    <AlbumList album={searchResult} exitSearch={exitSearch} navigation={navigation} key={index} />
+                                ))}
+                            </ScrollView>
+                            :
+                            null
+                        }
+                    </View>
                 </View>
             </Modal>
         </View>
     );
 };
+
+const BookList = ({book, exitSearch, navigation,}) => {
+    return (
+        <Pressable 
+            style={styles.resultList} 
+            onPress={() => 
+                {
+                    exitSearch();
+                    navigation.navigate('BookProfile', {
+                        bookId: book.book_id, 
+                    })
+                }
+            }
+        >
+            <Image 
+                source={book.book_cover !== null ? { uri: book.book_cover } : blankBookCover}
+                style={styles.bookCoverImage}
+            />
+            <View style={{ marginHorizontal: regWidth * 8, }}>
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 18, 
+                        fontWeight: "700", 
+                        width: regWidth * 220, 
+                    }}
+                    numberOfLines={2}
+                    ellipsizeMode='tail'
+                >
+                    {book.book_title}
+                </Text>
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 15, 
+                        fontWeight: "400", 
+                        width: regWidth * 180,
+                        marginTop: regHeight * 8,
+                    }}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                >
+                    {book.book_author}
+                </Text>
+            </View>
+        </Pressable>
+    )
+}
+
+const UserList = ({user, exitSearch, navigation,}) => {
+    return (
+        <Pressable 
+            style={styles.resultList} 
+            onPress={() => 
+                {
+                    exitSearch();
+                    navigation.navigate('OtherProfile', {
+                        userTag: user.user_tag, 
+                    })
+                }
+            }
+        >
+            <Image 
+                source={user.avatar !== null ? { uri: user.avatar } : blankAvatar}
+                style={styles.userImage}
+            />
+            <View style={{ marginHorizontal: regWidth * 8, }}>
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 18, 
+                        fontWeight: "700", 
+                        width: regWidth * 220, 
+                    }}
+                    numberOfLines={2}
+                    ellipsizeMode='tail'
+                >
+                    {user.name}
+                </Text>
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 15, 
+                        fontWeight: "400", 
+                        width: regWidth * 180,
+                        marginTop: regHeight * 8,
+                        color: "#008000",
+                    }}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                >
+                    {`@${user.user_tag}`}
+                </Text>
+            </View>
+        </Pressable>
+    )
+}
+
+const AlbumList = ({album, exitSearch, navigation,}) => {
+    return (
+        <Pressable 
+            style={styles.resultList} 
+            onPress={() => 
+                {
+                    exitSearch();
+                    navigation.navigate('AlbumProfile', {
+                        albumId: album.album_id, 
+                    })
+                }
+            }
+        >
+            <Image 
+                source={album.album_cover !== null ? { uri: album.album_cover } : blankBookCover}
+                style={styles.albumImage}
+            />
+            <View style={{ marginHorizontal: regWidth * 8, }}>
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 18, 
+                        fontWeight: "700", 
+                        width: regWidth * 220, 
+                    }}
+                    numberOfLines={2}
+                    ellipsizeMode='tail'
+                >
+                    {album.album_title}
+                </Text>
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 15, 
+                        fontWeight: "400", 
+                        width: regWidth * 180,
+                        marginTop: regHeight * 8,
+                        color: "#008000",
+                    }}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                >
+                    {`@${album.user_tag}`}
+                </Text>
+            </View>
+        </Pressable>
+    )
+}
 
 function useDebounce(value, delay = 500) {
     const [debounceVal, setDebounceVal] = useState(value);
@@ -621,7 +818,17 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: "#EEEEEE",
         height: regHeight * 280,
-        marginTop: regHeight * 8,
+        marginTop: regHeight * 12,
+    },
+    ctgContainer: {
+        backgroundColor: "#EEEEEE",
+        paddingVertical: regHeight * 10,
+        paddingHorizontal: regWidth * 18,
+        marginHorizontal: regWidth * 8, 
+        borderRadius: 999,
+        alignItems: "center",
+        justifyContent: "center",
+        
     },
     resultList: {
         borderBottomWidth: 0.5,
@@ -635,6 +842,20 @@ const styles = StyleSheet.create({
         width: regWidth * 92,
         height: regWidth * 92,
         resizeMode: "contain",
+    },
+    userImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+        resizeMode: "cover",
+        marginVertical: 5,
+        marginHorizontal: 8,
+    },
+    albumImage: {
+        width: regWidth * 70,
+        height: regWidth * 70,
+        resizeMode: "contain",
+        marginVertical: 5,
     },
 })
 
