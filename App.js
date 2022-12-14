@@ -471,7 +471,7 @@ const BookmarkScreen = () => {
     >
       <BookmarkStack.Screen name="BookmarkScreen" component={Bookmark} />
       <BookmarkStack.Screen 
-        name="PostModal2" 
+        name="PostModal3" 
         component={PostModal}
         options={{
           presentation: "transparentModal",
@@ -479,7 +479,7 @@ const BookmarkScreen = () => {
         }}
       />
       <BookmarkStack.Screen 
-        name="CreateBookmark2" 
+        name="CreateBookmark3" 
         component={CreateBookmark}
         options={{
           presentation: "transparentModal",
@@ -532,7 +532,7 @@ const ProfileScreen = () => {
     >
       <ProfileStack.Screen name="ProfileScreen" component={UserStorage} />
       <ProfileStack.Screen 
-        name="PostModal3" 
+        name="PostModal4" 
         component={PostModal}
         options={{
           presentation: "transparentModal",
@@ -540,7 +540,7 @@ const ProfileScreen = () => {
         }}
       />
       <ProfileStack.Screen 
-        name="CreateBookmark3" 
+        name="CreateBookmark4" 
         component={CreateBookmark}
         options={{
           presentation: "transparentModal",

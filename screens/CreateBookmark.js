@@ -19,8 +19,6 @@ import { userSelector } from '../modules/hooks';
 import { resetUserInfo, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
-// import { ImageManipulatorView } from 'expo-image-manipulator-view'
-
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const webViewProps = {
