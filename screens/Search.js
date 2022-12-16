@@ -140,7 +140,7 @@ const Search = ({navigation}) => {
             <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 20, marginTop: 8, }}>
                 <Pressable
                     onPress={() => setCtg("book")}
-                    hitSlop={{ bottom: 50, left: 50, right: 50, top: 50 }}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     style={{
                         ...styles.ctgContainer,
                         marginLeft: 0,

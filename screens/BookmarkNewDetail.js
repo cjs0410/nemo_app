@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, Image, ScrollView, FlatList, Dimensions, TouchableOpacity } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, Image, ScrollView, FlatList, Dimensions, TouchableOpacity, ActivityIndicator, } from "react-native";
 import React, { useEffect, useState, useRef, useCallback, } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import SelectDropdown from 'react-native-select-dropdown'
@@ -17,10 +17,33 @@ const BookmarkNewDetail = ({route, navigation}) => {
     const { bookmarks, subTitle, title, index } = route.params;
     const [ref, setRef] = useState(null);
     const flatListRef = useRef();
+    const [scrollLoading, setScrollLoading] = useState(false);
 
-    // useEffect(() => {
-    //     console.log(bookmarks);
-    // }, []);
+    useEffect(() => {
+        console.log(index);
+    }, []);
+
+    useEffect(() => {
+        console.log(scrollLoading);
+    }, [scrollLoading]);
+
+    useEffect(() => {
+        setScrollLoading(true);
+        let scrollTimer = setTimeout(() => {
+            
+            flatListRef.current.scrollToIndex({ index: index, animated: false });
+            setScrollLoading(false);
+            // if (index <= 9) {
+            //     setScrollLoading(false);
+            // }
+        }, 200);
+        
+        return ()=>{ 
+            clearTimeout(scrollTimer);
+            console.log("done");
+        }
+        
+    }, [])
 
     const autoScroll = () => {
         ref.scrollTo({ x: 0, y: SCREEN_WIDTH * index, animated: false });
@@ -79,6 +102,15 @@ const BookmarkNewDetail = ({route, navigation}) => {
                     <BookmarkDetail bookmark={bookmark} key={index} navigation={navigation} />
                 ))}
             </ScrollView> */}
+            {scrollLoading ? 
+                <ActivityIndicator 
+                    color="black" 
+                    style={{marginTop: 50}} 
+                    size="large"
+                />
+                :
+                null
+            }
             {(bookmarks !== null) && (bookmarks !== undefined) ? 
                 <FlatList 
                     data={bookmarks}
@@ -86,18 +118,35 @@ const BookmarkNewDetail = ({route, navigation}) => {
                     renderItem={renderBookmark}
                     keyExtractor={bookmark => bookmark.bookmark_id}
                     showsVerticalScrollIndicator={false}
-                    initialScrollIndex={index}
-                    disableVirtualization={false}
-                    // initialNumToRender={bookmarks.length / 5}
+                    style={{
+                        opacity: scrollLoading ? 0 : 1,
+                    }}
+                    // initialScrollIndex={index}
+                    // disableVirtualization={false}
+                    initialNumToRender={30}
                     onScrollToIndexFailed={(error) => {
                         console.log(error);
+                        // setScrollLoading(true);
                         flatListRef.current.scrollToOffset({ offset: error.averageItemLength * error.index, animated: false });
-                        setTimeout(() => {
+                        let scrollTimer = setTimeout(() => {
+                            // setScrollLoading(false);
                             if (bookmarks.length !== 0 && flatListRef !== null) {
                                 flatListRef.current.scrollToIndex({ index: error.index, animated: false });
                             }
                         }, 200);
+
+                        return ()=>{ 
+                            clearTimeout(scrollTimer);
+                            console.log("done");
+                        }
+                        
                     }}
+                    // onScrollToIndexFailed={info => {
+                    //     const wait = new Promise(resolve => setTimeout(resolve, 500));
+                    //     wait.then(() => {
+                    //         flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
+                    //     });
+                    // }}
                 />
                 :
                 null
