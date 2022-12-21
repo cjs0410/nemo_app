@@ -31,7 +31,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.cjs0410.Nemo",
-      "versionCode": 31
+      "versionCode": 32
     },
     "web": {
       "favicon": "./assets/NemoLogo.png"

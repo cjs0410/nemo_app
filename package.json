@@ -1,11 +1,10 @@
 {
   "name": "nemo",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
@@ -23,13 +22,18 @@
     "expo-font": "^10.2.1",
     "expo-image-picker": "^13.3.1",
     "expo-secure-store": "~11.3.0",
+    "expo-sharing": "~10.3.0",
+    "expo-splash-screen": "~0.16.2",
     "expo-status-bar": "~1.4.0",
+    "expo-updates": "~0.14.7",
     "jwt-decode": "^3.1.2",
     "react": "18.0.0",
+    "react-dom": "18.0.0",
     "react-native": "0.69.6",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-htmlview": "^0.16.0",
+    "react-native-image-crop-picker": "^0.39.0",
     "react-native-pager-view": "5.4.24",
     "react-native-pell-rich-editor": "^1.8.8",
     "react-native-reanimated": "~2.9.1",
@@ -39,13 +43,12 @@
     "react-native-select-dropdown": "^3.0.3",
     "react-native-svg": "12.3.0",
     "react-native-tab-view": "^3.3.0",
+    "react-native-view-shot": "3.3.0",
+    "react-native-web": "~0.18.7",
     "react-native-webview": "11.23.0",
     "react-redux": "^8.0.5",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22",
-    "redux-persist": "^6.0.0",
-    "expo-updates": "~0.14.7",
-    "react-native-view-shot": "3.3.0",
-    "expo-sharing": "~10.3.0"
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

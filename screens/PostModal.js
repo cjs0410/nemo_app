@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef, useMemo, useCallback, } from "react
 import { useTheme } from '@react-navigation/native';
 import { useCardAnimation } from '@react-navigation/stack';
 import { Feather } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+// import * as ImagePicker from 'expo-image-picker';
 import Api from "../lib/Api";
 import BottomSheet, { BottomSheetView, BottomSheetFooter, BottomSheetBackdrop, } from '@gorhom/bottom-sheet';
 import {
@@ -15,12 +15,13 @@ import {
   useFocusEffect,
   useScrollToTop,
 } from '@react-navigation/native';
+import ImagePicker from 'react-native-image-crop-picker';
 
 
 const PostModal = ({ route, navigation }) => {
   const { index } = route.params
-  const [status, requestPermission] = ImagePicker.useCameraPermissions();
-  const [status2, requestPermission2] = ImagePicker.useMediaLibraryPermissions();
+  // const [status, requestPermission] = ImagePicker.useCameraPermissions();
+  // const [status2, requestPermission2] = ImagePicker.useMediaLibraryPermissions();
   const [loading, setLoading] = useState(false);
 
   // useFocusEffect(
@@ -30,30 +31,40 @@ const PostModal = ({ route, navigation }) => {
   // );
 
   const makeImage = async () => {
-    const formData = new FormData();
     try {
-      if (!status.granted) {
-        const permission = await requestPermission();
-        if (!permission.granted) {
-          return null;
-        }
-      }
+      // if (!status.granted) {
+      //   const permission = await requestPermission();
+      //   if (!permission.granted) {
+      //     return null;
+      //   }
+      // }
 
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        // allowsMultipleSelection: true,
-        // allowsEditing: true,
-        quality: 1,
-      });
+      // const result = await ImagePicker.launchCameraAsync({
+      //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      //   quality: 1,
+      // });
   
-      console.log(result.uri);
+      // console.log(result.uri);
   
-      if (!result.cancelled) {
+      // if (!result.cancelled) {
+      //   navigation.goBack();
+      //   navigation.navigate(`CreateBookmark${index}`, {ocrImage: result.uri});
+      // }
+
+      ImagePicker.openCamera({
+        width: 1200,
+        height: 1500,
+        cropping: true,
+        freeStyleCropEnabled: true,
+      }).then(image => {
+        console.log(image);
         navigation.goBack();
-        navigation.navigate(`CreateBookmark${index}`, {ocrImage: result.uri});
-      }
+        navigation.navigate(`CreateBookmark${index}`, {ocrImage: `file://${image.path}`});
+      });
+
     } catch (error) {
       console.error(error);
+
     }
     setLoading(false);
   };
@@ -61,25 +72,36 @@ const PostModal = ({ route, navigation }) => {
   const pickImage = async () => {
     try {
       setLoading(true);
-      if (!status2.granted) {
-        const permission = await requestPermission2();
-        if (!permission.granted) {
-          return null;
-        }
-      }
+      // if (!status2.granted) {
+      //   const permission = await requestPermission2();
+      //   if (!permission.granted) {
+      //     return null;
+      //   }
+      // }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        // allowsEditing: true,
-        quality: 1,
+      // const result = await ImagePicker.launchImageLibraryAsync({
+      //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      //   quality: 1,
+      // });
+
+      // console.log(result.uri);
+
+      // if (!result.cancelled) {
+      //   navigation.goBack();
+      //   navigation.navigate(`CreateBookmark${index}`, {ocrImage: result.uri});
+      // }
+
+      ImagePicker.openPicker({
+        width: 1200,
+        height: 1500,
+        cropping: true,
+        freeStyleCropEnabled: true,
+      }).then(image => {
+        console.log(image);
+        navigation.goBack();
+        navigation.navigate(`CreateBookmark${index}`, {ocrImage: `file://${image.path}`});
       });
 
-      console.log(result.uri);
-
-      if (!result.cancelled) {
-        navigation.goBack();
-        navigation.navigate(`CreateBookmark${index}`, {ocrImage: result.uri});
-      }
     } catch (error) {
       console.error(error);
     }

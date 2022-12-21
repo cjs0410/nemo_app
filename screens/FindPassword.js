@@ -39,7 +39,7 @@ const FindPassword = ({navigation}) => {
             })
             .then((res) => {
                 console.log(res.data);
-                navigation.goBack();
+                navigation.navigate('FindPassword2');
             })
         } catch (err) {
             console.error(err);
@@ -107,6 +107,58 @@ const FindPassword = ({navigation}) => {
     )
 }
 
+const FindPassword2 = ({route, navigation}) => {
+    const logoValue = useRef(new Animated.Value(0)).current;
+
+    const showLogo = () => {
+        Animated.timing(logoValue, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: false,
+        }).start();
+    }
+
+    return (
+        <View style={styles.container}>
+            <SafeAreaView style={styles.header} >
+                <Pressable 
+                    onPress={() => navigation.goBack()} 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Ionicons name="chevron-back" size={28} color="black" />
+                </Pressable>
+                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                    <Animated.Image 
+                    source={NemoLogo}
+                    style={{
+                        ...styles.LogoImage,
+                        opacity: logoValue,
+                    }}
+                    onLoadEnd={showLogo}
+                    />
+                </View>
+                <Pressable 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    style={{ opacity: 0 }}
+                >
+                    <Ionicons name="chevron-back" size={28} color="black" />
+                </Pressable>
+            </SafeAreaView>
+            <View style={styles.introduce} >
+                <Text style={styles.introduceText}>임시 비밀번호를</Text>
+                <Text style={styles.introduceText}>입력하신 이메일로 전송했습니다</Text>
+
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Login')}
+                    style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
+                >
+                    <Text style={{...styles.btnText, color: "white",}}>로그인하러 가기</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    )
+}
+
 const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -167,4 +219,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default FindPassword;
+export { FindPassword, FindPassword2, };

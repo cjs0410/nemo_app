@@ -235,16 +235,16 @@ const CreateBookmark = ({navigation, route}) => {
             formData.append('text', info);
             formData.append('tags', JSON.stringify(tags));
             formData.append('album_id', albumId);
-            if (backgroundImage !== null) {
-                const filename = backgroundImage.split('/').pop();
-                const match = /\.(\w+)$/.exec(filename ?? '');
-                const type = match ? `image/${match[1]}` : `image`;
-                formData.append('backgroundimg', {
-                    uri: backgroundImage,
-                    type: type,
-                    name: filename
-                });
-            }
+            // if (backgroundImage !== null) {
+            //     const filename = backgroundImage.split('/').pop();
+            //     const match = /\.(\w+)$/.exec(filename ?? '');
+            //     const type = match ? `image/${match[1]}` : `image`;
+            //     formData.append('backgroundimg', {
+            //         uri: backgroundImage,
+            //         type: type,
+            //         name: filename
+            //     });
+            // }
     
             try {
                 console.log(formData);
@@ -544,7 +544,7 @@ const CreateBookmark = ({navigation, route}) => {
             await Api
             .post("/api/v2/bookmark/temp_list/")
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 setTempBookmarks(res.data);
             })
         } catch (err) {
@@ -561,9 +561,9 @@ const CreateBookmark = ({navigation, route}) => {
         });
         setWhatChapter(bookmark.chapter_title);
         setFrontContent(bookmark.contents.flat().join(''));
-        if (bookmark.backgroundimg !== null) {
-            setBackgroundImage(bookmark.backgroundimg);
-        }
+        // if (!bookmark.backgroundimg) {
+        //     setBackgroundImage(bookmark.backgroundimg);
+        // }
         setColor(bookmark.hex);
         setInfo(bookmark.text);
         setTags(bookmark.tags.map((tag) => tag.tag));

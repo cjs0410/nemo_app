@@ -112,7 +112,7 @@ const Welcome = ({ navigation }) => {
                 아이디 찾기
               </Text>
             </Pressable>
-            {/* <Text
+            <Text
               style={{
                 fontSize: regWidth * 15,
                 fontWeight: "400",
@@ -136,7 +136,7 @@ const Welcome = ({ navigation }) => {
               >
                 비밀번호 찾기
               </Text>
-            </Pressable> */}
+            </Pressable>
           </View>
           {/* <View style={{ flexDirection: "row", marginTop: 18, justifyContent: "center", }}>
             <Text style={{ fontSize: 13, fontWeight: "500", textAlign: "center", }}>

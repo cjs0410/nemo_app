@@ -22,12 +22,12 @@ import { PersistGate } from "redux-persist/integration/react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Join1, Join2, Join3} from "./screens/Join";
 import { FindId, FindId2, } from "./screens/FindId";
+import { FindPassword, FindPassword2, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
 import { SubmitEditedPost } from "./screens/EditPost";
 import { 
   Welcome, 
   Login, 
-  FindPassword,
   Home, 
   Search, 
   AlarmScreen,
@@ -191,6 +191,7 @@ const App = () => {
             <Stack.Screen name="FindId" component={FindId} options={{ headerShown: false, }} />
             <Stack.Screen name="FindId2" component={FindId2} options={{ headerShown: false, }} />
             <Stack.Screen name="FindPassword" component={FindPassword} options={{ headerShown: false, }} />
+            <Stack.Screen name="FindPassword2" component={FindPassword2} options={{ headerShown: false, }} />
           </Stack.Navigator>
         ) 
         : 

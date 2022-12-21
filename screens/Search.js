@@ -98,7 +98,7 @@ const Search = ({navigation}) => {
                 </Text>
             </SafeAreaView>
             <ScrollView
-                scrollEnabled="false"
+                scrollEnabled={false}
             >
                 <TextInput 
                     style={styles.searchInput}
