@@ -10,10 +10,11 @@ import {
   TouchableOpacity, 
   ActivityIndicator,
   RefreshControl,
+  Pressable,
 } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { Feather } from '@expo/vector-icons';
+import { Feather, AntDesign } from '@expo/vector-icons';
 import {
   useNavigation,
   useFocusEffect,
@@ -118,14 +119,56 @@ const Bookmark = ({navigation}) => {
       return (
         <View style={styles.container}>
           <SafeAreaView style={styles.header} >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={blankAvatar}
+                style={styles.userAvatar}
+              />
               <Text style={{
-                  fontSize: 25,
+                  fontSize: regWidth * 24,
                   fontWeight: "900",
+                  marginHorizontal: regWidth * 12,
               }}>
-                  Storage
+                  My Library
               </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center", }}>
+                    <Pressable
+                        // onPress={() => setSearchModalVisible(true)}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        style={{marginHorizontal: 10}}
+                    >
+                      <AntDesign name="plus" size={regWidth*30} color="black" />                    
+                    </Pressable>
+                    <Pressable
+                        // onPress={() => navigation.navigate('AlarmScreen')}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    >
+                      <Feather name="bell" size={regWidth*29} color="black" />
+                      {/* {isAlarm ? 
+                          <View
+                              style={{
+                                  position: "absolute",
+                                  backgroundColor: "#7341FF",
+                                  borderRadius: 50,
+                                  height: regWidth * 6,
+                                  width: regWidth * 6,
+                                  right: 0,
+                              }}
+                          >
+                          </View>
+                          : 
+                          null
+                      } */}
 
-              <SelectDropdown
+                    </Pressable>
+                </View>
+              {/* <SelectDropdown
                 data={categories}
                 onSelect={(selectedItem, index) => {
                   setWhichCategory(index);
@@ -151,7 +194,7 @@ const Bookmark = ({navigation}) => {
                 rowStyle={styles.rowStyle}
                 rowTextStyle={styles.arrangeText}
                 selectedRowStyle={{...styles.rowStyle, backgroundColor: "white", }}
-              />
+              /> */}
               {/* <TouchableOpacity activeOpacity={1} onPress={onArrange}>
                   <MaterialCommunityIcons name={ isTile ? "square-outline" : "view-grid-outline" } size={30} color="black" />
               </TouchableOpacity> */}
@@ -553,11 +596,19 @@ const styles = StyleSheet.create({
   },
   header: {
     // backgroundColor: "red",
-    marginVertical: 10,
+    marginTop: regHeight*12.5,
+    marginBottom: regHeight*10,
     marginHorizontal: 20,
     paddingBottom: 8,
     flexDirection: "row",
     justifyContent: "space-between"
+  },
+  userAvatar: {
+    width: regWidth*32,
+    height: regWidth*32,
+    borderRadius: 999,
+    marginTop: regHeight*4
+
   },
   arrange: {
     backgroundColor: "#DDDDDD",
