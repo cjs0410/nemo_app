@@ -18,7 +18,7 @@ const AlbumList = (props) => {
 
     return(
         <View style={styles.AlbumListContainer}>
-            <View style={{ flexDirection: "row", alignItems: "center", width: "70%"}}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Animated.Image 
                     source={{ uri: album.album_cover }} 
                     style={{
@@ -27,7 +27,7 @@ const AlbumList = (props) => {
                     }} 
                     onLoadEnd={showAlbumCover}
                 />
-                <View style={{ backgroundColor: "pink" }}>
+                <View style={{ width: "80%" }}>
                     <Text 
                         style={{ fontSize: regWidth*20, fontWeight: "500", marginHorizontal: 12 }}
                         numberOfLines={2}
@@ -35,17 +35,17 @@ const AlbumList = (props) => {
                     >
                         {album.album_title}
                     </Text>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+                    <View style={{ flexDirection: "row", alignItems: "center", width: "70%" }}>
                         <Text 
-                            style={{ fontSize: regWidth*11, fontWeight: "500", marginHorizontal: 12, color: "#606060", }}
+                            style={{ ...styles.AlbumInfoText, marginRight: regWidth*3 }}
                             numberOfLines={1}
                             ellipsizeMode="tail"
                         >
-                            유저 태그
+                            @유저 태그
                         </Text>
-                        <Entypo name="dot-single" size={10} color="#808080" />
+                        <Entypo name="dot-single" size={16} color="#808080" />
                         <Text 
-                            style={{ fontSize: regWidth*11, fontWeight: "500", marginHorizontal: 12, color: "#606060" }}
+                            style={{ ...styles.AlbumInfoText, width: "25%", marginHorizontal: regWidth*3 }}
                             // numberOfLines={1}
                             // ellipsizeMode="tail"
                         >
@@ -75,9 +75,15 @@ const styles = StyleSheet.create({
         marginHorizontal: 12,
     },
     AlbumImage: {
-        width: 45,
-        height: 45,
+        width: regWidth * 50,
+        height: regWidth * 50,
         resizeMode: "contain",
+    },
+    AlbumInfoText: {
+        fontSize: regWidth*11, 
+        fontWeight: "500", 
+        marginHorizontal: regWidth*12, 
+        color: "#606060"
     },
 
 })

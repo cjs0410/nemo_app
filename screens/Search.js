@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef, } from "react";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import blankBookCover from '../assets/images/blankBookImage.png';
 import blankAvatar from '../assets/images/peopleicon.png';
+import { BookList, } from '../components';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import Api from '../lib/Api';
 import {
@@ -203,6 +204,9 @@ const Search = ({navigation}) => {
                 <Text style={{marginHorizontal: 20, marginTop: 20, fontSize: 17, fontWeight: "500", }} >검색 내용이 없습니다.</Text> */}
                 {bookSearchResultList !== null && bookSearchResultList.length > 0 && ctg === "book" ?
                     <>
+                        {/* {bookSearchResultList.map((searchResult, index) => (
+                            <searchBookList book={searchResult} navigation={navigation} key={index} />
+                        ))} */}
                         {bookSearchResultList.map((searchResult, index) => (
                             <BookList book={searchResult} navigation={navigation} key={index} />
                         ))}
@@ -234,7 +238,7 @@ const Search = ({navigation}) => {
     );
 };
 
-const BookList = ({book, navigation,}) => {
+const searchBookList = ({book, navigation,}) => {
     return (
         <Pressable 
             style={styles.resultList} 
