@@ -34,6 +34,8 @@ import {
 } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 
+import analytics from '@react-native-firebase/analytics';
+
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const wait = (timeout) => {

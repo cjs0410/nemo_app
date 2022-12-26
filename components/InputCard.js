@@ -18,7 +18,7 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
-const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter,  watermark, setModalVisible, backgroundImage, setContentsByLine, ocrLoading, onChangeTotalContents, cardContents, totalContents, contentsByCard2, onNextCard, onKeyPress, inputRef, index, }) => {
+const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter,  watermark, setModalVisible, backgroundImage, setContentsByLine, ocrLoading, onChangeTotalContents, cardContents, totalContents, contentsByCard2, onNextCard, onKeyPress, inputRef, index, setCardCursorPosition, }) => {
     const [whatBook, setWhatBook] = useState('');
     const [bookList, setBookList] = useState(null);
     // const [selectedBook, setSelectedBook] = useState(null);
@@ -94,6 +94,13 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
             lines.map((line) => line.text)
         )
         // console.log(e.nativeEvent.lines.length, frontContent[frontContent.length-1]);
+    }
+
+    const onLayout = (e) => {
+        console.log(e.nativeEvent);
+        const layout = e.nativeEvent.layout;
+        console.log(parseInt(layout.width / (regWidth * 16)), regWidth * 16);
+        console.log(parseInt(layout.height / (regHeight * 28)), regHeight * 28);
     }
 
     return (
@@ -249,6 +256,7 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                         ...styles.bookmarkContentsInput,
                         borderWidth: isFocus ? 0.5 : 0,
                     }} 
+                    // onLayout={onLayout}
                 >
                     {ocrLoading ? 
                         <ActivityIndicator 
@@ -279,16 +287,23 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                                 numberOfLines={9}
                                 scrollEnabled="false"
                                 onChangeText={(text) => onChangeTotalContents(text, index)}
-                                onSubmitEditing={() => onNextCard(index)}
+                                onSubmitEditing={(e) => onNextCard(e, index)}
                                 onKeyPress={(e) => onKeyPress(e, index)}
-                                onFocus={() => setIsFocus(true)}
+                                onFocus={(e) => {
+                                    // console.log(e);
+                                    setIsFocus(true);
+                                }}
                                 onBlur={() => setIsFocus(false)}
                                 // value={cardContents}
                                 // value={contentsByCard2[index].join('')}
                                 value={totalContents[index]}
+                                // value={cardContents[index]}
+
                                 // defaultValue={contentsByCard2[index].join('')}
                                 ref={el => inputRef.current[index] = el}
                                 // textAlign={align === "center" ? "center" : "left"}
+                                // onLayout={onLayout}
+                                onSelectionChange={(e) => setCardCursorPosition(e.nativeEvent.selection.end)}
                             />
                             {/* <ScrollView
                                 style={{

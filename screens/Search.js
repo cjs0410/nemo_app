@@ -11,6 +11,8 @@ import {
     useScrollToTop,
 } from '@react-navigation/native';
 
+import analytics from '@react-native-firebase/analytics';
+
 const Search = ({navigation}) => {
     const [searchInput, setSearchInput] = useState('');
     const debounceVal = useDebounce(searchInput);
@@ -238,10 +240,13 @@ const BookList = ({book, navigation,}) => {
     return (
         <Pressable 
             style={styles.resultList} 
-            onPress={() => 
+            onPress={async() => 
                 {
                     navigation.navigate('BookProfile', {
                         bookId: book.book_id, 
+                    })
+                    await analytics().logEvent('searchBook', {
+                        search_book_title: book.book_title,
                     })
                 }
             }
@@ -283,10 +288,13 @@ const UserList = ({user, navigation,}) => {
     return (
         <Pressable 
             style={styles.resultList} 
-            onPress={() => 
+            onPress={async() => 
                 {
                     navigation.navigate('OtherProfile', {
                         userTag: user.user_tag, 
+                    })
+                    await analytics().logEvent('searchUser', {
+                        search_user_tag: user.user_tag,
                     })
                 }
             }
@@ -329,10 +337,13 @@ const AlbumList = ({album, navigation,}) => {
     return (
         <Pressable 
             style={styles.resultList} 
-            onPress={() => 
+            onPress={async() => 
                 {
                     navigation.navigate('AlbumProfile', {
                         albumId: album.album_id, 
+                    })
+                    await analytics().logEvent('searchAlbum', {
+                        search_album_title: album.album_title,
                     })
                 }
             }

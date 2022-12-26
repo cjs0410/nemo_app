@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "594229461555",
+    "project_id": "nemo-369308",
+    "storage_bucket": "nemo-369308.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:594229461555:android:8095fab74ccca3d878d946",
+        "android_client_info": {
+          "package_name": "com.cjs0410.Nemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "594229461555-jj0lrqph4o81vq8fdkgesskvu0pdh0js.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYMt16NCXx05RW2KG8mDu7a7EHfjxgNHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "594229461555-jj0lrqph4o81vq8fdkgesskvu0pdh0js.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

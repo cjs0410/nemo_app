@@ -31,6 +31,9 @@ import { addScrap, deleteScrap } from '../modules/scraps';
 import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
+import analytics from '@react-native-firebase/analytics';
+import { unloadAsync } from "expo-font";
+
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const BookmarkDetail = (props) => {
@@ -172,12 +175,19 @@ const BookmarkDetail = (props) => {
             .post("/api/v2/bookmark/likes/", {
                 bookmark_id: bookmark.bookmark_id,
             })
-            .then((res) => {
+            .then(async(res) => {
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.count);
                 // dispatch(setShouldHomeRefresh(true));
                 dispatch(setShouldStorageRefresh(true));
                 dispatch(setShouldUserRefresh(true));
+                if (res.data.is_like) {
+                    await analytics().logEvent('like', {
+                        writer_tag: bookmark.user_tag,
+                        bookmark_id: bookmark.bookmark_id,
+                        book_id: bookmark.book_id,
+                    })
+                }
             })
         } catch (err) {
             console.error(err);

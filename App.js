@@ -1,6 +1,6 @@
 import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useState, useCallback, useRef, } from "react";
+import { NavigationContainer, useNavigationContainerRef, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
@@ -63,6 +63,8 @@ import { userSelector } from './modules/hooks';
 import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, resetAvatar, setIsAlarm, } from './modules/user';
 import blankAvatar from './assets/images/peopleicon.png';
 
+import analytics from '@react-native-firebase/analytics';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
@@ -96,6 +98,9 @@ const App = () => {
   const { decodedRefresh, avatar, isAlarm, } = useSelector(userSelector);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const isSignOut = !((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000)));
+
+  const navigationRef = useNavigationContainerRef();
+  const routeNameRef = useRef();
   // const [avatar, setAvatar] = useState(null);
   // const [decodedRefresh, setDecodedRefresh] = useState(null);
 
@@ -171,7 +176,24 @@ const App = () => {
   // )
 
   return (
-      <NavigationContainer>
+      <NavigationContainer
+        ref={navigationRef}
+        onReady={() => {
+          routeNameRef.current = navigationRef.getCurrentRoute().name;
+        }}
+        onStateChange={async () => {
+          const previousRouteName = routeNameRef.current;
+          const currentRouteName = navigationRef.current.getCurrentRoute().name;
+  
+          if (previousRouteName !== currentRouteName) {
+            await analytics().logScreenView({
+              screen_name: currentRouteName,
+              screen_class: currentRouteName,
+            });
+          }
+          routeNameRef.current = currentRouteName;
+        }}
+      >
         <StatusBar />
         {!((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000))) ? 
         (

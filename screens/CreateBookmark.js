@@ -95,67 +95,88 @@ const CreateBookmark = ({navigation, route}) => {
 
 /////////////////////////////////////////////WYSIWYG 테스트////////////////////////////////////////////////////////////////////////
 
-    // const [totalContents, setTotalContents] = useState([]);
-    // const [contentsByLine2, setContentsByLine2] = useState([]);
-    // const [contentsByCard2, setContentsByCard2] = useState([]);
-    // const [inputRefs, setInputRefs] = useState([]);
-    // const firstInputRef = useRef();
-    // const inputRef = useRef([]);
-    // const [ref, setRef] = useState(null);
+    const [totalContents, setTotalContents] = useState([]);
+    const [contentsByLine2, setContentsByLine2] = useState([]);
+    const [contentsByCard2, setContentsByCard2] = useState([]);
+    const [cardContents, setCardContents] = useState([]);
+    const [inputRefs, setInputRefs] = useState([]);
+    const firstInputRef = useRef();
+    const inputRef = useRef([]);
+    const [ref, setRef] = useState(null);
+    const [cardCursorPosition, setCardCursorPosition] = useState(0);
 
-    // useEffect(() => {
-    //     setInputRefs([
-    //         firstInputRef
-    //     ])
-    // }, [])
+    useEffect(() => {
+        setInputRefs([
+            firstInputRef
+        ])
+    }, []);
 
-    // useEffect(() => {
-    //     // const cardNum = Math.ceil(contentsByLine2.length / 9);
-    //     const cardNum = parseInt(contentsByLine2.length / 9) + 1;
-    //     let copy = [];
+    useEffect(() => {
+        if (contentsByCard2.length > 0) {
+            console.log(cardCursorPosition, contentsByCard2[0].join('').length);
+        }
+        
+    }, [cardCursorPosition, contentsByCard2])
 
-    //     for ( let i = 0; i < cardNum; i++) {
-    //         copy = [...copy, contentsByLine2.slice(i * 9, (i + 1) * 9)]
-    //     }
-    //     setContentsByCard2(copy);
-    // }, [contentsByLine2]);
 
-    // const onChangeTotalContents = (payload, index) => {
-    //     const text = payload.replace(" ", "\u00A0");
-    //     let copy = [...totalContents];
-    //     copy[index] = text;
+    useEffect(() => {
+        // const cardNum = Math.ceil(contentsByLine2.length / 9);
+        const cardNum = parseInt(contentsByLine2.length / 9) + 1;
+        let copy = [];
 
-    //     setTotalContents(copy);
-    // }
+        for ( let i = 0; i < cardNum; i++) {
+            copy = [...copy, contentsByLine2.slice(i * 9, (i + 1) * 9)]
+        }
+        setContentsByCard2(copy);
+    }, [contentsByLine2]);
 
-    // const onNextCard = (index) => {
-    //     // console.log(contentsByCard2[index].length);
-    //     if (contentsByCard2[index].length === 9) {
-    //         console.log(index);
-    //         const next = inputRef.current[index + 1];
-    //         if (next) {
-    //             next.focus();
-    //         }
-    //         ref.scrollTo({ x: 0, y: SCREEN_WIDTH * (index + 1), animated: true });
-    //     }
-    // }
+    useEffect(() => {
+        const cardNum = Math.ceil(contentsByLine2.length / 9);
+        let copy = [];
 
-    // const onKeyPress = (e, index) => {
-    //     const key = e.nativeEvent.key;
-    //     if (key === "Backspace") {
-    //         console.log("back");
-    //         if ((index !== 0) && (contentsByCard2[index].length === 0)) {
-    //             const prev = inputRef.current[index - 1];
-    //             if (prev) {
-    //                 prev.focus();
-    //             }
-    //             ref.scrollTo({ x: 0, y: SCREEN_WIDTH * (index - 1), animated: true });
-    //         }
-    //     }
-    //     if (key === ' ') {
-    //         console.log("space");
-    //     }
-    // }
+        for ( let i = 0; i < cardNum; i++) {
+            copy = [...copy, contentsByLine2.slice(i * 9, (i + 1) * 9).join('')]
+        }
+        setTotalContents(copy);
+    }, [contentsByLine2.length]);
+
+    const onChangeTotalContents = (payload, index) => {
+        const text = payload.replace(" ", "\u00A0");
+        let copy = [...totalContents];
+        copy[index] = text;
+
+        setTotalContents(copy);
+    }
+
+    const onNextCard = (e, index) => {
+        // console.log(contentsByCard2[index].length);
+        if ((contentsByCard2[index].length === 9) && (cardCursorPosition === contentsByCard2[index].join('').length)) {
+            e.preventDefault();
+            console.log(index);
+            const next = inputRef.current[index + 1];
+            if (next) {
+                next.focus();
+            }
+            ref.scrollTo({ x: SCREEN_WIDTH * (index + 1), y: 0, animated: true });
+        }
+    }
+
+    const onKeyPress = (e, index) => {
+        const key = e.nativeEvent.key;
+        if (key === "Backspace") {
+            // console.log("back");
+            if ((index !== 0) && (contentsByCard2[index].length === 0)) {
+                const prev = inputRef.current[index - 1];
+                if (prev) {
+                    prev.focus();
+                }
+                ref.scrollTo({ x: SCREEN_WIDTH * (index - 1), y: 0, animated: true });
+            }
+        }
+        if (key === ' ') {
+            // console.log("space");
+        }
+    }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -648,7 +669,7 @@ const CreateBookmark = ({navigation, route}) => {
             >
                 {/*********************************************** NO WYSIWYG *******************************************************/}
 
-                <BlankCardChangable 
+                {/* <BlankCardChangable 
                     color={color} 
                     setBookTitle={setBookTitle} 
                     selectedBook={selectedBook}
@@ -665,7 +686,7 @@ const CreateBookmark = ({navigation, route}) => {
                     setContentsByCard={setContentsByCard}
                     ocrLoading={ocrLoading}
                     align={align}
-                />
+                /> */}
 
                 {/*********************************************** NO WYSIWYG *******************************************************/}
 
@@ -841,8 +862,18 @@ const CreateBookmark = ({navigation, route}) => {
                         ))}
                     </>
                 } */}
-
-                {/* <InputCard 
+                <ScrollView
+                    pagingEnabled
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    onScroll={handleCurrentChange}
+                    scrollEventThrottle={16}
+                    scrollEnabled={contentsByCard2.length === 1 ? false : true}
+                    ref={(ref) => {
+                        setRef(ref);
+                    }}
+                >
+                <InputCard 
                     color={color} 
                     setBookTitle={setBookTitle} 
                     selectedBook={selectedBook}
@@ -856,13 +887,14 @@ const CreateBookmark = ({navigation, route}) => {
                     align={align}
 
                     onChangeTotalContents={onChangeTotalContents}
-                    cardContents={totalContents[0]}
+                    cardContents={cardContents}
                     totalContents={totalContents}
                     // contentsByCard2={contentsByCard2}
                     contentsByCard2={contentsByCard2.length === 0 ? [[]]: contentsByCard2}
                     onNextCard={onNextCard}
                     onKeyPress={onKeyPress}
                     inputRef={inputRef}
+                    setCardCursorPosition={setCardCursorPosition}
                     index={0}
                 />
 
@@ -881,16 +913,35 @@ const CreateBookmark = ({navigation, route}) => {
                         align={align}
 
                         onChangeTotalContents={onChangeTotalContents}
-                        cardContents={totalContents[index + 1]}
+                        cardContents={cardContents}
                         totalContents={totalContents}
                         contentsByCard2={contentsByCard2}
                         onNextCard={onNextCard}
                         onKeyPress={onKeyPress}
                         inputRef={inputRef}
                         index={index + 1}
+                        setCardCursorPosition={setCardCursorPosition}
                         key={index}
                     />
                 ))}
+                </ScrollView>
+                {contentsByCard2.length === 1 ? 
+                    null
+                    :
+                    <View style={{
+                            flexDirection: "row", 
+                            alignItems: "center", 
+                            justifyContent: "center", 
+                            marginTop: -12, 
+                        }}>
+                            {contentsByCard2.map((contents, index) => {
+                                if (index === current) {
+                                    return <Entypo name="dot-single" size={24} color="red" style={{ marginHorizontal: -4, }} key={index} />
+                                }
+                                return <Entypo name="dot-single" size={24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
+                            })}
+                    </View>
+                }
 
 
                 <InvisibleCard 
@@ -911,7 +962,7 @@ const CreateBookmark = ({navigation, route}) => {
                     align={align}
 
                     totalContents={totalContents}
-                /> */}
+                />
 
                 {/*********************************************** WYSIWYG *******************************************************/}
 

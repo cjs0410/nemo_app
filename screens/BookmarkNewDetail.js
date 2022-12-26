@@ -19,13 +19,13 @@ const BookmarkNewDetail = ({route, navigation}) => {
     const flatListRef = useRef();
     const [scrollLoading, setScrollLoading] = useState(false);
 
-    useEffect(() => {
-        console.log(index);
-    }, []);
+    // useEffect(() => {
+    //     console.log(index);
+    // }, []);
 
-    useEffect(() => {
-        console.log(scrollLoading);
-    }, [scrollLoading]);
+    // useEffect(() => {
+    //     console.log(scrollLoading);
+    // }, [scrollLoading]);
 
     useEffect(() => {
         setScrollLoading(true);
@@ -123,7 +123,8 @@ const BookmarkNewDetail = ({route, navigation}) => {
                     }}
                     // initialScrollIndex={index}
                     // disableVirtualization={false}
-                    initialNumToRender={30}
+                    // initialNumToRender={30}
+                    initialNumToRender={bookmarks.length}
                     onScrollToIndexFailed={(error) => {
                         console.log(error);
                         // setScrollLoading(true);
