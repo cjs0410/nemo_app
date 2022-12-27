@@ -7,6 +7,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Api from '../lib/Api';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
+import Check from '../assets/images/Check.png';
+import Arrow from '../assets/icons/LeftArrow.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
@@ -146,312 +148,310 @@ const Join1 = ({ navigation }) => {
             setAuthWarning('잘못된 인증번호입니다.');
         }
     }
-
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+        <View style={{backgroundColor:"white", flex:1}}>
+            <SafeAreaView style={ styles.header } >
                 <Pressable 
                     onPress={() => navigation.goBack()} 
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </Pressable>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Animated.Image 
-                        source={NemoLogo}
-                        style={{
-                            ...styles.LogoImage,
-                            opacity: logoValue,
-                        }}
-                        onLoadEnd={showLogo}
-                    />
-                </View>
-                <Pressable 
-                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                    style={{ opacity: 0 }}
-                >
-                    <Ionicons name="chevron-back" size={28} color="black" />
+                    <Text style={{ fontSize: regWidth*16, fontWeight: "400" }}>
+                        Cancel
+                    </Text>
                 </Pressable>
             </SafeAreaView>
-            {/* <ScrollView
-                scrollEnabled={false}
-            > */}
-                <View style={styles.introduce} >
-                    <Text style={styles.introduceText}>전화번호를 입력하세요</Text>
-                    <TextInput 
-                        style={styles.input}
-                        placeholder="전화번호"
-                        onChangeText={onChangePhoneNumber}
-                        value={phoneNumber}
-                        keyboardType="numeric"
-                    />
-                    <Text style={{ ...styles.warning, color: warningColor, }}>
-                        {phoneNumberWarning}
+            <View style={{ alignItems: "center" }}>
+          <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
+            <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900" }}>
+                Create your account
+            </Text>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "flex-end", width: regWidth*280 }}>
+            <TextInput 
+                style={{ ...styles.txtInput, marginTop: regHeight*30, paddingHorizontal: regWidth*6 }}
+                // onChangeText={onChangeId}
+                placeholder="Name"
+                placeholderTextColor={"#606060"}
+                autoCapitalize="none"
+        
+            />
+            <Image 
+                source={Check}
+                style={ styles.checkIcon }
+                // onLoadEnd={showLogo}
+            />
+            
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "flex-end", width: regWidth*280 }}>
+            <TextInput 
+                style={{ ...styles.txtInput, marginTop: regHeight*30, paddingHorizontal: regWidth*6 }}
+                // onChangeText={onChangeId}
+                placeholder="Phone number or email address"
+                placeholderTextColor={"#7341ffcc"}
+                autoCapitalize="none"
+        
+            />
+            <Image 
+                source={Check}
+                style={ styles.checkIcon }
+                // onLoadEnd={showLogo}
+            />
+            
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "flex-end", width: regWidth*280 }}>
+            <TextInput 
+                style={{ ...styles.txtInput, marginTop: regHeight*30, paddingHorizontal: regWidth*6 }}
+                // onChangeText={onChangeId}
+                placeholder="Date of birth"
+                placeholderTextColor={"#606060"}
+                autoCapitalize="none"
+        
+            />
+            <Image 
+                source={Check}
+                style={ styles.checkIcon }
+                // onLoadEnd={showLogo}
+            />
+            
+          </View>
+
+          <View style={{ marginTop: regHeight*58, width: regWidth*280, alignItems: "flex-end" }}>
+            <Pressable
+            //    onPress={onLogin}
+               style={{...styles.nextBtn, backgroundColor: "#7341ffcc" }}
+             >
+               <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Next</Text>
+             </Pressable>
+          </View>   
+          <View style={{ width: regWidth*290, marginTop: regHeight*54 }}>
+            <View style={{flexDirection: "row"}}>
+                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                    By signing up, you agree to our&nbsp;  
+                </Text>
+                <Pressable
+                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                >
+                    <Text style={{ fontSize: regWidth*12, fontWeight: "500", color: "#7341ffcc", lineHeight: regHeight*18 }}>
+                        Terms of Service&nbsp;  
                     </Text>
-                    <TouchableOpacity
-                        onPress={requestPhoneNumber}
-                        style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
+                </Pressable>
+                
+                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                    and  
+                </Text>
+            </View> 
+            <View style={{flexDirection: "row"}}>
+                <Pressable
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     >
-                        <Text style={{...styles.btnText, color: "white",}} >{sendButton}</Text>
-                    </TouchableOpacity>
-
-                    {/* <Text style={styles.introduceText}>인증번호를 입력하세요</Text> */}
-
-
-                    <View
-                        style={{
-                            ...styles.introduceBtn, 
-                            backgroundColor: "#EEEEEE", 
-                            paddingHorizontal: regWidth * 10, 
-                            flexDirection: "row", 
-                            justifyContent: "space-between", 
-                            alignItems: "center", 
-                            marginTop: 18,
-                            marginBottom: 0,
-                        }}
+                        <Text style={{ fontSize: regWidth*12, fontWeight: "500", color: "#7341ffcc", lineHeight: regHeight*18 }}>
+                            Privacy Policy,&nbsp;  
+                        </Text>
+                </Pressable>
+                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                    including&nbsp;
+                </Text>
+                <Pressable
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     >
-                        <TextInput 
-                            placeholder="문자 인증번호 5자리를 입력해주세요"
-                            onChangeText={onChangeAuthNumber}
-                            keyboardType="numeric"
-                        />
-                        {isCountDown ? 
-                            <Text style={{ fontSize: 12, fontWeight: "500", }}>
-                                {`${min}:${sec}`}
-                            </Text>
-                            :
-                            null
-                        }
+                        <Text style={{ fontSize: regWidth*12, fontWeight: "500", color: "#7341ffcc", lineHeight: regHeight*18 }}>
+                            Cookie Use.&nbsp;
+                        </Text>
+                </Pressable>
+                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                    Nemo may use 
+                </Text>
+            </View>
+            <View style={{flexDirection: "row"}}>
+                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                    your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, 
+                    like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, 
+                    when provided.
+                </Text>
+            </View>
+          </View>
+          <View style={{ marginTop: regHeight*16, width: regWidth*280, alignItems: "center" }}>
+            <Pressable
+               onPress={() => navigation.navigate('Join2')}
+               style={ styles.signUpBtn }
+             >
+               <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Sign up</Text>
+             </Pressable>
+          </View>         
+          
+         </View>
 
-                    </View>
-                    {/* <TextInput 
-                        style={styles.input}
-                        placeholder="문자 인증번호 5자리를 입력해주세요"
-                        onChangeText={onChangeAuthNumber}
-                    /> */}
-                    <Text style={{...styles.warning, color: "#FF4040", }}>
-                        {authWarning}
-                    </Text>
-
-                    <TouchableOpacity
-                        onPress={requestAuthNumber}
-                        style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
-                    >
-                        <Text style={{...styles.btnText, color: "white",}} >다음</Text>
-                    </TouchableOpacity>
-                    
-                </View>
-            {/* </ScrollView> */}
         </View>
     );
+
   }
   
 const Join2 = ({ navigation, route }) => {
-    const axios = require('axios').default;
-    const dispatch = useDispatch();
-    const { phoneNumber, } = route.params;
-    const [loading, setLoading] = useState(false);
-    const [nickname, setNickname] = useState('');
-    const [username, setUsername] = useState('');
-    const [usernameWarning, setUsernameWarning] = useState('');
-    const [warningColor, setWarningColor] = useState("#FF4040");
-    const debounceVal = useDebounce(username);
-    const [password, setPassword] = useState('');
-    const [isPsw, setIsPsw] = useState(false);
-    const [passwordCheck, setPasswordCheck] = useState('');
-    const [isPswCheck, setIsPswCheck] = useState(false);
-    const [passwordWarning, setPasswordWarning] = useState('');
-    const [passwordCheckWarning, setPasswordCheckWarning] = useState('');
-    const [joinWarning, setJoinWarning] = useState('');
-    const logoValue = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        checkUsername();
-    }, [debounceVal]);
-
-    const onChangeNickname = (payload) => setNickname(payload);
-    const onChangeUsername = (payload) => setUsername(payload);
-
-    const onChangePassword = (payload) => {
-        const pswRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/
-        setPassword(payload);
-
-        if (!pswRegex.test(payload) && payload.length > 0) {
-            setPasswordWarning('숫자+영문자+특수문자 조합으로 8자리 이상 입력해주세요!');
-            setIsPsw(false);
-        } else {
-            setPasswordWarning('');
-            setIsPsw(true);
-        }
-
-        if (passwordCheck.length === 0 || (payload === passwordCheck)) {
-            setPasswordCheckWarning('');
-            setIsPswCheck(true);
-        } else {
-            setPasswordCheckWarning('비밀번호가 일치하지 않습니다.');
-            setIsPswCheck(false);
-        }
-    }
-
-    const onChangePasswordCheck = (payload) => {
-        setPasswordCheck(payload);
-        if (password === payload || payload.length === 0) {
-            setPasswordCheckWarning('');
-            setIsPswCheck(true);
-        } else {
-            setPasswordCheckWarning('비밀번호가 일치하지 않습니다.');
-            setIsPswCheck(false);
-        }
-    };
-
-    const buttonActive = isPsw && isPswCheck === true;
-
-    const onJoin = async() => {
-        if (loading) {
-        return;
-        }
-
-        try {
-            setLoading(true);
-            console.log(phoneNumber);
-            await Api
-            .post("/api/v1/user/register/", {
-                name: nickname,
-                username: username,
-                password: password,
-                phone_number: phoneNumber,
-            })
-            .then(async(res) => {
-                console.log(res.data);
-                try {
-                    await AsyncStorage.setItem('refresh', res.data.refresh);
-                    await AsyncStorage.setItem('access', res.data.access);
-                    dispatch(setRefreshToken(res.data.refresh));
-                } catch (err) {
-                    console.error(err);
-                }
-                navigation.navigate('Join3');
-            })
-        } catch (err) {
-            if (err.response.status === 400) {
-                setJoinWarning('같은 아이디가 이미 존재합니다');
-            }
-        }
-        setLoading(false);
-    }
-    
-    const showLogo = () => {
-        Animated.timing(logoValue, {
-            toValue: 1,
-            duration: 100,
-            useNativeDriver: false,
-        }).start();
-    }
-    
-    const checkUsername = async() => {
-        if (debounceVal.length > 0) {
-            try {
-                await Api.post("/api/v1/user/verify_username/", {
-                    username: debounceVal,
-                })
-                .then((res) => {
-                    console.log(res.data);
-                    setUsernameWarning("사용 가능한 아이디입니다");
-                    setWarningColor("#008000");
-                })
-            } catch (err) {
-                console.error(err);
-                if (err.response.status === 400) {
-                    setUsernameWarning("사용할 수 없는 아이디입니다");
-                    setWarningColor("#FF4040");
-                }
-            }
-        }
-    };
-
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+        <View style={{backgroundColor:"white", flex:1}} >
+            <SafeAreaView style={ styles.header } >
                 <Pressable 
                     onPress={() => navigation.goBack()} 
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </Pressable>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Animated.Image 
-                        source={NemoLogo}
-                        style={{
-                            ...styles.LogoImage,
-                            opacity: logoValue,
-                        }}
-                        onLoadEnd={showLogo}
+                    <Image 
+                        source={Arrow}
+                        style={{ width: regWidth*20, height: regHeight*17.5 }}
+                        // onLoadEnd={showLogo}
                     />
-                </View>
-                <Pressable 
-                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                    style={{ opacity: 0 }}
-                >
-                    <Ionicons name="chevron-back" size={28} color="black" />
                 </Pressable>
             </SafeAreaView>
-            <ScrollView
-                scrollEnabled={false}
-            >
-                <View style={styles.introduce} >
-                    <Text style={styles.introduceText}>거의 다 왔습니다.</Text>
-                    <TextInput 
-                        style={styles.input}
-                        placeholder="사용하실 닉네임을 입력해주세요"
-                        onChangeText={onChangeNickname}
-                        autoCapitalize="none"
-                    />
-                    <Text style={{...styles.warning, color: "#FF4040", }}>
-                        {""}
+            <View style={{ alignItems: "center" }}>
+                <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                        We sent you a code
                     </Text>
-                    <TextInput 
-                        style={styles.input}
-                        placeholder="아이디를 입력해주세요(초기 유저 태그로 사용됩니다)"
-                        onChangeText={onChangeUsername}
-                        autoCapitalize="none"
-                    />
-                    <Text style={{...styles.warning, color: warningColor, }}>
-                        {usernameWarning}
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060" }}>
+                        Enter it below to verify 010-0000-0000.
                     </Text>
-                    <TextInput 
-                        style={styles.input}
-                        placeholder="비밀번호를 입력해주세요"
-                        onChangeText={onChangePassword}
-                        secureTextEntry={true}
-                    />
-                    <Text style={{...styles.warning, color: "#FF4040", }}>
-                        {passwordWarning}
-                    </Text>
-                    <TextInput 
-                        style={styles.input}
-                        placeholder="비밀번호 확인"
-                        onChangeText={onChangePasswordCheck}
-                        secureTextEntry={true}
-                    />
-                    <Text style={{...styles.warning, color: "#FF4040", }}>
-                        {passwordCheckWarning}
-                    </Text>
-
-                    <Pressable
-                        onPress={onJoin}
-                        style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
-                        disabled={!buttonActive}
+                    <View style={{ flexDirection: "row", justifyContent: "center", width: regWidth*280, marginTop: regHeight*25 }}>
+                        <TextInput 
+                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            placeholderTextColor={"#606060"}
+                            autoCapitalize="none"
+                            placeholder="8"
+                        />
+                        <TextInput 
+                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            placeholderTextColor={"#606060"}
+                            autoCapitalize="none"
+                            placeholder="2"
+                        />
+                        <TextInput 
+                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            placeholderTextColor={"#606060"}
+                            autoCapitalize="none"
+                        />
+                        <TextInput 
+                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            placeholderTextColor={"#606060"}
+                            autoCapitalize="none"
+                        />
+                        <TextInput 
+                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            placeholderTextColor={"#606060"}
+                            autoCapitalize="none"
+                        />
+                        <TextInput 
+                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            placeholderTextColor={"#606060"}
+                            autoCapitalize="none"
+                        />
+                    </View>
+                    <Pressable 
+                        onPress={() => navigation.goBack()} 
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     >
-                        <Text style={{...styles.btnText, color: "white",}} >가입하기</Text>
+                        <Text style={{
+                            marginTop: regHeight*76,
+                            color: "#7341ffcc"
+                        }}>
+                            Didn't receive SMS?
+                        </Text>
                     </Pressable>
-                    <Text style={{...styles.warning, color: "#FF4040", }}>
-                        {joinWarning}
-                    </Text>
-                    
+                    <View style={{ marginTop: regHeight*8, width: regWidth*280, alignItems: "center" }}>
+                        <Pressable
+                            onPress={() => navigation.navigate('Join2')}
+                            style={ styles.signUpBtn }
+                        >
+                        <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Continue</Text>
+                        </Pressable>
+                    </View>    
                 </View>
-            </ScrollView>
+            </View>
+            
+            
         </View>
     );
+    
+    // return (
+    //     <View style={styles.container}>
+    //         <SafeAreaView style={styles.header} >
+    //             <Pressable 
+    //                 onPress={() => navigation.goBack()} 
+    //                 hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+    //             >
+    //                 <Ionicons name="chevron-back" size={28} color="black" />
+    //             </Pressable>
+    //             <View style={{ flexDirection: "row", alignItems: "center", }}>
+    //                 <Animated.Image 
+    //                     source={NemoLogo}
+    //                     style={{
+    //                         ...styles.LogoImage,
+    //                         opacity: logoValue,
+    //                     }}
+    //                     onLoadEnd={showLogo}
+    //                 />
+    //             </View>
+    //             <Pressable 
+    //                 hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+    //                 style={{ opacity: 0 }}
+    //             >
+    //                 <Ionicons name="chevron-back" size={28} color="black" />
+    //             </Pressable>
+    //         </SafeAreaView>
+    //         <ScrollView
+    //             scrollEnabled={false}
+    //         >
+    //             <View style={styles.introduce} >
+    //                 <Text style={styles.introduceText}>거의 다 왔습니다.</Text>
+    //                 <TextInput 
+    //                     style={styles.input}
+    //                     placeholder="사용하실 닉네임을 입력해주세요"
+    //                     onChangeText={onChangeNickname}
+    //                     autoCapitalize="none"
+    //                 />
+    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
+    //                     {""}
+    //                 </Text>
+    //                 <TextInput 
+    //                     style={styles.input}
+    //                     placeholder="아이디를 입력해주세요(초기 유저 태그로 사용됩니다)"
+    //                     onChangeText={onChangeUsername}
+    //                     autoCapitalize="none"
+    //                 />
+    //                 <Text style={{...styles.warning, color: warningColor, }}>
+    //                     {usernameWarning}
+    //                 </Text>
+    //                 <TextInput 
+    //                     style={styles.input}
+    //                     placeholder="비밀번호를 입력해주세요"
+    //                     onChangeText={onChangePassword}
+    //                     secureTextEntry={true}
+    //                 />
+    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
+    //                     {passwordWarning}
+    //                 </Text>
+    //                 <TextInput 
+    //                     style={styles.input}
+    //                     placeholder="비밀번호 확인"
+    //                     onChangeText={onChangePasswordCheck}
+    //                     secureTextEntry={true}
+    //                 />
+    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
+    //                     {passwordCheckWarning}
+    //                 </Text>
+
+    //                 <Pressable
+    //                     onPress={onJoin}
+    //                     style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
+    //                     disabled={!buttonActive}
+    //                 >
+    //                     <Text style={{...styles.btnText, color: "white",}} >가입하기</Text>
+    //                 </Pressable>
+    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
+    //                     {joinWarning}
+    //                 </Text>
+                    
+    //             </View>
+    //         </ScrollView>
+    //     </View>
+    // );
 }
 
 function useDebounce(value, delay = 1000) {
@@ -501,63 +501,45 @@ const Join3 = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "white",
-    },
     header: {
-      marginTop: regHeight * 58,
-      marginHorizontal: regWidth * 20,
-      paddingBottom: regHeight * 30,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+        marginTop: regHeight * 55,
+        marginHorizontal: regWidth * 30,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
-    LogoImage: {
-        width: regWidth * 120,
-        height: regWidth * 40,
-        resizeMode: "contain",
+    txtInput: {
+        height: regHeight * 40,
+        width: regWidth*280,
+        backgroundColor: "white",
+        borderBottomWidth: 1,
+        borderBottomColor: "#000000"
     },
-    introduce: {
-        // marginTop: -regHeight * 18,
+    nextBtn: {
+        borderRadius: 18,
         justifyContent: "center",
-        marginHorizontal: regWidth * 38,
+        alignItems: "center",
+        width: regWidth*80,
+        height: regHeight*36,
+        flexDirection: "row"
     },
-    introduceText: {
-        fontSize: regWidth * 24,
-        fontWeight: "900",
-        marginTop: regHeight * 35,
-        textAlign: "center",
+    checkIcon: {
+        width: regWidth*25,
+        height: regHeight*25,
+        marginBottom: regHeight*7,
+        marginLeft: -regWidth*24,
+        resizeMode: "contain"
     },
-    introduceBtn: {
-        height: regHeight * 50,
-        backgroundColor: "#EEEEEE",
-        // paddingVertical: 10,
-        marginVertical: regHeight * 10,
-        alignContent: "center",
+    signUpBtn: {
+        borderRadius: regWidth*30,
         justifyContent: "center",
-        borderRadius: 10,
-    },
-    btnText: {
-        fontSize: regWidth * 16,
-        fontWeight: "500",
-        textAlign: "center",
-    },
-    input: {
-        height: regHeight * 50,
-        backgroundColor: "#EEEEEE",
-        // paddingVertical: regHeight * 10,
-        paddingHorizontal: regWidth * 10,
-        borderRadius: 10,
-        marginTop: regHeight * 12,
-    },
-    warning: {
-        fontSize: regWidth * 12,
-        marginHorizontal: regWidth * 8,
-        fontWeight: "500",
-        // color: "#FF4040",
-        marginTop: regHeight * 8,
-    },
+        alignItems: "center",
+        width: regWidth*280,
+        height: regHeight*60,
+        flexDirection: "row",
+        backgroundColor: "#5c34cc" 
+    }
+    
   })
 
 export {Join1, Join2, Join3};

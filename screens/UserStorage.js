@@ -283,36 +283,21 @@ const UserStorage = ({route, navigation}) => {
                 justifyContent: "flex-end"
              }} >
                 <ImageBackground source={ require('../assets/images/userImage.jpeg') } resizeMode= "cover" 
-                                    style={{
-                                        height: 110, 
-                                        width:"100%"
-                                        }}>
-                    <View style={{ 
-                        flexDirection: "row", 
-                        justifyContent: "space-between"
-                         }}>
+                                    style={{ height: 110, width:"100%" }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                         <Pressable
                             onPress={() => navigation.navigate('UserSetting')}
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                            style={{ 
-                                marginLeft: regWidth*13, 
-                                marginTop: regWidth*45 
-                            }}
+                            style={{ marginLeft: regWidth*13, marginTop: regWidth*45 }}
                             >
                             <Image source={vectorLeftImage} 
-                            style={{ 
-                                width: regWidth*30, 
-                                height: regWidth*30 
-                                }}/>
+                            style={{ width: regWidth*30, height: regWidth*30 }}/>
                             {/* <FontAwesome name="arrow-circle-left" size={30} color="black" /> */}
                         </Pressable>
                         <Pressable
                             onPress={() => navigation.navigate('UserSetting')}
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                            style={{ 
-                                marginRight: regWidth*13, 
-                                marginTop: regWidth*45 
-                            }}
+                            style={{ marginRight: regWidth*13, marginTop: regWidth*45 }}
                         >
                             <Image source={settings} style={{ width: regWidth*30, height: regWidth*30 }}/>
                             {/* <Feather name="settings" size={30} color="black" /> */}
@@ -320,94 +305,29 @@ const UserStorage = ({route, navigation}) => {
                     </View>
                 </ImageBackground>
             </SafeAreaView>
-            <View style={{
-                // backgroundColor: "pink",
-                // marginHorizontal: regWidth * 20,
-                //paddingBottom: 30,
-                // paddingBottom: regHeight * 18,
-                // flexDirection: "row",
-                // justifyContent: "space-between",
-                alignItems: "center",
-                marginTop: -regHeight*40,
-                height: "30%",
-
-            }} >
-                    
+            <View style={{ alignItems: "center", marginTop: -regHeight*40, height: "30%"  }} >
                     {profile === null ? 
                         <ActivityIndicator 
                             color="white" 
-                            style={{
-                                marginTop: 10
-                            }} 
+                            style={{ marginTop: 10 }} 
                             size="large"
                         />
                         :
                         <>
-                        <View style={{ 
-                            flexDirection: "column", 
-                            alignItems: "flex-start",
-                            width: "100%",
-                            marginTop: 12,
-                            }}>
+                        <View style={{ flexDirection: "column", alignItems: "flex-start", width: "100%", marginTop: 12 }}>
 
                             <Animated.Image 
                                 source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                                style={{
-                                    width: regWidth * 100,
-                                    height: regWidth * 100,
-                                    resizeMode: "cover",
-                                    borderRadius: 50,
-                                    borderWidth: 2,
-                                    borderColor: "#7341ffcc",
-                                    opacity: avatarValue,
-                                    // marginBottom: 10,
-                                    marginLeft: regWidth*13,
-                                    // marginTop: -regHeight*50,
-
-                                }} 
+                                style={{ ...styles.profileAvatar, opacity: avatarValue }} 
                                 onLoadEnd={showAvatarImage}
                             />
             </View>
-            <View style={{
-                // backgroundColor: "blue",
-                width: "100%",
-                flexDirection: "column",
-                alignItems: "flex-end",
-                height: "50%",
+            <View style={{ width: "100%", flexDirection: "column", alignItems: "flex-end", height: "50%",
             }}>
-                <View style={{ 
-                        // marginHorizontal: 8, 
-                        // backgroundColor: "pink",
-                        marginTop: -regHeight*82,
-                        // opacity: 0.5,
-                        width: "69%",
-                        height: "70%"
-                        
-                    }}>
-                        <View style={{
-                            flexDirection: "row",
-                            justifyContent: "flex-end", 
-                            alignItems: "center",
-                            // backgroundColor: "skyblue",
-                            width: "100%",
-                            height: "30%",
-                            marginTop: regWidth*13
-                        }}>
+                <View style={{ marginTop: -regHeight*82, width: "69%", height: "70%" }}>
+                        <View style={ styles.editProfileBtnContainer }>
                             <TouchableOpacity 
-                                style={{
-                                    // paddingHorizontal: regWidth * 5,
-                                    // paddingVertical: regHeight * 5,
-                                    borderRadius: 20,
-                                    // marginBottom: regHeight * 2,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    width: "30%",
-                                    height: "110%",
-                                    borderColor: "#202020", 
-                                    borderWidth: 0.5, 
-                                    // marginTop: 10, 
-                                    marginRight: regWidth*13
-                                }} 
+                                style={ styles.editProfileBtn } 
                                 onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
                             >
                                 <Text style={{ 
@@ -417,22 +337,8 @@ const UserStorage = ({route, navigation}) => {
                                     }} >Edit profile</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={{ 
-                            flexDirection: "row", 
-                            width: "100%", 
-                            alignItems: "flex-start", 
-                            height: "25%",
-                            marginTop: -regHeight*15
-
-                        }} >
-                            <Text style={{
-                                fontSize: regWidth * 14,
-                                fontWeight: "700",
-                                color: "#7341ffcc",
-                                width: "28%",
-                                // opacity: 0.8
-                                
-                            }}
+                        <View style={ styles.usertagContainer } >
+                            <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#7341ffcc", width: "50%" }}
                                 numberOfLines={1}
                                 ellipsizeMode='tail'
                             >
@@ -441,13 +347,7 @@ const UserStorage = ({route, navigation}) => {
                         </View>
                         <View>
                             <Text 
-                                style={{
-                                    fontSize: regWidth * 23,
-                                    fontWeight: "900",
-                                    width: "70%",
-                                    height: regHeight*70,
-                                    color: "#202020",
-                                }}
+                                style={ styles.usernameContainer }
                                 numberOfLines={1}
                                 ellipsizeMode='tail'
                             >
@@ -457,29 +357,10 @@ const UserStorage = ({route, navigation}) => {
                         
                     </View>
             </View>
-            <View style={{
-                // backgroundColor:"pink",
-                // opacity: 0.5,
-                height: "73%",
-                width: "100%",
-                marginTop: -regHeight*100,
-                flexDirection: "column",
-                alignItems: "flex-start",
-            }}>
-                    <View style={{
-                            // backgroundColor: "pink",
-                            height: "40%",
-                            width: "100%",
-                            flexDirection: "column",
-                            alignItems: "flex-start"
-                        }}>
+            <View style={ styles.introContainer }>
+                    <View style={{ height: "40%", width: "100%", flexDirection: "column", alignItems: "flex-start" }}>
                         <Text
-                            style={{
-                                width: "90%",
-                                lineHeight: regHeight*19,
-                                color: "#404040",
-                                marginHorizontal: regWidth*13
-                            }}
+                            style={{ width: "90%", lineHeight: regHeight*19, color: "#404040", marginHorizontal: regWidth*13 }}
                             numberOfLines={3}
                             ellipsizeMode='tail'
                         >
@@ -489,119 +370,44 @@ const UserStorage = ({route, navigation}) => {
                             길어지면 이렇게 됨길어지면길어지면길어지면
                         </Text>
                     </View>
-                    <View style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginLeft: regWidth*13,
-                        
-                    }}>
-                        <Text style={{
-                            color: "#202020",
-                            fontWeight: "900",
-                            fontSize: regWidth*16,
-                            letterSpacing: -regWidth
-                        }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", marginLeft: regWidth*13 }}>
+                        <Text style={ styles.boldNumberTxt }>
                             111  
                         </Text>
-                        <Text style={{
-                            marginHorizontal: regWidth*8,
-                            fontWeight: "500",
-                            color: "#404040"
-                        }}>
+                        <Text style={ styles.followTxt }>
                             Nemos
                         </Text>
-                        <Text style={{
-                            color: "#202020",
-                            fontWeight: "900",
-                            fontSize: regWidth*16,
-                            marginLeft: regWidth*28,
-                            letterSpacing: -regWidth
-                        }}>
+                        <Text style={{ ...styles.boldNumberTxt, marginLeft: regWidth*28 }}>
                             20  
                         </Text>
-                        <Text style={{
-                            marginHorizontal: regWidth*8,
-                            fontWeight: "500",
-                            color: "#404040"
-                        }}>
+                        <Text style={ styles.followTxt }>
                             Followers
                         </Text>
-                        <Text style={{
-                            color: "#202020",
-                            fontWeight: "900",
-                            fontSize: regWidth*16,
-                            marginLeft: regWidth*28,
-                            letterSpacing: -regWidth
-                        }}>
+                        <Text style={{ ...styles.boldNumberTxt, marginLeft: regWidth*28 }}>
                             27 
                         </Text>
-                        <Text style={{
-                            marginHorizontal: regWidth*6,
-                            fontWeight: "500",
-                            color: "#404040"
-                        }}>
+                        <Text style={{ ...styles.followTxt, marginHorizontal: regWidth*6 }}>
                             Following
                         </Text>
                     </View>
-                    <View style={{
-                        // backgroundColor: "skyblue",
-                        flexDirection: "row",
-                        alignItems: "flex-start",
-                        width: "100%",
-                        height: "30%",
-                        marginTop: regHeight*12
-                    }}>
+                    <View style={ styles.followedByContainer}>
                         <Animated.Image 
                             source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                            style={{
-                                width: regWidth*30, 
-                                height: regWidth*30,
-                                resizeMode: "cover",
-                                borderRadius: regWidth*15,
-                                borderWidth: regWidth*1,
-                                borderColor: "#D9D9D9",
-                                opacity: avatarValue,
-                                marginLeft: regWidth*13,
-
-                            }} 
+                            style={{ ...styles.smallAvatar, opacity: avatarValue }} 
                             onLoadEnd={showAvatarImage}
                         />
                         <Animated.Image 
                             source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                            style={{
-                                width: regWidth*30, 
-                                height: regWidth*30,
-                                resizeMode: "cover",
-                                borderRadius: regWidth*15,
-                                borderWidth: regWidth*1,
-                                borderColor: "#D9D9D9",
-                                opacity: avatarValue,
-                                marginLeft: -regWidth*15 ,
-
-                            }} 
+                            style={{ ...styles.smallAvatar, opacity: avatarValue, marginLeft: -regWidth*15 }} 
                             onLoadEnd={showAvatarImage}
                         />
                         <Animated.Image 
                             source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                            style={{
-                                width: regWidth*30, 
-                                height: regWidth*30,
-                                resizeMode: "cover",
-                                borderRadius: regWidth*15,
-                                borderWidth: regWidth*1,
-                                borderColor: "#D9D9D9",
-                                opacity: avatarValue,
-                                marginLeft: -regWidth*15 ,
-
-                            }} 
+                            style={{ ...styles.smallAvatar, opacity: avatarValue, marginLeft: -regWidth*15 }} 
                             onLoadEnd={showAvatarImage}
                         />
 
-                        <Text style={{
-                            marginLeft: regWidth*11,
-                            width: "70%",
-                            color: "#606060"
-                        }}
+                        <Text style={{ marginLeft: regWidth*11, width: "70%", color: "#606060" }}
                             numberOfLines={2}
                         >
                                 Followed by Elon Musk, Doowoo Kang, and 1 other
@@ -609,646 +415,239 @@ const UserStorage = ({route, navigation}) => {
 
                     </View>
             </View>
-            <View style={{
-                flexDirection: "row",
-                alignItems: "flex-end",
-                // backgroundColor: "pink",
-                width: "100%",
-                height: "25%"
-            }}>
-                <Text style={{
-                    marginLeft: regWidth*13,
-                    color: "#000000",
-                    fontWeight: "700",
-                    fontSize: regWidth*20,
-                }}>
+            <View style={{ flexDirection: "row", alignItems: "flex-end", width: "100%", height: "25%" }}>
+                <Text style={{ marginLeft: regWidth*13, color: "#000000", fontWeight: "700", fontSize: regWidth*20 }}>
                     Your Move
                 </Text>
                 <TouchableOpacity 
-                    style={{
-                        borderRadius: 30,
-                        // marginBottom: regHeight * 2,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        width: "32%",
-                        height: "55%",
-                        backgroundColor: "#5c34cc",
-                        borderWidth: 1, 
-                        // marginTop: 10, 
-                        marginLeft: regWidth*140
-                    }} 
+                    style={ styles.streakBtn } 
                     onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
                 >
-                    <Text style={{ 
-                        fontSize: regWidth * 16, 
-                        fontWeight: "700",
-                        color: "#FFFFFF" 
-                        }} >6-day streak!</Text>
+                    <Text style={{ fontSize: regWidth * 16, fontWeight: "700", color: "#FFFFFF" }} >
+                        6-day streak!</Text>
                 </TouchableOpacity>
 
 
             </View>
             <View 
-                style={{
-                    borderRadius: 10,
-                    backgroundColor: "#404040",
-                    // opacity: 0.5,
-                    height: "115%",
-                    width: "94%",
-                    marginTop: regHeight*15,
-                    flexDirection: "column",
-                    alignItems: "flex-start"
-                }}
+                style={ styles.boardContainer }
                 onLayout={onLayout}
             >
-                <View style={{
-                        height: "50%",
-                        flexDirection: "column",
-                        alignItems: "flex-start"
-                    }}>
+                <View style={{  height: "50%", flexDirection: "column", alignItems: "flex-start" }}>
                     <Text
-                        style={{
-                            marginTop: regHeight*4, 
-                            marginLeft: regWidth*7,
-                            color: "#FFFFFF",
-                            fontWeight: "700",
-                            fontSize: regWidth*16
-                        }}
+                        style={{ marginTop: regHeight*4, marginLeft: regWidth*7, color: "#FFFFFF", fontWeight: "700", fontSize: regWidth*16 }}
                     >
                         Recent 2 weeks
                     </Text>
                 </View>
-                <View style={{
-                    flexDirection: 'row', 
-                    flexWrap: 'wrap',
-                    width: "100%",
-                    marginTop: -regHeight*90,
-                    height: "70%",
-                    // opacity: 0.5
-                    }}>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
+                <View style={ styles.calenderContainer }>
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
                             10
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "#D9D9D9",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#D9D9D9", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            11
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "#FFF0BC",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            12
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "#FFF0BC",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            13
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "#FFF0BC",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#8BB7EA", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            14
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "#8BB7EA",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFCECE", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            15
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "#FFCECE",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFCECE", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            16
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            17
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            18
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            19
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            20
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            21
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            22
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style ={{ 
-                        // backgroundColor: 'green',
-                        width: dateWidth,
-                        height: "40%",
-                    }}>
-                        <Text style={{
-                            color: "#FFFFFF",
-                            marginLeft: regWidth*5
-                        }}>
-                            10
+                    <View style ={{ width: dateWidth, height: "40%" }}>
+                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
+                            23
                         </Text>
-                        <View style={{
-                            // backgroundColor: 'green',
-                            marginLeft: regWidth*2,
-                            marginTop: -regHeight*4,
-                            width: dateWidth,
-                            height: dateWidth,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            // backgroundColor: 'green',
-                            // width: dateWidth,
-                            // height: dateWidth,
-                            // marginBottom: regHeight*35
-                        }}>
+                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
                             <View
-                                style={{
-                                    backgroundColor: "yellow",
-                                    
-                                    width: "80%",
-                                    height: "80%",
-                                }}
+                                style={{ backgroundColor: "#FFF0BC", width: "80%", height: "80%" }}
                             >
                                 <Text>
-                                    asdf
+                                    nemo
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    <View style = {{
-                        width: "100%",
-                        alignItems: "center",
-                        height: "40%",
-                        marginTop: regHeight*17
-                    }}>
+                    <View style = {{ width: "100%", alignItems: "center", height: "40%", marginTop: regHeight*17 }}>
                         <TouchableOpacity 
-                            style={{
-                                borderRadius: 30,
-                                justifyContent: "center",
-                                alignItems: "center",
-                                width: "25%",
-                                height: "45%",
-                                // backgroundColor: "#5c34cc",
-                                borderWidth: 1, 
-                                borderColor: "#FFFFFF"
-                                // marginTop: 10, 
-                            }} 
+                            style={ styles.viewAllBtn } 
                             onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
                         >
-                            <Text style={{ 
-                                fontSize: regWidth * 15, 
-                                fontWeight: "700",
-                                color: "#FFFFFF" 
-                                }} >View all</Text>
+                            <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#FFFFFF" }} >
+                                View all</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
-            
-                            
                             </>
                     }
                 </View>
@@ -1257,95 +656,137 @@ const UserStorage = ({route, navigation}) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "white",
-    },
-    header: {
-        //   backgroundColor: "pink",
-        marginVertical: 10,
-        marginHorizontal: 20,
-        //   paddingBottom: 30,
-        paddingBottom: 8,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    backgrounimage: {
-        width: regWidth * 375,
-        height: regWidth * 110,
-        resizeMode: "cover",
-        // marginLeft: -13,
-        // marginTop: -127
-    },
-    profileContainer: {
-        backgroundColor: "pink",
-        // marginHorizontal: regWidth * 20,
-        //paddingBottom: 30,
-        // paddingBottom: regHeight * 18,
-        // flexDirection: "row",
-        // justifyContent: "space-between",
-        alignItems: "center",
-        marginTop: -37.5
-    },
-    profileImage: {
+    // container: {
+    //     flex: 1,
+    //     backgroundColor: "white",
+    // },
+    // header: {
+    //     //   backgroundColor: "pink",
+    //     marginVertical: 10,
+    //     marginHorizontal: 20,
+    //     //   paddingBottom: 30,
+    //     paddingBottom: 8,
+    //     flexDirection: "row",
+    //     justifyContent: "space-between",
+    //     alignItems: "center",
+    // },
+    profileAvatar: {
         width: regWidth * 100,
         height: regWidth * 100,
         resizeMode: "cover",
         borderRadius: 50,
         borderWidth: 2,
-        borderColor: "#7341FF",
-        // backgroundColor: "red",
+        borderColor: "#7341ffcc",
+        marginLeft: regWidth*13,
     },
-    editOrPost: {
-        paddingHorizontal: regWidth * 5,
-        paddingVertical: regHeight * 5,
+    editProfileBtnContainer: {
+        flexDirection: "row",
+        justifyContent: "flex-end", 
+        alignItems: "center",
+        width: "100%",
+        height: "30%",
+        marginTop: regWidth*13
+    },
+    editProfileBtn: {
         borderRadius: 20,
-        marginHorizontal: regWidth * 8,
-        // marginBottom: regHeight * 2,
         justifyContent: "center",
         alignItems: "center",
-        width: "24.5%",
+        width: "30%",
+        height: "110%",
+        borderColor: "#202020", 
+        borderWidth: 0.5, 
+        marginRight: regWidth*13
     },
-    postByWho: {
-        width: SCREEN_WIDTH * 0.5,
-        alignItems: "center",
-        borderBottomWidth: 1,
-        paddingVertical: 15,
+    usertagContainer: {
+        flexDirection: "row", 
+        width: "100%", 
+        alignItems: "flex-start", 
+        height: "25%",
+        marginTop: -regHeight*15,
+    },
+    usernameContainer: {
+        fontSize: regWidth * 23,
+        fontWeight: "900",
+        width: "70%",
+        height: regHeight*70,
+        color: "#202020",
+    },
+    introContainer: {
+        height: "73%",
+        width: "100%",
+        marginTop: -regHeight*100,
+        flexDirection: "column",
+        alignItems: "flex-start",
+    },
+    boldNumberTxt: {
+        color: "#202020",
+        fontWeight: "900",
+        fontSize: regWidth*16,
+        letterSpacing: -regWidth
+    },
+    followTxt: {
+        marginHorizontal: regWidth*8,
+        fontWeight: "500",
+        color: "#404040"
+    },
+    followedByContainer: {
         flexDirection: "row",
+        alignItems: "flex-start",
+        width: "100%",
+        height: "30%",
+        marginTop: regHeight*12
+    },
+    smallAvatar: {
+        width: regWidth*30, 
+        height: regWidth*30,
+        resizeMode: "cover",
+        borderRadius: regWidth*15,
+        borderWidth: regWidth*1,
+        borderColor: "#D9D9D9",
+        marginLeft: regWidth*13,
+    },
+    streakBtn: {
+        borderRadius: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        width: "32%",
+        height: "55%",
+        backgroundColor: "#5c34cc",
+        borderWidth: 1, 
+        marginLeft: regWidth*140
+    },
+    boardContainer: {
+        borderRadius: 10,
+        backgroundColor: "#404040",
+        height: "115%",
+        width: "94%",
+        marginTop: regHeight*15,
+        flexDirection: "column",
+        alignItems: "flex-start"
+    },
+    calenderContainer: {
+        flexDirection: 'row', 
+        flexWrap: 'wrap',
+        width: "100%",
+        marginTop: -regHeight*90,
+        height: "70%",
+    },
+    nemoContatiner: {
+        marginLeft: regWidth*2,
+        marginTop: -regHeight*4,
+        alignItems: "center",
         justifyContent: "center",
     },
-    postTileBox: {
-        width: SCREEN_WIDTH * 0.5,
-        height: SCREEN_WIDTH * 0.5,
-    },
-    postTile: {
-        flex: 1,
-        // marginVertical: 1,
-        // marginHorizontal: 1,
-        borderWidth: 1,
-        borderColor: "white",
-        paddingHorizontal: 2,
-    },
-    postTitle: {
-        flex: 0.6,
-        width: "80%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-    postContent: {
-        flex: 2,
-    },
-    postIconAndWriter: {
-        flex: 0.3,
-        alignItems: "flex-end",
-    },
-    style: {
-        height: regWidth*41,
-        width: regWidth*41,
-        backgroundColor: 'pink',
-        marginHorizontal: regWidth*4
+    viewAllBtn: {
+        borderRadius: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        width: "25%",
+        height: "45%",
+        borderWidth: 1, 
+        borderColor: "#FFFFFF"
     }
+
 })
 
 export default UserStorage;
