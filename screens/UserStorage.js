@@ -401,8 +401,8 @@ const UserStorage = ({route, navigation}) => {
                                     // marginBottom: regHeight * 2,
                                     justifyContent: "center",
                                     alignItems: "center",
-                                    width: "33%",
-                                    height: "100%",
+                                    width: "30%",
+                                    height: "110%",
                                     borderColor: "#202020", 
                                     borderWidth: 0.5, 
                                     // marginTop: 10, 
@@ -411,7 +411,7 @@ const UserStorage = ({route, navigation}) => {
                                 onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
                             >
                                 <Text style={{ 
-                                    fontSize: regWidth * 15, 
+                                    fontSize: regWidth * 13, 
                                     fontWeight: "500",
                                     opacity: 0.8 
                                     }} >Edit profile</Text>
@@ -451,7 +451,7 @@ const UserStorage = ({route, navigation}) => {
                                 numberOfLines={1}
                                 ellipsizeMode='tail'
                             >
-                                {profile.name}아ㅣㄴ망;ㅣㄴ망ㅇㄴㅁ;ㅣㅏㅣㅇㄴㅁ;ㅣ롤
+                                Dong-in Jung
                             </Text>
                         </View>
                         
@@ -486,7 +486,7 @@ const UserStorage = ({route, navigation}) => {
                             I literally have no idea.
                             CEO of the Nemo project.
                             Majoring PHYS at Korea.
-                            길어지면 이렇게 됨ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                            길어지면 이렇게 됨길어지면길어지면길어지면
                         </Text>
                     </View>
                     <View style={{
@@ -686,6 +686,234 @@ const UserStorage = ({route, navigation}) => {
                     height: "70%",
                     // opacity: 0.5
                     }}>
+                    <View style ={{ 
+                        // backgroundColor: 'green',
+                        width: dateWidth,
+                        height: "40%",
+                    }}>
+                        <Text style={{
+                            color: "#FFFFFF",
+                            marginLeft: regWidth*5
+                        }}>
+                            10
+                        </Text>
+                        <View style={{
+                            // backgroundColor: 'green',
+                            marginLeft: regWidth*2,
+                            marginTop: -regHeight*4,
+                            width: dateWidth,
+                            height: dateWidth,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: 'green',
+                            // width: dateWidth,
+                            // height: dateWidth,
+                            // marginBottom: regHeight*35
+                        }}>
+                            <View
+                                style={{
+                                    backgroundColor: "#D9D9D9",
+                                    
+                                    width: "80%",
+                                    height: "80%",
+                                }}
+                            >
+                                <Text>
+                                    asdf
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style ={{ 
+                        // backgroundColor: 'green',
+                        width: dateWidth,
+                        height: "40%",
+                    }}>
+                        <Text style={{
+                            color: "#FFFFFF",
+                            marginLeft: regWidth*5
+                        }}>
+                            10
+                        </Text>
+                        <View style={{
+                            // backgroundColor: 'green',
+                            marginLeft: regWidth*2,
+                            marginTop: -regHeight*4,
+                            width: dateWidth,
+                            height: dateWidth,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: 'green',
+                            // width: dateWidth,
+                            // height: dateWidth,
+                            // marginBottom: regHeight*35
+                        }}>
+                            <View
+                                style={{
+                                    backgroundColor: "#FFF0BC",
+                                    
+                                    width: "80%",
+                                    height: "80%",
+                                }}
+                            >
+                                <Text>
+                                    asdf
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style ={{ 
+                        // backgroundColor: 'green',
+                        width: dateWidth,
+                        height: "40%",
+                    }}>
+                        <Text style={{
+                            color: "#FFFFFF",
+                            marginLeft: regWidth*5
+                        }}>
+                            10
+                        </Text>
+                        <View style={{
+                            // backgroundColor: 'green',
+                            marginLeft: regWidth*2,
+                            marginTop: -regHeight*4,
+                            width: dateWidth,
+                            height: dateWidth,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: 'green',
+                            // width: dateWidth,
+                            // height: dateWidth,
+                            // marginBottom: regHeight*35
+                        }}>
+                            <View
+                                style={{
+                                    backgroundColor: "#FFF0BC",
+                                    
+                                    width: "80%",
+                                    height: "80%",
+                                }}
+                            >
+                                <Text>
+                                    asdf
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style ={{ 
+                        // backgroundColor: 'green',
+                        width: dateWidth,
+                        height: "40%",
+                    }}>
+                        <Text style={{
+                            color: "#FFFFFF",
+                            marginLeft: regWidth*5
+                        }}>
+                            10
+                        </Text>
+                        <View style={{
+                            // backgroundColor: 'green',
+                            marginLeft: regWidth*2,
+                            marginTop: -regHeight*4,
+                            width: dateWidth,
+                            height: dateWidth,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: 'green',
+                            // width: dateWidth,
+                            // height: dateWidth,
+                            // marginBottom: regHeight*35
+                        }}>
+                            <View
+                                style={{
+                                    backgroundColor: "#FFF0BC",
+                                    
+                                    width: "80%",
+                                    height: "80%",
+                                }}
+                            >
+                                <Text>
+                                    asdf
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style ={{ 
+                        // backgroundColor: 'green',
+                        width: dateWidth,
+                        height: "40%",
+                    }}>
+                        <Text style={{
+                            color: "#FFFFFF",
+                            marginLeft: regWidth*5
+                        }}>
+                            10
+                        </Text>
+                        <View style={{
+                            // backgroundColor: 'green',
+                            marginLeft: regWidth*2,
+                            marginTop: -regHeight*4,
+                            width: dateWidth,
+                            height: dateWidth,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: 'green',
+                            // width: dateWidth,
+                            // height: dateWidth,
+                            // marginBottom: regHeight*35
+                        }}>
+                            <View
+                                style={{
+                                    backgroundColor: "#8BB7EA",
+                                    
+                                    width: "80%",
+                                    height: "80%",
+                                }}
+                            >
+                                <Text>
+                                    asdf
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style ={{ 
+                        // backgroundColor: 'green',
+                        width: dateWidth,
+                        height: "40%",
+                    }}>
+                        <Text style={{
+                            color: "#FFFFFF",
+                            marginLeft: regWidth*5
+                        }}>
+                            10
+                        </Text>
+                        <View style={{
+                            // backgroundColor: 'green',
+                            marginLeft: regWidth*2,
+                            marginTop: -regHeight*4,
+                            width: dateWidth,
+                            height: dateWidth,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            // backgroundColor: 'green',
+                            // width: dateWidth,
+                            // height: dateWidth,
+                            // marginBottom: regHeight*35
+                        }}>
+                            <View
+                                style={{
+                                    backgroundColor: "#FFCECE",
+                                    
+                                    width: "80%",
+                                    height: "80%",
+                                }}
+                            >
+                                <Text>
+                                    asdf
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
                     <View style ={{ 
                         // backgroundColor: 'green',
                         width: dateWidth,
@@ -994,7 +1222,7 @@ const UserStorage = ({route, navigation}) => {
                         width: "100%",
                         alignItems: "center",
                         height: "40%",
-                        marginTop: regHeight*15
+                        marginTop: regHeight*17
                     }}>
                         <TouchableOpacity 
                             style={{
