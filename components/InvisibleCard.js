@@ -88,8 +88,10 @@ const InvisibleCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onC
 
     const textInputLineNum = (e) => {
         // setLineNum(e.nativeEvent.lines.length);
-        // console.log(e.nativeEvent.lines);
+        
         const lines = e.nativeEvent.lines;
+        // console.log(lines);
+        // console.log( lines[0].width, lines[0].width / lines[0].text.length);
         setContentsByLine(
             lines.map((line) => line.text)
         )

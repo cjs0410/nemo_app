@@ -18,7 +18,7 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
-const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter,  watermark, setModalVisible, backgroundImage, contentsByLine, setContentsByLine, ocrLoading, onChangeTotalContents, cardContents, totalContents, contentsByCard2, onNextCard, onKeyPress, inputRef, index, cardCursorPosition, setCardCursorPosition, setShowMenu, }) => {
+const DotInputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, setShowMenu, align, }) => {
     const [whatBook, setWhatBook] = useState('');
     const [bookList, setBookList] = useState(null);
     // const [selectedBook, setSelectedBook] = useState(null);
@@ -26,16 +26,35 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
     const editorRef = useRef();
     const [inputHeight, setInputHeight] = useState(0);
     const [inputContainerHeight, setInputContainerHeight] = useState(0);
-    const [extraHeight, setExtraHeight] = useState(SCREEN_WIDTH);
+    const [extraHeight, setExtraHeight] = useState(0);
+    const [lineNum, setLineNum] = useState(0);
     const [isFocus, setIsFocus] = useState(false);
+    const [cardFlag, setCardFlag] = useState([]);
 
     useEffect(() => {
         fetchBook();
     }, [debounceVal]);
 
+    useEffect(() => {
+        const cardNum = Math.floor(lineNum / 9);
+        let copy = [];
+
+        for ( let i = 0; i < cardNum; i++) {
+            copy = [...copy, 1]
+        }
+        setCardFlag(copy);
+    }, [lineNum]);
+
     // useEffect(() => {
     //     console.log(align);
     // }, [align]);
+
+    // useEffect(() => {
+    //     if (contentsByLine.length > 9) {
+    //         setExtraHeight(regHeight * 28 * (contentsByLine.length - 9));
+    //     }
+        
+    // }, [contentsByLine]);
 
 
     const onChangeWhatBook = (payload) => {
@@ -90,32 +109,27 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
         // setLineNum(e.nativeEvent.lines.length);
         // console.log(e.nativeEvent.lines);
         const lines = e.nativeEvent.lines;
+        // console.log(lines);
         setContentsByLine(
             lines.map((line) => line.text)
         )
         // console.log(e.nativeEvent.lines.length, frontContent[frontContent.length-1]);
     }
 
-    const onLayout = (e) => {
-        // console.log(e.nativeEvent);
-        const layout = e.nativeEvent.layout;
-        // console.log(layout.width);
-        // console.log(parseInt(layout.width / (regWidth * 16)), regWidth * 16);
-        // console.log(parseInt(layout.height / (regHeight * 28)), regHeight * 28);
-    }
-
     return (
         <View
             style={{
                 ...styles.bookmarkContentsScrollBox, 
-                // height: extraHeight,
+                height: SCREEN_WIDTH + extraHeight,
             }}
+            // onLayout={(e) => console.log(e.nativeEvent)}
         >
-            <View style={{
-                ...styles.bookmarkContentsBox,  
-                // backgroundColor: color
-                backgroundColor: color === null ? "#D9D9D9" : color, 
-            }}>
+            <View 
+                style={{
+                    ...styles.bookmarkContentsBox,  
+                    backgroundColor: color === null ? "#D9D9D9" : color, 
+                }}
+            >
                 {backgroundImage !== null ? 
                     <View style={styles.backgroungImageContainer}>
                         <Image 
@@ -127,7 +141,14 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                     null
                 }
 
-                <View style={styles.bookmarkContentsBook}>
+                <View 
+                    style={{
+                        ...styles.bookmarkContentsBook,
+                        // borderStyle: 'dashed', 
+                        // borderWidth:  bookList !== null ? 0 : 0.5,
+                    }}
+                    
+                >
                     {selectedBook === null ? 
                         <>
                             <Feather name="search" size={20} color="grey" />
@@ -136,7 +157,7 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                             >
                                 <TextInput 
                                     style={{ fontSize: 18, }}
-                                    placeholder="책을 검색하세요"
+                                    placeholder="Choose your book"
                                     onChangeText={onChangeWhatBook}
                                     onSubmitEditing={bookSearch}
                                     value={whatBook}
@@ -162,7 +183,7 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                                     {selectedBook.book_title}
                                 </Text>
                                 <TextInput 
-                                    placeholder="챕터를 입력하세요"
+                                    placeholder="Write Chapter"
                                     style={styles.bookmarkContentsBookChapterInput}
                                     onChangeText={onChangeChapter}
                                     value={whatChapter}
@@ -171,7 +192,7 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                             </View>
                         </View>
                     }
-                    {bookList !== null && selectedBook === null ? 
+                    {bookList !== null ? 
                         <TouchableOpacity
                             activeOpacity={1}
                             onPress={deleteBook}
@@ -255,9 +276,13 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                 <View 
                     style={{
                         ...styles.bookmarkContentsInput,
-                        borderWidth: isFocus ? 0.5 : 0,
+                        // borderWidth: isFocus ? 0.5 : 0,
+                        borderWidth: 0.5,
+                        borderStyle: 'dashed',
+                        // backgroundColor: "green",
+                        height: regHeight * 284 + extraHeight,
                     }} 
-                    onLayout={onLayout}
+                    onLayout={(e) => console.log(e.nativeEvent)}
                 >
                     {ocrLoading ? 
                         <ActivityIndicator 
@@ -278,35 +303,15 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                                     lineHeight: regWidth * 28,
                                     // paddingHorizontal: 8,
                                     // backgroundColor: "pink",
-                                    // width: "100%",
-                                    // height: "100%",
-                                    // textAlign: align === "center" ? "center" : "left",
-                                    // alignSelf: align === "center" ? "center" : "flex-start",
+                                    // borderStyle: 'dashed',
+                                    // borderWidth: 0.5,
+                                    height: regHeight * 284 + extraHeight,
+
                                 }} 
-                                placeholder="북마크를 입력하세요"
+                                placeholder="Write anything from your reading"
                                 multiline={true}
-                                numberOfLines={Platform.OS === 'ios' ? null : 9}
-                                maxHeight={(Platform.OS === 'ios') ? (regWidth * 28 * 10) : null}
-                                autoCorrect={false}
-                                scrollEnabled="false"
-                                onChangeText={(text) => {
-                                    if (contentsByCard2[index].length === 9) {
-                                        const lastChar = text.slice(-1);
-                                        if (lastChar !== '\n') {
-                                            onChangeTotalContents(text + '\n', index)
-                                        } else {
-                                            onChangeTotalContents(text, index)
-                                        }
-                                    } else {
-                                        onChangeTotalContents(text, index)
-                                    }
-                                    // onChangeTotalContents(text, index)
-                                }}
-                                onSubmitEditing={(e) => onNextCard(e, index)}
-                                // blurOnSubmit={(contentsByCard2[index].length === 9) && (cardCursorPosition === contentsByCard2[index].join('').length) ? true : false}
-                                onKeyPress={(e) => onKeyPress(e, index)}
-                                onFocus={(e) => {
-                                    // console.log(e);
+                                onChangeText={onChangeFront}
+                                onFocus={() => {
                                     setIsFocus(true);
                                     setShowMenu(true);
                                 }}
@@ -314,23 +319,40 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                                     setIsFocus(false);
                                     setShowMenu(false);
                                 }}
-                                // value={cardContents}
-                                // value={contentsByCard2[index].join('')}
-                                // value={totalContents[index]}
-                                value={contentsByCard2[index].length === 9 ? totalContents[index].replace(/\n$/, '') : totalContents[index] }
-                                // value={contentsByLine.slice(index * 9, (index + 1) * 9).join('')}
-
-                                // defaultValue={contentsByCard2[index].join('')}
-                                ref={el => inputRef.current[index] = el}
-                                // textAlign={align === "center" ? "center" : "left"}
-                                // onLayout={onLayout}
-                                onSelectionChange={(e) => {
-                                    let copy = [...cardCursorPosition];
-                                    copy[index] = e.nativeEvent.selection.end;
-                                    setCardCursorPosition(copy)
+                                value={frontContent}
+                                scrollEnabled="false"
+                                onContentSizeChange={(e) => {
+                                    console.log(e.nativeEvent);
+                                    const contentHeight = e.nativeEvent.contentSize.height;
+                                    const lineNum = parseInt(contentHeight / (regHeight * 28));
+                                    setLineNum(lineNum);
+                                    // if (regHeight * 284 < contentHeight + regHeight * 28) {
+                                    //     setExtraHeight(contentHeight - regHeight * 284)
+                                    // }
+                                    if (lineNum > 9) {
+                                        setExtraHeight(regHeight * 28 * (lineNum - 9));
+                                    } else {
+                                        setExtraHeight(0);
+                                    }
                                 }}
+                                // textAlign={align === "center" ? "center" : "left"}
                             />
-                            {/* <ScrollView
+                            {cardFlag.map((flag, index) => (
+                                <View
+                                    style={{
+                                        position: "absolute",
+                                        width: "100%",
+                                        borderStyle: 'dashed',
+                                        borderWidth: 0.3,
+                                        // backgroundColor: "black",
+                                        // top: regHeight * 28 * 9 + regHeight * 12,
+                                        top: regHeight * 28 * 9 * (index + 1) + regHeight * 4,
+                                    }}
+                                    key={index}
+                                />
+                            ))}
+
+                            <ScrollView
                                 style={{
                                     position: "absolute",
                                     // backgroundColor: "pink",
@@ -352,7 +374,7 @@ const InputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChang
                                 >
                                     {frontContent}
                                 </Text>
-                            </ScrollView> */}
+                            </ScrollView>
                         {/* </ScrollView> */}
                         </>
                     }
@@ -383,7 +405,8 @@ function useDebounce(value, delay = 500) {
     return debounceVal;
 }
 
-export default InputCard;
+export default DotInputCard;
+
 
 const styles = StyleSheet.create({
     bookmarkContentsScrollBox: {
@@ -410,7 +433,8 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsBook: {
         // backgroundColor: "pink",
-        flex: 0.6,
+        // flex: 0.6,
+        height: regHeight * 43,
         flexDirection: "row", 
         justifyContent: "space-between",
         alignItems: "center",
@@ -433,6 +457,7 @@ const styles = StyleSheet.create({
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
         flex: 4,
+        
         marginTop: regHeight * 8,
         justifyContent: "center", 
     },
@@ -444,8 +469,9 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsInput: {
         // backgroundColor: "pink",
-        flex: 4,
-        marginTop: regWidth * 8,
+        // flex: 4,
+        height: regHeight * 284,
+        marginTop: regHeight * 8,
         justifyContent: "center",
         // textAlignVertical: "top",
         
@@ -465,7 +491,8 @@ const styles = StyleSheet.create({
     },
     postContentsWatermark: {
         // backgroundColor: "blue",
-        flex: 0.3,
+        // flex: 0.3,
+        height: regHeight * 21,
         flexDirection: "row",
         justifyContent: "space-between",
     },

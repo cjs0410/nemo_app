@@ -307,7 +307,10 @@ const CardPreview = (props) => {
                         {contents.join('')}
                     </Text> */}
                     {contents.map((line, index) => (
-                        <Text style={styles.bookmarkContentsText} key={index}>
+                        <Text style={{
+                            ...styles.bookmarkContentsText,
+                            backgroundColor: "yellow",
+                        }} key={index}>
                             {line.replace(/\n/g, '')}
                         </Text> 
                     ))}
@@ -577,7 +580,7 @@ const BlankCardFront = ({ color, setBookTitle, selectedBook, setSelectedBook, on
     )
 }
 
-const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, align, }) => {
+const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, setLineNum, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, setShowMenu, align, }) => {
     const [whatBook, setWhatBook] = useState('');
     const [bookList, setBookList] = useState(null);
     // const [selectedBook, setSelectedBook] = useState(null);
@@ -836,8 +839,14 @@ const BlankCardChangable = ({ color, setBookTitle, selectedBook, setSelectedBook
                                 placeholder="북마크를 입력하세요"
                                 multiline={true}
                                 onChangeText={onChangeFront}
-                                onFocus={() => setIsFocus(true)}
-                                onBlur={() => setIsFocus(false)}
+                                onFocus={() => {
+                                    setIsFocus(true);
+                                    setShowMenu(true);
+                                }}
+                                onBlur={() => {
+                                    setIsFocus(false);
+                                    setShowMenu(false);
+                                }}
                                 value={frontContent}
                                 // textAlign={align === "center" ? "center" : "left"}
                             />
@@ -1263,7 +1272,8 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsBook: {
         // backgroundColor: "pink",
-        flex: 0.6,
+        // flex: 0.6,
+        height: regHeight * 43,
         flexDirection: "row", 
         justifyContent: "space-between",
         alignItems: "center",
@@ -1285,9 +1295,11 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
-        flex: 4,
+        // flex: 4,
+        height: regHeight * 284,
         marginTop: regHeight * 8,
-        justifyContent: "center", 
+        // justifyContent: "center",
+        justifyContent: "flex-start", 
     },
     bookmarkContentsText: {
         fontWeight: "500",
@@ -1298,7 +1310,7 @@ const styles = StyleSheet.create({
     bookmarkContentsInput: {
         // backgroundColor: "pink",
         flex: 4,
-        marginTop: regWidth * 8,
+        marginTop: regHeight * 8,
         justifyContent: "center",
         // textAlignVertical: "top",
         
@@ -1318,7 +1330,8 @@ const styles = StyleSheet.create({
     },
     postContentsWatermark: {
         // backgroundColor: "blue",
-        flex: 0.3,
+        // flex: 0.3,
+        height: regHeight * 21,
         flexDirection: "row",
         justifyContent: "space-between",
     },

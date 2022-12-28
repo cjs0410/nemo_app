@@ -2,11 +2,14 @@ import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, Touchab
 import React, { useEffect, useState, useCallback, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, FontAwesome, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
-import { InputCard, InvisibleCard, } from '../components';
+import { InputCard, InvisibleCard, DotInputCard, } from '../components';
 import Api from "../lib/Api";
-import * as ImagePicker from 'expo-image-picker';
+// import * as ImagePicker from 'expo-image-picker';
 import bookCover from '../assets/images/steve.jpeg';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
+import iconCamera from '../assets/images/iconCamera.png';
+import iconImage from '../assets/images/iconImage.png';
+import iconPlus from '../assets/images/iconPlus.png';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
@@ -18,6 +21,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { resetUserInfo, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -48,8 +52,8 @@ const CreateBookmark = ({navigation, route}) => {
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(null);
     const [backgroundImage, setBackgroundImage] = useState(null);
-    const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
-    const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
+    // const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
+    // const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
     const [newBookTitle, setNewBookTitle] = useState('');
     const [newBookAuthor, setNewBookAuthor] = useState('');
@@ -74,7 +78,7 @@ const CreateBookmark = ({navigation, route}) => {
     const [contentsByLine, setContentsByLine] = useState([]);
     const [contentsByCard, setContentsByCard] = useState([]);
 
-    const { ocrImage, } = route.params;
+    // const { ocrImage, } = route.params;
     const [ ocrLoading, setOcrLoading ] = useState(false);
     const [croppedImage, setCroppedImage] = useState(null);
     const { ocrText, setOcrText } = useState('');
@@ -91,6 +95,8 @@ const CreateBookmark = ({navigation, route}) => {
     const [tempBookmarks, setTempBookmarks] = useState(null);
     
     const isEmpty = (frontContent.length === 0) || (selectedBook === null);
+    const [showMenu, setShowMenu] = useState(false);
+   
 
 
 /////////////////////////////////////////////WYSIWYG 테스트////////////////////////////////////////////////////////////////////////
@@ -103,7 +109,11 @@ const CreateBookmark = ({navigation, route}) => {
     const firstInputRef = useRef();
     const inputRef = useRef([]);
     const [ref, setRef] = useState(null);
-    const [cardCursorPosition, setCardCursorPosition] = useState(0);
+    const [cardCursorPosition, setCardCursorPosition] = useState([]);
+    const [lastLineFirstCursor, setLastLineFirstCursor] = useState([]);
+
+
+    const isEmpty2 = (totalContents.length === 0) || (selectedBook === null);
 
     useEffect(() => {
         setInputRefs([
@@ -113,12 +123,13 @@ const CreateBookmark = ({navigation, route}) => {
 
     useEffect(() => {
         if (contentsByCard2.length > 0) {
-            console.log(cardCursorPosition, contentsByCard2[0].join('').length);
+            // console.log(cardCursorPosition, contentsByCard2[0].join('').length);
+            // console.log(cardCursorPosition);
         }
         
-    }, [cardCursorPosition, contentsByCard2])
+    }, [cardCursorPosition, ])
 
-
+    // totalContents에 따라 카드별로 내용을 저장함
     useEffect(() => {
         // const cardNum = Math.ceil(contentsByLine2.length / 9);
         const cardNum = parseInt(contentsByLine2.length / 9) + 1;
@@ -130,6 +141,7 @@ const CreateBookmark = ({navigation, route}) => {
         setContentsByCard2(copy);
     }, [contentsByLine2]);
 
+    // totalContents의 line number가 변할 때 contentsByCard를 통해 totalContents를 초기화해줌
     useEffect(() => {
         const cardNum = Math.ceil(contentsByLine2.length / 9);
         let copy = [];
@@ -140,19 +152,53 @@ const CreateBookmark = ({navigation, route}) => {
         setTotalContents(copy);
     }, [contentsByLine2.length]);
 
+    // 각 카드의 마지막 줄의 첫번째 커서 위치 저장
+    useEffect(() => {
+        const cardNum = Math.ceil(contentsByLine2.length / 9);
+        let copy = [];
+
+        if (contentsByCard2.length > 0) {
+            for ( let i = 0; i < cardNum; i++) {
+                if (contentsByCard2[i].length === 9) {
+                    // console.log(contentsByCard2[i].slice(0, -1).join('').length);
+                    copy = [...copy, contentsByCard2[i].slice(0, -1).join('').length]
+                }
+            }
+        }
+        setLastLineFirstCursor(copy);
+        
+    }, [contentsByCard2])
+
     const onChangeTotalContents = (payload, index) => {
         const text = payload.replace(" ", "\u00A0");
         let copy = [...totalContents];
         copy[index] = text;
+        // if (contentsByCard2[index].length === 9) {
+        //     copy[index] = text.replace(/$/, '\n');
+        // }
+        
 
         setTotalContents(copy);
     }
 
+    // 각 카드의 마지막 줄에서 enter 입력할 경우 다음 카드로 넘어감
     const onNextCard = (e, index) => {
         // console.log(contentsByCard2[index].length);
-        if ((contentsByCard2[index].length === 9) && (cardCursorPosition === contentsByCard2[index].join('').length)) {
-            e.preventDefault();
-            console.log(index);
+
+        // if (contentsByCard2[index].length === 9) {
+        //     let copy=[...totalContents];
+        //     const lastChar = copy[index].slice(-1);
+        //     if (lastChar !== '\n') {
+        //         copy[index] = copy[index] + '\n'
+        //     }
+        //     setTotalContents(copy);
+        // }
+
+        if ((contentsByCard2[index].length === 9) && (cardCursorPosition[index] >= lastLineFirstCursor[index])) {
+            // e.preventDefault();
+
+
+
             const next = inputRef.current[index + 1];
             if (next) {
                 next.focus();
@@ -161,11 +207,17 @@ const CreateBookmark = ({navigation, route}) => {
         }
     }
 
+    // 각 카드의 0번째 커서에서 backspace 입력할 경우 이전 카드로 넘어감
     const onKeyPress = (e, index) => {
         const key = e.nativeEvent.key;
         if (key === "Backspace") {
             // console.log("back");
-            if ((index !== 0) && (contentsByCard2[index].length === 0)) {
+            if ((index !== 0) && (cardCursorPosition[index] === 0)) {
+
+                // let copy = [...totalContents];
+                // copy[index - 1] = copy[index - 1].replace(/\n*$/, '');
+                // setTotalContents(copy);
+
                 const prev = inputRef.current[index - 1];
                 if (prev) {
                     prev.focus();
@@ -178,13 +230,68 @@ const CreateBookmark = ({navigation, route}) => {
         }
     }
 
+    // const onAddBookmark = async() => {
+    //     if (isEmpty2 === false) {
+    //         setCreateBookmarkLoading(true);
+    //         const formData = new FormData();
+    //         // console.log(contents);
+    //         formData.append('book_id', selectedBook.book_id);
+    //         formData.append('chapter_title', whatChapter);
+    //         // formData.append('nemos', JSON.stringify(contents));
+    //         formData.append('contents', JSON.stringify(contentsByCard2));
+    //         formData.append('hex', color);
+    //         formData.append('text', info);
+    //         formData.append('tags', JSON.stringify(tags));
+    //         formData.append('album_id', albumId);
+    //         // if (backgroundImage !== null) {
+    //         //     const filename = backgroundImage.split('/').pop();
+    //         //     const match = /\.(\w+)$/.exec(filename ?? '');
+    //         //     const type = match ? `image/${match[1]}` : `image`;
+    //         //     formData.append('backgroundimg', {
+    //         //         uri: backgroundImage,
+    //         //         type: type,
+    //         //         name: filename
+    //         //     });
+    //         // }
+    
+    //         try {
+    //             console.log(formData);
+    //             await Api.post("/api/v2/bookmark/create/", formData,
+    //                 {
+    //                     headers: {
+    //                         'content-type': 'multipart/form-data',
+    //                     },
+    //                 },
+    //             )
+    //             .then((res) => {
+    //                 console.log(res.data);
+    //                 navigation.goBack();
+    //                 dispatch(setShouldHomeRefresh(true));
+    //                 dispatch(setShouldStorageRefresh(true));
+    //                 dispatch(setShouldUserRefresh(true));
+    //             })
+    //         } catch (err) {
+    //             console.error(err);
+    //         }
+    //         setCreateBookmarkLoading(false);
+    //     } else {
+    //         Alert.alert("북마크를 완성해주세요", "네모를 완성해주세요!", [
+    //             {
+    //                 text: "확인",
+    //             },
+    //         ]);
+    //     }
+
+
+    // }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         updateWatermark();
-        if (ocrImage !== null) {
-            fetchOCR(ocrImage);
-        }
+        // if (ocrImage !== null) {
+        //     fetchOCR(ocrImage);
+        // }
     }, []);
 
     useEffect(() => {
@@ -294,65 +401,97 @@ const CreateBookmark = ({navigation, route}) => {
                 },
             ]);
         }
-
-
     }
 
-    const pickImage = async () => {
+    const makeOcrImage = async () => {
         try {
-          setLoading(true);
-          if (!status.granted) {
-            const permission = await requestPermission();
-            if (!permission.granted) {
-              return null;
-            }
-          }
-    
-          const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 0.7,
+          ImagePicker.openCamera({
+            width: 1200,
+            height: 1500,
+            cropping: true,
+            freeStyleCropEnabled: true,
+          }).then(image => {
+            console.log(image);
+            fetchOCR(`file://${image.path}`);
           });
-      
-        //   console.log(result.uri);
-      
-          if (!result.cancelled) {
-            setImage(result.uri);
-          }
+    
+        } catch (error) {
+          console.error(error);
+    
+        }
+    };
+    const pickOcrImage = async () => {
+        try {
+          ImagePicker.openPicker({
+            width: 1200,
+            height: 1500,
+            cropping: true,
+            freeStyleCropEnabled: true,
+          }).then(image => {
+            console.log(image);
+            fetchOCR(`file://${image.path}`);
+          });
+    
         } catch (error) {
           console.error(error);
         }
-        setLoading(false);
-    };
+      };
 
-    const pickBackgroundImage = async () => {
-        try {
-          setLoading(true);
-          if (!status.granted) {
-            const permission = await requestPermission();
-            if (!permission.granted) {
-              return null;
-            }
-          }
+    // const pickImage = async () => {
+    //     try {
+    //       setLoading(true);
+    //       if (!status.granted) {
+    //         const permission = await requestPermission();
+    //         if (!permission.granted) {
+    //           return null;
+    //         }
+    //       }
     
-          const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            aspect: [1, 1],
-            allowsEditing: true,
-            quality: 1,
-          });
+    //       const result = await ImagePicker.launchImageLibraryAsync({
+    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //         quality: 0.7,
+    //       });
       
-        //   console.log(result.uri);
+    //     //   console.log(result.uri);
       
-          if (!result.cancelled) {
-            setBackgroundImage(result.uri);
-            setColor(null);
+    //       if (!result.cancelled) {
+    //         setImage(result.uri);
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //     setLoading(false);
+    // };
 
-          }
-        } catch (error) {
-          console.error(error);
-        }
-        setLoading(false);
-    };
+    // const pickBackgroundImage = async () => {
+    //     try {
+    //       setLoading(true);
+    //       if (!status.granted) {
+    //         const permission = await requestPermission();
+    //         if (!permission.granted) {
+    //           return null;
+    //         }
+    //       }
+    
+    //       const result = await ImagePicker.launchImageLibraryAsync({
+    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //         aspect: [1, 1],
+    //         allowsEditing: true,
+    //         quality: 1,
+    //       });
+      
+    //     //   console.log(result.uri);
+      
+    //       if (!result.cancelled) {
+    //         setBackgroundImage(result.uri);
+    //         setColor(null);
+
+    //       }
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //     setLoading(false);
+    // };
 
     const fetchOCR = async (ocrImage) => {
         const formData = new FormData();
@@ -677,6 +816,28 @@ const CreateBookmark = ({navigation, route}) => {
                     onChangeChapter={onChangeChapter} 
                     frontContent={frontContent}
                     onChangeFront={onChangeFront} 
+                    watermark={watermark}
+                    setModalVisible={setModalVisible}
+                    backgroundImage={backgroundImage}
+                    setLineNum={setLineNum}
+                    contentsByLine={contentsByLine}
+                    setContentsByLine={setContentsByLine}
+                    setContentsByCard={setContentsByCard}
+                    ocrLoading={ocrLoading}
+                    setShowMenu={setShowMenu}
+                    align={align}
+                /> */}
+                {/*********************************************** NO WYSIWYG *******************************************************/}
+
+                {/*********************************************** 두루마리 휴지형 *******************************************************/}
+                <DotInputCard 
+                    color={color} 
+                    setBookTitle={setBookTitle} 
+                    selectedBook={selectedBook}
+                    setSelectedBook={setSelectedBook}
+                    onChangeChapter={onChangeChapter} 
+                    frontContent={frontContent}
+                    onChangeFront={onChangeFront} 
                     watermark={watermark} 
                     setModalVisible={setModalVisible}
                     backgroundImage={backgroundImage}
@@ -685,10 +846,11 @@ const CreateBookmark = ({navigation, route}) => {
                     setContentsByLine={setContentsByLine}
                     setContentsByCard={setContentsByCard}
                     ocrLoading={ocrLoading}
+                    setShowMenu={setShowMenu}
                     align={align}
-                /> */}
-
-                {/*********************************************** NO WYSIWYG *******************************************************/}
+                />
+                {/*********************************************** 두루마리 휴지형 *******************************************************/}
+                
 
 
                 {/* <BlankCardFront 
@@ -862,7 +1024,8 @@ const CreateBookmark = ({navigation, route}) => {
                         ))}
                     </>
                 } */}
-                <ScrollView
+
+                {/* <ScrollView
                     pagingEnabled
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -873,32 +1036,6 @@ const CreateBookmark = ({navigation, route}) => {
                         setRef(ref);
                     }}
                 >
-                <InputCard 
-                    color={color} 
-                    setBookTitle={setBookTitle} 
-                    selectedBook={selectedBook}
-                    setSelectedBook={setSelectedBook}
-                    onChangeChapter={onChangeChapter} 
-                    watermark={watermark} 
-                    setModalVisible={setModalVisible}
-                    backgroundImage={backgroundImage}
-                    setContentsByLine={setContentsByLine2}
-                    ocrLoading={ocrLoading}
-                    align={align}
-
-                    onChangeTotalContents={onChangeTotalContents}
-                    cardContents={cardContents}
-                    totalContents={totalContents}
-                    // contentsByCard2={contentsByCard2}
-                    contentsByCard2={contentsByCard2.length === 0 ? [[]]: contentsByCard2}
-                    onNextCard={onNextCard}
-                    onKeyPress={onKeyPress}
-                    inputRef={inputRef}
-                    setCardCursorPosition={setCardCursorPosition}
-                    index={0}
-                />
-
-                {contentsByCard2.slice(1).map((contents, index) => (
                     <InputCard 
                         color={color} 
                         setBookTitle={setBookTitle} 
@@ -908,6 +1045,7 @@ const CreateBookmark = ({navigation, route}) => {
                         watermark={watermark} 
                         setModalVisible={setModalVisible}
                         backgroundImage={backgroundImage}
+                        contentsByLine={contentsByLine2}
                         setContentsByLine={setContentsByLine2}
                         ocrLoading={ocrLoading}
                         align={align}
@@ -915,15 +1053,46 @@ const CreateBookmark = ({navigation, route}) => {
                         onChangeTotalContents={onChangeTotalContents}
                         cardContents={cardContents}
                         totalContents={totalContents}
-                        contentsByCard2={contentsByCard2}
+                        // contentsByCard2={contentsByCard2}
+                        contentsByCard2={contentsByCard2.length === 0 ? [[]]: contentsByCard2}
                         onNextCard={onNextCard}
                         onKeyPress={onKeyPress}
                         inputRef={inputRef}
-                        index={index + 1}
+                        cardCursorPosition={cardCursorPosition}
                         setCardCursorPosition={setCardCursorPosition}
-                        key={index}
+                        setShowMenu={setShowMenu}
+                        index={0}
                     />
-                ))}
+
+                    {contentsByCard2.slice(1).map((contents, index) => (
+                        <InputCard 
+                            color={color} 
+                            setBookTitle={setBookTitle} 
+                            selectedBook={selectedBook}
+                            setSelectedBook={setSelectedBook}
+                            onChangeChapter={onChangeChapter} 
+                            watermark={watermark} 
+                            setModalVisible={setModalVisible}
+                            backgroundImage={backgroundImage}
+                            contentsByLine={contentsByLine2}
+                            setContentsByLine={setContentsByLine2}
+                            ocrLoading={ocrLoading}
+                            align={align}
+
+                            onChangeTotalContents={onChangeTotalContents}
+                            cardContents={cardContents}
+                            totalContents={totalContents}
+                            contentsByCard2={contentsByCard2}
+                            onNextCard={onNextCard}
+                            onKeyPress={onKeyPress}
+                            inputRef={inputRef}
+                            index={index + 1}
+                            cardCursorPosition={cardCursorPosition}
+                            setCardCursorPosition={setCardCursorPosition}
+                            setShowMenu={setShowMenu}
+                            key={index}
+                        />
+                    ))}
                 </ScrollView>
                 {contentsByCard2.length === 1 ? 
                     null
@@ -962,13 +1131,13 @@ const CreateBookmark = ({navigation, route}) => {
                     align={align}
 
                     totalContents={totalContents}
-                />
+                /> */}
 
                 {/*********************************************** WYSIWYG *******************************************************/}
 
                 <View style={styles.optionBar}>
                     <View style={{ flexDirection: "row", }} >
-                        <TouchableOpacity 
+                        {/* <TouchableOpacity 
                             activeOpacity={1} 
                             style={{
                                 ...styles.optionBox, 
@@ -1039,7 +1208,7 @@ const CreateBookmark = ({navigation, route}) => {
                                 selectColor("#D2BDFF");
                                 setBackgroundImage(null);
                             }}
-                        />
+                        /> */}
                         {/* <TouchableOpacity 
                             activeOpacity={1} 
                             style={styles.optionBox} 
@@ -1208,7 +1377,7 @@ const CreateBookmark = ({navigation, route}) => {
                             <TouchableOpacity
                                 style={{ marginTop: 15, }}
                                 activeOpacity={1}
-                                onPress={pickImage}
+                                // onPress={pickImage}
                             >
                                 <Text style={{ fontSize: 15, fontWeight: "500", color: "#FF4040", }}>
                                     책 커버 가져오기
@@ -1605,6 +1774,175 @@ const CreateBookmark = ({navigation, route}) => {
                     </View>
                 </View>
             </Modal>
+            {showMenu ? 
+                <KeyboardAvoidingView 
+                    style={styles.keyboardMenuContainer}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
+                    <View
+                        style={{
+                            height: regHeight * 60,
+                            
+                            flexDirection: "row",
+                            alignItems: "center",
+                        }}
+                    >
+                        <View
+                            style={{
+                                paddingHorizontal: regWidth * 8,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 9,
+                                    fontWeight: "400",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                Scan text from
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Pressable
+                                    onPress={makeOcrImage}
+                                >
+                                    <Image 
+                                        source={iconCamera}
+                                        style={styles.iconImage}
+                                    />
+                                </Pressable>
+                                <Pressable
+                                    onPress={pickOcrImage}
+                                >
+                                    <Image
+                                        source={iconImage}
+                                        style={{
+                                            ...styles.iconImage,
+                                            marginHorizontal: 8,
+                                        }}
+                                    />
+                                </Pressable>
+                            </View>
+                        </View>
+    
+                        <View style={styles.separator}/>
+    
+                        <View
+                            style={{
+                                paddingHorizontal: regWidth * 8,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 9,
+                                    fontWeight: "400",
+                                }}
+                            >
+                                Background
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#D9D9D9",
+                                        borderColor: color === "#D9D9D9" ? "#FF4040" : "black"
+                                    }}
+                                    onPress={() => {
+                                        selectColor("#D9D9D9");
+                                        setBackgroundImage(null);
+                                    }}
+                                />
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#FFCECE",
+                                        borderColor: color === "#FFCECE" ? "#FF4040" : "black"
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#FFCECE");
+                                        setBackgroundImage(null);
+                                    }}
+                                />
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#FFF0BC",
+                                        borderColor: color === "#FFF0BC" ? "#FF4040" : "black"
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#FFF0BC");
+                                        setBackgroundImage(null);
+                                    }}
+                                />
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#A0D88D",
+                                        borderColor: color === "#A0D88D" ? "#FF4040" : "black"
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#A0D88D");
+                                        setBackgroundImage(null);
+                                    }}
+                                />
+                                <Pressable>
+                                    <Image 
+                                        source={iconImage}
+                                        style={{
+                                            ...styles.iconImage,
+                                            // marginLeft: 8,
+                                        }}
+                                    />
+                                </Pressable>
+                            </View>
+                        </View>
+
+                        <View style={styles.separator}/>
+
+                        <View
+                            style={{
+                                paddingHorizontal: regWidth * 8,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 9,
+                                    fontWeight: "400",
+                                }}
+                            >
+                                Add sheet
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Pressable>
+                                    <Image 
+                                        source={iconPlus}
+                                        style={styles.iconImage}
+                                    />
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+                :
+                null
+            }
+
             {/* {richText.length !== 0 ? 
                 <KeyboardAvoidingView 
                     style={{ 
@@ -1679,13 +2017,14 @@ const styles = StyleSheet.create({
         marginVertical: 20,
     },
     optionBox: {
-        borderWidth: 1,
-        borderColor: "black",
+        // borderWidth: 1,
+        // borderColor: "black",
         height: regWidth * 30,
         width: regWidth * 30,
         justifyContent: "center",
         alignItems: "center",
-        marginHorizontal: regWidth * 5,
+        marginRight: regWidth * 10,
+        borderRadius: 3,
     },
     TagAddBox: {
         flexDirection: "row",
@@ -1769,9 +2108,27 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
     },
     albumImage: {
-        width: 45,
-        height: 45,
+        width: regWidth * 45,
+        height: regWidth * 45,
     },
+    keyboardMenuContainer: {
+        position: "absolute", 
+        bottom: 0, 
+        zIndex: 10, 
+        backgroundColor: "white", 
+        width: "100%", 
+        borderTopWidth: 0.3,
+        borderTopColor: "#7341ffcc",
+    },
+    iconImage: {
+        width: regWidth * 36,
+        height: regWidth * 36,
+    },
+    separator: {
+        width: 0.7,
+        height: regHeight * 49,
+        backgroundColor: "#7341ffcc",
+    }
 })
 
 const tagsStyles = {

@@ -270,7 +270,7 @@ const App = () => {
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
                   e.preventDefault();
-                  navigation.navigate(`PostModal${navigation.getState().index}`, { index: navigation.getState().index, });
+                  navigation.navigate(`CreateBookmark${navigation.getState().index}`, { index: navigation.getState().index, });
                 }
               })}
             />
