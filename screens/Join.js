@@ -8,6 +8,8 @@ import Api from '../lib/Api';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
 import Check from '../assets/images/Check.png';
+import Eye from '../assets/images/Eye.png';
+import ProfileImage from '../assets/images/ProfileImage.png';
 import Arrow from '../assets/icons/LeftArrow.png';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,6 +18,10 @@ import { setUserInfo, setRefreshToken, } from '../modules/user';
 import { ScrollView } from "react-native-gesture-handler";
 
 const Stack = createNativeStackNavigator();
+
+// const onChangePassword = (payload) => {
+//     setPassword(payload);
+//   }
 
 const Join1 = ({ navigation }) => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -306,39 +312,39 @@ const Join2 = ({ navigation, route }) => {
                     <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
                         We sent you a code
                     </Text>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060" }}>
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
                         Enter it below to verify 010-0000-0000.
                     </Text>
                     <View style={{ flexDirection: "row", justifyContent: "center", width: regWidth*280, marginTop: regHeight*25 }}>
                         <TextInput 
-                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
-                            placeholderTextColor={"#606060"}
+                            style={ styles.authInput }
+                            placeholderTextColor={"#000000"}
                             autoCapitalize="none"
                             placeholder="8"
                         />
                         <TextInput 
-                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
-                            placeholderTextColor={"#606060"}
+                            style={ styles.authInput }
+                            placeholderTextColor={"#000000"}
                             autoCapitalize="none"
                             placeholder="2"
                         />
                         <TextInput 
-                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            style={ styles.authInput }
                             placeholderTextColor={"#606060"}
                             autoCapitalize="none"
                         />
                         <TextInput 
-                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            style={ styles.authInput }
                             placeholderTextColor={"#606060"}
                             autoCapitalize="none"
                         />
                         <TextInput 
-                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            style={ styles.authInput }
                             placeholderTextColor={"#606060"}
                             autoCapitalize="none"
                         />
                         <TextInput 
-                            style={{ ...styles.txtInput, width: regWidth*36, marginTop: regHeight*30, paddingHorizontal: regWidth*14, marginHorizontal: regWidth*7.5 }}
+                            style={ styles.authInput }
                             placeholderTextColor={"#606060"}
                             autoCapitalize="none"
                         />
@@ -356,7 +362,7 @@ const Join2 = ({ navigation, route }) => {
                     </Pressable>
                     <View style={{ marginTop: regHeight*8, width: regWidth*280, alignItems: "center" }}>
                         <Pressable
-                            onPress={() => navigation.navigate('Join2')}
+                            onPress={() => navigation.navigate('Join3')}
                             style={ styles.signUpBtn }
                         >
                         <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Continue</Text>
@@ -368,90 +374,6 @@ const Join2 = ({ navigation, route }) => {
             
         </View>
     );
-    
-    // return (
-    //     <View style={styles.container}>
-    //         <SafeAreaView style={styles.header} >
-    //             <Pressable 
-    //                 onPress={() => navigation.goBack()} 
-    //                 hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-    //             >
-    //                 <Ionicons name="chevron-back" size={28} color="black" />
-    //             </Pressable>
-    //             <View style={{ flexDirection: "row", alignItems: "center", }}>
-    //                 <Animated.Image 
-    //                     source={NemoLogo}
-    //                     style={{
-    //                         ...styles.LogoImage,
-    //                         opacity: logoValue,
-    //                     }}
-    //                     onLoadEnd={showLogo}
-    //                 />
-    //             </View>
-    //             <Pressable 
-    //                 hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-    //                 style={{ opacity: 0 }}
-    //             >
-    //                 <Ionicons name="chevron-back" size={28} color="black" />
-    //             </Pressable>
-    //         </SafeAreaView>
-    //         <ScrollView
-    //             scrollEnabled={false}
-    //         >
-    //             <View style={styles.introduce} >
-    //                 <Text style={styles.introduceText}>거의 다 왔습니다.</Text>
-    //                 <TextInput 
-    //                     style={styles.input}
-    //                     placeholder="사용하실 닉네임을 입력해주세요"
-    //                     onChangeText={onChangeNickname}
-    //                     autoCapitalize="none"
-    //                 />
-    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
-    //                     {""}
-    //                 </Text>
-    //                 <TextInput 
-    //                     style={styles.input}
-    //                     placeholder="아이디를 입력해주세요(초기 유저 태그로 사용됩니다)"
-    //                     onChangeText={onChangeUsername}
-    //                     autoCapitalize="none"
-    //                 />
-    //                 <Text style={{...styles.warning, color: warningColor, }}>
-    //                     {usernameWarning}
-    //                 </Text>
-    //                 <TextInput 
-    //                     style={styles.input}
-    //                     placeholder="비밀번호를 입력해주세요"
-    //                     onChangeText={onChangePassword}
-    //                     secureTextEntry={true}
-    //                 />
-    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
-    //                     {passwordWarning}
-    //                 </Text>
-    //                 <TextInput 
-    //                     style={styles.input}
-    //                     placeholder="비밀번호 확인"
-    //                     onChangeText={onChangePasswordCheck}
-    //                     secureTextEntry={true}
-    //                 />
-    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
-    //                     {passwordCheckWarning}
-    //                 </Text>
-
-    //                 <Pressable
-    //                     onPress={onJoin}
-    //                     style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
-    //                     disabled={!buttonActive}
-    //                 >
-    //                     <Text style={{...styles.btnText, color: "white",}} >가입하기</Text>
-    //                 </Pressable>
-    //                 <Text style={{...styles.warning, color: "#FF4040", }}>
-    //                     {joinWarning}
-    //                 </Text>
-                    
-    //             </View>
-    //         </ScrollView>
-    //     </View>
-    // );
 }
 
 function useDebounce(value, delay = 1000) {
@@ -471,34 +393,265 @@ function useDebounce(value, delay = 1000) {
 }
 
 const Join3 = ({ navigation }) => {
-    const goHome = () => {
-        navigation.navigate('Home');
-    }
 
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
-                <Text style={{
-                    fontSize: 30,
-                    fontWeight: "700",
-                    letterSpacing: -0.28,
-                }}>
-                    Roseeta
-                </Text>
-            </SafeAreaView>
-            <View style={styles.introduce} >
-                <Text style={styles.introduceText}>가입이 완료되었습니다!!!</Text>
-                <TouchableOpacity
-                    onPress={goHome}
-                    style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
+        <View style={{backgroundColor:"white", flex:1}} >
+            <SafeAreaView style={ styles.header } >
+                <Image 
+                    source={Arrow}
+                    style={{ width: regWidth*20, height: regHeight*17.5, opacity: 0 }}
+                />
+                {/* <Pressable 
+                    onPress={() => navigation.goBack()} 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Text style={{...styles.btnText, color: "white",}} >홈으로 바로가기</Text>
-                </TouchableOpacity>
+                    <Image 
+                        source={Arrow}
+                        style={{ width: regWidth*20, height: regHeight*17.5 }}
+                        // onLoadEnd={showLogo}
+                    />
+                </Pressable> */}
+            </SafeAreaView>
+            <View style={{ alignItems: "center" }}>
+                <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                        You'll need a password
+                    </Text>
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                        Make sure it's 8 characters or more.
+                    </Text>
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "400", color: "#606060", marginTop: regHeight*51 }}>
+                        Password
+                    </Text>
+                </View>
                 
+                
+                <View style={{ flexDirection: "row", alignItems: "flex-end", width: regWidth*280 }}>
+                    <TextInput 
+                        style={{ ...styles.txtInput, paddingLeft: regWidth*4, paddingRight: regWidth*70 }}
+                        // onChangeText={onChangePassword}
+                        // placeholder="Password"
+                        // placeholderTextColor={"#606060"}
+                        secureTextEntry={true}
+                    />
+                    <Pressable
+                        // onPress={() => navigation.goBack()} 
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    >
+                        <Image 
+                            source={Eye}
+                            style={ styles.eyeIcon }
+                            // onLoadEnd={showLogo}
+                        />
+                    </Pressable>
+
+                    <Image 
+                        source={Check}
+                        style={ styles.checkIcon }
+                        // onLoadEnd={showLogo}
+                    />
+                </View>
+                <Text style={{
+                    marginTop: regHeight*60,
+                    color: "white"
+                }}>
+                    blank
+                </Text>
+                <View style={{ marginTop: regHeight*8, width: regWidth*280, alignItems: "center" }}>
+                    <Pressable
+                        onPress={() => navigation.navigate('Join4')}
+                        style={ styles.signUpBtn }
+                    >
+                    <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Next</Text>
+                    </Pressable>
+                </View>    
             </View>
         </View>
     );
 }
+
+
+const Join4 = ({ navigation }) => {
+
+    return (
+        <View style={{backgroundColor:"white", flex:1}} >
+            <SafeAreaView style={ styles.header } >
+                <Image 
+                    source={Arrow}
+                    style={{ width: regWidth*20, height: regHeight*17.5, opacity: 0 }}
+                />
+                {/* <Pressable 
+                    onPress={() => navigation.goBack()} 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Image 
+                        source={Arrow}
+                        style={{ width: regWidth*20, height: regHeight*17.5 }}
+                        // onLoadEnd={showLogo}
+                    />
+                </Pressable> */}
+            </SafeAreaView>
+            <View style={{ alignItems: "center" }}>
+                <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                        What should we call you?
+                    </Text>
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                        Your @username is unique. You can always change it later.
+                    </Text>
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "400", color: "#606060", marginTop: regHeight*36 }}>
+                        Username
+                    </Text>
+                </View>
+                
+                
+                <View 
+                    style={{ ...styles.txtInput, flexDirection: "row", alignItems: "center" }}
+                >
+                    <Text style={{ fontSize: regWidth*17, fontWeight: "700", color: "#5c34cc" }}>
+                        @
+                    </Text>
+                    <TextInput 
+                        style={ styles.usernameInput }
+                        // onChangeText={onChangePassword}
+                        placeholder="Username"
+                        placeholderTextColor={"#606060"}
+                    />
+
+                </View>
+                <Text style={{
+                    marginTop: regHeight*76,
+                    color: "white"
+                }}>
+                    blank
+                </Text>
+                <View style={{ marginTop: -regHeight*7, width: regWidth*280, alignItems: "center" }}>
+                    <Pressable
+                        onPress={() => navigation.navigate('Join5')}
+                        style={ styles.signUpBtn }
+                    >
+                    <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Next</Text>
+                    </Pressable>
+                </View>    
+            </View>
+        </View>
+    );
+}
+
+
+const Join5 = ({ navigation }) => {
+
+    return (
+        <View style={{backgroundColor:"white", flex:1}} >
+            <SafeAreaView style={ styles.header } >
+                <Image 
+                    source={Arrow}
+                    style={{ width: regWidth*20, height: regHeight*17.5, opacity: 0 }}
+                />
+                {/* <Pressable 
+                    onPress={() => navigation.goBack()} 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Image 
+                        source={Arrow}
+                        style={{ width: regWidth*20, height: regHeight*17.5 }}
+                        // onLoadEnd={showLogo}
+                    />
+                </Pressable> */}
+            </SafeAreaView>
+            <View style={{ alignItems: "center" }}>
+                <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                        Pick a profile picture
+                    </Text>
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                        Choose your favorite picture
+                    </Text>
+                </View>
+                
+                <View 
+                    style={{ marginTop: regHeight*51 }}
+                >
+                    <Image 
+                        source={ProfileImage}
+                        style={{ width: regWidth*140, height: regHeight*140, resizeMode: "contain" }}
+                    />
+                </View>
+                <View style={{ marginTop: regHeight*109, width: regWidth*280, alignItems: "center" }}>
+                    <Pressable
+                        onPress={() => navigation.navigate('Join6')}
+                        style={ styles.signUpBtn }
+                    >
+                        <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Next</Text>
+                    </Pressable>
+                    <Pressable
+                        // onPress={() => navigation.navigate('Join4')}
+                        style={{marginTop: regHeight*13}}
+                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    >
+                        <Text style={{ color: "#404040", fontSize:regWidth*18, fontWeight: "900", borderBottomWidth:regHeight*1 }} >Skip for now</Text>
+                    </Pressable>
+                </View>    
+            </View>
+        </View>
+    );
+}
+
+
+
+
+const Join6 = ({ navigation }) => {
+
+    return (
+        <View style={{backgroundColor:"white", flex:1}} >
+            <SafeAreaView style={ styles.header } >
+                <Image 
+                    source={Arrow}
+                    style={{ width: regWidth*20, height: regHeight*17.5, opacity: 0 }}
+                />
+                {/* <Pressable 
+                    onPress={() => navigation.goBack()} 
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Image 
+                        source={Arrow}
+                        style={{ width: regWidth*20, height: regHeight*17.5 }}
+                        // onLoadEnd={showLogo}
+                    />
+                </Pressable> */}
+            </SafeAreaView>
+            <View style={{ alignItems: "center" }}>
+                <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                        Welcome!
+                    </Text>
+                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                        Let's dive into the knowledge from books
+                    </Text>
+                </View>
+                
+                <View 
+                    style={{ marginTop: regHeight*90 }}
+                >
+                    <Image 
+                        source={NemoLogo}
+                        style={{ width: regWidth*220, height: regHeight*62.5, resizeMode: "contain" }}
+                    />
+                </View>
+                <View style={{ marginTop: regHeight*146.5, width: regWidth*280, alignItems: "center" }}>
+                    <Pressable
+                        // onPress={() => navigation.navigate('Join6')}
+                        style={ styles.signUpBtn }
+                    >
+                        <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Start</Text>
+                    </Pressable>
+                </View>    
+            </View>
+        </View>
+    );
+}
+
+
 
 const styles = StyleSheet.create({
     header: {
@@ -530,6 +683,13 @@ const styles = StyleSheet.create({
         marginLeft: -regWidth*24,
         resizeMode: "contain"
     },
+    eyeIcon: {
+        width: regWidth*30,
+        height: regHeight*30,
+        marginBottom: regHeight*5,
+        marginLeft: -regWidth*60,
+        resizeMode: "contain"
+    },
     signUpBtn: {
         borderRadius: regWidth*30,
         justifyContent: "center",
@@ -538,8 +698,26 @@ const styles = StyleSheet.create({
         height: regHeight*60,
         flexDirection: "row",
         backgroundColor: "#5c34cc" 
+    },
+    authInput: {
+        height: regHeight * 40,
+        backgroundColor: "white",
+        borderBottomWidth: 1,
+        borderBottomColor: "#000000",
+        width: regWidth*36, 
+        marginTop: regHeight*30, 
+        paddingHorizontal: regWidth*10, 
+        marginHorizontal: regWidth*7.5, 
+        fontSize: regWidth*30, 
+        fontWeight: "900"
+    },
+    usernameInput: {
+        height: "100%", 
+        width: "90%", 
+        fontSize: regWidth*17, 
+        lineHeight: regHeight*25.5
     }
     
   })
 
-export {Join1, Join2, Join3};
+export {Join1, Join2, Join3, Join4, Join5, Join6};

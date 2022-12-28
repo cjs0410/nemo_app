@@ -20,7 +20,7 @@ import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Join1, Join2, Join3} from "./screens/Join";
+import {Join1, Join2, Join3, Join4, Join5, Join6} from "./screens/Join";
 import { FindId, FindId2, } from "./screens/FindId";
 import { FindPassword, FindPassword2, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
@@ -187,6 +187,9 @@ const App = () => {
             <Stack.Screen name="Join1" component={Join1} options={{ headerShown: false, }} />
             <Stack.Screen name="Join2" component={Join2} options={{ headerShown: false, }} />
             <Stack.Screen name="Join3" component={Join3} options={{ headerShown: false, }} />
+            <Stack.Screen name="Join4" component={Join4} options={{ headerShown: false, }} />
+            <Stack.Screen name="Join5" component={Join5} options={{ headerShown: false, }} />
+            <Stack.Screen name="Join6" component={Join6} options={{ headerShown: false, }} />
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false, }} />
             <Stack.Screen name="FindId" component={FindId} options={{ headerShown: false, }} />
             <Stack.Screen name="FindId2" component={FindId2} options={{ headerShown: false, }} />
