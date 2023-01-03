@@ -34,7 +34,7 @@ const BookmarkList = (props) => {
                     backgroundColor: bookmark.hex === null ? "#D9D9D9" : bookmark.hex, 
                 }} 
             >
-                {bookmark.backgroundimg !== null ? 
+                {/* {bookmark.backgroundimg !== null ? 
                     <View style={styles.backgroungImageContainer}>
                         <Animated.Image 
                             source={{ uri: bookmark.backgroundimg }}
@@ -47,7 +47,7 @@ const BookmarkList = (props) => {
                     </View>
                     :
                     null
-                }
+                } */}
                 <View style={styles.bookmarkContentsBook}>
                     <TouchableOpacity 
                         activeOpacity={1}
@@ -62,7 +62,7 @@ const BookmarkList = (props) => {
                                 style={styles.bookmarkContentsBookCover}
                             />
                         </View>
-                        <View>
+                        <View style={{ justifyContent: "center" }}>
                             <Text style={styles.bookmarkContentsBookTitle}>{bookmark.book_title}</Text>
                             <Text style={styles.bookmarkContentsBookChapter}>{bookmark.chapter_title}</Text>
                         </View>
@@ -84,7 +84,7 @@ const BookmarkList = (props) => {
                     >
                         <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
                     </Pressable>
-                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", }} >{bookmark.created_date.split('T')[0]}</Text>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060" }} >{bookmark.created_date.split('T')[0]}</Text>
                 </View>
             </View>
             
@@ -157,7 +157,7 @@ const UnTouchableBookmarkList = (props) => {
                 </View>
                 <View style={styles.bookmarkContentsWatermark}>
                     <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
-                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", }} >{bookmark.created_date.split('T')[0]}</Text>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060" }} >{bookmark.created_date.split('T')[0]}</Text>
                 </View>
             </View>
             
@@ -189,20 +189,19 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
     },
     bookmarkContentsBook: {
-        // backgroundColor: "pink",
+        marginLeft: -5,
         flex: 0.6,
         flexDirection: "row", 
         justifyContent: "space-between",
         alignItems: "center",
     },
     bookmarkContentsBookTitle: {
-        fontWeight: "700",
-        fontSize: regWidth * 15,
-        marginTop: regHeight * 8,
-    },
-    bookmarkContentsBookChapter: {
         fontWeight: "400",
         fontSize: regWidth * 10,
+    },
+    bookmarkContentsBookChapter: {
+        fontWeight: "700",
+        fontSize: regWidth * 15,
     },
     bookmarkContentsBookChapterInput: {
         fontWeight: "400",
@@ -211,7 +210,7 @@ const styles = StyleSheet.create({
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
         flex: 1.5,
-        marginTop: regHeight * 8,
+        // marginTop: regHeight * 8,
         justifyContent: "center", 
     },
     bookmarkContentsText: {

@@ -1,6 +1,6 @@
-import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, } from "react-native";
-import React, { useEffect, useState, useCallback, useRef, } from "react";
-import { NavigationContainer, useNavigationContainerRef, } from '@react-navigation/native';
+import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, Platform, } from "react-native";
+import React, { useEffect, useState, useCallback, useRef, useLayoutEffect, } from "react";
+import { NavigationContainer, useNavigationContainerRef, getFocusedRouteNameFromRoute, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
@@ -20,7 +20,7 @@ import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Join1, Join2, Join3} from "./screens/Join";
+import {Join1, Join2, Join3, Join4, Join5, Join6} from "./screens/Join";
 import { FindId, FindId2, } from "./screens/FindId";
 import { FindPassword, FindPassword2, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
@@ -54,6 +54,7 @@ import {
   AlbumProfile,
   FollowScreen,
   LikeUsers,
+  UserLibrary,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -62,8 +63,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from './modules/hooks';
 import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, resetAvatar, setIsAlarm, } from './modules/user';
 import blankAvatar from './assets/images/peopleicon.png';
+import userLibraryLogo from './assets/icons/userLibraryLogo.png';
 
 import analytics from '@react-native-firebase/analytics';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
+import { Portal, PortalHost, PortalProvider } from '@gorhom/portal';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -72,6 +79,7 @@ const SearchStack = createNativeStackNavigator();
 const PostStack = createNativeStackNavigator();
 const BookmarkStack = createNativeStackNavigator();
 const ProfileStack = createNativeStackNavigator();
+const UserLibraryStack = createNativeStackNavigator();
 
 const SIGN_KEY = "@isSignedIn";
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -87,7 +95,9 @@ const appRedux = () => (
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <App />
+        <BottomSheetModalProvider>
+            <App />
+        </BottomSheetModalProvider>
       </GestureHandlerRootView>
     </PersistGate>
   </Provider>
@@ -176,6 +186,7 @@ const App = () => {
   // )
 
   return (
+    
       <NavigationContainer
         ref={navigationRef}
         onReady={() => {
@@ -209,6 +220,9 @@ const App = () => {
             <Stack.Screen name="Join1" component={Join1} options={{ headerShown: false, }} />
             <Stack.Screen name="Join2" component={Join2} options={{ headerShown: false, }} />
             <Stack.Screen name="Join3" component={Join3} options={{ headerShown: false, }} />
+            <Stack.Screen name="Join4" component={Join4} options={{ headerShown: false, }} />
+            <Stack.Screen name="Join5" component={Join5} options={{ headerShown: false, }} />
+            <Stack.Screen name="Join6" component={Join6} options={{ headerShown: false, }} />
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false, }} />
             <Stack.Screen name="FindId" component={FindId} options={{ headerShown: false, }} />
             <Stack.Screen name="FindId2" component={FindId2} options={{ headerShown: false, }} />
@@ -242,6 +256,15 @@ const App = () => {
                       borderRadius: 50,
                     }} 
                   />
+                } else if (route.name === 'UserLibrary') {
+                  return <Image 
+                    source={userLibraryLogo}
+                    style={{
+                      width: size,
+                      height: size,
+                      resizeMode: "contain",
+                    }}
+                  />
                 }
       
                 // You can return any component that you like here!
@@ -252,18 +275,29 @@ const App = () => {
               tabBarShowLabel: false,
             })}
           >
+
             <Tab.Screen 
-              name="Home" 
-              component={HomeScreen} 
-              options={{ headerShown: false, }} 
+              name="UserLibrary"
+              component={UserLibraryScreen}
+              // options={{ headerShown: false, }} 
+              options={({ route }) => ({
+                headerShown: false,
+                tabBarStyle: ((route) => {
+                  const routeName = getFocusedRouteNameFromRoute(route)
+                  if ((routeName === 'CreateBookmark0') && (Platform.OS === 'android')) {
+                    return { display: "none", }
+                  }
+                  return
+                })(route),
+              })}
             />
-            <Tab.Screen 
+            {/* <Tab.Screen 
               name="Search" 
               component={SearchScreen}
               options={{
                 headerShown: false,
               }}
-            />
+            /> */}
             <Tab.Screen 
               name="Post" 
               component={PostScreen}
@@ -274,7 +308,21 @@ const App = () => {
                 }
               })}
             />
-            <Tab.Screen name="Bookmark" component={BookmarkScreen} options={{ headerShown: false, }} />
+            <Tab.Screen 
+              name="Home" 
+              component={HomeScreen} 
+              options={({ route }) => ({
+                headerShown: false,
+                tabBarStyle: ((route) => {
+                  const routeName = getFocusedRouteNameFromRoute(route)
+                  if ((routeName === 'CreateBookmark2') && (Platform.OS === 'android')) {
+                    return { display: "none", }
+                  }
+                  return
+                })(route),
+              })}
+            />
+            {/* <Tab.Screen name="Bookmark" component={BookmarkScreen} options={{ headerShown: false, }} />
             <Tab.Screen 
               name="Profile" 
               component={ProfileScreen} 
@@ -293,14 +341,14 @@ const App = () => {
                         borderColor: "black",
                       }} 
                     />
-
                   )
                 }
               }} 
-            />
+            /> */}
           </Tab.Navigator>
         )}
       </NavigationContainer>
+      
   );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +415,57 @@ const App = () => {
 
 export default appRedux;
 
-const HomeScreen = () => {
+const UserLibraryScreen = ({route, navigation}) => {
+
+  return (
+    <UserLibraryStack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <UserLibraryStack.Screen name="UserLibraryScreen" component={UserLibrary} />
+      <UserLibraryStack.Screen 
+        name="CreateBookmark0" 
+        component={CreateBookmark}
+        options={{
+          presentation: "fullScreenModal",
+          // animation: "fade",
+        }}
+      />
+      <UserLibraryStack.Screen name="UserStorage" component={UserStorage} />
+      <UserLibraryStack.Screen 
+        name="UserSetting" 
+        component={UserSetting}
+      />
+      <UserLibraryStack.Screen name="AlarmScreen" component={AlarmScreen} />
+      <UserLibraryStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
+      <UserLibraryStack.Screen name="AlbumProfile" component={AlbumProfile} />
+      <UserLibraryStack.Screen name="BookProfile" component={BookProfile} />
+      <UserLibraryStack.Screen name="OtherProfile" component={OtherProfile} />
+      <UserLibraryStack.Screen 
+        name="ProfileEdit" 
+        component={ProfileEdit}
+        options={{
+          presentation: "transparentModal",
+          // animation: "horizontal",
+        }}
+      />
+    </UserLibraryStack.Navigator>
+  )
+}
+
+const HomeScreen = ({route, navigation}) => {
+
+  useLayoutEffect(() => {
+    const routeName = getFocusedRouteNameFromRoute(route);
+    console.log(routeName);
+    if (routeName === 'CreateBookmark2') {
+      navigation.setOptions({tabBarVisible: false});
+    } else {
+      navigation.setOptions({tabBarVisible: true});
+    }
+  }, [navigation, route]);
+
   return (
     <HomeStack.Navigator
       screenOptions={{
@@ -376,7 +474,7 @@ const HomeScreen = () => {
     >
       <HomeStack.Screen name="HomeScreen" component={Home} />
       <HomeStack.Screen 
-        name="PostModal0" 
+        name="PostModal2" 
         component={PostModal}
         options={{
           presentation: "transparentModal",
@@ -384,10 +482,10 @@ const HomeScreen = () => {
         }}
       />
       <HomeStack.Screen 
-        name="CreateBookmark0" 
+        name="CreateBookmark2" 
         component={CreateBookmark}
         options={{
-          presentation: "transparentModal",
+          presentation: "fullScreenModal",
           // animation: "fade",
         }}
       />
@@ -664,6 +762,9 @@ const PostScreen = () => {
     </PostStack.Navigator>
   )
 }
+
+
+
 
 const Auth = async() => {
   const dispatch = useDispatch();

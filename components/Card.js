@@ -154,7 +154,7 @@ const Card = (props) => {
                 }}>
                     <TouchableOpacity 
                         activeOpacity={1}
-                        style={{ flexDirection: "row" }}
+                        style={{ flexDirection: "row", alignItems: "center", }}
                         onPress={() => navigation.push('BookProfile', {
                             bookId: bookmark.book_id, 
                         })}
@@ -229,6 +229,7 @@ const Card = (props) => {
                             style={{
                                 ...styles.bookmarkContentsText,
                                 fontSize: regWidth * fontSize,
+                                height: regWidth * 28,
                             }} 
                             onTextLayout={textLineNum}
                             key={index}
@@ -309,7 +310,7 @@ const CardPreview = (props) => {
                     {contents.map((line, index) => (
                         <Text style={{
                             ...styles.bookmarkContentsText,
-                            backgroundColor: "yellow",
+                            height: regWidth * 28,
                         }} key={index}>
                             {line.replace(/\n/g, '')}
                         </Text> 
@@ -1279,14 +1280,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     bookmarkContentsBookTitle: {
-        fontWeight: "700",
-        fontSize: regWidth * 15,
-        marginTop: regWidth * 8,
+        fontWeight: "400",
+        fontSize: regWidth * 10,
         width: regWidth * 250,
     },
     bookmarkContentsBookChapter: {
-        fontWeight: "400",
-        fontSize: regWidth * 10,
+        fontWeight: "700",
+        fontSize: regWidth * 15,
         width: regWidth * 230,
     },
     bookmarkContentsBookChapterInput: {

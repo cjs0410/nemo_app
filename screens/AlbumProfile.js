@@ -1,5 +1,5 @@
 import { StyleSheet, View, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, } from "react-native";
-import React, { useEffect, useState, useRef, useCallback, } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
@@ -15,6 +15,16 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import {
+    BottomSheetModal,
+    BottomSheetModalProvider,
+    BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
+import iconEdit from '../assets/icons/iconEdit.png';
+import iconTrash from '../assets/icons/iconTrash.png';
+import iconAlert from '../assets/icons/iconAlert.png';
+import iconFollow from '../assets/icons/iconFollow.png';
+import iconEyeoff from '../assets/icons/iconEyeoff.png';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -212,6 +222,32 @@ const AlbumProfile = ({route, navigation}) => {
 
     }
 
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                // animatedIndex={{
+                //     value: 0,
+                // }}
+            />
+        ),
+        []
+    );
+
+    const menuModalRef = useRef();
+    const snapPoints = useMemo(() => [regHeight * 250], []);
+    const onPressMenu = useCallback(() => {
+        menuModalRef.current.present();
+    }, [menuModalRef]);
+
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        menuModalRef.current.dismiss();
+    }, [menuModalRef]);
+
     return (
         <View style={styles.container}>
             {albumInfo !== null ? 
@@ -262,11 +298,12 @@ const AlbumProfile = ({route, navigation}) => {
                             :
                             <Pressable
                                 hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                                onPress={() => setAlbumModalVisible(true)}
-                                style={{
-                                    opacity: albumInfo.user_tag !== userTag ? 0 : 1,
-                                }}
-                                disabled={albumInfo.user_tag !== userTag ? true : false}
+                                // onPress={() => setAlbumModalVisible(true)}
+                                onPress={onPressMenu}
+                                // style={{
+                                //     opacity: albumInfo.user_tag !== userTag ? 0 : 1,
+                                // }}
+                                // disabled={albumInfo.user_tag !== userTag ? true : false}
                             >
                                 <Entypo name="dots-three-horizontal" size={24} color="black" />
                             </Pressable>
@@ -394,7 +431,138 @@ const AlbumProfile = ({route, navigation}) => {
                 : 
                 null
             }
-            <Modal
+
+            <BottomSheetModal
+                index={0}
+                ref={menuModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={styles.modalContainer}
+                >
+                    <Pressable
+                        onPress={onPressClose}
+                    >
+                        <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                            Cancel
+                        </Text>
+                    </Pressable>
+                    {albumInfo && albumInfo.user_tag !== userTag ? 
+                        <>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                                <Image 
+                                    source={iconFollow}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        {`Follow @${albumInfo.user_tag}`}
+                                    </Text>
+                                </View>
+                            </Pressable>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                                <Image 
+                                    source={iconEyeoff}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        {`Block @${albumInfo.user_tag}`}
+                                    </Text>
+                                </View>
+                            </Pressable>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                                <Image 
+                                    source={iconAlert}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Report
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Report your issue
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        </>
+                        :
+                        <>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                                <Image 
+                                    source={iconEdit}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Edit
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Edit your Nemolist
+                                    </Text>
+                                </View>
+                            </Pressable>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                                <Image 
+                                    source={iconTrash}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Delete
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Delete Nemolist from your library
+                                    </Text>
+                                </View>
+                            </Pressable>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                                <Image 
+                                    source={iconAlert}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Report
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Report your issue
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        </>
+                    }
+
+                </View>
+            </BottomSheetModal>
+
+            {/* <Modal
                 // animationType="fade"
                 transparent={true}
                 visible={albumModalVisible}
@@ -523,7 +691,7 @@ const AlbumProfile = ({route, navigation}) => {
                             ))}
                         </ScrollView>
                     </Animated.View>
-            </Modal>
+            </Modal> */}
         </View>
     )
 }
@@ -630,6 +798,9 @@ const styles = StyleSheet.create({
         opacity: 1,
         justifyContent: "center",
         alignItems: "center",
+    },
+    modalContainer: {
+        marginHorizontal: regWidth * 20,
     },
 })
 

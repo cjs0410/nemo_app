@@ -362,90 +362,60 @@ const Home = ({navigation}) => {
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.header} >
-                <Pressable 
-                    style={{ flexDirection: "row", alignItems: "center", }}
-                    // onPress={() => setReRender(!reRender)}
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        backgroundColor: "#D9D9D9",
+                        width: "100%",
+                        borderRadius: 10,
+                        height: regWidth * 36,
+                        paddingHorizontal: regWidth * 8,
+                        marginTop: regHeight * 18,
+                    }}
                 >
-                    <Animated.Image 
-                        source={NemoLogo}
+                    <Feather name="search" size={regWidth * 18} color="#606060" />
+                    <TextInput 
+                        placeholder="Search Accounts, Books, and Nemolists"
+                        placeholderTextColor={"#606060"}
                         style={{
-                            ...styles.LogoImage,
-                            opacity: logoValue,
+                            height: "100%",
+                            width: "90%",
                         }}
-                        onLoadEnd={showLogo}
                     />
-                    {/* <Text style={{
-                        fontFamily: "frank",
-                        fontSize: regWidth * 30,
-                        fontWeight: "900",
-                        marginHorizontal: regWidth * 8,
-                    }}>
-                        Nemo
-                    </Text> */}
-                </Pressable>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    {/* <Pressable
-                        onPress={() => setSearchModalVisible(true)}
-                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                    >
-                        <Feather name="search" size={30} color="black" style={{ marginRight: 24, }}/>
-                    </Pressable> */}
-                    <Pressable
-                        onPress={() => navigation.navigate('AlarmScreen')}
-                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                        // style={{ backgroundColor: "pink"}}
-                    >
-                        <Feather name="bell" size={28} color="black" />
-                        {isAlarm ? 
-                            <View
-                                style={{
-                                    position: "absolute",
-                                    backgroundColor: "red",
-                                    borderRadius: 50,
-                                    height: regWidth * 6,
-                                    width: regWidth * 6,
-                                    right: 0,
-                                }}
-                            >
-                            </View>
-                            : 
-                            null
-                        }
-
+                </View>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: regHeight * 12,
+                        width: regWidth * 185,
+                        // backgroundColor: "pink",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Pressable>
+                        <Text
+                            style={{
+                                fontSize: 17,
+                                fontWeight: "900",
+                            }}
+                        >
+                            Following
+                        </Text>
+                    </Pressable>
+                    <Pressable>
+                        <Text
+                            style={{
+                                fontSize: 17,
+                                fontWeight: "900",
+                            }}
+                        >
+                            Explore
+                        </Text>
                     </Pressable>
                 </View>
-                {/* <TouchableOpacity 
-                    activeOpacity={1} 
-                    onPress={() => navigation.navigate('Profile')}
-                    // onPress={testLogout}
-                >
-                    <Image source={ avatar !== null ? { uri: `http://3.38.228.24${avatar}`} : blankAvatar} style={styles.profileImage} />
-                </TouchableOpacity> */}
             </SafeAreaView>
-            {/* <ScrollView 
-                showsVerticalScrollIndicator={false}
-                ref={ref}
-                refreshControl={
-                    <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={onRefresh}
-                    />
-                }
-            >
-                {posts === null ? 
-                    <ActivityIndicator 
-                        color="white" 
-                        style={{marginTop: 10}} 
-                        size="large"
-                    />
-                    :
-                    <>
-                        {posts.map((post, index) => (
-                            <Post post={post} navigation={navigation} key={index} />
-                        ))}
-                    </>
-                }
-            </ScrollView> */}
 
             { bookmarks !== null ? 
                 <FlatList 
@@ -776,8 +746,7 @@ const styles = StyleSheet.create({
         marginVertical: regHeight * 10,
         marginHorizontal: 20,
         paddingBottom: regHeight * 8,
-        flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
         alignItems: "center",
     },
     LogoImage: {

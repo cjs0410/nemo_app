@@ -305,7 +305,7 @@ const DotInputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onCh
                                     // backgroundColor: "pink",
                                     // borderStyle: 'dashed',
                                     // borderWidth: 0.5,
-                                    height: regHeight * 284 + extraHeight,
+                                    // height: regHeight * 284 + extraHeight,
 
                                 }} 
                                 placeholder="Write anything from your reading"
@@ -472,7 +472,8 @@ const styles = StyleSheet.create({
         // flex: 4,
         height: regHeight * 284,
         marginTop: regHeight * 8,
-        justifyContent: "center",
+        // justifyContent: "center",
+        justifyContent: "flex-start",
         // textAlignVertical: "top",
         
     },

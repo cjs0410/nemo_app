@@ -19,7 +19,7 @@ import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { resetUserInfo, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
 
@@ -267,7 +267,7 @@ const CreateBookmark = ({navigation, route}) => {
     //                 console.log(res.data);
     //                 navigation.goBack();
     //                 dispatch(setShouldHomeRefresh(true));
-    //                 dispatch(setShouldStorageRefresh(true));
+    //                 dispatch(setShouldLibraryRefresh(true));
     //                 dispatch(setShouldUserRefresh(true));
     //             })
     //         } catch (err) {
@@ -387,7 +387,7 @@ const CreateBookmark = ({navigation, route}) => {
                     console.log(res.data);
                     navigation.goBack();
                     dispatch(setShouldHomeRefresh(true));
-                    dispatch(setShouldStorageRefresh(true));
+                    dispatch(setShouldLibraryRefresh(true));
                     dispatch(setShouldUserRefresh(true));
                 })
             } catch (err) {
@@ -516,8 +516,9 @@ const CreateBookmark = ({navigation, route}) => {
             )
             .then((res) => {
                 console.log(res.data);
-                // setOcrText(res.data.message);
-                setFrontContent(res.data.message);
+                setFrontContent((prevState) => {
+                    return prevState + res.data.message;
+                })
             })
         } catch (err) {
             console.error(err)
@@ -1273,14 +1274,14 @@ const CreateBookmark = ({navigation, route}) => {
                     </Text>
                 </Pressable> */}
 
-                <View style={{ alignItems: "center", }}>
+                {/* <View style={{ alignItems: "center", }}>
                     <Pressable 
                         style={styles.previewBtn} 
                         onPress={() => setPreviewVisible(true)}    
                     >
                         <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, }} >미리보기</Text>
                     </Pressable>
-                </View>
+                </View> */}
                 <Pressable 
                     style={styles.TagAddBox} 
                     onPress={() => setInfoVisible(true)}    
@@ -1895,7 +1896,7 @@ const CreateBookmark = ({navigation, route}) => {
                                         setBackgroundImage(null);
                                     }}
                                 />
-                                <Pressable>
+                                {/* <Pressable>
                                     <Image 
                                         source={iconImage}
                                         style={{
@@ -1903,11 +1904,11 @@ const CreateBookmark = ({navigation, route}) => {
                                             // marginLeft: 8,
                                         }}
                                     />
-                                </Pressable>
+                                </Pressable> */}
                             </View>
                         </View>
 
-                        <View style={styles.separator}/>
+                        {/* <View style={styles.separator}/>
 
                         <View
                             style={{
@@ -1936,7 +1937,7 @@ const CreateBookmark = ({navigation, route}) => {
                                     />
                                 </Pressable>
                             </View>
-                        </View>
+                        </View> */}
                     </View>
                 </KeyboardAvoidingView>
                 :
@@ -2021,6 +2022,7 @@ const styles = StyleSheet.create({
         // borderColor: "black",
         height: regWidth * 30,
         width: regWidth * 30,
+        marginTop: regWidth * 6,
         justifyContent: "center",
         alignItems: "center",
         marginRight: regWidth * 10,

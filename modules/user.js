@@ -12,7 +12,7 @@ const initialState = {
     isAlarm: false,
     isStaff: false,
     shouldHomeRefresh: false,
-    shouldStorageRefresh: false,
+    shouldLibraryRefresh: false,
     shouldUserRefresh: false,
 }
 
@@ -59,8 +59,8 @@ export const userSlice = createSlice({
         setShouldHomeRefresh: (state, action) => {
             state.shouldHomeRefresh = action.payload;
         },
-        setShouldStorageRefresh: (state, action) => {
-            state.shouldStorageRefresh = action.payload;
+        setShouldLibraryRefresh: (state, action) => {
+            state.shouldLibraryRefresh = action.payload;
         },
         setShouldUserRefresh: (state, action) => {
             state.shouldUserRefresh = action.payload;
@@ -73,7 +73,7 @@ export const userSlice = createSlice({
 
 export const {
     setUserInfo, resetUserInfo, setAccessToken, setRefreshToken, resetRefreshToken,
-    setAvatar, resetAvatar, setIsAlarm, setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, setIsStaff,
+    setAvatar, resetAvatar, setIsAlarm, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setIsStaff,
 } = userSlice.actions;
 
 export default userSlice.reducer;

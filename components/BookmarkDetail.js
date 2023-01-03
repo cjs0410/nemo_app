@@ -28,7 +28,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector, scrapSelector } from '../modules/hooks';
 import { addBookmark } from '../modules/bookmarks';
 import { addScrap, deleteScrap } from '../modules/scraps';
-import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import { setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import analytics from '@react-native-firebase/analytics';
@@ -179,7 +179,7 @@ const BookmarkDetail = (props) => {
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.count);
                 // dispatch(setShouldHomeRefresh(true));
-                dispatch(setShouldStorageRefresh(true));
+                dispatch(setShouldLibraryRefresh(true));
                 dispatch(setShouldUserRefresh(true));
                 if (res.data.is_like) {
                     await analytics().logEvent('like', {
@@ -204,7 +204,7 @@ const BookmarkDetail = (props) => {
             .then((res) => {
                 setIsScrap(res.data.is_scrap);
                 setScrapCount(res.data.count);
-                dispatch(setShouldStorageRefresh(true));
+                dispatch(setShouldLibraryRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -261,7 +261,7 @@ const BookmarkDetail = (props) => {
                             setBookmarkModalVisible(false);
                             setReportVisible(false);
                             dispatch(setShouldHomeRefresh(true));
-                            dispatch(setShouldStorageRefresh(true));
+                            dispatch(setShouldLibraryRefresh(true));
                             dispatch(setShouldUserRefresh(true));
                         })
                     } catch (err) {

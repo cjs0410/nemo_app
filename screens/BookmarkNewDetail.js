@@ -40,7 +40,7 @@ const BookmarkNewDetail = ({route, navigation}) => {
         
         return ()=>{ 
             clearTimeout(scrollTimer);
-            console.log("done");
+            // console.log("done");
         }
         
     }, [])
