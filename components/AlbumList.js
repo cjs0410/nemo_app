@@ -3,9 +3,11 @@ import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, FontAwesome, } from '@expo/vector-icons'; 
 import bookCover from '../assets/images/steve.jpeg';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import likedNemos from '../assets/images/likedNemos.png';
 
 const AlbumList = (props) => {
     const album = props.album;
+    const isDefault = props.isDefault;
     const albumCoverValue = useRef(new Animated.Value(0)).current;
 
     const showAlbumCover = () => {
@@ -20,7 +22,7 @@ const AlbumList = (props) => {
         <View style={styles.AlbumListContainer}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Animated.Image 
-                    source={{ uri: album.album_cover }} 
+                    source={ isDefault ? likedNemos : { uri: album.album_cover }} 
                     style={{
                         ...styles.AlbumImage,
                         opacity: albumCoverValue
@@ -33,9 +35,9 @@ const AlbumList = (props) => {
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
-                        {album.album_title}
+                        {album.nemolist_title}
                     </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", width: "70%" }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", width: "70%", }}>
                         <Text 
                             style={{ ...styles.AlbumInfoText, marginRight: regWidth*3 }}
                             numberOfLines={1}
@@ -45,11 +47,11 @@ const AlbumList = (props) => {
                         </Text>
                         <Entypo name="dot-single" size={16} color="#808080" />
                         <Text 
-                            style={{ ...styles.AlbumInfoText, width: "25%", marginHorizontal: regWidth*3 }}
+                            style={{ ...styles.AlbumInfoText, width: "40%", marginHorizontal: regWidth*3, }}
                             // numberOfLines={1}
                             // ellipsizeMode="tail"
                         >
-                            {album.bookmark_count} Nemos
+                            {album.nemos} Nemos
                         </Text>
                     </View>
                 </View>

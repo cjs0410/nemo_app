@@ -8,3 +8,4 @@ export { default as BookmarkDetail } from './BookmarkDetail';
 export { default as PostTile } from './PostTile';
 export { default as AlbumList } from './AlbumList';
 export { default as DotInputCard } from './DotInputCard';
+export { default as BookList } from './BookList';

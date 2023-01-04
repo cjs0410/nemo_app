@@ -47,12 +47,13 @@ import {
 } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 import blankAvatar from '../assets/images/peopleicon.png';
+import sortCheck from '../assets/images/sortCheck.png';
 import iconRepeat from '../assets/icons/iconRepeat.png';
 import iconGrid from '../assets/icons/iconGrid.png';
 import iconNemolist from '../assets/icons/iconNemolist.png';
 import iconBook from '../assets/icons/iconBook.png';
 import iconAlarm from '../assets/icons/iconAlarm.png';
-import { regHeight, regWidth } from "../config/globalStyles";
+import { colors, regHeight, regWidth } from "../config/globalStyles";
 import {
     BottomSheetModal,
     BottomSheetModalProvider,
@@ -313,12 +314,14 @@ const NemoScreen = ({route, navigation}) => {
     const { shouldLibraryRefresh } = useSelector(userSelector);
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
+    const sortList = [ "recents", "book", ];
+    const [sort, setSort] = useState(0)
 
     const ref = useRef();
     useScrollToTop(ref);
 
     useEffect(() => {
-        fetchBookmarkList();
+        fetchBookmarkList(sort);
     }, []);
 
     useEffect(() => {
@@ -329,21 +332,26 @@ const NemoScreen = ({route, navigation}) => {
     }, [shouldLibraryRefresh]);
 
     const renderBookmark = ({ item, index }) => (
-        <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: "내꺼", title: "북마크", index: index, })} 
+        <Pressable
+            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: "My Library", title: "Bookmarks", index: index, })} 
         >
             <BookmarkList bookmark={item} navigation={navigation} />
-        </TouchableOpacity>
+        </Pressable>
     )
 
-    const fetchBookmarkList = async() => {
+    const fetchBookmarkList = async(sortNum) => {
+        console.log(sortList[sortNum])
         try {
             setLoading(true);
             await Api
-            .get("api/v1/user/mylist/")
+            .post("api/v1/user/library/", {
+                ctg: "nemos",
+                // sort: "recents",
+                sort: sortList[sortNum],
+            })
             .then((res) => {
-                setBookmarks(res.data.bookmarks.reverse());
+                // console.log(res.data);
+                setBookmarks(res.data.reverse());
             })
         } catch (err) {
             console.error(err);
@@ -354,10 +362,16 @@ const NemoScreen = ({route, navigation}) => {
     const onRefresh = useCallback(async() => {
         setRefreshing(true);
 
-        await fetchBookmarkList()
+        await fetchBookmarkList(sort)
         .then(() => setRefreshing(false));
     }, []);
 
+
+    const onSort = (sortNum) => {
+        setSort(sortNum);
+        onPressClose();
+        fetchBookmarkList(sortNum)
+    }
 
 
     const renderBackdrop = useCallback(
@@ -469,20 +483,51 @@ const NemoScreen = ({route, navigation}) => {
                     <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
                         Sort by
                     </Text>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#202020", }}>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(0)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
                             Recents
                         </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 0 ? 1 : 0,
+                            }}
+                        />
                     </Pressable>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#202020", }}>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(1)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
                             Book
                         </Text>
-                    </Pressable>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#202020", }}>
-                            Creator
-                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 1 ? 1 : 0,
+                            }}
+                        />
                     </Pressable>
                 </View>
             </BottomSheetModal>
@@ -493,15 +538,18 @@ const NemoScreen = ({route, navigation}) => {
 const NemoListScreen = ({navigation}) => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
-    const [albums, setAlbums] = useState(null);
+    const [likedNemos, setLikedNemos] = useState(null);
+    const [nemolists, setNemolists] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
+    const sortList = [ "recents", "alphabetical", "creator", ];
+    const [sort, setSort] = useState(0)
 
     const ref = useRef();
     useScrollToTop(ref);
 
     useEffect(() => {
-        fetchAlbum();
+        fetchAlbum(sort);
     }, []);
 
     const renderAlbum = ({ item, index }) => (
@@ -509,17 +557,24 @@ const NemoListScreen = ({navigation}) => {
             activeOpacity={1}
             onPress={() => navigation.navigate('AlbumProfile', { albumId: item.album_id, })} 
         >
-            <AlbumList album={item} navigation={navigation} />
+            <AlbumList album={item} navigation={navigation} isDefault={false} />
         </TouchableOpacity>
     )
 
-    const fetchAlbum = async() => {
+    const fetchAlbum = async(sortNum) => {
+        console.log(sortList[sortNum])
         try {
             setLoading(true);
             await Api
-            .get("api/v1/user/mylist/")
+            .post("api/v1/user/library/", {
+                ctg: "nemolists",
+                sort: sortList[sortNum],
+                cursor: "",
+            })
             .then((res) => {
-                setAlbums(res.data.albums);
+                console.log(res.data);
+                setLikedNemos(res.data.Liked_Nemos);
+                setNemolists(res.data.Nemolists);
             })
         } catch (err) {
             console.error(err);
@@ -530,9 +585,16 @@ const NemoListScreen = ({navigation}) => {
     const onRefresh = useCallback(async() => {
         setRefreshing(true);
 
-        await fetchAlbum()
+        await fetchAlbum(sort)
         .then(() => setRefreshing(false));
     }, []);
+
+    const onSort = (sortNum) => {
+        setSort(sortNum);
+        onPressClose();
+        fetchAlbum(sortNum);
+    }
+
 
     const renderBackdrop = useCallback(
         (props) => (
@@ -541,9 +603,6 @@ const NemoListScreen = ({navigation}) => {
                 pressBehavior="close"
                 appearsOnIndex={0}
                 disappearsOnIndex={-1}
-                // animatedIndex={{
-                //     value: 0,
-                // }}
             />
         ),
         []
@@ -554,18 +613,23 @@ const NemoListScreen = ({navigation}) => {
         sortModalRef.current.present();
     }, [sortModalRef]);
 
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        sortModalRef.current.dismiss();
+    }, [sortModalRef]);
+
     return (
         <View style={styles.container}>
-            { albums && albums.length !== 0 ? 
-                <FlatList 
-                    data={albums}
-                    renderItem={renderAlbum}
-                    keyExtractor={album => album.album_id}
-                    showsVerticalScrollIndicator={false}
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    ref={ref}
-                    ListHeaderComponent={
+            <FlatList 
+                data={nemolists}
+                renderItem={renderAlbum}
+                keyExtractor={album => album.album_id}
+                showsVerticalScrollIndicator={false}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                ref={ref}
+                ListHeaderComponent={
+                    <>
                         <View
                             style={{
                                 flexDirection: "row",
@@ -609,6 +673,82 @@ const NemoListScreen = ({navigation}) => {
                                 />
                             </Pressable>
                         </View>
+                        {likedNemos ? 
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                onPress={() => navigation.navigate('AlbumProfile', { albumId: likedNemos.nemolist_id, })} 
+                            >
+                                <AlbumList album={likedNemos} navigation={navigation} isDefault={true} />
+                            </TouchableOpacity>
+                            :
+                            null
+                        }
+
+                    </>
+                }
+            />
+
+            {/* { nemolists && nemolists.length !== 0 ? 
+                <FlatList 
+                    data={nemolists}
+                    renderItem={renderAlbum}
+                    keyExtractor={album => album.album_id}
+                    showsVerticalScrollIndicator={false}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    ref={ref}
+                    ListHeaderComponent={
+                        <>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    marginHorizontal: regWidth * 13,
+                                    marginVertical: regHeight * 10,
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Pressable
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                    }}
+                                    onPress={onPressSort}
+                                >
+                                    <Image 
+                                        source={iconRepeat}
+                                        style={{
+                                            width: regWidth * 15,
+                                            height: regWidth * 15,
+                                        }}
+                                    />
+                                    <Text
+                                        style={{
+                                            fontSize: 13,
+                                            fontWeight: "700",
+                                            marginHorizontal: regWidth * 5,
+                                        }}
+                                    >
+                                        Recent
+                                    </Text>
+                                </Pressable>
+                                <Pressable>
+                                    <Image 
+                                        source={iconGrid}
+                                        style={{
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                        }}
+                                    />
+                                </Pressable>
+                            </View>
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                onPress={() => navigation.navigate('AlbumProfile', { albumId: item.album_id, })} 
+                            >
+                                <AlbumList album={item} navigation={navigation} />
+                            </TouchableOpacity>
+                        </>
                     }
                 />
                 :
@@ -629,7 +769,7 @@ const NemoListScreen = ({navigation}) => {
                         앨범을 생성해보세요
                     </Text>
                 </View>
-            }
+            } */}
             <BottomSheetModal
                 index={0}
                 ref={sortModalRef}
@@ -643,20 +783,74 @@ const NemoListScreen = ({navigation}) => {
                     <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
                         Sort by
                     </Text>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#202020", }}>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(0)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
                             Recents
                         </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 0 ? 1 : 0,
+                            }}
+                        />
                     </Pressable>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#202020", }}>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(1)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
                             Alphabetical
                         </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 1 ? 1 : 0,
+                            }}
+                        />
                     </Pressable>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#202020", }}>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(2)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 2 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
                             Creator
                         </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 2 ? 1 : 0,
+                            }}
+                        />
                     </Pressable>
                 </View>
             </BottomSheetModal>
@@ -862,6 +1056,12 @@ const styles = StyleSheet.create({
     modalContainer: {
         marginHorizontal: regWidth * 20,
     },
+    sortBtn: {
+        flexDirection: "row", 
+        alignItems: "center", 
+        marginTop: regHeight * 24, 
+        justifyContent: "space-between",
+    }
 })
 
 export default UserLibrary;

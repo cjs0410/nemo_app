@@ -14,6 +14,7 @@ const initialState = {
     shouldHomeRefresh: false,
     shouldLibraryRefresh: false,
     shouldUserRefresh: false,
+    recentRead: [],
 }
 
 export const userSlice = createSlice({
@@ -67,6 +68,10 @@ export const userSlice = createSlice({
         },
         setIsStaff: (state, action) => {
             state.isStaff = action.payload;
+        },
+        addRecentRead: (state, action) => {
+            // state.recentRead = state.recentRead.concat(action.payload);
+            console.log(state.recentRead);
         }
     }
 })
@@ -74,6 +79,7 @@ export const userSlice = createSlice({
 export const {
     setUserInfo, resetUserInfo, setAccessToken, setRefreshToken, resetRefreshToken,
     setAvatar, resetAvatar, setIsAlarm, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setIsStaff,
+    addRecentRead,
 } = userSlice.actions;
 
 export default userSlice.reducer;

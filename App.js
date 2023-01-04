@@ -43,6 +43,8 @@ import {
   ProfilePosts,
   OtherProfile,
   PostDetail,
+  SelectBook,
+  CreateBook,
   CreateBookmark,
   EditBookmark,
   CreatePost,
@@ -284,7 +286,7 @@ const App = () => {
                 headerShown: false,
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
-                  if ((routeName === 'CreateBookmark0') && (Platform.OS === 'android')) {
+                  if ((routeName === 'SelectBook0' || 'CreateBook0' || 'CreateBookmark0') && (Platform.OS === 'android')) {
                     return { display: "none", }
                   }
                   return
@@ -304,7 +306,7 @@ const App = () => {
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
                   e.preventDefault();
-                  navigation.navigate(`CreateBookmark${navigation.getState().index}`, { index: navigation.getState().index, });
+                  navigation.navigate(`SelectBook${navigation.getState().index}`, { index: navigation.getState().index, });
                 }
               })}
             />
@@ -315,7 +317,7 @@ const App = () => {
                 headerShown: false,
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
-                  if ((routeName === 'CreateBookmark2') && (Platform.OS === 'android')) {
+                  if ((routeName === 'SelectBook2' || 'CreateBook2' || 'CreateBookmark2') && (Platform.OS === 'android')) {
                     return { display: "none", }
                   }
                   return
@@ -425,6 +427,22 @@ const UserLibraryScreen = ({route, navigation}) => {
     >
       <UserLibraryStack.Screen name="UserLibraryScreen" component={UserLibrary} />
       <UserLibraryStack.Screen 
+        name="SelectBook0" 
+        component={SelectBook}
+        options={{
+          presentation: "fullScreenModal",
+          // animation: "fade",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="CreateBook0" 
+        component={CreateBook}
+        options={{
+          presentation: "fullScreenModal",
+          // animation: "fade",
+        }}
+      />
+      <UserLibraryStack.Screen 
         name="CreateBookmark0" 
         component={CreateBookmark}
         options={{
@@ -456,16 +474,6 @@ const UserLibraryScreen = ({route, navigation}) => {
 
 const HomeScreen = ({route, navigation}) => {
 
-  useLayoutEffect(() => {
-    const routeName = getFocusedRouteNameFromRoute(route);
-    console.log(routeName);
-    if (routeName === 'CreateBookmark2') {
-      navigation.setOptions({tabBarVisible: false});
-    } else {
-      navigation.setOptions({tabBarVisible: true});
-    }
-  }, [navigation, route]);
-
   return (
     <HomeStack.Navigator
       screenOptions={{
@@ -481,12 +489,26 @@ const HomeScreen = ({route, navigation}) => {
           animation: "fade",
         }}
       />
+      <UserLibraryStack.Screen 
+        name="SelectBook2" 
+        component={SelectBook}
+        options={{
+          presentation: "fullScreenModal",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="CreateBook2" 
+        component={CreateBook}
+        options={{
+          presentation: "fullScreenModal",
+          // animation: "fade",
+        }}
+      />
       <HomeStack.Screen 
         name="CreateBookmark2" 
         component={CreateBookmark}
         options={{
           presentation: "fullScreenModal",
-          // animation: "fade",
         }}
       />
       <HomeStack.Screen 

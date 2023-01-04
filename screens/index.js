@@ -17,6 +17,8 @@ export { default as ProfileEdit } from './ProfileEdit';
 export { default as ProfilePosts } from './ProfilePosts';
 export { default as OtherProfile } from './OtherProfile';
 export { default as PostDetail } from './PostDetail';
+export { default as SelectBook } from './SelectBook';
+export { default as CreateBook } from './CreateBook';
 export { default as CreateBookmark } from './CreateBookmark';
 export { default as CreatePost } from './CreatePost';
 export { default as EditPost } from './EditPost';

@@ -781,7 +781,7 @@ const Join2 = ({ navigation, route }) => {
     );
 }
 
-function useDebounce(value, delay = 1000) {
+function useDebounce(value, delay = 500) {
     const [debounceVal, setDebounceVal] = useState(value);
 
     useEffect(() => {
@@ -969,7 +969,7 @@ const Join4 = ({ navigation, route }) => {
         if (debounceVal.length > 0) {
             try {
                 await Api.post("/api/v1/user/verify_username/", {
-                    username: debounceVal,
+                    user_tag: debounceVal,
                 })
                 .then((res) => {
                     console.log(res.data);
@@ -992,7 +992,7 @@ const Join4 = ({ navigation, route }) => {
         // if (loading) {
         // return;
         // }
-
+        console.log(name, hpOrEmail, type, psw, username, date,)
         try {
             await Api
             .post("/api/v1/user/register/", {

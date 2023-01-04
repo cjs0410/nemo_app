@@ -71,8 +71,8 @@ const Login = ({ navigation }) => {
       setLoading(true);
       await Api
       .post("/api/v1/user/login/", {
-        // hp_or_email: hpOrEmail,
-        username: hpOrEmail,
+        hp_or_email: hpOrEmail,
+        // username: hpOrEmail,
         password: password,
         type: type,
       })

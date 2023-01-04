@@ -18,10 +18,9 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
-const DotInputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, setShowMenu, align, }) => {
+const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onChangeFront, frontContent, watermark, setModalVisible, backgroundImage, contentsByLine, setContentsByLine, setContentsByCard, ocrLoading, setShowMenu, align, }) => {
     const [whatBook, setWhatBook] = useState('');
     const [bookList, setBookList] = useState(null);
-    // const [selectedBook, setSelectedBook] = useState(null);
     const debounceVal = useDebounce(whatBook);
     const editorRef = useRef();
     const [inputHeight, setInputHeight] = useState(0);
@@ -34,6 +33,9 @@ const DotInputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onCh
     useEffect(() => {
         fetchBook();
     }, [debounceVal]);
+    useEffect(() => {
+        console.log(selectedBook);
+    }, [selectedBook]);
 
     useEffect(() => {
         const cardNum = Math.floor(lineNum / 9);
@@ -93,17 +95,17 @@ const DotInputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onCh
         }
     }
 
-    const selectBook = (selected) => {
-        setSelectedBook(selected);
-        setBookTitle(selected.book_title);
-        console.log(selected);
-    }
+    // const selectBook = (selected) => {
+    //     setSelectedBook(selected);
+    //     setBookTitle(selected.book_title);
+    //     console.log(selected);
+    // }
 
-    const deleteBook = () => {
-        setBookList(null);
-        setSelectedBook(null);
-        setWhatBook('');
-    }
+    // const deleteBook = () => {
+    //     setBookList(null);
+    //     setSelectedBook(null);
+    //     setWhatBook('');
+    // }
 
     const textInputLineNum = (e) => {
         // setLineNum(e.nativeEvent.lines.length);
@@ -227,14 +229,14 @@ const DotInputCard = ({ color, setBookTitle, selectedBook, setSelectedBook, onCh
                         </View>
                         :
                         <ScrollView
-                        style={{...styles.searchList, backgroundColor: color, }}
-                        showsVerticalScrollIndicator={false}
+                            style={{...styles.searchList, backgroundColor: color, }}
+                            showsVerticalScrollIndicator={false}
                         >
                             {bookList.map((book, index) => (
                                 <TouchableOpacity
                                     activeOpacity={1}
                                     style={styles.searchBlock}
-                                    onPress={() => selectBook(book)}
+                                    // onPress={() => selectBook(book)}
                                     key={index}
                                 >
                                     <Image 

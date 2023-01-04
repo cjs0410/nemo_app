@@ -57,7 +57,7 @@ const CreateBookmark = ({navigation, route}) => {
 
     const [newBookTitle, setNewBookTitle] = useState('');
     const [newBookAuthor, setNewBookAuthor] = useState('');
-    const [selectedBook, setSelectedBook] = useState(null);
+    const { selectedBook, } = route.params;
 
     const [addedNum, setAddedNum] = useState(0);
     const [firstContents, setFirstContents] = useState('');
@@ -556,7 +556,6 @@ const CreateBookmark = ({navigation, route}) => {
             .then((res) => {
                 console.log(res.data);
                 // navigation.goBack();
-                setSelectedBook(res.data);
                 setModalVisible(false);
             })
         } catch (err) {
@@ -646,13 +645,13 @@ const CreateBookmark = ({navigation, route}) => {
         }
     }
 
-    const onExit = () => {
-        Alert.alert("북마크 생성을 취소하시겠습니까?", "확인 버튼을 누르면 취소됩니다.", [
+    const reSelectBook = () => {
+        Alert.alert("Do you want to re-select book?", "확인 버튼을 누르면 취소됩니다.", [
             {
-                text: "취소",
+                text: "No",
             },
             {
-                text: "확인", 
+                text: "Yes", 
                 onPress: () => navigation.goBack()
             }
         ]);
@@ -715,11 +714,11 @@ const CreateBookmark = ({navigation, route}) => {
 
     const onApplyTempBookmark = (bookmark) => {
         console.log(bookmark);
-        setSelectedBook({
-            book_cover: bookmark.book_cover,
-            book_title: bookmark.book_title,
-            book_id: bookmark.book_id,
-        });
+        // setSelectedBook({
+        //     book_cover: bookmark.book_cover,
+        //     book_title: bookmark.book_title,
+        //     book_id: bookmark.book_id,
+        // });
         setWhatChapter(bookmark.chapter_title);
         setFrontContent(bookmark.contents.flat().join(''));
         // if (!bookmark.backgroundimg) {
@@ -768,7 +767,7 @@ const CreateBookmark = ({navigation, route}) => {
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Pressable 
-                        onPress={onExit}
+                        onPress={reSelectBook}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     >
                         <Text style={{ fontSize: regWidth * 15, fontWeight: "500", marginRight: regWidth * 32, color: "#FF4040", }} >취소</Text>
@@ -833,9 +832,7 @@ const CreateBookmark = ({navigation, route}) => {
                 {/*********************************************** 두루마리 휴지형 *******************************************************/}
                 <DotInputCard 
                     color={color} 
-                    setBookTitle={setBookTitle} 
                     selectedBook={selectedBook}
-                    setSelectedBook={setSelectedBook}
                     onChangeChapter={onChangeChapter} 
                     frontContent={frontContent}
                     onChangeFront={onChangeFront} 

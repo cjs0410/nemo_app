@@ -19,11 +19,6 @@ import {
     useScrollToTop,
 } from '@react-navigation/native';
 
-import {
-    BottomSheetModal,
-    BottomSheetModalProvider,
-} from '@gorhom/bottom-sheet';
-
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector, scrapSelector } from '../modules/hooks';
 import { addBookmark } from '../modules/bookmarks';
@@ -33,6 +28,16 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import analytics from '@react-native-firebase/analytics';
 import { unloadAsync } from "expo-font";
+import {
+    BottomSheetModal,
+    BottomSheetModalProvider,
+    BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
+import iconEdit from '../assets/icons/iconEdit.png';
+import iconTrash from '../assets/icons/iconTrash.png';
+import iconAlert from '../assets/icons/iconAlert.png';
+import iconFollow from '../assets/icons/iconFollow.png';
+import iconEyeoff from '../assets/icons/iconEyeoff.png';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -308,25 +313,32 @@ const BookmarkDetail = (props) => {
     };
 
 
-    // // ref
-    // const bottomSheetModalRef = useRef();
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                // animatedIndex={{
+                //     value: 0,
+                // }}
+            />
+        ),
+        []
+    );
 
-    // // variables
-    // const snapPoints = useMemo(() => ['25%', '50%'], []);
+    const menuModalRef = useRef();
+    const snapPoints = useMemo(() => [regHeight * 250], []);
+    const onPressMenu = useCallback(() => {
+        menuModalRef.current.present();
+    }, [menuModalRef]);
 
-    // // callbacks
-    // const handlePresentModalPress = useCallback(() => {
-    //     bottomSheetModalRef.current.present();
-    // }, []);
-    // const handleSheetChanges = useCallback((index) => {
-    //     console.log('handleSheetChanges', index);
-    // }, []);
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        menuModalRef.current.dismiss();
+    }, [menuModalRef]);
 
-    // const bottomSheetRef = useRef(null);
-
-    // const handleSnapPress = useCallback((index) => {
-    //     bottomSheetRef.current.present();
-    // }, []);
 
     if (bookmark === null) {
         return;
@@ -362,7 +374,8 @@ const BookmarkDetail = (props) => {
                     </View>
                     <Pressable
                         hitSlop={{ bottom: 30, left: 30, right: 30, top: 30 }}
-                        onPress={() => setBookmarkModalVisible(true)}
+                        // onPress={() => setBookmarkModalVisible(true)}
+                        onPress={onPressMenu}
                         // onPress={showOrUnshow}
                         // onPress={handlePresentModalPress}
                         // onPress={() => {
@@ -575,8 +588,7 @@ const BookmarkDetail = (props) => {
 
                 </View>
             </View>
-            <Modal
-                // animationType="fade"
+            {/* <Modal
                 transparent={true}
                 visible={bookmarkModalVisible}
             >
@@ -595,14 +607,6 @@ const BookmarkDetail = (props) => {
                     <Animated.View 
                         style={{
                             ...styles.modal,
-                            // transform: [
-                            //     {
-                            //         translateY: modalValue.interpolate({
-                            //             inputRange: [0, 1],
-                            //             outputRange: [0, 300]
-                            //         })
-                            //     }
-                            // ]
                         }}
                     >
                         <TouchableOpacity 
@@ -627,7 +631,6 @@ const BookmarkDetail = (props) => {
                                 onCapture();
                             }}
                         >
-                            {/* <AntDesign name="pluscircleo" size={24} color="black" /> */}
                             <Entypo name="share-alternative" size={24} color="black" />
                             <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
                                 캡쳐 후 공유하기
@@ -680,7 +683,7 @@ const BookmarkDetail = (props) => {
 
                     </Animated.View>
 
-            </Modal>
+            </Modal> */}
 
             {/* <Modal
                 animationType="fade"
@@ -780,77 +783,140 @@ const BookmarkDetail = (props) => {
             </Modal> */}
 
 
-                {/* <BottomSheetModal
-                    ref={bottomSheetModalRef}
-                    index={1}
-                    snapPoints={snapPoints}
-                    onChange={handleSheetChanges}
+            <BottomSheetModal
+                index={0}
+                ref={menuModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={styles.modalContainer}
                 >
-                    <View
-                        style={styles.modal}
+                    <Pressable
+                        onPress={onPressClose}
                     >
-                        <TouchableOpacity 
-                            style={styles.menu}
-                            activeOpacity={1}
-                            onPress={() => {
-                                setBookmarkModalVisible(false);
-                                setReportVisible(true);
-                            }}
-                        >
-                            <Entypo name="warning" size={24} color="red" />
-                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "red", }}>신고</Text>
-                        </TouchableOpacity>
-                        {bookmark.user_tag === userTag ? 
-                            <>
-                                <TouchableOpacity 
-                                    style={styles.menu}
-                                    activeOpacity={1}
-                                    onPress={() => {
-                                        setBookmarkModalVisible(false);
-                                        setReportVisible(false);
-                                        navigation.navigate('EditBookmark', { 
-                                            bookmark: bookmark,
-                                        });
+                        <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                            Cancel
+                        </Text>
+                    </Pressable>
+                    {bookmark.user_tag !== userTag ? 
+                        <>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                                <Image 
+                                    source={iconFollow}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
                                     }}
-                                >
-                                    <AntDesign name="edit" size={24} color="black" />
-                                    <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
-                                        수정하기
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        {`Follow @${bookmark.user_tag}`}
                                     </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity 
-                                    style={styles.menu}
-                                    activeOpacity={1}
-                                    // onPress={deletePost}
-                                >
-                                    <Feather name="trash" size={24} color="black" />
-                                    <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
-                                        삭제하기
+                                </View>
+                            </Pressable>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                                <Image 
+                                    source={iconEyeoff}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        {`Block @${bookmark.user_tag}`}
                                     </Text>
-                                </TouchableOpacity>
-                            </>
-                            :
-                            null
-                        }
-                        <TouchableOpacity 
-                            style={styles.menu}
-                            activeOpacity={1}
-                            onPress={() => {
-                                setBookmarkModalVisible(false);
-                                setAlbumModalVisible(true);
-                                fetchAlbumList();
-                            }}
-                        >
-                            <AntDesign name="pluscircleo" size={24} color="black" />
-                            <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>
-                                앨범에 추가하기
-                            </Text>
-                        </TouchableOpacity>
+                                </View>
+                            </Pressable>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                                <Image 
+                                    source={iconAlert}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Report
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Report your issue
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        </>
+                        :
+                        <>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                                <Image 
+                                    source={iconEdit}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Edit
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Edit your Nemo
+                                    </Text>
+                                </View>
+                            </Pressable>
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
+                                onPress={deleteBookmark}
+                            >
+                                <Image 
+                                    source={iconTrash}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Delete
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Delete Nemo from your library
+                                    </Text>
+                                </View>
+                            </Pressable>
+                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                                <Image 
+                                    source={iconAlert}
+                                    style={{
+                                        height: regWidth * 39,
+                                        width: regWidth * 39,
+                                        resizeMode: "contain",
+                                    }}
+                                />
+                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                        Report
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                        Report your issue
+                                    </Text>
+                                </View>
+                            </Pressable>
+                        </>
+                    }
 
-                    </View>
-                </BottomSheetModal> */}
+                </View>
+            </BottomSheetModal>
 
-            <Modal
+            {/* <Modal
                 // animationType="fade"
                 transparent={true}
                 visible={reportVisible}
@@ -888,9 +954,9 @@ const BookmarkDetail = (props) => {
                         <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "white", }}>신고하기</Text>
                     </TouchableOpacity>
                 </KeyboardAvoidingView>
-            </Modal>
+            </Modal> */}
 
-            <Modal
+            {/* <Modal
                 // animationType="fade"
                 transparent={true}
                 visible={albumModalVisible}
@@ -942,7 +1008,7 @@ const BookmarkDetail = (props) => {
                         </ScrollView>
                     </View>
                 </View>
-            </Modal>
+            </Modal> */}
             {/* </BottomSheetModalProvider> */}
         </>
     );
@@ -1077,6 +1143,9 @@ const styles = StyleSheet.create({
     albumImage: {
         width: 45,
         height: 45,
+    },
+    modalContainer: {
+        marginHorizontal: regWidth * 20,
     },
 })
 

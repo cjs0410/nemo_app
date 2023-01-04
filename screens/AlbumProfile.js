@@ -520,7 +520,10 @@ const AlbumProfile = ({route, navigation}) => {
                                     </Text>
                                 </View>
                             </Pressable>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
+                                onPress={deleteAlbum}
+                            >
                                 <Image 
                                     source={iconTrash}
                                     style={{
