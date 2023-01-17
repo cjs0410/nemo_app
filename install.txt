@@ -42,3 +42,5 @@ npm install expo-image-manipulator-view
 npm install @react-navigation/material-top-tabs react-native-tab-view
 npm install react-native-pager-view
 npm i react-native-modal-datetime-picker @react-native-community/datetimepicker
+
+npm i @invertase/react-native-apple-authentication

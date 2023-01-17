@@ -9,11 +9,103 @@ import Api from '../lib/Api';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
 import GoogleLogo from '../assets/images/GoogleLogo.png';
 import AppleLogo from '../assets/images/AppleLogo.png';
+import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
+import jwtDecode from "jwt-decode";
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const Welcome = ({ navigation }) => {
   const logoValue = useRef(new Animated.Value(0)).current;
+
+  const [credentialStateForUser, updateCredentialStateForUser] = useState(-1);
+  useEffect(() => {
+    if (!appleAuth.isSupported) return;
+
+    fetchAndUpdateCredentialState(updateCredentialStateForUser).catch(error =>
+      updateCredentialStateForUser(`Error: ${error.code}`),
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!appleAuth.isSupported) return;
+
+    return appleAuth.onCredentialRevoked(async () => {
+      console.warn('Credential Revoked');
+      fetchAndUpdateCredentialState(updateCredentialStateForUser).catch(error =>
+        updateCredentialStateForUser(`Error: ${error.code}`),
+      );
+    });
+  }, []);
+
+  /**
+   * Fetches the credential state for the current user, if any, and updates state on completion.
+   */
+  async function fetchAndUpdateCredentialState(updateCredentialStateForUser) {
+    if (user === null) {
+      updateCredentialStateForUser('N/A');
+    } else {
+      const credentialState = await appleAuth.getCredentialStateForUser(user);
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        updateCredentialStateForUser('AUTHORIZED');
+      } else {
+        updateCredentialStateForUser(credentialState);
+      }
+    }
+  }
+
+  async function onAppleButtonPress(updateCredentialStateForUser) {
+    console.log('Beginning Apple Authentication');
+  
+    // start a login request
+    try {
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      });
+  
+      console.log('appleAuthRequestResponse', appleAuthRequestResponse);
+  
+      const {
+        user: newUser,
+        email,
+        nonce,
+        identityToken,
+        realUserStatus /* etc */,
+      } = appleAuthRequestResponse;
+  
+      user = newUser;
+  
+      fetchAndUpdateCredentialState(updateCredentialStateForUser).catch(error =>
+        updateCredentialStateForUser(`Error: ${error.code}`),
+      );
+  
+      if (identityToken) {
+        // e.g. sign in with Firebase Auth using `nonce` & `identityToken`
+        console.log(nonce, jwtDecode(identityToken, {header: true}));
+        await Api
+        .post('', {
+
+        })
+        .then((res) => {
+          console.log("asdf")
+        })
+      } else {
+        // no token - failed sign-in?
+      }
+  
+      if (realUserStatus === appleAuth.UserStatus.LIKELY_REAL) {
+        console.log("I'm a real person!");
+      }
+  
+      console.log(`Apple Authentication Completed, ${user}, ${email}`);
+    } catch (error) {
+      if (error.code === appleAuth.Error.CANCELED) {
+        console.log('User canceled Apple Sign in.');
+      } else {
+        console.error(error);
+      }
+    }
+  }
 
   const showLogo = () => {
       Animated.timing(logoValue, {
@@ -123,8 +215,8 @@ const Welcome = ({ navigation }) => {
     //   </View>
     // );
     return (
-      <View style={{flex:1}}>
-                <View style={{
+      <View style={{ flex:1, }}>
+        <View style={{
           // flexDirection: "row",
           alignItems: "center",
           marginTop: regHeight*77,
@@ -185,6 +277,7 @@ const Welcome = ({ navigation }) => {
           <Pressable 
               style={{ ...styles.Btn, marginTop: regHeight*14, borderColor: "#202020" }} 
               // onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
+              onPress={() => onAppleButtonPress(updateCredentialStateForUser)}
           >
               <Image 
                 source={AppleLogo}
@@ -197,8 +290,15 @@ const Welcome = ({ navigation }) => {
                 onLoadEnd={showLogo}
               />
               <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: "#202020" }} >
-                  Continue with Apple</Text>
+                Continue with Apple
+              </Text>
           </Pressable>
+          {/* <AppleButton
+            buttonStyle={AppleButton.Style.WHITE}
+            buttonType={AppleButton.Type.SIGN_IN}
+            style={{ ...styles.Btn, marginTop: regHeight*14, borderColor: "#202020" }} 
+            onPress={() => onAppleButtonPress()}
+          /> */}
         </View>
         <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: regHeight*25}}>
           <View style={{ backgroundColor: "#606060", height: regHeight*1, width: regWidth*130 }}>
