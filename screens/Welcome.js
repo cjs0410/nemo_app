@@ -10,14 +10,27 @@ import NemoLogo from '../assets/images/NemoLogo(small).png';
 import GoogleLogo from '../assets/images/GoogleLogo.png';
 import AppleLogo from '../assets/images/AppleLogo.png';
 import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import jwtDecode from "jwt-decode";
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const Welcome = ({ navigation }) => {
   const logoValue = useRef(new Animated.Value(0)).current;
+  const googleSigninConfigure = () => { 
+    GoogleSignin.configure({ webClientId: '594229461555-jj0lrqph4o81vq8fdkgesskvu0pdh0js.apps.googleusercontent.com'}) 
+  }
 
   const [credentialStateForUser, updateCredentialStateForUser] = useState(-1);
+
+  useEffect(()=>{
+    googleSigninConfigure();
+  },[])
+
   useEffect(() => {
     if (!appleAuth.isSupported) return;
 
@@ -36,6 +49,12 @@ const Welcome = ({ navigation }) => {
       );
     });
   }, []);
+
+  const onGoogleButtonPress = async () => { 
+    const { idToken } = await GoogleSignin.signIn(); 
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken); 
+    return auth().signInWithCredential(googleCredential); 
+  }
 
   /**
    * Fetches the credential state for the current user, if any, and updates state on completion.
@@ -82,13 +101,13 @@ const Welcome = ({ navigation }) => {
       if (identityToken) {
         // e.g. sign in with Firebase Auth using `nonce` & `identityToken`
         console.log(nonce, jwtDecode(identityToken, {header: true}));
-        await Api
-        .post('', {
+        // await Api
+        // .post('', {
 
-        })
-        .then((res) => {
-          console.log("asdf")
-        })
+        // })
+        // .then((res) => {
+        //   console.log("asdf")
+        // })
       } else {
         // no token - failed sign-in?
       }
@@ -259,7 +278,7 @@ const Welcome = ({ navigation }) => {
           <Pressable 
               // hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
               style={{ ...styles.Btn, marginTop: regHeight*65, borderColor: "#202020" }} 
-              // onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
+              onPress={() => onGoogleButtonPress()}
           >
               <Image 
                 source={GoogleLogo}
