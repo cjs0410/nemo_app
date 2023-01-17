@@ -133,7 +133,7 @@ const Card = (props) => {
                     backgroundColor: bookmark.hex === null ? "#D9D9D9" : bookmark.hex, 
                 }} 
             >
-                {bookmark.backgroundimg !== null ? 
+                {/* {bookmark.backgroundimg !== null ? 
                 
                     <View style={styles.backgroungImageContainer}>
                         <Animated.Image 
@@ -148,7 +148,7 @@ const Card = (props) => {
                     </View>
                     :
                     null
-                }
+                } */}
                 <View style={{
                     ...styles.bookmarkContentsBook,
                 }}>
@@ -243,7 +243,7 @@ const Card = (props) => {
                         onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     >
-                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", marginTop: regWidth * 9, marginHorizontal: regWidth * 2, }} >{`@${bookmark.user_tag}`}</Text>
                     </Pressable>
                 </View>
             </View>
@@ -1262,7 +1262,7 @@ const styles = StyleSheet.create({
         marginHorizontal: regWidth * 13,
         paddingVertical: regWidth * 5,
         borderRadius: 2,
-        paddingHorizontal: regWidth * 10,
+        paddingHorizontal: regWidth * 3,
     },
     bookmarkContentsBookCover: {
         // flex: 1,
@@ -1281,11 +1281,11 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsBookTitle: {
         fontWeight: "400",
-        fontSize: regWidth * 10,
+        fontSize: regWidth * 11,
         width: regWidth * 250,
     },
     bookmarkContentsBookChapter: {
-        fontWeight: "700",
+        fontWeight: "900",
         fontSize: regWidth * 15,
         width: regWidth * 230,
     },
@@ -1296,10 +1296,11 @@ const styles = StyleSheet.create({
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
         // flex: 4,
-        height: regHeight * 284,
-        marginTop: regHeight * 8,
+        height: regHeight * 264,
+        marginTop: regHeight * 20,
         // justifyContent: "center",
         justifyContent: "flex-start", 
+        paddingHorizontal: regWidth * 7,
     },
     bookmarkContentsText: {
         fontWeight: "500",

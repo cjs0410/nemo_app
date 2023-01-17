@@ -57,6 +57,7 @@ import {
   FollowScreen,
   LikeUsers,
   UserLibrary,
+  NemoCalender,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -286,7 +287,10 @@ const App = () => {
                 headerShown: false,
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
-                  if ((routeName === 'SelectBook0' || 'CreateBook0' || 'CreateBookmark0') && (Platform.OS === 'android')) {
+                  if ((routeName === 'SelectBook0' || routeName === 'CreateBook0' || routeName === 'CreateBookmark0') && (Platform.OS === 'android')) {
+                    return { display: "none", }
+                  }
+                  if (routeName === 'NemoCalender') {
                     return { display: "none", }
                   }
                   return
@@ -317,7 +321,7 @@ const App = () => {
                 headerShown: false,
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
-                  if ((routeName === 'SelectBook2' || 'CreateBook2' || 'CreateBookmark2') && (Platform.OS === 'android')) {
+                  if ((routeName === 'SelectBook2' || routeName === 'CreateBook2' || routeName === 'CreateBookmark2') && (Platform.OS === 'android')) {
                     return { display: "none", }
                   }
                   return
@@ -460,6 +464,14 @@ const UserLibraryScreen = ({route, navigation}) => {
       <UserLibraryStack.Screen name="AlbumProfile" component={AlbumProfile} />
       <UserLibraryStack.Screen name="BookProfile" component={BookProfile} />
       <UserLibraryStack.Screen name="OtherProfile" component={OtherProfile} />
+      <UserLibraryStack.Screen 
+        name="NemoCalender" 
+        component={NemoCalender}
+        options={{
+          // presentation: "fullScreenModal",
+          presentation: "card"
+        }} 
+      />
       <UserLibraryStack.Screen 
         name="ProfileEdit" 
         component={ProfileEdit}

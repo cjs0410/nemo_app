@@ -362,7 +362,7 @@ const CreateBookmark = ({navigation, route}) => {
             formData.append('hex', color);
             formData.append('text', info);
             formData.append('tags', JSON.stringify(tags));
-            formData.append('album_id', albumId);
+            formData.append('nemolist_id', albumId);
             // if (backgroundImage !== null) {
             //     const filename = backgroundImage.split('/').pop();
             //     const match = /\.(\w+)$/.exec(filename ?? '');
@@ -385,7 +385,7 @@ const CreateBookmark = ({navigation, route}) => {
                 )
                 .then((res) => {
                     console.log(res.data);
-                    navigation.goBack();
+                    navigation.popToTop();
                     dispatch(setShouldHomeRefresh(true));
                     dispatch(setShouldLibraryRefresh(true));
                     dispatch(setShouldUserRefresh(true));
@@ -761,11 +761,33 @@ const CreateBookmark = ({navigation, route}) => {
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.header} >
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Text style={{ fontSize: regWidth * 25, fontWeight: "900", marginRight: regWidth * 8, }} >Create</Text>
-                    <Feather name="bookmark" size={28} color="black" />
-                </View>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                <Pressable 
+                    onPress={reSelectBook}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginRight: regWidth * 8, }} >Cancel</Text>
+                </Pressable>
+                <Pressable
+                    style={{
+                        backgroundColor: colors.nemoDark,
+                        paddingVertical: regHeight * 5,
+                        paddingHorizontal: regWidth * 11,
+                        borderRadius: 10,
+                    }}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    onPress={onAddBookmark}
+                >
+                    <Text
+                        style={{
+                            color: "white",
+                            fontSize: regWidth * 17,
+                            fontWeight: "700",
+                        }}
+                    >
+                        Create Nemo
+                    </Text>
+                </Pressable>
+                {/* <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Pressable 
                         onPress={reSelectBook}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -797,7 +819,7 @@ const CreateBookmark = ({navigation, route}) => {
                             <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }} >완료</Text>
                         </Pressable>
                     }
-                </View>
+                </View> */}
             </SafeAreaView>
 
             <ScrollView
@@ -1992,11 +2014,11 @@ const styles = StyleSheet.create({
     header: {
         // backgroundColor: "red",
         marginVertical: 10,
-        marginHorizontal: 20,
+        marginHorizontal: regWidth * 13,
         paddingBottom: 8,
         flexDirection: "row",
-        justifyContent: "space-between"
-
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     searchInput: {
         backgroundColor: "#EEEEEE",

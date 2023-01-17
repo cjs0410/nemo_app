@@ -146,12 +146,36 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                 <View 
                     style={{
                         ...styles.bookmarkContentsBook,
-                        // borderStyle: 'dashed', 
-                        // borderWidth:  bookList !== null ? 0 : 0.5,
+                        // backgroundColor: "green",
                     }}
                     
                 >
-                    {selectedBook === null ? 
+
+                    <Image 
+                        source={ selectedBook.book_cover !== null ? { uri: selectedBook.book_cover } : blankBookCover} 
+                        style={styles.bookmarkContentsBookCover} 
+                    />
+                    <View style={{ width: SCREEN_WIDTH - regWidth * (26 + 6 + 40)}}>
+                        <Text 
+                            style={styles.bookmarkContentsBookTitle}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                        >
+                            {selectedBook.book_title}
+                        </Text>
+                        <TextInput 
+                            placeholder="Detail Information"
+                            style={{
+                                ...styles.bookmarkContentsBookChapterInput,
+                                borderWidth: 0.5,
+                                borderStyle: 'dashed',
+                            }}
+                            onChangeText={onChangeChapter}
+                            value={whatChapter}
+                            // maxLength={regWidth * 22}
+                        />
+                    </View>
+                    {/* {selectedBook === null ? 
                         <>
                             <Feather name="search" size={20} color="grey" />
                             <ScrollView
@@ -185,25 +209,29 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                     {selectedBook.book_title}
                                 </Text>
                                 <TextInput 
-                                    placeholder="Write Chapter"
-                                    style={styles.bookmarkContentsBookChapterInput}
+                                    placeholder="Detail Information"
+                                    style={{
+                                        ...styles.bookmarkContentsBookChapterInput,
+                                        borderWidth: 0.5,
+                                        borderStyle: 'dashed',
+                                    }}
                                     onChangeText={onChangeChapter}
                                     value={whatChapter}
-                                    maxLength={regWidth * 22}
+                                    // maxLength={regWidth * 22}
                                 />
                             </View>
                         </View>
-                    }
-                    {bookList !== null ? 
+                    } */}
+                    {/* {bookList !== null ? 
                         <TouchableOpacity
                             activeOpacity={1}
-                            onPress={deleteBook}
+                            // onPress={deleteBook}
                         >
                             <Feather name="x" size={24} color="black" />
                         </TouchableOpacity>
                         :
                         null
-                    }
+                    } */}
 
                 </View>
                 {bookList !== null && selectedBook === null ? 
@@ -303,11 +331,12 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                     fontWeight: "500",
                                     fontSize: regWidth * 16,
                                     lineHeight: regWidth * 28,
+                                    paddingHorizontal: regWidth * 7,
                                     // paddingHorizontal: 8,
                                     // backgroundColor: "pink",
                                     // borderStyle: 'dashed',
                                     // borderWidth: 0.5,
-                                    // height: regHeight * 284 + extraHeight,
+                                    height: regHeight * 284 + extraHeight,
 
                                 }} 
                                 placeholder="Write anything from your reading"
@@ -384,7 +413,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
 
                 </View>
                 <View style={styles.postContentsWatermark}>
-                    <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${watermark}`}</Text>
+                    <Text style={{ fontSize: regWidth * 11, fontWeight: "700", marginTop: regWidth * 9, marginHorizontal: regWidth * 2, }} >{`@${watermark}`}</Text>
                 </View>
             </View>
         </View>
@@ -424,7 +453,7 @@ const styles = StyleSheet.create({
         marginHorizontal: regWidth * 13,
         paddingVertical: regWidth * 5,
         borderRadius: 2,
-        paddingHorizontal: regWidth * 10,
+        paddingHorizontal: regWidth * 3,
     },
     bookmarkContentsBookCover: {
         // flex: 1,
@@ -438,14 +467,15 @@ const styles = StyleSheet.create({
         // flex: 0.6,
         height: regHeight * 43,
         flexDirection: "row", 
-        justifyContent: "space-between",
+        // justifyContent: "space-between",
         alignItems: "center",
     },
     bookmarkContentsBookTitle: {
-        fontWeight: "700",
-        fontSize: regWidth * 15,
-        marginTop: regWidth * 8,
+        fontWeight: "500",
+        fontSize: regWidth * 12,
+        // marginTop: regWidth * 8,
         width: regWidth * 250,
+        lineHeight: regWidth * 17,
     },
     bookmarkContentsBookChapter: {
         fontWeight: "400",
@@ -453,8 +483,9 @@ const styles = StyleSheet.create({
         width: regWidth * 230,
     },
     bookmarkContentsBookChapterInput: {
-        fontWeight: "400",
+        fontWeight: "900",
         fontSize: regWidth * 15,
+        lineHeight: regWidth * 21,
     },
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
@@ -473,11 +504,8 @@ const styles = StyleSheet.create({
         // backgroundColor: "pink",
         // flex: 4,
         height: regHeight * 284,
-        marginTop: regHeight * 8,
-        // justifyContent: "center",
+        marginTop: regHeight * 2,
         justifyContent: "flex-start",
-        // textAlignVertical: "top",
-        
     },
     richTextEditorStyle: {
         borderBottomLeftRadius: 10,
@@ -498,6 +526,7 @@ const styles = StyleSheet.create({
         height: regHeight * 21,
         flexDirection: "row",
         justifyContent: "space-between",
+        // alignItems: "flex-end",
     },
     searchList: {
         backgroundColor: "#D9D9D9",

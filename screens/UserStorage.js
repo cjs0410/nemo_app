@@ -383,7 +383,15 @@ const UserStorage = ({route, navigation}) => {
                                             }}
                                             key={index}
                                         >
-                                            <Text style={{ color: colors.bgdLight, fontSize: regWidth * 11, fontWeight: "700", lineHeight: regWidth * 16, }}>
+                                            <Text 
+                                                style={{ 
+                                                    color: colors.bgdLight, 
+                                                    fontSize: regWidth * 11, 
+                                                    fontWeight: "700", 
+                                                    lineHeight: regWidth * 16, 
+                                                    marginBottom: regHeight * 4,
+                                                }}
+                                            >
                                                 {day.days}
                                             </Text>
                                             <ImageBackground 
@@ -417,7 +425,7 @@ const UserStorage = ({route, navigation}) => {
                                 <View style = {{ width: "100%", alignItems: "center", marginTop: regHeight*9 }}>
                                     <Pressable 
                                         style={ styles.viewAllBtn } 
-                                        // onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
+                                        onPress={() => navigation.navigate('NemoCalender')}
                                     >
                                         <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#FFFFFF" }} >
                                             View all</Text>
@@ -667,7 +675,7 @@ const styles = StyleSheet.create({
         fontWeight: "900",
         fontSize: regWidth*16,
         letterSpacing: -regWidth,
-        width: regWidth * 12,
+        // width: regWidth * 20,
     },
     followTxt: {
         marginLeft: regWidth*8,

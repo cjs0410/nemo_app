@@ -22,7 +22,7 @@ const AlbumList = (props) => {
         <View style={styles.AlbumListContainer}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Animated.Image 
-                    source={ isDefault ? likedNemos : { uri: album.album_cover }} 
+                    source={ isDefault ? likedNemos : { uri: album.nemolist_cover }} 
                     style={{
                         ...styles.AlbumImage,
                         opacity: albumCoverValue

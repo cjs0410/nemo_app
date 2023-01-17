@@ -14,7 +14,7 @@ import {
     Animated,
     FlatList,
 } from "react-native";
-import React, { useEffect, useState, useCallback, useRef, createRef, useMemo, forwardRef, } from "react";
+import React, { useEffect, useState, useCallback, useRef, createRef, useMemo, forwardRef, Suspense, } from "react";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons';
 import {
@@ -69,7 +69,7 @@ const TopTab = createMaterialTopTabNavigator();
 const UserLibrary = ({navigation, route }) => {
     const dispatch = useDispatch();
     const { isAlarm, avatar, } = useSelector(userSelector);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     // const snapPoints = useMemo(() => ['25%','65%'], []);
 
@@ -87,13 +87,14 @@ const UserLibrary = ({navigation, route }) => {
     const fetchRefreshToken = async() => {
         const refreshToken = await AsyncStorage.getItem('refresh');
         if (refreshToken !== null) {
+            setLoading(true);
             try {
             await Api.post("/api/v1/user/reissue/", {
                 refresh_token: refreshToken,
             })
             .then(async(res) => {
                 try {
-                    // console.log("reissue!", res.data.refresh);
+                    // console.log("reissue!");
                     // console.log(res.data);
                     await AsyncStorage.setItem('refresh', res.data.refresh)
                     .then(async() => await AsyncStorage.setItem('access', res.data.access))
@@ -118,16 +119,17 @@ const UserLibrary = ({navigation, route }) => {
                     console.error(err);
                 }
             }
+            setLoading(false);
         }
     }
 
     const fetchAvatar = async() => {
-        // const refreshToken = await AsyncStorage.getItem('refresh');
+        const refreshToken = await AsyncStorage.getItem('refresh');
         try {
             await Api
             .get("/api/v1/user/avatar/")
             .then((res) => {
-                // console.log("avatar!", refreshToken);
+                // console.log("avatar!");
                 // console.log(res.data);
                 dispatch(setAvatar(res.data.avatar));
             })
@@ -137,12 +139,12 @@ const UserLibrary = ({navigation, route }) => {
     }
 
     const fetchNewAlarm = async() => {
-        // const refreshToken = await AsyncStorage.getItem('refresh');
+        const refreshToken = await AsyncStorage.getItem('refresh');
         try {
             await Api
             .get("/api/v1/user/new_alarm/")
             .then((res) => {
-                // console.log("alarm!", refreshToken);
+                // console.log("alarm!");
                 dispatch(setIsAlarm(res.data.alarm));
             })
         } catch (err) {
@@ -238,18 +240,21 @@ const UserLibrary = ({navigation, route }) => {
                     </Pressable>
                 </View>
             </SafeAreaView>
-            
-            <TopTab.Navigator
-                tabBar={(props) => <MyTabBar {...props} />}
-            >
-                <TopTab.Screen 
-                    name="Nemos" 
-                    component={NemoScreen} 
-                    // initialParams={{ sortModalRef: sortModalRef, }}
-                />
-                <TopTab.Screen name="NemoLists" component={NemoListScreen} />
-                <TopTab.Screen name="Books" component={BookScreen} />
-            </TopTab.Navigator>
+            {loading ? 
+                null
+                :
+                <TopTab.Navigator
+                    tabBar={(props) => <MyTabBar {...props} />}
+                >
+                    <TopTab.Screen 
+                        name="Nemos" 
+                        component={NemoScreen} 
+                        // initialParams={{ sortModalRef: sortModalRef, }}
+                    />
+                    <TopTab.Screen name="NemoLists" component={NemoListScreen} />
+                    <TopTab.Screen name="Books" component={BookScreen} />
+                </TopTab.Navigator>
+            }
 
             <BottomSheetModal
                 index={0}
@@ -311,11 +316,13 @@ const NemoScreen = ({route, navigation}) => {
     // const { sortModalRef, } = route.params;
     const [loading, setLoading] = useState(false);
     const [bookmarks, setBookmarks] = useState(null);
+    const [newBookmarkNum, setNewBookmarkNum] = useState(0);
     const { shouldLibraryRefresh } = useSelector(userSelector);
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const sortList = [ "recents", "book", ];
-    const [sort, setSort] = useState(0)
+    const [sort, setSort] = useState(0);
+    const [scrollLoading, setScrollLoading] = useState(false);
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -340,18 +347,20 @@ const NemoScreen = ({route, navigation}) => {
     )
 
     const fetchBookmarkList = async(sortNum) => {
-        console.log(sortList[sortNum])
         try {
             setLoading(true);
             await Api
             .post("api/v1/user/library/", {
                 ctg: "nemos",
-                // sort: "recents",
                 sort: sortList[sortNum],
+                items: 0,
             })
             .then((res) => {
                 // console.log(res.data);
-                setBookmarks(res.data.reverse());
+                // console.log("fetch Nemos");
+                // setBookmarks(res.data.reverse());
+                setBookmarks(res.data);
+                setNewBookmarkNum(res.data.length);
             })
         } catch (err) {
             console.error(err);
@@ -372,6 +381,38 @@ const NemoScreen = ({route, navigation}) => {
         onPressClose();
         fetchBookmarkList(sortNum)
     }
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getBookmarks();
+        }
+    };
+
+    const getBookmarks = async() => {
+        if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
+            // console.log(bookmarks[bookmarks.length - 1].nemo_num);
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("api/v1/user/library/", {
+                    ctg: "nemos",
+                    sort: sortList[sort],
+                    items: bookmarks.length,
+                    // cursor: bookmarks[bookmarks.length - 1].nemo_num,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setBookmarks([...bookmarks, ...res.data, ]);
+                    setNewBookmarkNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+            // setCursor(bookmarks.at(-1).cursor);
+        }
+    };
 
 
     const renderBackdrop = useCallback(
@@ -412,6 +453,9 @@ const NemoScreen = ({route, navigation}) => {
                         refreshing={refreshing}
                         onRefresh={onRefresh}
                         ref={ref}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={0.3}
+                        ListFooterComponent={scrollLoading && <ActivityIndicator />}
                         ListHeaderComponent={
                             <View
                                 style={{
@@ -549,7 +593,7 @@ const NemoListScreen = ({navigation}) => {
     useScrollToTop(ref);
 
     useEffect(() => {
-        fetchAlbum(sort);
+        fetchNemoList(sort);
     }, []);
 
     const renderAlbum = ({ item, index }) => (
@@ -561,18 +605,18 @@ const NemoListScreen = ({navigation}) => {
         </TouchableOpacity>
     )
 
-    const fetchAlbum = async(sortNum) => {
-        console.log(sortList[sortNum])
+    const fetchNemoList = async(sortNum) => {
         try {
             setLoading(true);
             await Api
             .post("api/v1/user/library/", {
                 ctg: "nemolists",
                 sort: sortList[sortNum],
-                cursor: "",
+                items: 0,
             })
             .then((res) => {
                 console.log(res.data);
+                // console.log("fetch Nemolists");
                 setLikedNemos(res.data.Liked_Nemos);
                 setNemolists(res.data.Nemolists);
             })
@@ -585,14 +629,14 @@ const NemoListScreen = ({navigation}) => {
     const onRefresh = useCallback(async() => {
         setRefreshing(true);
 
-        await fetchAlbum(sort)
+        await fetchNemoList(sort)
         .then(() => setRefreshing(false));
     }, []);
 
     const onSort = (sortNum) => {
         setSort(sortNum);
         onPressClose();
-        fetchAlbum(sortNum);
+        fetchNemoList(sortNum);
     }
 
 
@@ -623,7 +667,7 @@ const NemoListScreen = ({navigation}) => {
             <FlatList 
                 data={nemolists}
                 renderItem={renderAlbum}
-                keyExtractor={album => album.album_id}
+                keyExtractor={nemolist => nemolist.nemolist_id}
                 showsVerticalScrollIndicator={false}
                 refreshing={refreshing}
                 onRefresh={onRefresh}

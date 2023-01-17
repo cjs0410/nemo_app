@@ -184,8 +184,8 @@ const BookmarkDetail = (props) => {
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.count);
                 // dispatch(setShouldHomeRefresh(true));
-                dispatch(setShouldLibraryRefresh(true));
-                dispatch(setShouldUserRefresh(true));
+                // dispatch(setShouldLibraryRefresh(true));
+                // dispatch(setShouldUserRefresh(true));
                 if (res.data.is_like) {
                     await analytics().logEvent('like', {
                         writer_tag: bookmark.user_tag,
@@ -209,7 +209,7 @@ const BookmarkDetail = (props) => {
             .then((res) => {
                 setIsScrap(res.data.is_scrap);
                 setScrapCount(res.data.count);
-                dispatch(setShouldLibraryRefresh(true));
+                // dispatch(setShouldLibraryRefresh(true));
             })
         } catch (err) {
             console.error(err);
