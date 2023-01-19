@@ -84,12 +84,12 @@ const UserStorage = ({route, navigation}) => {
     //     }, [])
     // );
 
-    const onRefresh = useCallback(async() => {
-        setRefreshing(true);
-        await fetchProfile()
-        .then(() => fetchBookmarkList())
-        .then(() => setRefreshing(false));
-    }, []);
+    // const onRefresh = useCallback(async() => {
+    //     setRefreshing(true);
+    //     await fetchProfile()
+    //     .then(() => fetchBookmarkList())
+    //     .then(() => setRefreshing(false));
+    // }, []);
 
     const fetchProfile = async() => {
         try {

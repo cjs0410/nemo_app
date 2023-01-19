@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, Image, Animated, Pressable, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, Image, Animated, Pressable, Platform, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 // import favicon from '../assets/images/favicon.ico';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
@@ -6,6 +6,7 @@ import * as Font from "expo-font";
 import * as Update from "expo-updates";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import Api from '../lib/Api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
 import GoogleLogo from '../assets/images/GoogleLogo.png';
 import AppleLogo from '../assets/images/AppleLogo.png';
@@ -15,21 +16,26 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
 import jwtDecode from "jwt-decode";
+
+import { useSelector, useDispatch } from 'react-redux';
+import { userSelector } from '../modules/hooks';
+import { setUserInfo, setRefreshToken, } from '../modules/user';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const Welcome = ({ navigation }) => {
+  const dispatch = useDispatch();
   const logoValue = useRef(new Animated.Value(0)).current;
   const googleSigninConfigure = () => { 
-    GoogleSignin.configure({ webClientId: '594229461555-jj0lrqph4o81vq8fdkgesskvu0pdh0js.apps.googleusercontent.com'}) 
+    GoogleSignin.configure({ 
+      webClientId: '594229461555-l001ir3b47pdahbqbioo23og1fjuus7i.apps.googleusercontent.com',
+      offlineAccess: true,
+    }) 
   }
 
   const [credentialStateForUser, updateCredentialStateForUser] = useState(-1);
-
-  useEffect(()=>{
-    googleSigninConfigure();
-  },[])
 
   useEffect(() => {
     if (!appleAuth.isSupported) return;
@@ -50,10 +56,44 @@ const Welcome = ({ navigation }) => {
     });
   }, []);
 
+  useEffect(() => {
+    googleSigninConfigure();
+  },[]);
+
   const onGoogleButtonPress = async () => { 
-    const { idToken } = await GoogleSignin.signIn(); 
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken); 
-    return auth().signInWithCredential(googleCredential); 
+    // const { idToken } = await GoogleSignin.signIn(); 
+    // const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    // console.log(googleCredential); 
+    // return auth().signInWithCredential(googleCredential); 
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      // console.log(userInfo);
+      // console.log(jwtDecode(userInfo.idToken));
+
+      try {
+        await Api
+        .post("/api/v1/user/social_login/", {
+          ctg: "google",
+          id_token: userInfo.idToken,
+        })
+        .then(async(res) => {
+          try {
+            await AsyncStorage.setItem('refresh', res.data.refresh);
+            await AsyncStorage.setItem('access', res.data.access);
+            dispatch(setRefreshToken(res.data.refresh));
+          } catch (err) {
+            console.error(err);
+          }
+        })
+      } catch (err) {
+        console.error(err);
+      }
+
+    } catch (err) {
+      console.log(err.message);
+    }
+
   }
 
   /**
@@ -99,15 +139,27 @@ const Welcome = ({ navigation }) => {
       );
   
       if (identityToken) {
-        // e.g. sign in with Firebase Auth using `nonce` & `identityToken`
         console.log(nonce, jwtDecode(identityToken, {header: true}));
-        // await Api
-        // .post('', {
+        try {
+          await Api
+          .post('/api/v1/user/social_login/', {
+              ctg: "apple",
+              id_token: identityToken,
+          })
+          .then(async(res) => {
+            console.log(res.data)
+            try {
+              await AsyncStorage.setItem('refresh', res.data.refresh);
+              await AsyncStorage.setItem('access', res.data.access);
+              dispatch(setRefreshToken(res.data.refresh));
+            } catch (err) {
+              console.error(err);
+            }
+          })
+        } catch (err) {
+          console.error(err)
+        }
 
-        // })
-        // .then((res) => {
-        //   console.log("asdf")
-        // })
       } else {
         // no token - failed sign-in?
       }
@@ -293,25 +345,29 @@ const Welcome = ({ navigation }) => {
               <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: "#202020" }} >
                   Continue with Google</Text>
           </Pressable>
-          <Pressable 
+          {Platform.OS === "ios" ?
+            <Pressable 
               style={{ ...styles.Btn, marginTop: regHeight*14, borderColor: "#202020" }} 
-              // onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
               onPress={() => onAppleButtonPress(updateCredentialStateForUser)}
-          >
-              <Image 
-                source={AppleLogo}
-                style={{
-                  width: regWidth*25,
-                  height: regHeight*27,
-                  marginRight: regWidth*13,
-                  resizeMode: "contain"
-                }}
-                onLoadEnd={showLogo}
-              />
-              <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: "#202020" }} >
-                Continue with Apple
-              </Text>
-          </Pressable>
+            >
+                <Image 
+                  source={AppleLogo}
+                  style={{
+                    width: regWidth*25,
+                    height: regHeight*27,
+                    marginRight: regWidth*13,
+                    resizeMode: "contain"
+                  }}
+                  onLoadEnd={showLogo}
+                />
+                <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: "#202020" }} >
+                  Continue with Apple
+                </Text>
+            </Pressable>
+            :
+            null
+          }
+
           {/* <AppleButton
             buttonStyle={AppleButton.Style.WHITE}
             buttonType={AppleButton.Type.SIGN_IN}

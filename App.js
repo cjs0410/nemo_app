@@ -58,6 +58,7 @@ import {
   LikeUsers,
   UserLibrary,
   NemoCalender,
+  CreateNemolist,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -475,6 +476,14 @@ const UserLibraryScreen = ({route, navigation}) => {
       <UserLibraryStack.Screen 
         name="ProfileEdit" 
         component={ProfileEdit}
+        options={{
+          presentation: "transparentModal",
+          // animation: "horizontal",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="CreateNemolist" 
+        component={CreateNemolist}
         options={{
           presentation: "transparentModal",
           // animation: "horizontal",

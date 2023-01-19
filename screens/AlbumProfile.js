@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, } from "react-native";
+import { StyleSheet, View, SafeAreaView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, ImageBackground, } from "react-native";
 import React, { useEffect, useState, useRef, useCallback, useMemo, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
@@ -25,6 +25,14 @@ import iconTrash from '../assets/icons/iconTrash.png';
 import iconAlert from '../assets/icons/iconAlert.png';
 import iconFollow from '../assets/icons/iconFollow.png';
 import iconEyeoff from '../assets/icons/iconEyeoff.png';
+import iconThreeDot from '../assets/icons/iconThreeDot.png';
+import vectorLeftImage from '../assets/icons/vector_left.png';
+import likedNemos from '../assets/images/likedNemos.png';
+import shadow from '../assets/images/shadow.png';
+import iconHeart from '../assets/icons/iconHeart.png';
+import iconHeartOutline from '../assets/icons/iconHeartOutline.png';
+
+import LinearGradient from 'react-native-linear-gradient';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -49,23 +57,24 @@ const AlbumProfile = ({route, navigation}) => {
     const [isDeleteMode, setIsDeleteMode] = useState(false);
     const [selectToDelete, setSelectToDelete] = useState([]);
 
+    const [headerHeight, setHeaderHeight] = useState(0);
 
     useEffect(() => {
         fetchAlbum();
-        fetchUserTag();
     }, [])
 
     const fetchAlbum = async() => {
-        // console.log(albumId);
+        console.log(albumId);
         try {
             setLoading(true)
             await Api.post("/api/v4/album/view/", {
-                album_id: albumId,
+                nemolist_id: albumId,
             })
             .then((res) => {
                 // console.log(res.data);
                 // console.log(res.data.bookmarks);
                 setAlbumInfo(res.data);
+
                 setBookmarkNumbering(
                     (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a)
                 )
@@ -247,6 +256,181 @@ const AlbumProfile = ({route, navigation}) => {
         // @ts-ignore
         menuModalRef.current.dismiss();
     }, [menuModalRef]);
+
+    const onLayout = (e) => {
+        console.log(e.nativeEvent.layout.height);
+        setHeaderHeight(e.nativeEvent.layout.height);
+    }
+
+
+    return (
+        <View style={styles.container}>
+            {albumInfo !== null ? 
+                <>
+                    <SafeAreaView 
+                        style={{
+                            ...styles.header,
+                            zIndex: 10,
+                        }}
+                        onLayout={onLayout}
+                    >
+                        <Pressable
+                            onPress={() => navigation.goBack()}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        >
+                            <Image 
+                                source={vectorLeftImage} 
+                                style={{ width: regWidth*35, height: regWidth*35 }}
+                            />
+                        </Pressable>
+                        <Text
+                            style={{
+                                fontSize: regWidth * 17,
+                                fontWeight: "700",
+                            }}
+                        >
+                            {albumInfo.nemolist_title}
+                        </Text>
+                        <Pressable
+                            onPress={() => navigation.goBack()}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        >
+                            <Image 
+                                source={iconThreeDot} 
+                                style={{ width: regWidth*35, height: regWidth*35 }}
+                            />
+                        </Pressable>
+                    </SafeAreaView>
+                    <ScrollView
+                        style={{
+                            marginTop: -regHeight * headerHeight,
+                            zIndex: 0,
+                        }}
+                    >
+                        <LinearGradient 
+                            colors={[
+                                albumInfo.background ? albumInfo.background : colors.nemoLight, 
+                                // 'white',
+                                'white'
+                            ]} 
+                            style={{
+                                width: "100%",
+                                height: regHeight * 600,
+                                position: "absolute",
+                                // backgroundColor: "pink"
+                            }}
+                        />
+                        <View style={{ alignItems: "center", }}>
+                            <ImageBackground
+                                source={shadow}
+                                style={{
+                                    width: regWidth * 220,
+                                    height: regWidth * 220,
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginTop: regHeight * (40 + headerHeight),
+                                }}
+                            >
+                                <Animated.Image 
+                                    source={ albumInfo.nemolist_cover !== null ? { uri: albumInfo.nemolist_cover} : likedNemos} 
+                                    style={{
+                                        ...styles.AlbumCover,
+                                        opacity: albumCoverValue,
+                                        marginTop: -regWidth * 10,
+                                    }}
+                                    onLoadEnd={showAlbumCover}
+                                />
+                            </ImageBackground>
+                        </View>
+                        <View
+                            style={{
+                                marginTop: regHeight * 8,
+                                marginHorizontal: regWidth * 18,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 14,
+                                    fontWeight: "500",
+                                    lineHeight: regWidth * 21,
+                                }}
+                            >
+                                마케팅의 핵심 요소인 ‘교환’
+                                교환의 한 참여자가 무엇인가를 다른 사람에게 제공하고 자신이 원하는 무엇인가를 획득하는 행위
+                            </Text>
+                            <View
+                                style={{ 
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginTop: regHeight * 9,
+                                }}
+                            >
+                                <View>
+                                    <Text
+                                        style={{
+                                            fontSize: regWidth * 14,
+                                            fontWeight: "700",
+                                            color: colors.nemoDark,
+                                        }}
+                                    >
+                                        {`@${albumInfo.user_tag}`}
+                                    </Text>
+                                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
+                                        <Text style={styles.albumInfoTxt}>
+                                            1
+                                        </Text>
+                                        <Text style={styles.albumInfoTxt}>
+                                            {' likes'}
+                                        </Text>
+                                        <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
+                                        <Text style={styles.albumInfoTxt}>
+                                            {albumInfo.nemos}
+                                        </Text>
+                                        <Text style={styles.albumInfoTxt}>
+                                            {' Nemos'}
+                                        </Text>
+                                    </View>
+
+                                </View>
+                                <Pressable>
+                                    <Image 
+                                        source={iconHeartOutline}
+                                        style={{
+                                            width: regWidth * 35,
+                                            height: regWidth * 35,
+                                        }}
+                                    />
+                                </Pressable>
+                            </View>
+                        </View>
+                        {loading ? 
+                            <ActivityIndicator 
+                                color="black" 
+                                style={{marginTop: 100}} 
+                                size="large"
+                            />
+                            :
+                            <View style={{ marginTop: regHeight * 25, }}>
+                                {albumInfo.bookmarks !== null && orderedBookmarks.map((bookmark, index) => (
+                                    <TouchableOpacity
+                                        activeOpacity={1}
+                                        onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: orderedBookmarks, subTitle: albumInfo.nemolist_title, title: "Bookmarks", index: index, })} 
+                                        key={index}
+                                    >
+                                        <BookmarkList bookmark={bookmark} navigation={navigation} />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        }
+
+                    </ScrollView>
+                </>
+                :
+                null
+            }
+        </View>
+    )
 
     return (
         <View style={styles.container}>
@@ -703,35 +887,33 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "white",
+        // backgroundColor: '(0, 0, 0, 0.5)',
     },
     header: {
-        // backgroundColor: "pink",
-        marginTop: 60,
-        marginHorizontal: 10,
-        paddingBottom: 8,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
+      marginHorizontal: regWidth * 10,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     AlbumCover: {
-        width: 200,
-        height: 200,
+        width: regWidth * 200,
+        height: regWidth * 200,
         resizeMode: "contain",
-
-        ...Platform.select({
-            ios: {
-              shadowColor: "black",
-              shadowOffset: {
-                width: 5,
-                // height: 5,
-              },
-              shadowOpacity: 0.5,
-            //   shadowRadius: 10,
-            },
-            android: {
-              elevation: 3,
-            },
-        }),
+        borderRadius: 5,
+        // ...Platform.select({
+        //     ios: {
+        //       shadowColor: "black",
+        //       shadowOffset: {
+        //         width: 5,
+        //         // height: 5,
+        //       },
+        //       shadowOpacity: 0.5,
+        //     //   shadowRadius: 10,
+        //     },
+        //     android: {
+        //       elevation: 3,
+        //     },
+        // }),
     },
     profileImage: {
         width: regWidth * 25,
@@ -805,6 +987,12 @@ const styles = StyleSheet.create({
     modalContainer: {
         marginHorizontal: regWidth * 20,
     },
+    albumInfoTxt: {
+        fontSize: regWidth * 14,
+        fontWeight: "700",
+        lineHeight: regWidth * 20,
+        color: colors.textLight,
+    }
 })
 
 export default AlbumProfile;

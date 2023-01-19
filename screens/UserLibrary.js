@@ -62,6 +62,7 @@ import {
 // import BottomSheet from '@gorhom/bottom-sheet';
 import { Portal, PortalHost } from '@gorhom/portal';
 
+
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const TopTab = createMaterialTopTabNavigator();
@@ -173,6 +174,11 @@ const UserLibrary = ({navigation, route }) => {
         plusModalRef.current.present();
     }, [plusModalRef]);
 
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        plusModalRef.current.dismiss();
+    }, [plusModalRef]);
+
 
     return (
         <View style={styles.container}>
@@ -269,7 +275,13 @@ const UserLibrary = ({navigation, route }) => {
                     <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
                         Create
                     </Text>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                    <Pressable 
+                        style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
+                        onPress={() => {
+                            navigation.navigate('CreateNemolist');
+                            onPressClose();
+                        }}    
+                    >
                         <Image 
                             source={iconNemolist}
                             style={{
@@ -599,7 +611,7 @@ const NemoListScreen = ({navigation}) => {
     const renderAlbum = ({ item, index }) => (
         <TouchableOpacity
             activeOpacity={1}
-            onPress={() => navigation.navigate('AlbumProfile', { albumId: item.album_id, })} 
+            onPress={() => navigation.navigate('AlbumProfile', { albumId: item.nemolist_id, })} 
         >
             <AlbumList album={item} navigation={navigation} isDefault={false} />
         </TouchableOpacity>
