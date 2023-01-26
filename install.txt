@@ -44,3 +44,6 @@ npm install react-native-pager-view
 npm i react-native-modal-datetime-picker @react-native-community/datetimepicker
 
 npm i @invertase/react-native-apple-authentication
+npm install @react-native-google-signin/google-signin
+npm install --save @react-native-masked-view/masked-view
+npm install react-native-linear-gradient --save

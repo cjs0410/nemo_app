@@ -28,7 +28,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { color } from "react-native-reanimated";
 
 const CreateBook = ({navigation, route}) => {
-    // const { index } = route.params;
+    const { index, isLib, } = route.params;
     const [keyword, setKeyword] = useState('');
     const [bookList, setBookList] = useState(null);
     const debounceVal = useDebounce(keyword);
@@ -208,7 +208,11 @@ const CreateBook = ({navigation, route}) => {
                         color: "#FFFFFF",
                     }}
                 >
-                    Add
+                    {isLib ? 
+                        "Add to my library"
+                        :
+                        "Add"
+                    }
                 </Text>
             </Pressable>
         </View>

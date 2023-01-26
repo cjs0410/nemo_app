@@ -11,6 +11,11 @@ import { BookmarkList, AlbumList } from '../components';
 import Api from "../lib/Api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import vectorLeftImage from '../assets/icons/vector_left.png';
+import iconPerson from '../assets/icons/iconPerson.png';
+import iconLock from '../assets/icons/iconLock.png';
+import iconLoaderOutline from '../assets/icons/iconLoaderOutline.png';
+import iconCheckmark from '../assets/icons/iconCheckmark.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { resetRefreshToken, resetAvatar, } from '../modules/user';
@@ -106,35 +111,106 @@ const UserSetting = ({navigation}) => {
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.header} >
-                <Pressable 
+                <Pressable
                     onPress={() => navigation.goBack()}
-                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Ionicons name="chevron-back" size={28} color="black" />
+                    <Image 
+                        source={vectorLeftImage} 
+                        style={{ width: regWidth*35, height: regWidth*35 }}
+                    />
                 </Pressable>
                 <Text style={{
-                    fontSize: 16,
-                    fontWeight: "500",
+                    fontSize: regWidth * 18,
+                    fontWeight: "700",
                 }}>
-                    설정
+                    Settings
                 </Text>
                 <Pressable
-                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     style={{ opacity: 0, }}
                 >
-                    <Ionicons name="chevron-back" size={28} color="black" />
+                    <Image 
+                        source={vectorLeftImage} 
+                        style={{ width: regWidth*35, height: regWidth*35 }}
+                    />
                 </Pressable>
             </SafeAreaView>
             <Pressable 
                 style={styles.menuContainer}
-                onPress={() => setPasswordModalVisible(true)}
+                onPress={() => navigation.navigate('AccountInfo')}
             >
-                <Text style={{ fontSize: 16, fontWeight: "500", }}>
-                    비밀번호 변경
-                </Text>
+                <Image 
+                    source={iconPerson}
+                    style={styles.icon}
+                />
+                <View style={{ justifyContent: "center", width: "75%", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                        Account information
+                    </Text>
+                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
+                        See your account information such as your phone
+                    </Text>
+                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 2, }}>
+                        number and email address.
+                    </Text>
+                </View>
                 <Ionicons name="chevron-forward" size={24} color="black" />
             </Pressable>
             <Pressable 
+                style={styles.menuContainer}
+                onPress={() => setPasswordModalVisible(true)}
+            >
+                <Image 
+                    source={iconLock}
+                    style={styles.icon}
+                />
+                <View style={{ justifyContent: "center", width: "75%", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                        Change your password
+                    </Text>
+                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
+                        Whenever change it.
+                    </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color="black" />
+            </Pressable>
+            <Pressable 
+                style={styles.menuContainer}
+                // onPress={() => setPasswordModalVisible(true)}
+            >
+                <Image 
+                    source={iconLoaderOutline}
+                    style={styles.icon}
+                />
+                <View style={{ justifyContent: "center", width: "75%", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                        Deactivate your account
+                    </Text>
+                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
+                        You can recover your account within 30 days.
+                    </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color="black" />
+            </Pressable>
+            <Pressable 
+                style={styles.menuContainer}
+                // onPress={() => setPasswordModalVisible(true)}
+            >
+                <Image 
+                    source={iconLock}
+                    style={styles.icon}
+                />
+                <View style={{ justifyContent: "center", width: "75%", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                        Contact us
+                    </Text>
+                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
+                        Contact us anytime.
+                    </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color="black" />
+            </Pressable>
+            {/* <Pressable 
                 style={styles.menuContainer}
                 onPress={logout}
             >
@@ -151,13 +227,7 @@ const UserSetting = ({navigation}) => {
                     탈퇴하기
                 </Text>
                 <Ionicons name="chevron-forward" size={24} color="black" />
-            </Pressable>
-            {/* <View style={styles.menuContainer}>
-                <Text style={{ fontSize: 16, fontWeight: "500", }}>
-                    탈퇴하기
-                </Text>
-                <Ionicons name="chevron-forward" size={24} color="black" />
-            </View> */}
+            </Pressable> */}
 
             <Modal
                 animationType="fade"
@@ -376,7 +446,7 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         flexDirection: "row",
-        borderBottomWidth: 0.5,
+        // borderBottomWidth: 0.5,
         paddingVertical: 18,
         alignItems: "center",
         justifyContent: "space-between",
@@ -413,6 +483,10 @@ const styles = StyleSheet.create({
         color: "#FF4040",
         marginTop: regHeight * 8,
     },
+    icon: {
+        width: regWidth * 40,
+        height: regWidth * 40,
+    }
 })
 
 export default UserSetting;

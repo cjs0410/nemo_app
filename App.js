@@ -21,6 +21,7 @@ import { PersistGate } from "redux-persist/integration/react";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Join1, Join2, Join3, Join4, Join5, Join6} from "./screens/Join";
+import { CreateNemolist1, CreateNemolist2, CreateNemolist3, } from "./screens/CreateNemolist";
 import { FindId, FindId2, } from "./screens/FindId";
 import { FindPassword, FindPassword2, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
@@ -58,7 +59,7 @@ import {
   LikeUsers,
   UserLibrary,
   NemoCalender,
-  CreateNemolist,
+  AccountInfo,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -311,7 +312,7 @@ const App = () => {
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
                   e.preventDefault();
-                  navigation.navigate(`SelectBook${navigation.getState().index}`, { index: navigation.getState().index, });
+                  navigation.navigate(`SelectBook${navigation.getState().index}`, { index: navigation.getState().index, isLib: false, });
                 }
               })}
             />
@@ -465,6 +466,7 @@ const UserLibraryScreen = ({route, navigation}) => {
       <UserLibraryStack.Screen name="AlbumProfile" component={AlbumProfile} />
       <UserLibraryStack.Screen name="BookProfile" component={BookProfile} />
       <UserLibraryStack.Screen name="OtherProfile" component={OtherProfile} />
+      <UserLibraryStack.Screen name="AccountInfo" component={AccountInfo} />
       <UserLibraryStack.Screen 
         name="NemoCalender" 
         component={NemoCalender}
@@ -482,11 +484,27 @@ const UserLibraryScreen = ({route, navigation}) => {
         }}
       />
       <UserLibraryStack.Screen 
-        name="CreateNemolist" 
-        component={CreateNemolist}
+        name="CreateNemolist1" 
+        component={CreateNemolist1}
         options={{
           presentation: "transparentModal",
           // animation: "horizontal",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="CreateNemolist2" 
+        component={CreateNemolist2}
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="CreateNemolist3" 
+        component={CreateNemolist3}
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
         }}
       />
     </UserLibraryStack.Navigator>

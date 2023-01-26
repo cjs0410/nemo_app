@@ -79,7 +79,7 @@ const Home = ({navigation}) => {
     useScrollToTop(ref);
 
     useEffect(() => {
-        fetchRefreshToken();
+        // fetchRefreshToken();
     }, [])
 
     useEffect(() => {

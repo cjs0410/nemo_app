@@ -26,5 +26,7 @@ export const colors = {
   bgdNormal: "#aeaeae",
   bgdDark: "#828282",
   white: "#FFFFFF",
-  
+  redLight: "#ff6666",
+  redNormal: "#ff3333",
+  redDark: "#cc0100",
 }

@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
 import { resetBookmarks, addBookmark, deleteBookmark } from '../modules/bookmarks';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import LinearGradient from 'react-native-linear-gradient';
+import MaskedView from '@react-native-masked-view/masked-view';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -110,56 +112,67 @@ const UnTouchableBookmarkList = (props) => {
 
     return (
         <View style={styles.bookmarkContentsScrollBox}>
-            <View 
+            <MaskedView
+                // style={styles.bookmarkContentsBox}
                 style={{
-                    ...styles.bookmarkContentsBox, 
-                    backgroundColor: bookmark.hex === null ? "#D9D9D9" : bookmark.hex, 
-                }} 
-            >
-                {bookmark.backgroundimg !== null ? 
-                    <View style={styles.backgroungImageContainer}>
-                        <Animated.Image 
-                            source={{ uri: bookmark.backgroundimg }}
-                            style={{
-                                ...styles.backgroundImage,
-                                opacity: backgroundImageValue,
-                            }}
-                            onLoadEnd={showBackgroundImage}
-                        />
-                    </View>
-                    :
-                    null
+                    flex:1,
+                }}
+                maskElement={
+                    <LinearGradient 
+                        style={{
+                            flex: 1, 
+                        }} 
+                        start={{x: 0, y: 0}} 
+                        end={{x: 1, y: 0}}
+                        colors={[
+                            // bookmark.hex === null ? "#D9D9D9" : `${bookmark.hex}`,
+                            // bookmark.hex === null ? "#D9D9D9" : `${bookmark.hex}`,
+                            "white",
+                            "white",
+                            "white",
+                            // 'rgba(255, 255, 255, 1)',
+                            'transparent'
+                        ]}
+                    />
                 }
-                <View style={styles.bookmarkContentsBook}>
-                    <View 
-                        style={{ flexDirection: "row" }}
-                    >
-                        <View>
-                            <Image 
-                                source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : blankBookCover} 
-                                style={styles.bookmarkContentsBookCover}
-                            />
-                        </View>
-                        <View>
-                            <Text style={styles.bookmarkContentsBookTitle}>{bookmark.book_title}</Text>
-                            <Text style={styles.bookmarkContentsBookChapter}>{bookmark.chapter_title}</Text>
+            >
+                <View 
+                    style={{
+                        ...styles.bookmarkContentsBox,
+                        backgroundColor: bookmark.hex === null ? "#D9D9D9" : `${bookmark.hex}`,
+                    }}
+                >
+                    <View style={styles.bookmarkContentsBook}>
+                        <View 
+                            style={{ flexDirection: "row" }}
+                        >
+                            <View>
+                                <Image 
+                                    source={ bookmark.book_cover !== null ? { uri: bookmark.book_cover } : blankBookCover} 
+                                    style={styles.bookmarkContentsBookCover}
+                                />
+                            </View>
+                            <View>
+                                <Text style={styles.bookmarkContentsBookTitle}>{bookmark.book_title}</Text>
+                                <Text style={styles.bookmarkContentsBookChapter}>{bookmark.chapter_title}</Text>
+                            </View>
                         </View>
                     </View>
+                    <View style={styles.bookmarkContentsTextBox}>
+                        <Text 
+                            style={styles.bookmarkContentsText}
+                            numberOfLines={3} 
+                            ellipsizeMode="tail"    
+                        >
+                            {bookmark.contents[0].join('')}
+                        </Text>
+                    </View>
+                    <View style={styles.bookmarkContentsWatermark}>
+                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060" }} >{bookmark.created_date.split('T')[0]}</Text>
+                    </View>
                 </View>
-                <View style={styles.bookmarkContentsTextBox}>
-                    <Text 
-                        style={styles.bookmarkContentsText}
-                        numberOfLines={3} 
-                        ellipsizeMode="tail"    
-                    >
-                        {bookmark.contents[0].join('')}
-                    </Text>
-                </View>
-                <View style={styles.bookmarkContentsWatermark}>
-                    <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
-                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060" }} >{bookmark.created_date.split('T')[0]}</Text>
-                </View>
-            </View>
+            </MaskedView>
             
         </View>
     );
@@ -180,6 +193,7 @@ const styles = StyleSheet.create({
         paddingVertical: regWidth * 5,
         borderRadius: 2,
         paddingHorizontal: regWidth * 10,
+        // backgroundColor: 'red',
     },
     bookmarkContentsBookCover: {
         // flex: 1,

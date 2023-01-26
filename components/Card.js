@@ -122,7 +122,9 @@ const Card = (props) => {
 
     }
 
-
+    const asdf = (e) => {
+        console.log(e.nativeEvent)
+    }
 
     return (
         <View style={styles.bookmarkContentsScrollBox}>
@@ -132,6 +134,7 @@ const Card = (props) => {
                     // backgroundColor: bookmark.hex, 
                     backgroundColor: bookmark.hex === null ? "#D9D9D9" : bookmark.hex, 
                 }} 
+                onLayout={asdf}
             >
                 {/* {bookmark.backgroundimg !== null ? 
                 
@@ -243,7 +246,16 @@ const Card = (props) => {
                         onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     >
-                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", marginTop: regWidth * 9, marginHorizontal: regWidth * 2, }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 11, 
+                                fontWeight: "700", 
+                                // marginTop: regWidth * 9, 
+                                marginHorizontal: regWidth * 2, 
+                            }}
+                        >
+                            {`@${bookmark.user_tag}`}
+                        </Text>
                     </Pressable>
                 </View>
             </View>
@@ -1263,6 +1275,7 @@ const styles = StyleSheet.create({
         paddingVertical: regWidth * 5,
         borderRadius: 2,
         paddingHorizontal: regWidth * 3,
+        zIndex: 0,
     },
     bookmarkContentsBookCover: {
         // flex: 1,
@@ -1274,7 +1287,7 @@ const styles = StyleSheet.create({
     bookmarkContentsBook: {
         // backgroundColor: "pink",
         // flex: 0.6,
-        height: regHeight * 43,
+        height: regWidth * 43,
         flexDirection: "row", 
         justifyContent: "space-between",
         alignItems: "center",
@@ -1296,8 +1309,8 @@ const styles = StyleSheet.create({
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
         // flex: 4,
-        height: regHeight * 264,
-        marginTop: regHeight * 20,
+        height: regWidth * 264,
+        marginTop: regHeight *20,
         // justifyContent: "center",
         justifyContent: "flex-start", 
         paddingHorizontal: regWidth * 7,
@@ -1332,9 +1345,11 @@ const styles = StyleSheet.create({
     postContentsWatermark: {
         // backgroundColor: "blue",
         // flex: 0.3,
-        height: regHeight * 21,
+        height: regWidth * 21,
         flexDirection: "row",
         justifyContent: "space-between",
+        marginTop: regWidth * 9,
+        zIndex: 10,
     },
     searchList: {
         backgroundColor: "#D9D9D9",

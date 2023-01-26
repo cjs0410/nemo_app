@@ -278,7 +278,7 @@ const UserLibrary = ({navigation, route }) => {
                     <Pressable 
                         style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
                         onPress={() => {
-                            navigation.navigate('CreateNemolist');
+                            navigation.navigate('CreateNemolist1');
                             onPressClose();
                         }}    
                     >
@@ -299,7 +299,13 @@ const UserLibrary = ({navigation, route }) => {
                             </Text>
                         </View>
                     </Pressable>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                    <Pressable 
+                        style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
+                        onPress={() => {
+                            navigation.navigate('SelectBook0', { index: 0, isLib: true, });
+                            onPressClose();
+                        }}  
+                    >
                         <Image 
                             source={iconBook}
                             style={{

@@ -29,6 +29,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
     const [lineNum, setLineNum] = useState(0);
     const [isFocus, setIsFocus] = useState(false);
     const [cardFlag, setCardFlag] = useState([]);
+    const [lineBarList, setLineBarList] = useState([]);
 
     useEffect(() => {
         fetchBook();
@@ -234,7 +235,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                     } */}
 
                 </View>
-                {bookList !== null && selectedBook === null ? 
+                {/* {bookList !== null && selectedBook === null ? 
                     <>
                     {bookList.length === 0 ? 
                         <View style={{...styles.searchList, backgroundColor: color, }}>
@@ -302,7 +303,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                     </>
                     :
                     null
-                }
+                } */}
                 <View 
                     style={{
                         ...styles.bookmarkContentsInput,
@@ -337,7 +338,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                     // borderStyle: 'dashed',
                                     // borderWidth: 0.5,
                                     height: regHeight * 284 + extraHeight,
-
+                                    textAlignVertical: "top",
+                                    // backgroundColor: "pink"
                                 }} 
                                 placeholder="Write anything from your reading"
                                 multiline={true}
@@ -360,8 +362,16 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                     // if (regHeight * 284 < contentHeight + regHeight * 28) {
                                     //     setExtraHeight(contentHeight - regHeight * 284)
                                     // }
+                                    if (lineNum !== 0 && lineNum % 9 === 0) {
+                                        let copy = [...lineBarList];
+
+                                        copy[parseInt(lineNum / 9) - 1] = contentHeight;
+                                        setLineBarList(copy);
+                                    }
+
                                     if (lineNum > 9) {
                                         setExtraHeight(regHeight * 28 * (lineNum - 9));
+
                                     } else {
                                         setExtraHeight(0);
                                     }
@@ -376,8 +386,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                         borderStyle: 'dashed',
                                         borderWidth: 0.3,
                                         // backgroundColor: "black",
-                                        // top: regHeight * 28 * 9 + regHeight * 12,
-                                        top: regHeight * 28 * 9 * (index + 1) + regHeight * 4,
+                                        // top: regHeight * 28 * 9 * (index + 1) + regHeight * 12,
+                                        top: lineBarList[index] + regHeight * 2,
                                     }}
                                     key={index}
                                 />
@@ -413,7 +423,16 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
 
                 </View>
                 <View style={styles.postContentsWatermark}>
-                    <Text style={{ fontSize: regWidth * 11, fontWeight: "700", marginTop: regWidth * 9, marginHorizontal: regWidth * 2, }} >{`@${watermark}`}</Text>
+                    <Text 
+                        style={{ 
+                            fontSize: regWidth * 11, 
+                            fontWeight: "700", 
+                            // marginTop: regWidth * 4, 
+                            marginHorizontal: regWidth * 2, 
+                        }}
+                    >
+                        {`@${watermark}`}
+                    </Text>
                 </View>
             </View>
         </View>
@@ -465,7 +484,7 @@ const styles = StyleSheet.create({
     bookmarkContentsBook: {
         // backgroundColor: "pink",
         // flex: 0.6,
-        height: regHeight * 43,
+        height: regWidth * 43,
         flexDirection: "row", 
         // justifyContent: "space-between",
         alignItems: "center",
@@ -503,8 +522,8 @@ const styles = StyleSheet.create({
     bookmarkContentsInput: {
         // backgroundColor: "pink",
         // flex: 4,
-        height: regHeight * 284,
-        marginTop: regHeight * 2,
+        height: regWidth * 284,
+        marginTop: regHeight * 6,
         justifyContent: "flex-start",
     },
     richTextEditorStyle: {
@@ -523,9 +542,10 @@ const styles = StyleSheet.create({
     postContentsWatermark: {
         // backgroundColor: "blue",
         // flex: 0.3,
-        height: regHeight * 21,
+        height: regWidth * 21,
         flexDirection: "row",
         justifyContent: "space-between",
+        marginTop: regWidth * 9,
         // alignItems: "flex-end",
     },
     searchList: {

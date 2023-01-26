@@ -30,4 +30,4 @@ export { default as EditBookmark } from './EditBookmark';
 export { default as LikeUsers } from './LikeUsers';
 export { default as UserLibrary } from './UserLibrary';
 export { default as NemoCalender } from './NemoCalender';
-export { default as CreateNemolist } from './CreateNemolist';
+export { default as AccountInfo } from './AccountInfo';

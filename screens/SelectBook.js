@@ -10,6 +10,7 @@ import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import iconCamera from '../assets/images/iconCamera.png';
 import iconImage from '../assets/images/iconImage.png';
 import iconPlus from '../assets/images/iconPlus.png';
+import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
 import iconBook from '../assets/icons/iconBook.png';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
@@ -26,7 +27,7 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
 
 const SelectBook = ({navigation, route}) => {
-    // const { index } = route.params;
+    const { index, isLib, } = route.params;
     const dispatch = useDispatch();
     const [keyword, setKeyword] = useState('');
     const [bookList, setBookList] = useState(null);
@@ -123,7 +124,7 @@ const SelectBook = ({navigation, route}) => {
                             borderBottomWidth: 0.5,
                             borderBottomColor: "#CBCBCB",
                         }}
-                        onPress={() => navigation.navigate(`CreateBook${route.params.index}`, {index: route.params.index})}
+                        onPress={() => navigation.navigate(`CreateBook${route.params.index}`, {index: route.params.index, isLib: route.params.isLib})}
                     >
                         <Image 
                             source={iconBook}
@@ -163,8 +164,31 @@ const SelectBook = ({navigation, route}) => {
                             onPress={() => {
                                 navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: book, });
                             }}
+                            disabled={isLib ? true : false}
+                            style={{ justifyContent: "center", }}
                         >
                             <BookList book={book} />
+                            {isLib ? 
+                                <Pressable
+                                    style={{
+                                        position: "absolute",
+                                        right: 0,
+                                        marginHorizontal: regWidth * 12,
+                                    }}
+                                    onPress={() => console.log("1")}
+                                >
+                                    <Image 
+                                        source={iconPlusCircleOutline}
+                                        style={{
+                                            width: regWidth * 40,
+                                            height: regWidth * 40,
+                                        }}
+                                    />
+                                </Pressable>
+                                :
+                                null
+                            }
+
                         </Pressable>
                     ))}
                 </ScrollView>
@@ -181,8 +205,30 @@ const SelectBook = ({navigation, route}) => {
                                 navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: book, });
                                 dispatch(addRecentRead(book));
                             }}
+                            disabled={isLib ? true : false}
+                            style={{ justifyContent: "center", }}
                         >
                             <BookList book={book} />
+                            {isLib ? 
+                                <Pressable
+                                    style={{
+                                        position: "absolute",
+                                        right: 0,
+                                        marginHorizontal: regWidth * 12,
+                                    }}
+                                    onPress={() => console.log("1")}
+                                >
+                                    <Image 
+                                        source={iconPlusCircleOutline}
+                                        style={{
+                                            width: regWidth * 40,
+                                            height: regWidth * 40,
+                                        }}
+                                    />
+                                </Pressable>
+                                :
+                                null
+                            }
                         </Pressable>
                     ))}
                 </ScrollView>

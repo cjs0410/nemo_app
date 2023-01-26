@@ -1303,41 +1303,81 @@ const CreateBookmark = ({navigation, route}) => {
                 </View> */}
                 <Pressable 
                     style={styles.TagAddBox} 
-                    onPress={() => setInfoVisible(true)}    
+                    // onPress={() => setInfoVisible(true)}
                 >
-                    <Entypo name="edit" size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >설명 추가</Text>
+                    {/* <Entypo name="edit" size={regWidth * 20} color="black" /> */}
+                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Description</Text>
+                    <TextInput 
+                        placeholder="Add a description"
+                        style={{
+                            height: 90,
+                            width: "70%",
+                            textAlignVertical: "top",
+                            // marginLeft: regWidth * 18,
+                            fontSize: regWidth * 14,
+                            fontWeight: "500",
+                            lineHeight: regWidth * 20,
+                            padding: 0,
+                            // margin: 0,
+                            // backgroundColor:"pink"
+                        }}
+                        multiline={true}
+                    />
                 </Pressable>
                 <Pressable 
                     style={styles.TagAddBox} 
-                    onPress={() => setTagVisible(true)}    
+                    // onPress={() => setTagVisible(true)}    
                 >
-                    <Feather name="hash" size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >태그 추가</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700",  }} >Tags</Text>
+                    <TextInput 
+                        placeholder="Add your tags"
+                        style={{
+                            width: "70%",
+                            textAlignVertical: "top",
+                            // marginLeft: regWidth * 18,
+                            fontSize: regWidth * 14,
+                            fontWeight: "500",
+                            // lineHeight: regWidth * 20,
+                            // backgroundColor:"pink"
+                        }}
+                    />
                 </Pressable>
                 <Pressable 
-                    style={styles.TagAddBox} 
-                    onPress={() => {
-                        setAlbumVisible(true);
-                        fetchAlbumList();
-                    }}    
+                    style={{
+                        ...styles.TagAddBox,
+                        borderBottomWidth: 0.5,
+                    }} 
+                    // onPress={() => {
+                    //     setAlbumVisible(true);
+                    //     fetchAlbumList();
+                    // }}    
                 >
-                    <Feather name='folder' size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Nemolists</Text>
+                    <TextInput 
+                        placeholder="Add to your Nemolists"
+                        style={{
+                            width: "70%",
+                            textAlignVertical: "top",
+                            // marginLeft: regWidth * 18,
+                            fontSize: regWidth * 14,
+                            fontWeight: "500",
+                            // lineHeight: regWidth * 20,
+                            // backgroundColor:"pink"
+                        }}
+                    />
                 </Pressable>
 
-                <Pressable 
+                {/* <Pressable 
                     style={styles.TagAddBox} 
                     onPress={() => {
                         setTempVisible(true);
                         fetchTempBookmarks();
                     }}    
                 >
-                    <FontAwesome name="save" size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >임시저장 목록</Text>
-                </Pressable>
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", }} >임시저장 목록</Text>
+                </Pressable> */}
 
-                <View style={{height: 200}} ></View>
+                {/* <View style={{height: 200}} ></View> */}
             </ScrollView>
 
             <Modal
@@ -2049,12 +2089,13 @@ const styles = StyleSheet.create({
     },
     TagAddBox: {
         flexDirection: "row",
-        borderTopWidth: 1,
-        borderTopColor: "grey",
-        borderBottomColor: "grey",
-        paddingVertical: 20,
-        paddingHorizontal: 10,
+        borderTopWidth: 0.5,
+        borderTopColor: colors.bgdNormal,
+        borderBottomColor: colors.bgdNormal,
+        paddingVertical: regHeight * 10,
+        marginHorizontal: regWidth * 13,
         alignItems: "center",
+        justifyContent: "space-between"
     },
     modal: {
         width: '100%', 
