@@ -60,6 +60,7 @@ import {
   UserLibrary,
   NemoCalender,
   AccountInfo,
+  EditAlbum,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -210,7 +211,9 @@ const App = () => {
           routeNameRef.current = currentRouteName;
         }}
       >
-        <StatusBar />
+        <StatusBar 
+          barStyle={'dark-content'}
+        />
         {!((decodedRefresh !== null) && (decodedRefresh.exp > (Date.now() / 1000))) ? 
         (
           <Stack.Navigator>
@@ -456,6 +459,14 @@ const UserLibraryScreen = ({route, navigation}) => {
           // animation: "fade",
         }}
       />
+      <UserLibraryStack.Screen 
+        name="CreateBookmark" 
+        component={CreateBookmark}
+        options={{
+          presentation: "fullScreenModal",
+          // animation: "fade",
+        }}
+      />
       <UserLibraryStack.Screen name="UserStorage" component={UserStorage} />
       <UserLibraryStack.Screen 
         name="UserSetting" 
@@ -471,8 +482,8 @@ const UserLibraryScreen = ({route, navigation}) => {
         name="NemoCalender" 
         component={NemoCalender}
         options={{
-          // presentation: "fullScreenModal",
-          presentation: "card"
+          presentation: "fullScreenModal",
+          // presentation: "card"
         }} 
       />
       <UserLibraryStack.Screen 
@@ -487,15 +498,14 @@ const UserLibraryScreen = ({route, navigation}) => {
         name="CreateNemolist1" 
         component={CreateNemolist1}
         options={{
-          presentation: "transparentModal",
-          // animation: "horizontal",
+          // presentation: "fullScreenModal",
         }}
       />
       <UserLibraryStack.Screen 
         name="CreateNemolist2" 
         component={CreateNemolist2}
         options={{
-          presentation: "transparentModal",
+          // presentation: "fullScreenModal",
           animation: "fade",
         }}
       />
@@ -503,8 +513,15 @@ const UserLibraryScreen = ({route, navigation}) => {
         name="CreateNemolist3" 
         component={CreateNemolist3}
         options={{
-          presentation: "transparentModal",
+          // presentation: "fullScreenModal",
           animation: "fade",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="EditAlbum" 
+        component={EditAlbum}
+        options={{
+          // animation: "fade",
         }}
       />
     </UserLibraryStack.Navigator>
@@ -528,14 +545,14 @@ const HomeScreen = ({route, navigation}) => {
           animation: "fade",
         }}
       />
-      <UserLibraryStack.Screen 
+      <HomeStack.Screen 
         name="SelectBook2" 
         component={SelectBook}
         options={{
           presentation: "fullScreenModal",
         }}
       />
-      <UserLibraryStack.Screen 
+      <HomeStack.Screen 
         name="CreateBook2" 
         component={CreateBook}
         options={{
@@ -545,6 +562,13 @@ const HomeScreen = ({route, navigation}) => {
       />
       <HomeStack.Screen 
         name="CreateBookmark2" 
+        component={CreateBookmark}
+        options={{
+          presentation: "fullScreenModal",
+        }}
+      />
+      <HomeStack.Screen 
+        name="CreateBookmark" 
         component={CreateBookmark}
         options={{
           presentation: "fullScreenModal",
@@ -581,6 +605,13 @@ const HomeScreen = ({route, navigation}) => {
       <HomeStack.Screen name="FollowScreen" component={FollowScreen} />
       <HomeStack.Screen name="AlbumProfile" component={AlbumProfile} />
       <HomeStack.Screen name="LikeUsers" component={LikeUsers} />
+      <HomeStack.Screen 
+        name="Search" 
+        component={Search} 
+        options={{
+          animation: "none",
+        }}
+      />
     </HomeStack.Navigator>
   )
 }

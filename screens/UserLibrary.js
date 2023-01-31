@@ -24,7 +24,7 @@ import {
 } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SelectDropdown from 'react-native-select-dropdown';
-import { Card, BookmarkTile, BookmarkList, AlbumList } from '../components';
+import { Card, BookmarkTile, BookmarkList, AlbumList, BookList, AlbumTile, BookTile, } from '../components';
 import Api from "../lib/Api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -40,6 +40,9 @@ import {
     setShouldHomeRefresh, 
     setShouldLibraryRefresh, 
     setShouldUserRefresh, 
+    setShouldNemoRefresh,
+    setShouldNemolistRefresh,
+    setShouldBookRefresh,
     setIsAlarm, 
     resetAvatar, 
     setAvatar, 
@@ -50,6 +53,7 @@ import blankAvatar from '../assets/images/peopleicon.png';
 import sortCheck from '../assets/images/sortCheck.png';
 import iconRepeat from '../assets/icons/iconRepeat.png';
 import iconGrid from '../assets/icons/iconGrid.png';
+import iconList from '../assets/icons/iconList.png';
 import iconNemolist from '../assets/icons/iconNemolist.png';
 import iconBook from '../assets/icons/iconBook.png';
 import iconAlarm from '../assets/icons/iconAlarm.png';
@@ -200,8 +204,9 @@ const UserLibrary = ({navigation, route }) => {
                     </Pressable>
                     <Text style={{
                         fontSize: 24,
-                        fontWeight: "900",
+                        fontFamily: "NotoSansKR-Black",
                         marginHorizontal: regWidth * 10,
+                        lineHeight: regWidth * 34,
                     }}>
                         My Library
                     </Text>
@@ -335,7 +340,7 @@ const NemoScreen = ({route, navigation}) => {
     const [loading, setLoading] = useState(false);
     const [bookmarks, setBookmarks] = useState(null);
     const [newBookmarkNum, setNewBookmarkNum] = useState(0);
-    const { shouldLibraryRefresh } = useSelector(userSelector);
+    const { shouldNemoRefresh } = useSelector(userSelector);
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const sortList = [ "recents", "book", ];
@@ -350,11 +355,12 @@ const NemoScreen = ({route, navigation}) => {
     }, []);
 
     useEffect(() => {
-        if (shouldLibraryRefresh === true) {
-            fetchBookmarkList();
-            dispatch(setShouldLibraryRefresh(false));
+        if (shouldNemoRefresh === true) {
+            console.log("auto");
+            fetchBookmarkList(sort);
+            dispatch(setShouldNemoRefresh(false));
         }
-    }, [shouldLibraryRefresh]);
+    }, [shouldNemoRefresh]);
 
     const renderBookmark = ({ item, index }) => (
         <Pressable
@@ -366,6 +372,7 @@ const NemoScreen = ({route, navigation}) => {
 
     const fetchBookmarkList = async(sortNum) => {
         try {
+            // console.log(sortList[sortNum])
             setLoading(true);
             await Api
             .post("api/v1/user/library/", {
@@ -446,7 +453,7 @@ const NemoScreen = ({route, navigation}) => {
             />
         ),
         []
-      );
+    );
     const sortModalRef = useRef();
 
     const onPressSort = useCallback(() => {
@@ -506,7 +513,7 @@ const NemoScreen = ({route, navigation}) => {
                                             marginHorizontal: regWidth * 5,
                                         }}
                                     >
-                                        Recent
+                                        {sort === 0 ? "Recents" : "Book"}
                                     </Text>
                                 </Pressable>
                             </View>
@@ -602,10 +609,14 @@ const NemoListScreen = ({navigation}) => {
     const [loading, setLoading] = useState(false);
     const [likedNemos, setLikedNemos] = useState(null);
     const [nemolists, setNemolists] = useState(null);
+    const [newNemolistNum, setNewNemolistNum] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const sortList = [ "recents", "alphabetical", "creator", ];
-    const [sort, setSort] = useState(0)
+    const [sort, setSort] = useState(0);
+    const { shouldNemolistRefresh } = useSelector(userSelector);
+    const [scrollLoading, setScrollLoading] = useState(false);
+    const [isTile, setIsTile] = useState(false);
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -614,13 +625,25 @@ const NemoListScreen = ({navigation}) => {
         fetchNemoList(sort);
     }, []);
 
+    useEffect(() => {
+        if (shouldNemolistRefresh === true) {
+            fetchNemoList(sort);
+            dispatch(setShouldNemolistRefresh(false));
+        }
+    }, [shouldNemolistRefresh]);
+
     const renderAlbum = ({ item, index }) => (
-        <TouchableOpacity
+        <Pressable
             activeOpacity={1}
             onPress={() => navigation.navigate('AlbumProfile', { albumId: item.nemolist_id, })} 
         >
-            <AlbumList album={item} navigation={navigation} isDefault={false} />
-        </TouchableOpacity>
+            {isTile ? 
+                <AlbumTile album={item} navigation={navigation} isDefault={false} />
+                :
+                <AlbumList album={item} navigation={navigation} isDefault={false} />
+            }
+            
+        </Pressable>
     )
 
     const fetchNemoList = async(sortNum) => {
@@ -633,15 +656,45 @@ const NemoListScreen = ({navigation}) => {
                 items: 0,
             })
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 // console.log("fetch Nemolists");
                 setLikedNemos(res.data.Liked_Nemos);
                 setNemolists(res.data.Nemolists);
+                setNewNemolistNum(res.data.Nemolists.length);
             })
         } catch (err) {
             console.error(err);
         }
         setLoading(false);
+    };
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemolist();
+        }
+    };
+
+    const getNemolist = async() => {
+        if (nemolists.length >= 16 && newNemolistNum >= 16) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("api/v1/user/library/", {
+                    ctg: "nemolists",
+                    sort: sortList[sort],
+                    items: nemolists.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setNemolists([...nemolists, ...res.data.Nemolists, ]);
+                    setNewNemolistNum(res.data.Nemolists.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
     }
 
     const onRefresh = useCallback(async() => {
@@ -685,11 +738,16 @@ const NemoListScreen = ({navigation}) => {
             <FlatList 
                 data={nemolists}
                 renderItem={renderAlbum}
-                keyExtractor={nemolist => nemolist.nemolist_id}
+                key={isTile ? '_' : "#"}
+                keyExtractor={isTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
                 showsVerticalScrollIndicator={false}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
                 ref={ref}
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.3}
+                ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                numColumns={isTile ? 2 : 1}
                 ListHeaderComponent={
                     <>
                         <View
@@ -722,12 +780,14 @@ const NemoListScreen = ({navigation}) => {
                                         marginHorizontal: regWidth * 5,
                                     }}
                                 >
-                                    Recent
+                                    {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
                                 </Text>
                             </Pressable>
-                            <Pressable>
+                            <Pressable
+                                onPress={() => setIsTile(!isTile)}
+                            >
                                 <Image 
-                                    source={iconGrid}
+                                    source={isTile ? iconList : iconGrid}
                                     style={{
                                         width: regWidth * 20,
                                         height: regWidth * 20,
@@ -736,12 +796,17 @@ const NemoListScreen = ({navigation}) => {
                             </Pressable>
                         </View>
                         {likedNemos ? 
-                            <TouchableOpacity
+                            <Pressable
                                 activeOpacity={1}
                                 onPress={() => navigation.navigate('AlbumProfile', { albumId: likedNemos.nemolist_id, })} 
                             >
-                                <AlbumList album={likedNemos} navigation={navigation} isDefault={true} />
-                            </TouchableOpacity>
+                                {isTile ? 
+                                    <AlbumTile album={likedNemos} navigation={navigation} isDefault={true} />
+                                    :
+                                    <AlbumList album={likedNemos} navigation={navigation} isDefault={true} />
+                                }
+                                
+                            </Pressable>
                             :
                             null
                         }
@@ -920,12 +985,283 @@ const NemoListScreen = ({navigation}) => {
     )
 }
 
-const BookScreen = () => {
+const BookScreen = ({navigation}) => {
+    const dispatch = useDispatch();
+    const [books, setBooks] = useState(null);
+    const [newBookNum, setNewBookNum] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const sortList = [ "recents", "alphabetical", "creator", ];
+    const [sort, setSort] = useState(0);
+    const { shouldBookRefresh } = useSelector(userSelector);
+    const [refreshing, setRefreshing] = useState(false);
+    const snapPoints = useMemo(() => [regHeight * 250], []);
+    const [scrollLoading, setScrollLoading] = useState(false);
+    const [isTile, setIsTile] = useState(false);
+
+    const ref = useRef();
+    useScrollToTop(ref);
+
+    useEffect(() => {
+        fetchBook(sort);
+    }, []);
+
+    useEffect(() => {
+        if (shouldBookRefresh === true) {
+            fetchBook(sort);
+            dispatch(setShouldBookRefresh(false));
+        }
+    }, [shouldBookRefresh]);
+
+    const fetchBook = async(sortNum) => {
+        try {
+            setLoading(true);
+            await Api
+            .post("api/v1/user/library/", {
+                ctg: "books",
+                sort: sortList[sortNum],
+                items: 0,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setBooks(res.data);
+                setNewBookNum(res.data.length);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    }
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getBook();
+        }
+    };
+
+    const getBook = async() => {
+        if (books.length >= 16 && newBookNum >= 16) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("api/v1/user/library/", {
+                    ctg: "books",
+                    sort: sortList[sort],
+                    items: nemolists.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setNemolists([...books, ...res.data, ]);
+                    setNewNemolistNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
+    }
+
+    const onRefresh = useCallback(async() => {
+        setRefreshing(true);
+
+        await fetchBook(sort)
+        .then(() => setRefreshing(false));
+    }, []);
+
+    const renderBook = ({ item, index }) => (
+        <Pressable
+            activeOpacity={1}
+            onPress={() => navigation.push('BookProfile', {
+                bookId: item.book_id, 
+            })}
+        >
+            {isTile ? 
+                <BookTile book={item} />
+                :
+                <BookList book={item} />
+            }
+            
+        </Pressable>
+    );
+
+    const onSort = (sortNum) => {
+        setSort(sortNum);
+        onPressClose();
+        fetchBook(sortNum);
+    }
+
+
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+            />
+        ),
+        []
+    );
+    const sortModalRef = useRef();
+
+    const onPressSort = useCallback(() => {
+        sortModalRef.current.present();
+    }, [sortModalRef]);
+
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        sortModalRef.current.dismiss();
+    }, [sortModalRef]);
+
     return (
         <View style={styles.container}>
-            <Text>
-                books
-            </Text>
+            <FlatList 
+                data={books}
+                renderItem={renderBook}
+                key={isTile ? '_' : "#"}
+                keyExtractor={isTile ? book => "_" + book.book_id : book => "#" + book.book_id}
+                showsVerticalScrollIndicator={false}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                ref={ref}
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.3}
+                ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                numColumns={isTile ? 2 : 1}
+                ListHeaderComponent={
+                    <>
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                marginHorizontal: regWidth * 13,
+                                marginVertical: regHeight * 10,
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <Pressable
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                }}
+                                onPress={onPressSort}
+                            >
+                                <Image 
+                                    source={iconRepeat}
+                                    style={{
+                                        width: regWidth * 15,
+                                        height: regWidth * 15,
+                                    }}
+                                />
+                                <Text
+                                    style={{
+                                        fontSize: 13,
+                                        fontWeight: "700",
+                                        marginHorizontal: regWidth * 5,
+                                    }}
+                                >
+                                    {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={() => setIsTile(!isTile)}
+                            >
+                                <Image 
+                                    source={isTile ? iconList : iconGrid}
+                                    style={{
+                                        width: regWidth * 20,
+                                        height: regWidth * 20,
+                                    }}
+                                />
+                            </Pressable>
+                        </View>
+                    </>
+                }
+            />
+            <BottomSheetModal
+                index={0}
+                ref={sortModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={styles.modalContainer}
+                >
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        Sort by
+                    </Text>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(0)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Recents
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 0 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(1)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Alphabetical
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 1 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(2)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 2 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Creator
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 2 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                </View>
+            </BottomSheetModal>
         </View>
     )
 }
@@ -1072,6 +1408,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                     opacity,
                                     fontSize: regWidth * 16,
                                     fontWeight: "700",
+                                    fontFamily: "NotoSansKR-Regular",
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}
@@ -1123,7 +1460,7 @@ const styles = StyleSheet.create({
         alignItems: "center", 
         marginTop: regHeight * 24, 
         justifyContent: "space-between",
-    }
+    },
 })
 
 export default UserLibrary;

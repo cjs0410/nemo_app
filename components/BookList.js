@@ -22,13 +22,13 @@ const BookList = (props) => {
             style={{...styles.resultList}} 
         >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Image 
+                <Animated.Image 
                     source={book.book_cover !== null ? { uri: book.book_cover } : blankBookCover}
                     style={{
                         ...styles.bookCoverImage,
-                        // opacity: bookCoverValue,
+                        opacity: bookCoverValue,
                     }}
-                    // onLoadEnd={showBookCover}
+                    onLoadEnd={showBookCover}
                 />
                 <View style={{ width: "85.5%", }}>
                     <Text 
@@ -59,7 +59,7 @@ const BookList = (props) => {
                             // numberOfLines={1}
                             // ellipsizeMode="tail"
                         >
-                            333 Nemos
+                            {`${book.nemos} Nemos`}
                         </Text>
                     </View>
                     

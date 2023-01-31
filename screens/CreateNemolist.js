@@ -29,12 +29,14 @@ import addBookCover from '../assets/images/addBookCover.png';
 import iconBook from '../assets/icons/iconBook.png';
 import addAlbumCover from '../assets/images/addAlbumCover.png';
 import shadow from '../assets/images/shadow.png';
+import iconPlusCircle from '../assets/icons/iconPlusCircle.png';
 
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
 import RenderHtml from 'react-native-render-html';
 import HTML from 'react-native-render-html';
+import { BookmarkList, } from '../components';
 import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 import { BookList, } from '../components';
 
@@ -52,6 +54,7 @@ import {
     BottomSheetBackdrop,
     BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
+import LinearGradient from 'react-native-linear-gradient';
 
 const CreateNemolist1 = ({navigation}) => {
     const [albumTitle, setAlbumTitle] = useState('');
@@ -133,6 +136,7 @@ const CreateNemolist1 = ({navigation}) => {
 const CreateNemolist2 = ({navigation, route}) => {
     const [albumCover, setAlbumCover] = useState(null);
     const { albumTitle, } = route.params;
+    const [loading, setLoading] = useState(null);
 
     const onExit = () => {
         Alert.alert("Discard changes?", "If you go back now, you’ll lose your changes.", [
@@ -161,6 +165,40 @@ const CreateNemolist2 = ({navigation, route}) => {
           console.error(error);
         }
     };
+
+    const makeAlbum = async() => {
+        const formData = new FormData();
+        const filename = albumCover.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename ?? '');
+        const type = match ? `image/${match[1]}` : `image`;
+        formData.append('nemolist_cover', {
+            uri: albumCover,
+            type: type,
+            name: filename,
+        });
+    
+        formData.append('nemolist_title', albumTitle)
+        
+        try {
+            setLoading(true);
+            await Api
+            .post("api/v4/album/add/", formData,
+                {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                },
+                }
+            )
+            .then((res) => {
+                console.log(res.data);
+                // dispatch(setShouldUserRefresh(true));
+                navigation.navigate('CreateNemolist3', { albumTitle: albumTitle, albumCover: albumCover, hex: res.data.hex, albumId: res.data.nemolist_id, })
+            })
+        } catch (err) {
+          console.error(err);
+        }
+        setLoading(false);
+    }
 
     return (
         <View style={styles.container}>
@@ -219,17 +257,26 @@ const CreateNemolist2 = ({navigation, route}) => {
                         paddingVertical: regWidth * 12,
                         borderRadius: 30,
                     }}
-                    onPress={() => navigation.navigate('CreateNemolist3', { albumTitle: albumTitle, albumCover: albumCover, })}
+                    onPress={makeAlbum}
                 >
-                    <Text
-                        style={{
-                            fontSize: regWidth * 18,
-                            fontWeight: "900",
-                            color: "white",
-                        }}
-                    >
-                        Create
-                    </Text>
+                    {loading ? 
+                        <ActivityIndicator 
+                            color="white" 
+                            // style={{marginTop: 100}} 
+                            size="large"
+                        />
+                        :
+                        <Text
+                            style={{
+                                fontSize: regWidth * 18,
+                                fontWeight: "900",
+                                color: "white",
+                            }}
+                        >
+                            Create
+                        </Text>
+                    }
+
                 </Pressable>
                 <Pressable
                     style={{
@@ -248,12 +295,18 @@ const CreateNemolist2 = ({navigation, route}) => {
 }
 
 const CreateNemolist3 = ({navigation, route}) => {
-    const { albumTitle, albumCover, } = route.params;
+    const dispatch = useDispatch();
+    const { albumTitle, albumCover, hex, albumId, } = route.params;
     const albumCoverValue = useRef(new Animated.Value(0)).current;
     const [userTag, setUserTag] = useState(null);
     const [addTextMode, setAddTextMode] = useState(false);
     const [text, setText] = useState(null);
     const [bookmarks, setBookmarks] = useState(null);
+    const [selectedBookmarks, setSelectedBookmarks] = useState([]);
+    const [albumInfo, setAlbumInfo] = useState(null);
+    const [bookmarkNumbering, setBookmarkNumbering] = useState(null);
+    const [orderedBookmarks, setOrderedBookmarks] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchUserTag();
@@ -276,6 +329,31 @@ const CreateNemolist3 = ({navigation, route}) => {
         }
     }
 
+    const fetchAlbum = async() => {
+        try {
+            setLoading(true)
+            await Api.post("/api/v4/album/view/", {
+                nemolist_id: albumId,
+            })
+            .then((res) => {
+                console.log(res.data);
+                // console.log(res.data.bookmarks);
+                setAlbumInfo(res.data);
+
+                setBookmarkNumbering(
+                    (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a)
+                )
+                const orderedNumbering = (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                setOrderedBookmarks(
+                    orderedNumbering.map((number) => res.data.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
+                )
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    }
+
     const fetchBookmarks = async() => {
         try {
             await Api
@@ -291,6 +369,56 @@ const CreateNemolist3 = ({navigation, route}) => {
         }
     }
 
+    const selectBookmark = (bookmark) => {
+        if (selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1) {
+            setSelectedBookmarks([
+                ...selectedBookmarks,
+                bookmark,
+            ]);
+        } else {
+            setSelectedBookmarks(
+                selectedBookmarks.filter(selectedBookmark => selectedBookmark.bookmark_id !== bookmark.bookmark_id)
+            )
+        }
+    }
+
+    const onAddBookmark = async() => {
+        const bookmarkIds = selectedBookmarks.map((selectedBookmark) => (selectedBookmark.bookmark_id));
+
+        try {
+            console.log(bookmarkIds);
+            console.log(albumId);
+            await Api
+            .post("/api/v4/album/insertbookmark/", {
+                bookmark_id: bookmarkIds,
+                nemolist_id: albumId,
+            })
+            .then((res) => {
+                setSelectedBookmarks([]);
+                fetchAlbum();
+                // dispatch(setShouldLibraryRefresh(true));
+                onCloseAddNemos();
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const onAddDesc = async() => {
+        try {
+            await Api
+            .post("/api/v4/album/edit_description/", {
+                nemolist_id: albumId,
+                description: text,
+            })
+            .then((res) => {
+                setAddTextMode(false);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const renderBackdrop = useCallback(
         (props) => (
             <BottomSheetBackdrop
@@ -298,9 +426,6 @@ const CreateNemolist3 = ({navigation, route}) => {
                 pressBehavior="close"
                 appearsOnIndex={0}
                 disappearsOnIndex={-1}
-                // animatedIndex={{
-                //     value: 0,
-                // }}
             />
         ),
         []
@@ -319,7 +444,7 @@ const CreateNemolist3 = ({navigation, route}) => {
         <View style={styles.container}>
             <SafeAreaView 
                 style={{
-                    // backgroundColor: albumInfo.background ? albumInfo.background : colors.nemoLight,
+                    backgroundColor: hex ? hex : colors.nemoLight,
                 }}
             >
                 <View style={styles.albumHeader}>
@@ -350,7 +475,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                         {albumTitle}
                     </Text>
                     <Pressable
-                        onPress={addTextMode ? () => setAddTextMode(false) : () => navigation.popToTop()}
+                        onPress={addTextMode ? onAddDesc : () => navigation.popToTop()}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     >
                         <Text
@@ -373,6 +498,20 @@ const CreateNemolist3 = ({navigation, route}) => {
                 bounces={false}
                 showsVerticalScrollIndicator={false}
             >
+                <LinearGradient 
+                    colors={[
+                        hex ? hex : colors.nemoLight,
+                        // 'white',
+                        'white'
+                    ]} 
+                    style={{
+                        width: "100%",
+                        height: regHeight * 400,
+                        // height: "100%",
+                        position: "absolute",
+                        // backgroundColor: "pink"
+                    }}
+                />
                 <View style={{ alignItems: "center", }}>
                     <ImageBackground
                         source={shadow}
@@ -504,6 +643,8 @@ const CreateNemolist3 = ({navigation, route}) => {
 
                         </View>
                     </View>
+                </View>
+                {albumInfo === null ? 
                     <View style={{ alignItems: "center", marginTop: regHeight * 80, }}>
                         <Pressable
                             style={{
@@ -548,7 +689,24 @@ const CreateNemolist3 = ({navigation, route}) => {
                             Add Nemos to your Nemolist
                         </Text>
                     </View>
-                </View>
+                    :
+                    <>
+                        {loading ? 
+                            <ActivityIndicator 
+                                color="black" 
+                                style={{marginTop: 100}} 
+                                size="large"
+                            />
+                            :
+                            <View style={{ marginTop: regHeight * 25, }}>
+                                {albumInfo.bookmarks !== null && orderedBookmarks.map((bookmark, index) => (
+                                    <BookmarkList bookmark={bookmark} navigation={navigation} key={index} />
+                                ))}
+                            </View>
+                        }
+                    </>
+                }
+
             </ScrollView>
             <BottomSheetModal
                 index={0}
@@ -574,7 +732,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                             Add Nemos
                         </Text>
                         <Pressable
-                            onPress={onCloseAddNemos}
+                            onPress={onAddBookmark}
                         >
                             <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
                                 Done
@@ -663,6 +821,31 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         lineHeight: regWidth * 20,
         color: colors.textLight,
+    },
+    modalHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginVertical: regHeight * 8,
+        alignItems: "center",
+        marginHorizontal: regWidth * 20,
+        // marginHorizontal: regWidth * 18, 
+    },
+    numbering: {
+        position: "absolute",
+        backgroundColor: "#008000",
+        width: regWidth * 45,
+        height: regWidth * 45,
+        right: 0,
+        marginRight: 22,
+        borderRadius: 50,
+        // borderWidth: 1,
+        // borderColor: "white",
+        opacity: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalContainer: {
+        marginHorizontal: regWidth * 20,
     },
 })
 

@@ -307,7 +307,6 @@ const UserStorage = ({route, navigation}) => {
                                 Following
                             </Text>
                         </View>
-
                         <View 
                             style={{ 
                                 flexDirection: "row", 
@@ -433,174 +432,6 @@ const UserStorage = ({route, navigation}) => {
                                 </View>
                             </View>
                         </View>
-                        {/* <View 
-                            style={{ 
-                                width: "100%", 
-                                flexDirection: "column", 
-                                alignItems: "flex-end", 
-                                height: "50%",
-                            }}
-                        >
-                            <View style={{ marginTop: -regHeight * 82, width: "69%", height: "70%", }}>
-                                    <View style={ styles.editProfileBtnContainer }>
-                                        <Pressable 
-                                            style={styles.editProfileBtn} 
-                                            onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
-                                        >
-                                            <Text style={{ 
-                                                fontSize: regWidth * 13, 
-                                                fontWeight: "500",
-                                                opacity: 0.8 
-                                                }} >Edit profile</Text>
-                                        </Pressable>
-                                    </View>
-                                    <View style={ styles.usertagContainer } >
-                                        <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: "#7341ffcc", width: "50%" }}
-                                            numberOfLines={1}
-                                            ellipsizeMode='tail'
-                                        >
-                                            {`@${profile.user_tag}`}</Text>
-
-                                    </View>
-                                    <View>
-                                        <Text 
-                                            style={ styles.usernameContainer }
-                                            numberOfLines={1}
-                                            ellipsizeMode='tail'
-                                        >
-                                            {profile.name}
-                                        </Text>
-                                    </View>
-                                    
-                                </View>
-                        </View>
-                        <View style={ styles.introContainer }>
-                                <View style={{ height: "40%", width: "100%", flexDirection: "column", alignItems: "flex-start" }}>
-                                    <Text
-                                        style={{ width: "90%", lineHeight: regHeight*19, color: "#404040", marginHorizontal: regWidth*13 }}
-                                        numberOfLines={3}
-                                        ellipsizeMode='tail'
-                                    >
-                                        I literally have no idea.
-                                        CEO of the Nemo project.
-                                        Majoring PHYS at Korea.
-                                        길어지면 이렇게 됨길어지면길어지면길어지면
-                                    </Text>
-                                </View>
-                                <View style={{ flexDirection: "row", alignItems: "center", marginLeft: regWidth*13 }}>
-                                    <Text style={ styles.boldNumberTxt }>
-                                        {profile.nemos}
-                                    </Text>
-                                    <Text style={ styles.followTxt }>
-                                        Nemos
-                                    </Text>
-                                    <Text style={{ ...styles.boldNumberTxt, marginLeft: regWidth*28 }}>
-                                        {profile.followers}
-                                    </Text>
-                                    <Text style={ styles.followTxt }>
-                                        Followers
-                                    </Text>
-                                    <Text style={{ ...styles.boldNumberTxt, marginLeft: regWidth*28 }}>
-                                        {profile.followings}
-                                    </Text>
-                                    <Text style={{ ...styles.followTxt, marginHorizontal: regWidth*6 }}>
-                                        Following
-                                    </Text>
-                                </View>
-                                <View style={ styles.followedByContainer}>
-                                    <Animated.Image 
-                                        source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                                        style={{ ...styles.smallAvatar, opacity: avatarValue }} 
-                                        onLoadEnd={showAvatarImage}
-                                    />
-                                    <Animated.Image 
-                                        source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                                        style={{ ...styles.smallAvatar, opacity: avatarValue, marginLeft: -regWidth*15 }} 
-                                        onLoadEnd={showAvatarImage}
-                                    />
-                                    <Animated.Image 
-                                        source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                                        style={{ ...styles.smallAvatar, opacity: avatarValue, marginLeft: -regWidth*15 }} 
-                                        onLoadEnd={showAvatarImage}
-                                    />
-
-                                    <Text style={{ marginLeft: regWidth*11, width: "70%", color: "#606060" }}
-                                        numberOfLines={2}
-                                    >
-                                            Followed by Elon Musk, Doowoo Kang, and 1 other
-                                    </Text>
-
-                                </View>
-                        </View>
-                        <View 
-                            style={{ 
-                                flexDirection: "row", 
-                                alignItems: "flex-end", 
-                                // width: "100%", 
-                                height: "25%", 
-                                justifyContent: "space-between" 
-                            }}
-                        >
-                            <Text 
-                                style={{ 
-                                    marginLeft: regWidth*13, 
-                                    color: "#000000", 
-                                    fontWeight: "700", 
-                                    fontSize: regWidth*20 
-                                }}
-                            >
-                                Nemo Calender
-                            </Text>
-                            <TouchableOpacity 
-                                style={ styles.streakBtn } 
-                                // onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
-                            >
-                                <Text style={{ fontSize: regWidth * 16, fontWeight: "700", color: "#FFFFFF" }} >
-                                    6-day streak!</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View 
-                            style={ styles.boardContainer }
-                            onLayout={onLayout}
-                        >
-                            <View style={{  height: "50%", flexDirection: "column", alignItems: "flex-start" }}>
-                                <Text
-                                    style={{ marginTop: regHeight*5, marginLeft: regWidth*7, color: "#FFFFFF", fontWeight: "700", fontSize: regWidth*16 }}
-                                >
-                                    Recent 2 weeks
-                                </Text>
-                            </View>
-                            <View style={ styles.calenderContainer }>
-                                {profile && profile.two_weeks.map((day, index) => (
-                                    <View 
-                                        style ={{ width: dateWidth, height: "40%" }}
-                                        key={index}
-                                    >
-                                        <Text style={{ color: "#FFFFFF", marginLeft: regWidth*5 }}>
-                                            {day.days}
-                                        </Text>
-                                        <View style={{ ...styles.nemoContatiner, width: dateWidth, height: dateWidth }}>
-                                            <View
-                                                style={{ backgroundColor: "#D9D9D9", width: "80%", height: "80%" }}
-                                            >
-                                                <Text>
-                                                    nemo
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                ))}
-                                <View style = {{ width: "100%", alignItems: "center", height: "40%", marginTop: regHeight*17 }}>
-                                    <Pressable 
-                                        style={ styles.viewAllBtn } 
-                                        // onPress={() => navigation.navigate('ProfileEdit', { profile: profile, })}
-                                    >
-                                        <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#FFFFFF" }} >
-                                            View all</Text>
-                                    </Pressable>
-                                </View>
-                            </View>
-                        </View> */}
                     </>
                 }
             </View>
@@ -686,8 +517,8 @@ const styles = StyleSheet.create({
     followedByContainer: {
         flexDirection: "row",
         alignItems: "flex-start",
-        width: "100%",
-        height: "30%",
+        // width: "100%",
+        // height: "30%",
         marginTop: regHeight*12
     },
     smallAvatar: {

@@ -14,7 +14,7 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, setShouldNemolistRefresh, } from '../modules/user';
 import {
     BottomSheetModal,
     BottomSheetModalProvider,
@@ -36,6 +36,11 @@ import iconPlusNemoDark from '../assets/icons/iconPlusNemoDark.png';
 import iconPlusCircle from '../assets/icons/iconPlusCircle.png';
 
 import LinearGradient from 'react-native-linear-gradient';
+import {
+    useNavigation,
+    useFocusEffect,
+    useScrollToTop,
+} from '@react-navigation/native';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -61,15 +66,24 @@ const AlbumProfile = ({route, navigation}) => {
     const [selectToDelete, setSelectToDelete] = useState([]);
 
     const [headerHeight, setHeaderHeight] = useState(0);
+    const [isLike, setIsLike] = useState(false);
+    const [isFollow, setIsFollow] = useState(false);
+    const [isDefault, setIsDefault] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
 
     useEffect(() => {
-        fetchAlbum();
         fetchUserTag();
-    }, [])
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchAlbum();
+        }, []),
+    )
 
     const fetchAlbum = async() => {
         try {
-            setLoading(true)
+            setLoading(true);
             await Api.post("/api/v4/album/view/", {
                 nemolist_id: albumId,
             })
@@ -77,6 +91,10 @@ const AlbumProfile = ({route, navigation}) => {
                 // console.log(res.data);
                 // console.log(res.data.bookmarks);
                 setAlbumInfo(res.data);
+                setIsLike(res.data.is_like);
+                setLikeCount(res.data.likes);
+                setIsFollow(res.data.is_follow);
+                setIsDefault(res.data.default);
 
                 setBookmarkNumbering(
                     (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a)
@@ -96,6 +114,46 @@ const AlbumProfile = ({route, navigation}) => {
         try {
             const accessToken = await AsyncStorage.getItem('access');
             setUserTag(jwt_decode(accessToken).user_tag);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const onLike = async() => {
+        try {
+            await Api
+            .post("api/v4/album/like/", {
+                nemolist_id: albumId,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                setIsLike(res.data.is_like);
+                setLikeCount(res.data.likes);
+                if (res.data.is_like) {
+                    Alert.alert(albumInfo.album_title, "is added to your library");
+                } else {
+                    Alert.alert(albumInfo.album_title, "is deleted from your library");
+                }
+                dispatch(setShouldNemolistRefresh(true));
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const onFollow = async() => {
+        // setIsFollow(!isFollow);
+        try {
+            await Api
+            .post("api/v1/user/follow/", {
+                user_tag: albumInfo.user_tag,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                setIsFollow(res.data.is_follow);
+                // setFollowers(res.data.count);
+                // dispatch(setShouldUserRefresh(true));
+            })
         } catch (err) {
             console.error(err);
         }
@@ -371,14 +429,13 @@ const AlbumProfile = ({route, navigation}) => {
                                     lineHeight: regWidth * 21,
                                 }}
                             >
-                                마케팅의 핵심 요소인 ‘교환’
-                                교환의 한 참여자가 무엇인가를 다른 사람에게 제공하고 자신이 원하는 무엇인가를 획득하는 행위
+                                {albumInfo.description}
                             </Text>
                             <View
                                 style={{ 
                                     flexDirection: "row",
                                     justifyContent: "space-between",
-                                    alignItems: "center",
+                                    alignItems: "flex-end",
                                     marginTop: regHeight * 9,
                                 }}
                             >
@@ -394,7 +451,7 @@ const AlbumProfile = ({route, navigation}) => {
                                     </Text>
                                     <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
                                         <Text style={styles.albumInfoTxt}>
-                                            1
+                                            {likeCount}
                                         </Text>
                                         <Text style={styles.albumInfoTxt}>
                                             {' likes'}
@@ -410,42 +467,58 @@ const AlbumProfile = ({route, navigation}) => {
 
                                 </View>
                                 {albumInfo.user_tag === userTag ? 
+                                    <>
+                                        {isDefault ? 
+                                            <Text
+                                                style={{
+                                                    fontSize: regWidth * 14,
+                                                    fontFamily: "NotoSansKR-Bold"
+                                                }}
+                                            >
+                                                Nemos that you liked
+                                            </Text>
+                                            :
+                                            <Pressable
+                                                style={{
+                                                    borderWidth: 2,
+                                                    borderColor: colors.nemoDark,
+                                                    borderRadius: 20,
+                                                    paddingHorizontal: regWidth * 14,
+                                                    paddingVertical: regWidth * 4,
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                }}
+                                                onPress={() => {
+                                                    onPressAddNemos();
+                                                    fetchBookmarks();
+                                                }}
+                                            >
+                                                <Image 
+                                                    source={iconPlusNemoDark}
+                                                    style={{
+                                                        width: regWidth * 28,
+                                                        height: regWidth * 28,
+                                                    }}
+                                                />
+                                                <Text
+                                                    style={{
+                                                        fontSize: regWidth * 19,
+                                                        fontWeight: "900",
+                                                        color: colors.nemoDark,
+                                                    }}
+                                                >
+                                                    Add Nemos
+                                                </Text>
+                                            </Pressable>
+                                        }
+                                    </>
+
+                                    :
                                     <Pressable
-                                        style={{
-                                            borderWidth: 2,
-                                            borderColor: colors.nemoDark,
-                                            borderRadius: 20,
-                                            paddingHorizontal: regWidth * 14,
-                                            paddingVertical: regWidth * 4,
-                                            flexDirection: "row",
-                                            alignItems: "center",
-                                        }}
-                                        onPress={() => {
-                                            onPressAddNemos();
-                                            fetchBookmarks();
-                                        }}
+                                            onPress={onLike}
                                     >
                                         <Image 
-                                            source={iconPlusNemoDark}
-                                            style={{
-                                                width: regWidth * 28,
-                                                height: regWidth * 28,
-                                            }}
-                                        />
-                                        <Text
-                                            style={{
-                                                fontSize: regWidth * 19,
-                                                fontWeight: "900",
-                                                color: colors.nemoDark,
-                                            }}
-                                        >
-                                            Add Nemos
-                                        </Text>
-                                    </Pressable>
-                                    :
-                                    <Pressable>
-                                        <Image 
-                                            source={iconHeartOutline}
+                                            source={isLike ? iconHeart : iconHeartOutline}
                                             style={{
                                                 width: regWidth * 35,
                                                 height: regWidth * 35,
@@ -500,7 +573,10 @@ const AlbumProfile = ({route, navigation}) => {
                     </Pressable>
                     {albumInfo && albumInfo.user_tag !== userTag ? 
                         <>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}
+                                onPress={onFollow}
+                            >
                                 <Image 
                                     source={iconFollow}
                                     style={{
@@ -511,7 +587,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
                                     <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
-                                        {`Follow @${albumInfo.user_tag}`}
+                                        {isFollow ? `Unfollow @${albumInfo.user_tag}` : `Follow @${albumInfo.user_tag}`}
                                     </Text>
                                 </View>
                             </Pressable>
@@ -551,7 +627,13 @@ const AlbumProfile = ({route, navigation}) => {
                         </>
                         :
                         <>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}
+                                onPress={() => {
+                                    navigation.navigate("EditAlbum", { albumInfo: albumInfo, });
+                                    onPressClose();
+                                }}
+                            >
                                 <Image 
                                     source={iconEdit}
                                     style={{
@@ -652,7 +734,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 key={index}
                                 onPress={() => selectBookmark(bookmark)}
                                 style={{ 
-                                    opacity: selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1 ? 1 : 0.5,
+                                    // opacity: selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1 ? 1 : 0.5,
                                     justifyContent: "center",
                                 }}
                             >

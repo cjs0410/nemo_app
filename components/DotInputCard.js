@@ -9,7 +9,8 @@ import jwt_decode from "jwt-decode";
 import Api from '../lib/Api';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import RenderHtml from 'react-native-render-html';
-import FastImage from 'react-native-fast-image'
+import FastImage from 'react-native-fast-image';
+import * as Font from "expo-font";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector } from '../modules/hooks';
@@ -26,17 +27,25 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
     const [inputHeight, setInputHeight] = useState(0);
     const [inputContainerHeight, setInputContainerHeight] = useState(0);
     const [extraHeight, setExtraHeight] = useState(0);
-    const [lineNum, setLineNum] = useState(0);
+    const [lineNum, setLineNum] = useState(1);
     const [isFocus, setIsFocus] = useState(false);
     const [cardFlag, setCardFlag] = useState([]);
     const [lineBarList, setLineBarList] = useState([]);
+    const [loadFont, setLoadFont] = useState(false);
 
     useEffect(() => {
         fetchBook();
     }, [debounceVal]);
+
     useEffect(() => {
         console.log(selectedBook);
+        // console.log(regWidth * 28);
+        // console.log(regHeight * 284);
     }, [selectedBook]);
+
+    useEffect(() => {
+        console.log(lineBarList);
+    }, [lineBarList]);
 
     useEffect(() => {
         const cardNum = Math.floor(lineNum / 9);
@@ -47,6 +56,10 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
         }
         setCardFlag(copy);
     }, [lineNum]);
+
+    useEffect(() => {
+        fetchFont();
+    }, []);
 
     // useEffect(() => {
     //     console.log(align);
@@ -119,6 +132,21 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
         // console.log(e.nativeEvent.lines.length, frontContent[frontContent.length-1]);
     }
 
+    const fetchFont = async() => {
+        await Font.loadAsync({
+            "frank": require("../assets/fonts/FrankRuhlLibre-Bold.ttf"),
+            "notoSans": require("../assets/fonts/NotoSansKR-Medium.otf"),
+        });
+        setLoadFont(true)
+    }
+
+    if (!loadFont) {
+        return (
+            <View style={styles.container}>
+            </View>
+        )
+    };
+
     return (
         <View
             style={{
@@ -170,6 +198,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 ...styles.bookmarkContentsBookChapterInput,
                                 borderWidth: 0.5,
                                 borderStyle: 'dashed',
+                                textAlignVertical: "center",
                             }}
                             onChangeText={onChangeChapter}
                             value={whatChapter}
@@ -311,9 +340,9 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                         borderWidth: 0.5,
                         borderStyle: 'dashed',
                         // backgroundColor: "green",
-                        height: regHeight * 284 + extraHeight,
+                        height: regWidth * 284 + extraHeight,
                     }} 
-                    onLayout={(e) => console.log(e.nativeEvent)}
+                    // onLayout={(e) => console.log(e.nativeEvent)}
                 >
                     {ocrLoading ? 
                         <ActivityIndicator 
@@ -321,7 +350,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                             style={{marginTop: 10}} 
                             size="large"
                         />
-                        : 
+                        :
                         <>
                         {/* text input만 사용하는 코드(가변) */}
                         {/* <ScrollView
@@ -329,16 +358,13 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                         > */}
                             <TextInput 
                                 style={{         
-                                    fontWeight: "500",
                                     fontSize: regWidth * 16,
                                     lineHeight: regWidth * 28,
                                     paddingHorizontal: regWidth * 7,
-                                    // paddingHorizontal: 8,
-                                    // backgroundColor: "pink",
-                                    // borderStyle: 'dashed',
-                                    // borderWidth: 0.5,
-                                    height: regHeight * 284 + extraHeight,
+                                    height: regWidth * 284 + extraHeight,
                                     textAlignVertical: "top",
+                                    fontWeight: "500",
+                                    // fontFamily: "NotoSansKR-Medium",
                                     // backgroundColor: "pink"
                                 }} 
                                 placeholder="Write anything from your reading"
@@ -355,18 +381,23 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 value={frontContent}
                                 scrollEnabled="false"
                                 onContentSizeChange={(e) => {
-                                    console.log(e.nativeEvent);
+                                    // console.log(e.nativeEvent);
                                     const contentHeight = e.nativeEvent.contentSize.height;
-                                    const lineNum = parseInt(contentHeight / (regHeight * 28));
-                                    setLineNum(lineNum);
-                                    // if (regHeight * 284 < contentHeight + regHeight * 28) {
-                                    //     setExtraHeight(contentHeight - regHeight * 284)
-                                    // }
+                                    const lineNum = parseInt(contentHeight / (regWidth * 28));
+                                    if (lineNum === 0) {
+                                        setLineNum(1);
+                                    } else {
+                                        setLineNum(lineNum);
+                                    }
+                                    
+                                    console.log(lineNum);
+
                                     if (lineNum !== 0 && lineNum % 9 === 0) {
                                         let copy = [...lineBarList];
-
-                                        copy[parseInt(lineNum / 9) - 1] = contentHeight;
-                                        setLineBarList(copy);
+                                        if (!(copy[parseInt(lineNum / 9) - 1])) {
+                                            copy[parseInt(lineNum / 9) - 1] = contentHeight;
+                                            setLineBarList(copy);
+                                        }
                                     }
 
                                     if (lineNum > 9) {
@@ -378,7 +409,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 }}
                                 // textAlign={align === "center" ? "center" : "left"}
                             />
-                            {cardFlag.map((flag, index) => (
+                            {lineBarList.length !== 0 && cardFlag.map((flag, index) => (
                                 <View
                                     style={{
                                         position: "absolute",
@@ -426,9 +457,11 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                     <Text 
                         style={{ 
                             fontSize: regWidth * 11, 
-                            fontWeight: "700", 
+                            // fontWeight: "700", 
                             // marginTop: regWidth * 4, 
-                            marginHorizontal: regWidth * 2, 
+                            lineHeight: regWidth * 14.5,
+                            marginHorizontal: regWidth * 2,
+                            fontFamily: "NotoSansKR-Bold", 
                         }}
                     >
                         {`@${watermark}`}
@@ -490,21 +523,23 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     bookmarkContentsBookTitle: {
-        fontWeight: "500",
         fontSize: regWidth * 12,
         // marginTop: regWidth * 8,
         width: regWidth * 250,
         lineHeight: regWidth * 17,
+        fontFamily: "NotoSansKR-Medium",
     },
     bookmarkContentsBookChapter: {
-        fontWeight: "400",
+        // fontWeight: "400",
         fontSize: regWidth * 10,
         width: regWidth * 230,
+        fontFamily: "NotoSansKR-Regular",
     },
     bookmarkContentsBookChapterInput: {
         fontWeight: "900",
         fontSize: regWidth * 15,
         lineHeight: regWidth * 21,
+        // fontFamily: "NotoSansKR-Black",
     },
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
@@ -545,7 +580,7 @@ const styles = StyleSheet.create({
         height: regWidth * 21,
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: regWidth * 9,
+        marginTop: regWidth * 4,
         // alignItems: "flex-end",
     },
     searchList: {

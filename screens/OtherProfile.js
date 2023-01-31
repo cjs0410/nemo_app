@@ -1,20 +1,38 @@
-import { View, SafeAreaView, KeyboardAvoidingView, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, Pressable, Modal, Alert, } from "react-native";
-import React, { useEffect, useState, useRef, } from "react";
+import { View, SafeAreaView, KeyboardAvoidingView, Text, TextInput, Button, StyleSheet, Image, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Animated, Pressable, Modal, Alert, ImageBackground, FlatList, } from "react-native";
+import React, { useEffect, useState, useRef, createRef, useMemo, useCallback, } from "react";
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Api from "../lib/Api";
 import blankAvatar from '../assets/images/peopleicon.png';
-import { BookmarkList, AlbumList } from '../components';
+import { BookmarkList, AlbumList, BookList, } from '../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+import {
+    useScrollToTop,
+} from '@react-navigation/native';
+
+import vectorLeftImage from '../assets/icons/vector_left.png';
+import settings from '../assets/icons/settings.png';
+import sortCheck from '../assets/images/sortCheck.png';
+import iconRepeat from '../assets/icons/iconRepeat.png';
+import iconGrid from '../assets/icons/iconGrid.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
 
+import {
+    BottomSheetModal,
+    BottomSheetModalProvider,
+    BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
+
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
+const TopTab = createMaterialTopTabNavigator();
 
 const OtherProfile = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -35,7 +53,7 @@ const OtherProfile = ({navigation, route}) => {
 
     useEffect(() => {
         fetchProfile();
-        fetchBookmarkList();
+        // fetchBookmarkList();
         fetchMyTag();
     }, []);
 
@@ -129,272 +147,1178 @@ const OtherProfile = ({navigation, route}) => {
         }
     }
 
+
     return (
-        <View style={styles.container}>
-            {profile === null ? 
-                <ActivityIndicator 
-                    color="white" 
-                    style={{marginTop: 10}} 
-                    size="large"
-                />
-                :
-                <SafeAreaView style={styles.header} >
-                    <TouchableOpacity onPress={() => navigation.goBack()} >
-                        <Ionicons name="chevron-back" size={28} color="black" />
-                    </TouchableOpacity>
-                    <View style={{ alignItems: "center", }}>
-                        <Text style={{ fontSize: 16, fontWeight: "500", color: "black", }} >
-                            {profile.name}
-                        </Text>
+        <View 
+            style={{
+                flex: 1,
+                backgroundColor: "white",
+            }}
+            stickyHeaderIndices={[0]}
+        >
+            {/* <View 
+                style={{ 
+                    justifyContent: "flex-end"
+                }}
+            > */}
+                <ImageBackground 
+                    source={ require('../assets/images/userImage.jpeg') } 
+                    resizeMode= "cover" 
+                    style={{ height: regHeight * 110, width:"100%", zIndex: 0,}}
+                >
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: regWidth * 13, marginTop: regHeight * 45, }}>
+                        <Pressable
+                            onPress={() => navigation.goBack()}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        >
+                            <Image 
+                                source={vectorLeftImage} 
+                                style={{ width: regWidth*35, height: regWidth*35 }}
+                            />
+                        </Pressable>
+                        <Pressable
+                            onPress={() => navigation.navigate('UserSetting')}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                        >
+                            <Image 
+                                source={settings} 
+                                style={{ width: regWidth*35, height: regWidth*35 }}
+                            />
+                        </Pressable>
                     </View>
-                    <Pressable
-                        hitSlop={{ bottom: 30, left: 30, right: 30, top: 30 }}
-                        style={{
-                            opacity: myTag !== userTag ? 1 : 0,
-                        }}
-                        disabled={myTag !== userTag ? false : true}
-                        onPress={() => setProfileModalVisible(true)}
-                    >
-                        <Entypo name="dots-three-horizontal" size={regWidth * 28} color="black" />
-                    </Pressable>
-                </SafeAreaView>
-            }
-
-
-            <ScrollView>
-                <View style={styles.profileInfo} >
+                </ImageBackground>
+            {/* </View> */}
+            <View 
+                style={{ 
+                    // alignItems: "center", 
+                    // marginTop: -regHeight*40, 
+                    // height: "30%", 
+                    backgroundColor: "white",
+                    paddingHorizontal: regWidth * 13,
+                    zIndex: 10,
+                }}
+            >
                 {profile === null ? 
                     <ActivityIndicator 
                         color="white" 
-                        style={{marginTop: 10}} 
+                        style={{ marginTop: 10 }} 
                         size="large"
                     />
                     :
-                    <View style={{ flexDirection: "row", alignItems: "center", }}>
-                        <Animated.Image 
-                            source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                            style={{
-                                ...styles.profileImage,
-                                opacity: avatarValue,
-                            }} 
-                            onLoadEnd={showAvatarImage} 
-                        />
-                        <View style={{ marginHorizontal: 18, }}>
-                            <Text style={{
-                                fontSize: 11,
-                                fontWeight: "500",
-                                color: "#008000",
-                            }}>{`@${profile.user_tag}`}</Text>
-                            <Text 
+                    <>
+                        <View 
+                            style={{ 
+                                marginTop: -regHeight * 25, 
+                                justifyContent: "space-between",
+                                alignItems: "center", 
+                                flexDirection: "row",
+                            }}
+                        >
+                            <View style={{ flexDirection: "row", alignItems: "flex-end"}}>
+                                <Animated.Image 
+                                    source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
+                                    style={{ ...styles.profileAvatar, opacity: avatarValue }} 
+                                    onLoadEnd={showAvatarImage}
+                                />
+                                <View
+                                    style={{
+                                        marginTop: 40,
+                                        marginHorizontal: regWidth * 7,
+                                    }}
+                                >
+                                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: colors.nemoNormal, lineHeight: 20, }}>
+                                        {`@${profile.user_tag}`}
+                                    </Text>
+                                    <Text style={{ fontSize: regWidth * 23, fontWeight: "900", color: colors.textDark, lineHeight: 33, }}>
+                                        {profile.name}
+                                    </Text>
+                                </View>
+                            </View>
+                            <Pressable 
                                 style={{
-                                    fontSize: regWidth * 25,
-                                    fontWeight: "900",
-                                    width: regWidth * 245,
+                                    ...styles.followBtn,
+                                    backgroundColor: isFollow ? "white" : colors.textNormal,
+                                }} 
+                                onPress={onFollow}
+                            >
+                                <Text 
+                                    style={{ 
+                                        fontSize: regWidth * 13, 
+                                        // fontWeight: "500",
+                                        color: isFollow ? colors.textDark : "white",
+                                        fontFamily: "NotoSansKR-Bold",
+                                    }}
+                                >
+                                    {isFollow ? "Following" : "Follow"}
+                                </Text>
+                            </Pressable>
+                        </View>
+                        <View style={{ marginTop: regHeight * 10, }}>
+                            <Text
+                                style={{ 
+                                    width: "50%", 
+                                    lineHeight: regHeight*19, 
+                                    color: "#404040",
+                                    fontSize: regWidth * 13,
+                                    fontWeight: "500",
                                 }}
-                                numberOfLines={2}
+                                numberOfLines={3}
                                 ellipsizeMode='tail'
                             >
-                                {profile.name}
-                            </Text>
-                            <View style={{ flexDirection: "row", marginTop: 8,}}>
-                                <Pressable
-                                    onPress={() => navigation.push('FollowScreen', { title: "팔로워", userTag: profile.user_tag, })}
-                                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                                >
-                                    <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${followers} Followers`}</Text>
-                                </Pressable>
-                                <Entypo name="dot-single" size={15} color="black" />
-                                <Pressable
-                                    onPress={() => navigation.push('FollowScreen', { title: "팔로잉", userTag: profile.user_tag, })}
-                                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                                >
-                                    <Text style={{ fontSize: 15, fontWeight: "500", }} >{`${profile.followings} Following`}</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-                    </View>
-                }
-                </View>
-                {/* <View style={styles.introduce} >
-                    <Text style={{fontSize: 15, fontWeight: "350", }} >자기소개를 열심히 적어봅시다. 여기 자기소개에는 최대 두줄까지 적을 수가 있습니다. 잘 만들어서 써보세요.</Text>
-                </View> */}
-                {myTag !== userTag && profile !== null ? 
-                    <TouchableOpacity 
-                        activeOpacity={1}
-                        style={{...styles.followBtn, backgroundColor: isFollow ? "#DDDDDD" : "#FF4040"}}
-                        onPress={onFollow}
-                    >
-                        <Text style={{ fontSize: 15, fontWeight: "500", color: isFollow ? "#808080" : "white", }}>
-                            { isFollow ? "팔로우 중" : "팔로우" }
-                        </Text>
-                    </TouchableOpacity>
-                    :
-                    null
-                }
-
-
-                <View style={{ flexDirection: "row", justifyContent: "center", }} >
-                    <TouchableOpacity activeOpacity={1} onPress={mine}>
-                        <View style={{...styles.postByWho, borderBottomColor: isMine ? "red" : "#CBCBCB" }}>
-                            <Feather name="bookmark" size={24} color={isMine ? "red" : "#CBCBCB"} />
-                            <Text style={{
-                                fontSize: 13,
-                                fontWeight: "500",
-                                marginHorizontal: 4,
-                                color: isMine ? "red" : "#CBCBCB"
-                            }}>
-                                {bookmarks ? bookmarks.length : null}
+                                {profile.introduce}
                             </Text>
                         </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={1} onPress={others}>
-                        <View style={{...styles.postByWho, borderBottomColor: !isMine ? "red" : "#CBCBCB" }}>
-                            <Feather name="folder" size={24} color={!isMine ? "red" : "#CBCBCB"} />
-                            <Text style={{
-                                fontSize: 13,
-                                fontWeight: "500",
-                                marginHorizontal: 4,
-                                color: !isMine ? "red" : "#CBCBCB"
-                            }}>
-                                {albums ? albums.length : null}
+                        <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 13, }}>
+                            <Text style={ styles.boldNumberTxt }>
+                                {profile.nemos}
+                            </Text>
+                            <Text style={ styles.followTxt }>
+                                Nemos
+                            </Text>
+                            <Text style={styles.boldNumberTxt}>
+                                {followers}
+                            </Text>
+                            <Text style={ styles.followTxt }>
+                                Followers
+                            </Text>
+                            <Text style={styles.boldNumberTxt}>
+                                {profile.followings}
+                            </Text>
+                            <Text style={ styles.followTxt }>
+                                Following
                             </Text>
                         </View>
-                    </TouchableOpacity>
-                </View>
-                {isMine ? 
-                    <>
-                        {loading ? 
-                            <ActivityIndicator 
-                                color="black" 
-                                style={{marginTop: 100}} 
-                                size="large"
-                            />
-                            : 
-                            <>
-                                <View>
-                                {bookmarks && bookmarks.map((bookmark, index) => (
-                                    <TouchableOpacity
-                                        activeOpacity={1}
-                                        onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookmarks, subTitle: profile.name, title: "북마크", index: index, })} 
-                                        key={index}
-                                    >
-                                        <BookmarkList bookmark={bookmark} navigation={navigation} />
-                                    </TouchableOpacity>
-                                ))}
-                                </View>
-                            </>
-                        }
-                    </>
-                    :
-                    <>
-                        {loading ? 
-                            <ActivityIndicator 
-                                color="black" 
-                                style={{marginTop: 100}} 
-                                size="large"
-                            />
-                            : 
-                            <>
-                                <View>
-                                {albums && albums.map((album, index) => (
-                                    <TouchableOpacity
-                                        activeOpacity={1}
-                                        onPress={() => navigation.push('AlbumProfile', { albumId: album.album_id, })} 
-                                        // onPress={() => navigation.navigate('BookmarkNewDetail', {bookmarked: bookmarked, index: index, })} 
-                                        key={index}
-                                    >
-                                        <AlbumList album={album} navigation={navigation} />
-                                    </TouchableOpacity>
-                                ))}
-                                </View>
-                            </>
-                        }
+                        <View style={ styles.followedByContainer}>
+                            {profile.know_together.map((user, index) => (
+                                <Animated.Image 
+                                    source={ user.avatar !== null ? { uri: user.avatar } : blankAvatar} 
+                                    style={{
+                                        ...styles.smallAvatar, 
+                                        opacity: avatarValue,
+                                        marginLeft: index === 0 ? 0 : -regWidth*15
+                                    }} 
+                                    onLoadEnd={showAvatarImage}
+                                    key={index}
+                                />
+                            ))}
+                            <Text style={{ marginLeft: regWidth*11, width: "70%", color: "#606060" }}
+                                numberOfLines={2}
+                            >
+                                    {`Followed by ${profile.know_together.map((user, index) => `${index === 0 ? '' : ' '}${user.name}`)} ${profile.know_together_counts - profile.know_together.length === 0 ? "" : `and ${profile.know_together_counts - profile.know_together.length} other`}`}
+                            </Text>
+                        </View>
                     </>
                 }
+            </View>
+            {profile ? 
+                <TopTab.Navigator
+                    tabBar={(props) => <MyTabBar {...props} />}
+                >
+                    <TopTab.Screen 
+                        name="Nemos" 
+                        component={NemoScreen} 
+                        initialParams={{ userTag: profile.user_tag }}
+                    />
+                    <TopTab.Screen 
+                        name="NemoLists" 
+                        component={NemoListScreen} 
+                        initialParams={{ userTag: profile.user_tag }}
+                    />
+                    <TopTab.Screen 
+                        name="Books" 
+                        component={BookScreen} 
+                        initialParams={{ userTag: profile.user_tag }}
+                    />
+                </TopTab.Navigator>
+                :
+                null
+            }
 
-            </ScrollView>
-            <Modal
-                // animationType="fade"
-                transparent={true}
-                visible={profileModalVisible}
-            >
-                <Pressable 
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                    ]}
-                    onPress={()=>
-                        {
-                            setProfileModalVisible(false);
-                            setReportVisible(false);
-                        }
-                    }
-                />
-                    <Animated.View 
-                        style={{
-                            ...styles.modal,
-                        }}
-                    >
-                        {myTag !== userTag ? 
-                            <TouchableOpacity 
-                                style={styles.menu}
-                                activeOpacity={1}
-                                onPress={() => {
-                                    setProfileModalVisible(false);
-                                    setReportVisible(true);
+        </View>
+    );
+};
+
+
+const NemoScreen = ({route, navigation}) => {
+    const dispatch = useDispatch();
+    const { userTag, } = route.params;
+    const sortList = [ "recents", "book", ];
+    const [sort, setSort] = useState(0);
+    const [refreshing, setRefreshing] = useState(false);
+    const snapPoints = useMemo(() => [regHeight * 250], []);
+    const [bookmarks, setBookmarks] = useState(null);
+    const [newBookmarkNum, setNewBookmarkNum] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [scrollLoading, setScrollLoading] = useState(false);
+
+    const ref = useRef();
+    useScrollToTop(ref);
+
+    useEffect(() => {
+        fetchBookmarkList(sort);
+    }, []);
+
+    const fetchBookmarkList = async(sortNum) => {
+        try {
+            // console.log(sortList[sortNum])
+            setLoading(true);
+            await Api
+            .post("api/v1/user/library/", {
+                ctg: "nemos",
+                sort: sortList[sortNum],
+                items: 0,
+                user_tag: userTag,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                // console.log("fetch Nemos");
+                // setBookmarks(res.data.reverse());
+                setBookmarks(res.data);
+                setNewBookmarkNum(res.data.length);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    }
+
+    const onRefresh = useCallback(async() => {
+        setRefreshing(true);
+
+        await fetchBookmarkList(sort)
+        .then(() => setRefreshing(false));
+    }, []);
+
+
+    const onSort = (sortNum) => {
+        setSort(sortNum);
+        onPressClose();
+        fetchBookmarkList(sortNum)
+    }
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getBookmarks();
+        }
+    };
+
+    const getBookmarks = async() => {
+        if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
+            // console.log(bookmarks[bookmarks.length - 1].nemo_num);
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("api/v1/user/library/", {
+                    ctg: "nemos",
+                    sort: sortList[sort],
+                    items: bookmarks.length,
+                    user_tag: userTag,
+                    // cursor: bookmarks[bookmarks.length - 1].nemo_num,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setBookmarks([...bookmarks, ...res.data, ]);
+                    setNewBookmarkNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+            // setCursor(bookmarks.at(-1).cursor);
+        }
+    };
+    
+
+    const renderBookmark = ({ item, index }) => (
+        <Pressable
+            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: "My Library", title: "Bookmarks", index: index, })} 
+        >
+            <BookmarkList bookmark={item} navigation={navigation} />
+        </Pressable>
+    );
+
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                // animatedIndex={{
+                //     value: 0,
+                // }}
+            />
+        ),
+        []
+    );
+    const sortModalRef = useRef();
+
+    const onPressSort = useCallback(() => {
+        sortModalRef.current.present();
+    }, [sortModalRef]);
+
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        sortModalRef.current.dismiss();
+    }, [sortModalRef]);
+
+    return (
+        <View style={styles.container}>
+            { bookmarks && bookmarks.length !== 0 ? 
+                <>
+                    <FlatList 
+                        data={bookmarks}
+                        renderItem={renderBookmark}
+                        keyExtractor={bookmark => bookmark.bookmark_id}
+                        showsVerticalScrollIndicator={false}
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        ref={ref}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={0.3}
+                        ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                        ListHeaderComponent={
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    marginHorizontal: regWidth * 13,
+                                    marginVertical: regHeight * 10,
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
                                 }}
                             >
-                                <Entypo name="warning" size={24} color="black" />
-                                <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, }}>신고</Text>
+                                <Pressable
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                    }}
+                                    // onPress={() => navigation.navigate('UserLibrary', { test: "test", })}
+                                    onPress={onPressSort}
+                                >
+                                    <Image 
+                                        source={iconRepeat}
+                                        style={{
+                                            width: regWidth * 15,
+                                            height: regWidth * 15,
+                                        }}
+                                    />
+                                    <Text
+                                        style={{
+                                            fontSize: 13,
+                                            fontWeight: "700",
+                                            marginHorizontal: regWidth * 5,
+                                        }}
+                                    >
+                                        {sort === 0 ? "Recents" : "Book"}
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        }
+                    />
+                </>
+                :
+                <View
+                    style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 20,
+                        fontWeight: "500",
+                        color: "grey",
+                        }}
+                    >
+                        북마크를 생성해보세요
+                    </Text>
+                </View>
+            }
+            <BottomSheetModal
+                index={0}
+                ref={sortModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={styles.modalContainer}
+                >
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        Sort by
+                    </Text>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(0)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Recents
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 0 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(1)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Book
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 1 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                </View>
+            </BottomSheetModal>
+        </View>
+    )
+}
+
+const NemoListScreen = ({route, navigation}) => {
+    const dispatch = useDispatch();
+    const { userTag, } = route.params;
+    const [loading, setLoading] = useState(false);
+    const [likedNemos, setLikedNemos] = useState(null);
+    const [nemolists, setNemolists] = useState(null);
+    const [newNemolistNum, setNewNemolistNum] = useState(0);
+    const [refreshing, setRefreshing] = useState(false);
+    const snapPoints = useMemo(() => [regHeight * 250], []);
+    const sortList = [ "recents", "alphabetical", "creator", ];
+    const [sort, setSort] = useState(0);
+    const { shouldLibraryRefresh } = useSelector(userSelector);
+    const [scrollLoading, setScrollLoading] = useState(false);
+
+    const ref = useRef();
+    useScrollToTop(ref);
+
+    useEffect(() => {
+        fetchNemoList(sort);
+    }, []);
+
+
+    const renderAlbum = ({ item, index }) => (
+        <Pressable
+            activeOpacity={1}
+            onPress={() => navigation.navigate('AlbumProfile', { albumId: item.nemolist_id, })} 
+        >
+            <AlbumList album={item} navigation={navigation} isDefault={false} />
+        </Pressable>
+    )
+
+    const fetchNemoList = async(sortNum) => {
+        try {
+            setLoading(true);
+            await Api
+            .post("api/v1/user/library/", {
+                ctg: "nemolists",
+                sort: sortList[sortNum],
+                items: 0,
+                user_tag: userTag,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                // console.log("fetch Nemolists");
+                setLikedNemos(res.data.Liked_Nemos);
+                setNemolists(res.data.Nemolists);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    };
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemolist();
+        }
+    };
+
+    const getNemolist = async() => {
+        if (nemolists.length >= 16 && newNemolistNum >= 16) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("api/v1/user/library/", {
+                    ctg: "nemolists",
+                    sort: sortList[sort],
+                    items: nemolists.length,
+                    user_tag: userTag,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setNemolists([...nemolists, ...res.data.Nemolists, ]);
+                    setNewNemolistNum(res.data.Nemolists.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
+    }
+
+    const onRefresh = useCallback(async() => {
+        setRefreshing(true);
+
+        await fetchNemoList(sort)
+        .then(() => setRefreshing(false));
+    }, []);
+
+    const onSort = (sortNum) => {
+        setSort(sortNum);
+        onPressClose();
+        fetchNemoList(sortNum);
+    }
+
+
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+            />
+        ),
+        []
+    );
+    const sortModalRef = useRef();
+
+    const onPressSort = useCallback(() => {
+        sortModalRef.current.present();
+    }, [sortModalRef]);
+
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        sortModalRef.current.dismiss();
+    }, [sortModalRef]);
+
+    return (
+        <View style={styles.container}>
+            <FlatList 
+                data={nemolists}
+                renderItem={renderAlbum}
+                keyExtractor={nemolist => nemolist.nemolist_id}
+                showsVerticalScrollIndicator={false}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                ref={ref}
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.3}
+                ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                ListHeaderComponent={
+                    <>
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                marginHorizontal: regWidth * 13,
+                                marginVertical: regHeight * 10,
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <Pressable
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                }}
+                                onPress={onPressSort}
+                            >
+                                <Image 
+                                    source={iconRepeat}
+                                    style={{
+                                        width: regWidth * 15,
+                                        height: regWidth * 15,
+                                    }}
+                                />
+                                <Text
+                                    style={{
+                                        fontSize: 13,
+                                        fontWeight: "700",
+                                        marginHorizontal: regWidth * 5,
+                                    }}
+                                >
+                                    Recent
+                                </Text>
+                            </Pressable>
+                            <Pressable>
+                                <Image 
+                                    source={iconGrid}
+                                    style={{
+                                        width: regWidth * 20,
+                                        height: regWidth * 20,
+                                    }}
+                                />
+                            </Pressable>
+                        </View>
+                        {likedNemos ? 
+                            <TouchableOpacity
+                                activeOpacity={1}
+                                onPress={() => navigation.navigate('AlbumProfile', { albumId: likedNemos.nemolist_id, })} 
+                            >
+                                <AlbumList album={likedNemos} navigation={navigation} isDefault={true} />
                             </TouchableOpacity>
                             :
                             null
                         }
 
-                    </Animated.View>
-            </Modal>
-            <Modal
-                // animationType="fade"
-                transparent={true}
-                visible={reportVisible}
+                    </>
+                }
+            />
+            <BottomSheetModal
+                index={0}
+                ref={sortModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
             >
-                <Pressable 
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                    ]}
-                    onPress={()=>
-                        {
-                            setReportVisible(false);
-                        }
-                    }
-                />
-                <KeyboardAvoidingView
-                    style={{
-                        ...styles.modal, 
-                        height: regHeight * 650, 
-                    }}
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                <View
+                    style={styles.modalContainer}
                 >
-                    <Entypo name="warning" size={24} color="red" />
-                        <TextInput 
-                            style={styles.reportInput}
-                            placeholder="신고 내용을 적어주세요."
-                            onChangeText={(payload => setReportContents(payload))}
-                            multiline={true}
-                        />
-                    <TouchableOpacity 
-                        style={{...styles.menu, justifyContent: "center", backgroundColor: "red"}}
-                        activeOpacity={1}
-                        onPress={onReport}
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        Sort by
+                    </Text>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(0)}
                     >
-                        <Text style={{ fontSize: 17, fontWeight: "700", marginHorizontal: 10, color: "white", }}>신고하기</Text>
-                    </TouchableOpacity>
-                </KeyboardAvoidingView>
-            </Modal>
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Recents
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 0 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(1)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Alphabetical
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 1 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(2)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 2 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Creator
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 2 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                </View>
+            </BottomSheetModal>
+        </View>
+    )
+}
+
+const BookScreen = ({route, navigatoin}) => {
+    const dispatch = useDispatch();
+    const { userTag, } = route.params;
+    const [books, setBooks] = useState(null);
+    const [newBookNum, setNewBookNum] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const sortList = [ "recents", "alphabetical", "creator", ];
+    const [sort, setSort] = useState(0);
+    const { shouldBookRefresh } = useSelector(userSelector);
+    const [refreshing, setRefreshing] = useState(false);
+    const snapPoints = useMemo(() => [regHeight * 250], []);
+    const [scrollLoading, setScrollLoading] = useState(false);
+
+    const ref = useRef();
+    useScrollToTop(ref);
+
+    useEffect(() => {
+        fetchBook(sort);
+    }, []);
+
+    const fetchBook = async(sortNum) => {
+        try {
+            setLoading(true);
+            await Api
+            .post("api/v1/user/library/", {
+                ctg: "books",
+                sort: sortList[sortNum],
+                items: 0,
+                user_tag: userTag,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                setBooks(res.data);
+                setNewBookNum(res.data.length);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    }
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getBook();
+        }
+    };
+
+    const getBook = async() => {
+        if (books.length >= 16 && newBookNum >= 16) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("api/v1/user/library/", {
+                    ctg: "books",
+                    sort: sortList[sort],
+                    items: nemolists.length,
+                    user_tag: userTag,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setNemolists([...books, ...res.data, ]);
+                    setNewNemolistNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
+    }
+
+    const onRefresh = useCallback(async() => {
+        setRefreshing(true);
+
+        await fetchBook(sort)
+        .then(() => setRefreshing(false));
+    }, []);
+
+    const renderBook = ({ item, index }) => (
+        <Pressable
+            activeOpacity={1}
+            onPress={() => navigation.push('BookProfile', {
+                bookId: item.book_id, 
+            })}
+        >
+            <BookList book={item} />
+        </Pressable>
+    );
+
+    const onSort = (sortNum) => {
+        setSort(sortNum);
+        onPressClose();
+        fetchBook(sortNum);
+    }
+
+
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+            />
+        ),
+        []
+    );
+    const sortModalRef = useRef();
+
+    const onPressSort = useCallback(() => {
+        sortModalRef.current.present();
+    }, [sortModalRef]);
+
+    const onPressClose = useCallback(() => {
+        // @ts-ignore
+        sortModalRef.current.dismiss();
+    }, [sortModalRef]);
+
+    return (
+        <View style={styles.container}>
+            <FlatList 
+                data={books}
+                renderItem={renderBook}
+                keyExtractor={book => book.book_id}
+                showsVerticalScrollIndicator={false}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                ref={ref}
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.3}
+                ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                ListHeaderComponent={
+                    <>
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                marginHorizontal: regWidth * 13,
+                                marginVertical: regHeight * 10,
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <Pressable
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                }}
+                                onPress={onPressSort}
+                            >
+                                <Image 
+                                    source={iconRepeat}
+                                    style={{
+                                        width: regWidth * 15,
+                                        height: regWidth * 15,
+                                    }}
+                                />
+                                <Text
+                                    style={{
+                                        fontSize: 13,
+                                        fontWeight: "700",
+                                        marginHorizontal: regWidth * 5,
+                                    }}
+                                >
+                                    {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
+                                </Text>
+                            </Pressable>
+                            <Pressable>
+                                <Image 
+                                    source={iconGrid}
+                                    style={{
+                                        width: regWidth * 20,
+                                        height: regWidth * 20,
+                                    }}
+                                />
+                            </Pressable>
+                        </View>
+                    </>
+                }
+            />
+            <BottomSheetModal
+                index={0}
+                ref={sortModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={styles.modalContainer}
+                >
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        Sort by
+                    </Text>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(0)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Recents
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 0 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(1)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Alphabetical
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 1 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(2)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 2 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Creator
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 2 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                </View>
+            </BottomSheetModal>
+        </View>
+    )
+}
+
+function MyTabBar({ state, descriptors, navigation, position }) {
+    const viewRef = useRef();
+    const [tabBarSize, setTabBarSize] = useState(0);
+    const tabRefs = useRef(
+        Array.from({ length: state.routes.length }, () => createRef())
+    ).current;
+    const [measures, setMeasures] = useState(null);
+
+    useEffect(() => {
+        if (viewRef.current) {
+          const temp = [];
+
+          tabRefs.forEach((ref, _, array) => {
+            ref.current.measureLayout(
+              viewRef.current,
+              (left, top, width, height) => {
+                temp.push({ left, top, width, height });
+                if (temp.length === array.length) {
+                    // console.log(temp);
+                    setMeasures(temp);
+                }
+              },
+              () => console.log('fail')
+            );
+          });
+        } else {
+            console.log("!!");
+        }
+      }, [tabRefs, tabBarSize]);
+
+    const handleTabWrapperLayout = (e) => {
+        const { width } = e.nativeEvent.layout;
+        // console.log(width);
+        setTabBarSize(width);
+    };
+
+    const standardSize = useMemo(() => {
+        if (!tabBarSize) return 0;
+        return tabBarSize / state.routes.length;
+    }, [tabBarSize]);
+
+    const inputRange = useMemo(() => {
+        return state.routes.map((_, i) => i);
+    }, [state]);
+
+    const indicatorScale = useMemo(() => {
+        if (!measures || !standardSize) return 0;
+      
+        return position.interpolate({
+            inputRange,
+            outputRange: measures.map(
+                measure => measure.width / standardSize
+            ),
+        });
+    }, [inputRange, measures, standardSize]);
+
+    const translateX = useMemo(() => {
+        if (!measures || !standardSize) return 0;
+      
+        return position.interpolate({
+            inputRange,
+            outputRange: measures.map(
+                measure =>
+                measure.left - (standardSize - measure.width) / 2
+            ),
+        });
+    }, [inputRange, measures, standardSize]);
+
+    return (
+        <View
+            style={{
+                borderBottomWidth: 0.3,
+                marginBottom: 2,
+            }}
+            ref={viewRef}
+        >
+            <View 
+                style={{ 
+                    flexDirection: 'row', 
+                    paddingTop: 18, 
+                    paddingBottom: 5,
+                    marginHorizontal: regWidth * 37,
+                    justifyContent: "space-between",
+                }}
+                onLayout={handleTabWrapperLayout}
+            >
+                {state.routes.map((route, index) => {
+                    const ref = tabRefs[index];
+                    const { options } = descriptors[route.key];
+                    const label =
+                        options.tabBarLabel !== undefined
+                        ? options.tabBarLabel
+                        : options.title !== undefined
+                        ? options.title
+                        : route.name;
+            
+                    const isFocused = state.index === index;
+            
+                    const onPress = () => {
+                        const event = navigation.emit({
+                        type: 'tabPress',
+                        target: route.key,
+                        });
+            
+                        if (!isFocused && !event.defaultPrevented) {
+                            navigation.navigate(route.name);
+                        }
+                    };
+            
+                    const onLongPress = () => {
+                        navigation.emit({
+                            type: 'tabLongPress',
+                            target: route.key,
+                        });
+                    };
+                    // modify inputRange for custom behavior
+                    const inputRange = state.routes.map((_, i) => i);
+                    const opacity = position.interpolate({
+                        inputRange,
+                        outputRange: inputRange.map(i => (i === index ? 1 : 0.6)),
+                    });
+            
+                    return (
+                        <Pressable
+                            ref={ref}
+                            accessibilityRole="button"
+                            accessibilityState={isFocused ? { selected: true } : {}}
+                            accessibilityLabel={options.tabBarAccessibilityLabel}
+                            testID={options.tabBarTestID}
+                            onPress={onPress}
+                            onLongPress={onLongPress}
+                            style={{ 
+                                width: "auto",
+                                alignItems: "center",
+                            }}
+                            key={index}
+                        >
+                            <Animated.Text 
+                                style={{ 
+                                    opacity,
+                                    fontSize: regWidth * 16,
+                                    fontWeight: "700",
+                                    fontFamily: "NotoSansKR-Regular",
+                                    // paddingHorizontal: 4,
+                                    // backgroundColor: "green",
+                                }}
+                            >   
+                                {label}
+                            </Animated.Text>
+                        </Pressable>
+
+                    );
+                })}
+            </View>
+            <Animated.View
+                style={{
+                    width: standardSize,
+                    height: 3,
+                    backgroundColor: "#7341ffcc",
+                    transform: [
+                        {
+                          translateX,
+                        },
+                        {
+                          scaleX: indicatorScale,
+                        },
+                    ],
+                }}
+            />
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -410,98 +1334,88 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
     },
-    profileInfo: {
-        marginHorizontal: regWidth * 20,
-        paddingBottom: regHeight * 18,
-        flexDirection: "row",
-        // justifyContent: "space-between",
-        alignItems: "center",
-    },
-    profileImage: {
-        width: 70,
-        height: 70,
+    profileAvatar: {
+        width: regWidth * 100,
+        height: regWidth * 100,
         resizeMode: "cover",
         borderRadius: 50,
-        // backgroundColor: "red",
-        marginTop: 10,
+        borderWidth: 2,
+        borderColor: "#7341ffcc",
+        // marginLeft: regWidth*13,
+    },
+    followBtnContainer: {
+        flexDirection: "row",
+        justifyContent: "flex-end", 
+        alignItems: "center",
+        width: "100%",
+        height: "30%",
+        marginTop: regWidth*13,
     },
     followBtn: {
-        height: regWidth * 40,
-        paddingHorizontal: 38,
-        // paddingVertical: 10,
-        borderRadius: 10,
-        marginHorizontal: 15,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    introduce: {
-        marginTop: -10,
-        marginHorizontal: 24,
-    },
-    postByWho: {
-        width: SCREEN_WIDTH * 0.5,
-        alignItems: "center",
-        borderBottomWidth: 1,
-        paddingVertical: 15,
-        flexDirection: "row",
-        justifyContent: "center",
-    },
-    postTileBox: {
-        width: SCREEN_WIDTH * 0.5,
-        height: SCREEN_WIDTH * 0.5,
-    },
-    postTile: {
-        flex: 1,
-        // marginVertical: 1,
-        // marginHorizontal: 1,
-        borderWidth: 1,
-        borderColor: "white",
-        paddingHorizontal: 2,
-    },
-    postTitle: {
-        flex: 0.6,
-        width: "80%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-    postContent: {
-        flex: 2,
-    },
-    postIconAndWriter: {
-        flex: 0.3,
-        alignItems: "flex-end",
-    },
-    modal: {
-        position: "absolute",
-        width: "100%",
-        height: regHeight * 150,
-        bottom: 0, 
-        backgroundColor: "white",
         borderRadius: 20,
-        paddingTop: 12,
+        justifyContent: "center",
         alignItems: "center",
+        borderColor: colors.textDark,
+        borderWidth: 0.5, 
+        paddingHorizontal: regWidth * 18,
+        paddingVertical: regHeight * 5,
     },
-    menu: {
-        backgroundColor: "#DDDDDD",
-        width: SCREEN_WIDTH - regWidth * 40,
-        height: regHeight * 40,
-        borderRadius: 5,
-        // paddingVertical: 8,
-        paddingHorizontal: regWidth * 13,
-        marginTop: regHeight * 18,
+    usertagContainer: {
+        flexDirection: "row", 
+        width: "60%", 
+        alignItems: "flex-start", 
+        height: "25%",
+        marginTop: -regHeight*15,
+    },
+    usernameContainer: {
+        fontSize: regWidth * 23,
+        fontWeight: "900",
+        width: "70%",
+        height: regHeight*70,
+        color: "#202020",
+    },
+    introContainer: {
+        height: "73%",
+        width: "100%",
+        marginTop: -regHeight*100,
+        flexDirection: "column",
+        alignItems: "flex-start",
+    },
+    boldNumberTxt: {
+        color: "#202020",
+        fontWeight: "900",
+        fontSize: regWidth*16,
+        letterSpacing: -regWidth,
+        // width: regWidth * 20,
+    },
+    followTxt: {
+        marginLeft: regWidth*8,
+        marginRight: regWidth*15,
+        fontWeight: "500",
+        color: "#404040",
+    },
+    followedByContainer: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "flex-start",
+        // height: "30%",
+        marginTop: regHeight * 12,
     },
-    reportInput: {
-        width: SCREEN_WIDTH - regWidth * 40,
-        height: regHeight * 170,
-        backgroundColor: "#DDDDDD",
-        borderWidth: 1,
-        borderColor: "#FF4040",
-        borderRadius: 10,
-        marginTop: regHeight * 20,
-        paddingHorizontal: regWidth * 10,
+    smallAvatar: {
+        width: regWidth*30, 
+        height: regWidth*30,
+        resizeMode: "cover",
+        borderRadius: 999,
+        borderWidth: regWidth*1,
+        borderColor: "#D9D9D9",
+    },
+    modalContainer: {
+        marginHorizontal: regWidth * 20,
+    },
+    sortBtn: {
+        flexDirection: "row", 
+        alignItems: "center", 
+        marginTop: regHeight * 24, 
+        justifyContent: "space-between",
     },
 })
 

@@ -168,8 +168,8 @@ const UnTouchableBookmarkList = (props) => {
                         </Text>
                     </View>
                     <View style={styles.bookmarkContentsWatermark}>
-                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
-                        <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060" }} >{bookmark.created_date.split('T')[0]}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", fontFamily: "NotoSansKR-Regular", }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060", fontFamily: "NotoSansKR-Regular", }} >{bookmark.created_date.split('T')[0]}</Text>
                     </View>
                 </View>
             </MaskedView>
@@ -212,10 +212,12 @@ const styles = StyleSheet.create({
     bookmarkContentsBookTitle: {
         fontWeight: "400",
         fontSize: regWidth * 10,
+        fontFamily: "NotoSansKR-Regular",
     },
     bookmarkContentsBookChapter: {
         fontWeight: "700",
         fontSize: regWidth * 15,
+        fontFamily: "NotoSansKR-Regular",
     },
     bookmarkContentsBookChapterInput: {
         fontWeight: "400",
@@ -228,10 +230,10 @@ const styles = StyleSheet.create({
         justifyContent: "center", 
     },
     bookmarkContentsText: {
-        fontWeight: "500",
-        // fontSize: 16,
+        // fontWeight: "500",
         fontSize: regWidth * 16,
         lineHeight: regWidth * 28,
+        fontFamily: "NotoSansKR-Medium",
     },
     bookmarkContentsInput: {
         // backgroundColor: "pink",

@@ -1,6 +1,7 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, TextInput, ScrollView, Pressable, Image, } from "react-native";
-import React, { useEffect, useState, useRef, } from "react";
+import { View, SafeAreaView, Text, Button, StyleSheet, TextInput, ScrollView, Pressable, Image, Animated, } from "react-native";
+import React, { useEffect, useState, useRef, createRef, useMemo, } from "react";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
 import blankBookCover from '../assets/images/blankBookImage.png';
 import blankAvatar from '../assets/images/peopleicon.png';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
@@ -10,11 +11,26 @@ import {
     useFocusEffect,
     useScrollToTop,
 } from '@react-navigation/native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { AlbumList, BookList, UserList, } from '../components';
 
 import analytics from '@react-native-firebase/analytics';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { userSelector, bookmarkSelector } from '../modules/hooks';
+import { 
+    setSearchKeyword,
+    addRecentSearch,
+    deleteRecentSearch,
+} from '../modules/user';
+
+const TopTab = createMaterialTopTabNavigator();
+
 const Search = ({navigation}) => {
+    const dispatch = useDispatch();
     const [searchInput, setSearchInput] = useState('');
+    const { recentSearch, } = useSelector(userSelector);
+    const searchRecord = [...recentSearch].reverse();
     const debounceVal = useDebounce(searchInput);
     const [bookSearchResultList, setBookSearchResultList] = useState(null);
     const [userSearchResultList, setUserSearchResultList] = useState(null);
@@ -25,41 +41,73 @@ const Search = ({navigation}) => {
         || (albumSearchResultList !== null && albumSearchResultList.length > 0);
 
     const [ctg, setCtg] = useState("book");
+    const searchBarValue = useRef(new Animated.Value(0)).current;
 
     const ref = useRef();
     useScrollToTop(ref);
 
     useEffect(() => {
+        showSearchBar();
+    }, [])
+
+    useEffect(() => {
         autoSearch();
+        dispatch(setSearchKeyword(debounceVal))
     }, [debounceVal, ctg]);
 
+
+    const showSearchBar = () => {
+        Animated.timing(searchBarValue, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
+    }
 
     const onChangeSearchInput = (payload) => setSearchInput(payload);
 
     const autoSearch = async() => {
-        if (debounceVal.length > 0) {
-            try {
-                await Api.post("/api/v5/search/", {
-                    keyword: debounceVal,
-                    ctg: ctg,
-                })
-                .then((res) => {
-                    console.log(res.data);
-                    if (ctg === "book") {
-                        setBookSearchResultList(res.data);
-                    }
-                    if (ctg === "user") {
-                        setUserSearchResultList(res.data);
-                    }
-                    if (ctg === "album") {
-                        setAlbumSearchResultList(res.data);
-                    }
-                    
-                })
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        // if (debounceVal.length > 0) {
+        //     try {
+        //         await Api
+        //         .post("/api/v5/search/", {
+        //             keyword: searchInput,
+        //             ctg: "book",
+        //         })
+        //         .then((res) => {
+        //             console.log(res.data);
+        //             setBookSearchResultList(res.data);
+        //         })
+        //     } catch (err) {
+        //         console.error(err);
+        //     }
+        //     try {
+        //         await Api
+        //         .post("/api/v5/search/", {
+        //             keyword: searchInput,
+        //             ctg: "nemolist",
+        //         })
+        //         .then((res) => {
+        //             // console.log(res.data);
+        //             setAlbumSearchResultList(res.data);
+        //         })
+        //     } catch (err) {
+        //         console.error(err);
+        //     }
+        //     try {
+        //         await Api
+        //         .post("/api/v5/search/", {
+        //             keyword: searchInput,
+        //             ctg: "user",
+        //         })
+        //         .then((res) => {
+        //             // console.log(res.data);
+        //             setUserSearchResultList(res.data);
+        //         })
+        //     } catch (err) {
+        //         console.error(err);
+        //     }
+        // }
     };
 
     const onSearch = async() => {
@@ -90,56 +138,181 @@ const Search = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <View>
-            <SafeAreaView style={styles.header} >
-                <Text style={{
-                    fontSize: 25,
-                    fontWeight: "900",
-                }} >
-                    Search
-                </Text>
+            <SafeAreaView >
+                <View style={styles.header} >
+                    <Animated.View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            backgroundColor: "#D9D9D9",
+                            // width: `${searchBarValue}%`,
+                            width: searchBarValue.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: ["100%" , "83%"]
+                            }),
+                            // transform: [{
+                            //     width: searchBarValue.interpolate({
+                            //         inputRange: [0, 1],
+                            //         outputRange: ["0%" , "100%"]
+                            //     })
+                            // }],
+                            borderRadius: 10,
+                            height: regWidth * 36,
+                            paddingHorizontal: regWidth * 8,
+                            // marginTop: regHeight * 12,
+                            justifyContent: "space-between",
+                            zIndex: 10,
+                        }}
+                    >
+                        <Feather name="search" size={regWidth * 18} color="#606060" />
+                        <TextInput 
+                            placeholder="Search Accounts, Books, and Nemolists"
+                            placeholderTextColor={"#606060"}
+                            style={{
+                                height: "100%",
+                                width: "85%",
+                            }}
+                            onChangeText={onChangeSearchInput}
+                            onSubmitEditing={autoSearch}
+                            autoFocus="true"
+                            value={searchInput}
+                        />
+                        <Pressable
+                            onPress={() => setSearchInput('')}
+                        >
+                            <Feather name="x" size={regWidth * 18} color="#606060" />
+                        </Pressable>
+                    </Animated.View>
+                    <Pressable
+                        onPress={() => navigation.navigate('HomeScreen', { cancel: true, })}
+                        style={{
+                            position: "absolute",
+                            right: 0,
+                            zIndex: 0,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontSize: regWidth * 15,
+                                fontFamily: "NotoSansKR-Medium",
+                            }}
+                        >
+                            Cancel
+                        </Text>
+                    </Pressable>
+                </View>
             </SafeAreaView>
-            <ScrollView
-                scrollEnabled={false}
-            >
-                <TextInput 
-                    style={styles.searchInput}
-                    placeholder="키워드를 입력하세요"
-                    onChangeText={onChangeSearchInput}
-                    value={searchInput}
-                />
-            </ScrollView>
-            {/* <ScrollView
-                showsHorizontalScrollIndicator={false}
-                horizontal
-            >
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>부동산</Text>
-                </View>
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>메타버스</Text>
-                </View>
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>아이폰</Text>
-                </View>
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>상당히</Text>
-                </View>
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>빡세네</Text>
-                </View>
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>리액트</Text>
-                </View>
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>네이티브</Text>
-                </View>
-                <View style={styles.category}>
-                    <Text style={styles.categoryText}>홀리쉣</Text>
-                </View>
-            </ScrollView> */}
 
-            <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 20, marginTop: 8, }}>
+            {debounceVal.length > 0 ? 
+                <TopTab.Navigator
+                    tabBar={(props) => <MyTabBar {...props} />}
+                >
+                    <TopTab.Screen 
+                        name="Book" 
+                        component={BookResultScreen} 
+                        initialParams={{ searchInput: debounceVal, bookSearchResultList: bookSearchResultList, }}
+                    />
+                    <TopTab.Screen 
+                        name="NemoList" 
+                        component={NemolistResultScreen} 
+                        initialParams={{ searchInput: debounceVal, albumSearchResultList: albumSearchResultList, }}
+                    />
+                    <TopTab.Screen 
+                        name="User" 
+                        component={UserResultScreen} 
+                        initialParams={{ searchInput: debounceVal, userSearchResultList: userSearchResultList, }}
+                    />
+                </TopTab.Navigator>
+                :
+                <>
+                    <Text 
+                        style={{ 
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Black", 
+                            marginHorizontal: regWidth * 12, 
+                            marginTop: regHeight * 12, 
+                        }}
+                    >
+                        Recent searches
+                    </Text>
+                    <ScrollView>
+                        {searchRecord.map((item, index) => {
+                            if (item.ctg === "book") {
+                                return (
+                                    <Pressable 
+                                        onPress={async() => 
+                                            {
+                                                navigation.navigate('BookProfile', {
+                                                    bookId: item.book_id, 
+                                                })
+                                                await analytics().logEvent('searchBook', {
+                                                    search_book_title: item.book_title,
+                                                })
+                                                dispatch(addRecentSearch({...item, "ctg": "book"}));
+                                            }
+                                        }
+                                        style={{ justifyContent: "center", }}
+                                        key={index}
+                                    >
+                                        <BookList book={item} navigation={navigation}  />
+                                        <Pressable
+                                            onPress={() => dispatch(deleteRecentSearch(searchRecord.length - index - 1))}
+                                            style={{
+                                                position: "absolute",
+                                                right: regWidth * 18,
+                                            }}
+                                        >
+                                            <Feather name="x" size={regWidth * 24} color={colors.bgdDark} />
+                                        </Pressable>
+                                    </Pressable>
+                                )
+                            }
+                            if (item.ctg === "album") {
+                                return (
+                                    <Pressable 
+                                        onPress={async() => 
+                                            {
+                                                navigation.navigate('AlbumProfile', {
+                                                    albumId: item.nemolist_id,
+                                                })
+                                                await analytics().logEvent('searchAlbum', {
+                                                    search_album_title: item.nemolist_title,
+                                                })
+                                                dispatch(addRecentSearch({...item, "ctg": "album"}));
+                                            }
+                                        }
+                                        key={index}
+                                    >
+                                        <AlbumList album={item} navigation={navigation} isDefault={false} />
+                                    </Pressable>
+                                )
+                            }
+                            if (item.ctg === "user") {
+                                return (
+                                    <Pressable
+                                        onPress={async() => 
+                                            {
+                                                navigation.navigate('OtherProfile', {
+                                                    userTag: item.user_tag, 
+                                                })
+                                                await analytics().logEvent('searchUser', {
+                                                    search_user_tag: item.user_tag,
+                                                })
+                                                dispatch(addRecentSearch({...item, "ctg": "user"}));
+                                            }
+                                        }
+                                        key={index}
+                                    >
+                                        <UserList user={item} navigation={navigation}  />
+                                    </Pressable>
+                                )
+
+                            }
+                        })}
+                    </ScrollView>
+                </>
+            }
+            {/* <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 20, marginTop: 8, }}>
                 <Pressable
                     onPress={() => setCtg("book")}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -190,19 +363,16 @@ const Search = ({navigation}) => {
                         앨범
                     </Text>
                 </Pressable>
-            </View>
-            </View>
-            <View
+            </View> */}
+            {/* <View
                 style={{ backgroundColor: "#DDDDDD", paddingVertical:0.3, marginTop: 8, }}
             >
-            </View>
+            </View> */}
 
-            <ScrollView
+            {/* <ScrollView
 
                 ref={ref}
             >
-                {/* <Text style={{marginHorizontal: 20, marginTop: 20, fontSize: 20, fontWeight: "700", }} >최근 검색어</Text>
-                <Text style={{marginHorizontal: 20, marginTop: 20, fontSize: 17, fontWeight: "500", }} >검색 내용이 없습니다.</Text> */}
                 {bookSearchResultList !== null && bookSearchResultList.length > 0 && ctg === "book" ?
                     <>
                         {bookSearchResultList.map((searchResult, index) => (
@@ -231,156 +401,316 @@ const Search = ({navigation}) => {
                     null
                 }
             
-            </ScrollView>
+            </ScrollView> */}
         </View>
     );
 };
 
-const BookList = ({book, navigation,}) => {
-    return (
-        <Pressable 
-            style={styles.resultList} 
-            onPress={async() => 
-                {
-                    navigation.navigate('BookProfile', {
-                        bookId: book.book_id, 
-                    })
-                    await analytics().logEvent('searchBook', {
-                        search_book_title: book.book_title,
-                    })
-                }
+const BookResultScreen = ({route, navigation}) => {
+    const dispatch = useDispatch();
+    const { searchKeyword, } = useSelector(userSelector);
+    const [bookSearchResultList, setBookSearchResultList] = useState(null);
+
+    useEffect(() => {
+        onSearch();
+        console.log(searchKeyword);
+    }, [searchKeyword])
+
+    const onSearch = async() => {
+        if (searchKeyword.length > 0) {
+            try {
+                await Api
+                .post("/api/v5/search/", {
+                    keyword: searchKeyword,
+                    ctg: "book",
+                })
+                .then((res) => {
+                    // console.log(res.data);
+                    setBookSearchResultList(res.data);
+                })
+            } catch (err) {
+                console.error(err);
             }
-        >
-            <Image 
-                source={book.book_cover !== null ? { uri: book.book_cover } : blankBookCover}
-                style={styles.bookCoverImage}
-            />
-            <View style={{ marginHorizontal: regWidth * 8, }}>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 18, 
-                        fontWeight: "700", 
-                        width: regWidth * 220, 
-                    }}
-                    numberOfLines={2}
-                    ellipsizeMode='tail'
-                >
-                    {book.book_title}
-                </Text>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 15, 
-                        fontWeight: "400", 
-                        width: regWidth * 180,
-                        marginTop: regHeight * 8,
-                    }}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                >
-                    {book.book_author}
-                </Text>
-            </View>
-        </Pressable>
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            <ScrollView>
+                {bookSearchResultList && bookSearchResultList.map((searchResult, index) => (
+                    <Pressable 
+                        onPress={async() => 
+                            {
+                                navigation.navigate('BookProfile', {
+                                    bookId: searchResult.book_id, 
+                                })
+                                await analytics().logEvent('searchBook', {
+                                    search_book_title: searchResult.book_title,
+                                })
+                                dispatch(addRecentSearch({...searchResult, "ctg": "book"}));
+                            }
+                        }
+                        key={index}
+                    >
+                        <BookList book={searchResult} navigation={navigation}  />
+                    </Pressable>
+                ))}
+            </ScrollView>
+        </View>
     )
 }
 
-const UserList = ({user, navigation,}) => {
-    return (
-        <Pressable 
-            style={styles.resultList} 
-            onPress={async() => 
-                {
-                    navigation.navigate('OtherProfile', {
-                        userTag: user.user_tag, 
-                    })
-                    await analytics().logEvent('searchUser', {
-                        search_user_tag: user.user_tag,
-                    })
-                }
+const NemolistResultScreen = ({route, navigation}) => {
+    const dispatch = useDispatch();
+    const { searchKeyword, } = useSelector(userSelector);
+    const [albumSearchResultList, setAlbumSearchResultList] = useState(null);
+
+    useEffect(() => {
+        onSearch();
+    }, [searchKeyword])
+
+    const onSearch = async() => {
+        if (searchKeyword.length > 0) {
+            try {
+                await Api
+                .post("/api/v5/search/", {
+                    keyword: searchKeyword,
+                    ctg: "nemolist",
+                })
+                .then((res) => {
+                    // console.log(res.data);
+                    setAlbumSearchResultList(res.data);
+                })
+            } catch (err) {
+                console.error(err);
             }
-        >
-            <Image 
-                source={user.avatar !== null ? { uri: user.avatar } : blankAvatar}
-                style={styles.userImage}
-            />
-            <View style={{ marginHorizontal: regWidth * 8, }}>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 18, 
-                        fontWeight: "700", 
-                        width: regWidth * 220, 
-                    }}
-                    numberOfLines={2}
-                    ellipsizeMode='tail'
-                >
-                    {user.name}
-                </Text>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 15, 
-                        fontWeight: "400", 
-                        width: regWidth * 180,
-                        marginTop: regHeight * 8,
-                        color: "#008000",
-                    }}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                >
-                    {`@${user.user_tag}`}
-                </Text>
-            </View>
-        </Pressable>
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            <ScrollView>
+                {albumSearchResultList && albumSearchResultList.map((searchResult, index) => (
+                    <Pressable 
+                        onPress={async() => 
+                            {
+                                navigation.navigate('AlbumProfile', {
+                                    albumId: searchResult.nemolist_id,
+                                })
+                                await analytics().logEvent('searchAlbum', {
+                                    search_album_title: searchResult.nemolist_title,
+                                })
+                                dispatch(addRecentSearch({...searchResult, "ctg": "album"}));
+                            }
+                        }
+                        key={index}
+                    >
+                        <AlbumList album={searchResult} navigation={navigation} isDefault={false} />
+                    </Pressable>
+                ))}
+            </ScrollView>
+        </View>
     )
 }
 
-const AlbumList = ({album, navigation,}) => {
-    return (
-        <Pressable 
-            style={styles.resultList} 
-            onPress={async() => 
-                {
-                    navigation.navigate('AlbumProfile', {
-                        albumId: album.album_id, 
-                    })
-                    await analytics().logEvent('searchAlbum', {
-                        search_album_title: album.album_title,
-                    })
-                }
+const UserResultScreen = ({route, navigation}) => {
+    const dispatch = useDispatch();
+    const { searchKeyword, } = useSelector(userSelector);
+    const [userSearchResultList, setUserSearchResultList] = useState(null);
+
+    useEffect(() => {
+        onSearch();
+    }, [searchKeyword])
+
+    const onSearch = async() => {
+        if (searchKeyword.length > 0) {
+            try {
+                await Api
+                .post("/api/v5/search/", {
+                    keyword: searchKeyword,
+                    ctg: "user",
+                })
+                .then((res) => {
+                    // console.log(res.data);
+                    setUserSearchResultList(res.data);
+                })
+            } catch (err) {
+                console.error(err);
             }
-        >
-            <Image 
-                source={album.album_cover !== null ? { uri: album.album_cover } : emptyAlbumImage}
-                style={styles.albumImage}
-            />
-            <View style={{ marginHorizontal: regWidth * 8, }}>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 18, 
-                        fontWeight: "700", 
-                        width: regWidth * 220, 
-                    }}
-                    numberOfLines={2}
-                    ellipsizeMode='tail'
-                >
-                    {album.album_title}
-                </Text>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 15, 
-                        fontWeight: "400", 
-                        width: regWidth * 180,
-                        marginTop: regHeight * 8,
-                        color: "#008000",
-                    }}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                >
-                    {`@${album.user_tag}`}
-                </Text>
-            </View>
-        </Pressable>
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            <ScrollView>
+                {userSearchResultList && userSearchResultList.map((searchResult, index) => (
+                    <Pressable
+                        onPress={async() => 
+                            {
+                                navigation.navigate('OtherProfile', {
+                                    userTag: searchResult.user_tag, 
+                                })
+                                await analytics().logEvent('searchUser', {
+                                    search_user_tag: searchResult.user_tag,
+                                })
+                                dispatch(addRecentSearch({...searchResult, "ctg": "user"}));
+                            }
+                        }
+                        key={index}
+                    >
+                        <UserList user={searchResult} navigation={navigation}  />
+                    </Pressable>
+                ))}
+            </ScrollView>
+        </View>
     )
 }
+
+// const BookList = ({book, navigation,}) => {
+//     return (
+//         <Pressable 
+//             style={styles.resultList} 
+//             onPress={async() => 
+//                 {
+//                     navigation.navigate('BookProfile', {
+//                         bookId: book.book_id, 
+//                     })
+//                     await analytics().logEvent('searchBook', {
+//                         search_book_title: book.book_title,
+//                     })
+//                 }
+//             }
+//         >
+//             <Image 
+//                 source={book.book_cover !== null ? { uri: book.book_cover } : blankBookCover}
+//                 style={styles.bookCoverImage}
+//             />
+//             <View style={{ marginHorizontal: regWidth * 8, }}>
+//                 <Text 
+//                     style={{ 
+//                         fontSize: regWidth * 18, 
+//                         fontWeight: "700", 
+//                         width: regWidth * 220, 
+//                     }}
+//                     numberOfLines={2}
+//                     ellipsizeMode='tail'
+//                 >
+//                     {book.book_title}
+//                 </Text>
+//                 <Text 
+//                     style={{ 
+//                         fontSize: regWidth * 15, 
+//                         fontWeight: "400", 
+//                         width: regWidth * 180,
+//                         marginTop: regHeight * 8,
+//                     }}
+//                     numberOfLines={1}
+//                     ellipsizeMode='tail'
+//                 >
+//                     {book.book_author}
+//                 </Text>
+//             </View>
+//         </Pressable>
+//     )
+// }
+
+// const UserList = ({user, navigation,}) => {
+//     return (
+//         <Pressable 
+//             style={styles.resultList} 
+//             onPress={async() => 
+//                 {
+//                     navigation.navigate('OtherProfile', {
+//                         userTag: user.user_tag, 
+//                     })
+//                     await analytics().logEvent('searchUser', {
+//                         search_user_tag: user.user_tag,
+//                     })
+//                 }
+//             }
+//         >
+//             <Image 
+//                 source={user.avatar !== null ? { uri: user.avatar } : blankAvatar}
+//                 style={styles.userImage}
+//             />
+//             <View style={{ marginHorizontal: regWidth * 8, }}>
+//                 <Text 
+//                     style={{ 
+//                         fontSize: regWidth * 18, 
+//                         fontWeight: "700", 
+//                         width: regWidth * 220, 
+//                     }}
+//                     numberOfLines={2}
+//                     ellipsizeMode='tail'
+//                 >
+//                     {user.name}
+//                 </Text>
+//                 <Text 
+//                     style={{ 
+//                         fontSize: regWidth * 15, 
+//                         fontWeight: "400", 
+//                         width: regWidth * 180,
+//                         marginTop: regHeight * 8,
+//                         color: "#008000",
+//                     }}
+//                     numberOfLines={1}
+//                     ellipsizeMode='tail'
+//                 >
+//                     {`@${user.user_tag}`}
+//                 </Text>
+//             </View>
+//         </Pressable>
+//     )
+// }
+
+// const AlbumList = ({album, navigation,}) => {
+//     return (
+//         <Pressable 
+//             style={styles.resultList} 
+//             onPress={async() => 
+//                 {
+//                     navigation.navigate('AlbumProfile', {
+//                         albumId: album.album_id, 
+//                     })
+//                     await analytics().logEvent('searchAlbum', {
+//                         search_album_title: album.album_title,
+//                     })
+//                 }
+//             }
+//         >
+//             <Image 
+//                 source={album.album_cover !== null ? { uri: album.album_cover } : emptyAlbumImage}
+//                 style={styles.albumImage}
+//             />
+//             <View style={{ marginHorizontal: regWidth * 8, }}>
+//                 <Text 
+//                     style={{ 
+//                         fontSize: regWidth * 18, 
+//                         fontWeight: "700", 
+//                         width: regWidth * 220, 
+//                     }}
+//                     numberOfLines={2}
+//                     ellipsizeMode='tail'
+//                 >
+//                     {album.album_title}
+//                 </Text>
+//                 <Text 
+//                     style={{ 
+//                         fontSize: regWidth * 15, 
+//                         fontWeight: "400", 
+//                         width: regWidth * 180,
+//                         marginTop: regHeight * 8,
+//                         color: "#008000",
+//                     }}
+//                     numberOfLines={1}
+//                     ellipsizeMode='tail'
+//                 >
+//                     {`@${album.user_tag}`}
+//                 </Text>
+//             </View>
+//         </Pressable>
+//     )
+// }
 
 
 function useDebounce(value, delay = 500) {
@@ -399,16 +729,189 @@ function useDebounce(value, delay = 500) {
     return debounceVal;
 }
 
+function MyTabBar({ state, descriptors, navigation, position }) {
+    const viewRef = useRef();
+    const [tabBarSize, setTabBarSize] = useState(0);
+    const tabRefs = useRef(
+        Array.from({ length: state.routes.length }, () => createRef())
+    ).current;
+    const [measures, setMeasures] = useState(null);
+
+    useEffect(() => {
+        if (viewRef.current) {
+          const temp = [];
+
+          tabRefs.forEach((ref, _, array) => {
+            ref.current.measureLayout(
+              viewRef.current,
+              (left, top, width, height) => {
+                temp.push({ left, top, width, height });
+                if (temp.length === array.length) {
+                    // console.log(temp);
+                    setMeasures(temp);
+                }
+              },
+              () => console.log('fail')
+            );
+          });
+        } else {
+            console.log("!!");
+        }
+      }, [tabRefs, tabBarSize]);
+
+    const handleTabWrapperLayout = (e) => {
+        const { width } = e.nativeEvent.layout;
+        // console.log(width);
+        setTabBarSize(width);
+    };
+
+    const standardSize = useMemo(() => {
+        if (!tabBarSize) return 0;
+        return tabBarSize / state.routes.length;
+    }, [tabBarSize]);
+
+    const inputRange = useMemo(() => {
+        return state.routes.map((_, i) => i);
+    }, [state]);
+
+    const indicatorScale = useMemo(() => {
+        if (!measures || !standardSize) return 0;
+      
+        return position.interpolate({
+            inputRange,
+            outputRange: measures.map(
+                measure => measure.width / standardSize
+            ),
+        });
+    }, [inputRange, measures, standardSize]);
+
+    const translateX = useMemo(() => {
+        if (!measures || !standardSize) return 0;
+      
+        return position.interpolate({
+            inputRange,
+            outputRange: measures.map(
+                measure =>
+                measure.left - (standardSize - measure.width) / 2
+            ),
+        });
+    }, [inputRange, measures, standardSize]);
+
+    return (
+        <View
+            style={{
+                borderBottomWidth: 0.3,
+                marginBottom: 2,
+            }}
+            ref={viewRef}
+        >
+            <View 
+                style={{ 
+                    flexDirection: 'row', 
+                    paddingTop: regHeight * 12, 
+                    paddingBottom: regHeight * 5,
+                    marginHorizontal: regWidth * 37,
+                    justifyContent: "space-between",
+                }}
+                onLayout={handleTabWrapperLayout}
+            >
+                {state.routes.map((route, index) => {
+                    const ref = tabRefs[index];
+                    const { options } = descriptors[route.key];
+                    const label =
+                        options.tabBarLabel !== undefined
+                        ? options.tabBarLabel
+                        : options.title !== undefined
+                        ? options.title
+                        : route.name;
+            
+                    const isFocused = state.index === index;
+            
+                    const onPress = () => {
+                        const event = navigation.emit({
+                        type: 'tabPress',
+                        target: route.key,
+                        });
+            
+                        if (!isFocused && !event.defaultPrevented) {
+                            navigation.navigate(route.name);
+                        }
+                    };
+            
+                    const onLongPress = () => {
+                        navigation.emit({
+                            type: 'tabLongPress',
+                            target: route.key,
+                        });
+                    };
+                    // modify inputRange for custom behavior
+                    const inputRange = state.routes.map((_, i) => i);
+                    const opacity = position.interpolate({
+                        inputRange,
+                        outputRange: inputRange.map(i => (i === index ? 1 : 0.6)),
+                    });
+            
+                    return (
+                        <Pressable
+                            ref={ref}
+                            accessibilityRole="button"
+                            accessibilityState={isFocused ? { selected: true } : {}}
+                            accessibilityLabel={options.tabBarAccessibilityLabel}
+                            testID={options.tabBarTestID}
+                            onPress={onPress}
+                            onLongPress={onLongPress}
+                            style={{ 
+                                width: "auto",
+                                alignItems: "center",
+                            }}
+                            key={index}
+                        >
+                            <Animated.Text 
+                                style={{ 
+                                    opacity,
+                                    fontSize: regWidth * 16,
+                                    fontWeight: "700",
+                                    fontFamily: "NotoSansKR-Regular",
+                                    // paddingHorizontal: 4,
+                                    // backgroundColor: "green",
+                                }}
+                            >   
+                                {label}
+                            </Animated.Text>
+                        </Pressable>
+
+                    );
+                })}
+            </View>
+            <Animated.View
+                style={{
+                    width: standardSize,
+                    height: 3,
+                    backgroundColor: "#7341ffcc",
+                    transform: [
+                        {
+                          translateX,
+                        },
+                        {
+                          scaleX: indicatorScale,
+                        },
+                    ],
+                }}
+            />
+        </View>
+    );
+}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "white",
     },
     header: {
-        // backgroundColor: "red",
-        marginVertical: regHeight * 10,
+        // backgroundColor: "pink",
+        marginVertical: regHeight * 8,
         marginHorizontal: 20,
-        paddingBottom: regHeight * 8,
+        // paddingBottom: regHeight * 8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",

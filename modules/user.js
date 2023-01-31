@@ -14,7 +14,11 @@ const initialState = {
     shouldHomeRefresh: false,
     shouldLibraryRefresh: false,
     shouldUserRefresh: false,
-    recentRead: [],
+    shouldNemoRefresh: false,
+    shouldNemolistRefresh: false,
+    shouldBookRefresh: false,
+    recentSearch: [],
+    searchKeyword: '',
 }
 
 export const userSlice = createSlice({
@@ -66,20 +70,68 @@ export const userSlice = createSlice({
         setShouldUserRefresh: (state, action) => {
             state.shouldUserRefresh = action.payload;
         },
+        setShouldNemoRefresh: (state, action) => {
+            state.shouldNemoRefresh = action.payload;
+        },
+        setShouldNemolistRefresh: (state, action) => {
+            state.shouldNemolistRefresh = action.payload;
+        },
+        setShouldBookRefresh: (state, action) => {
+            state.shouldBookRefresh = action.payload;
+        },
         setIsStaff: (state, action) => {
             state.isStaff = action.payload;
         },
-        addRecentRead: (state, action) => {
-            // state.recentRead = state.recentRead.concat(action.payload);
-            console.log(state.recentRead);
+        resetRecentSearch: (state, action) => {
+            state.recentSearch = [];
+        },
+        addRecentSearch: (state, action) => {
+            if (state.recentSearch) {
+                if (state.recentSearch.length === 20) {
+                    state.recentSearch.splice(0, 1);
+                }
+
+                const dupIndex = state.recentSearch.findIndex((item) => {
+                    if (action.payload.ctg === "book") {
+                        return (Number(item.book_id) === Number(action.payload.book_id))
+                    }
+                    if (action.payload.ctg === "album") {
+                        return (Number(item.nemolist_id) === Number(action.payload.nemolist_id))
+                    }
+                    if (action.payload.ctg === "user") {
+                        return (item.user_tag === action.payload.user_tag)
+                    }
+                })
+                if (dupIndex !== -1) {
+                    console.log(dupIndex);
+                    state.recentSearch.splice(dupIndex, 1);
+                    state.recentSearch = state.recentSearch.concat(action.payload);
+                } else {
+                    state.recentSearch = state.recentSearch.concat(action.payload);
+                }
+            } else {
+                state.recentSearch = [];
+                state.recentSearch = state.recentSearch.concat(action.payload);
+            }
+            console.log(state.recentSearch);
+        },
+        deleteRecentSearch: (state, action) => {
+            state.recentSearch.splice(action.payload, 1);
+        },
+        setSearchKeyword: (state, action) => {
+            state.searchKeyword = action.payload;
         }
     }
 })
 
 export const {
     setUserInfo, resetUserInfo, setAccessToken, setRefreshToken, resetRefreshToken,
-    setAvatar, resetAvatar, setIsAlarm, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setIsStaff,
-    addRecentRead,
+    setAvatar, resetAvatar, setIsAlarm, 
+    setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, 
+    setShouldNemoRefresh, setShouldNemolistRefresh, setShouldBookRefresh,
+    setIsStaff,
+    addRecentSearch, deleteRecentSearch,
+    setSearchKeyword,
 } = userSlice.actions;
 
 export default userSlice.reducer;

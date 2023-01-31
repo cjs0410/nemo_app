@@ -194,7 +194,14 @@ const SelectBook = ({navigation, route}) => {
                 </ScrollView>
                 : 
                 <>
-                <Text style={{ fontSize: regWidth * 17, fontWeight: "700", marginHorizontal: regWidth * 12, marginTop: regHeight * 18, }}>
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 17, 
+                        fontWeight: "700", 
+                        marginHorizontal: regWidth * 12, 
+                        marginTop: regHeight * 18, 
+                    }}
+                >
                     Recent
                 </Text>
                 <ScrollView>

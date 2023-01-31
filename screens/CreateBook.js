@@ -22,12 +22,13 @@ import { BookList, } from '../components';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, } from '../modules/user';
+import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setShouldBookRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
 import { color } from "react-native-reanimated";
 
 const CreateBook = ({navigation, route}) => {
+    const dispatch = useDispatch();
     const { index, isLib, } = route.params;
     const [keyword, setKeyword] = useState('');
     const [bookList, setBookList] = useState(null);
@@ -92,7 +93,10 @@ const CreateBook = ({navigation, route}) => {
             )
             .then((res) => {
                 console.log(res.data);
-                navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: res.data, })
+                navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: res.data, });
+                if (isLib) {
+                    dispatch(setShouldBookRefresh(true));
+                }
             })
         } catch (err) {
             console.error(err);

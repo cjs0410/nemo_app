@@ -123,7 +123,7 @@ const Card = (props) => {
     }
 
     const asdf = (e) => {
-        console.log(e.nativeEvent)
+        // console.log(e.nativeEvent)
     }
 
     return (
@@ -232,10 +232,13 @@ const Card = (props) => {
                             style={{
                                 ...styles.bookmarkContentsText,
                                 fontSize: regWidth * fontSize,
-                                height: regWidth * 28,
+                                height: line === "\n" ? regWidth * 28 : null,
+                                maxHeight: regWidth * 28 * 2,
+                                // height: regWidth * 28,
                             }} 
                             onTextLayout={textLineNum}
                             key={index}
+                            // adjustsFontSizeToFit={true}
                         >
                             {line.replace(/\n/g, '')}
                         </Text> 
@@ -1316,10 +1319,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: regWidth * 7,
     },
     bookmarkContentsText: {
-        fontWeight: "500",
+        // fontWeight: "500",
         // fontSize: SCREEN_WIDTH * 0.041,
         fontSize: regWidth * 16,
         lineHeight: regWidth * 28,
+        fontFamily: "NotoSansKR-Medium",
     },
     bookmarkContentsInput: {
         // backgroundColor: "pink",

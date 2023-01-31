@@ -19,7 +19,7 @@ import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, } from '../modules/user';
+import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setShouldNemoRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
 
@@ -375,7 +375,7 @@ const CreateBookmark = ({navigation, route}) => {
             // }
     
             try {
-                console.log(formData);
+                // console.log(formData);
                 await Api.post("/api/v2/bookmark/create/", formData,
                     {
                         headers: {
@@ -386,9 +386,10 @@ const CreateBookmark = ({navigation, route}) => {
                 .then((res) => {
                     console.log(res.data);
                     navigation.popToTop();
-                    dispatch(setShouldHomeRefresh(true));
-                    dispatch(setShouldLibraryRefresh(true));
-                    dispatch(setShouldUserRefresh(true));
+                    // dispatch(setShouldHomeRefresh(true));
+                    // dispatch(setShouldLibraryRefresh(true));
+                    // dispatch(setShouldUserRefresh(true));
+                    dispatch(setShouldNemoRefresh(true));
                 })
             } catch (err) {
                 console.error(err);

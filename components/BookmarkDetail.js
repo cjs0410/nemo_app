@@ -1020,8 +1020,8 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: regHeight * 8,
         paddingBottom: regHeight * 8,
-        borderTopWidth: 0.3,
-        borderTopColor: "#808080",
+        borderBottomWidth: 0.3,
+        borderBottomColor: "#808080",
     },
 
     bookmarkTop: {

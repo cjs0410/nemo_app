@@ -31,7 +31,7 @@ const AlbumList = (props) => {
                 />
                 <View style={{ width: "80%" }}>
                     <Text 
-                        style={{ fontSize: regWidth*20, fontWeight: "500", marginHorizontal: 12 }}
+                        style={{ fontSize: regWidth*20, fontFamily: "NotoSansKR-Bold", marginHorizontal: 12 }}
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
@@ -73,17 +73,18 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         // borderBottomWidth: 0.5,
         // borderBottomColor: "#CBCBCB",
-        paddingVertical: 12,
-        marginHorizontal: 12,
+        paddingVertical: regHeight * 12,
+        marginHorizontal: regWidth * 12,
     },
     AlbumImage: {
         width: regWidth * 50,
         height: regWidth * 50,
         resizeMode: "contain",
+        borderRadius: 3,
     },
     AlbumInfoText: {
         fontSize: regWidth*11, 
-        fontWeight: "500", 
+        fontFamily: "NotoSansKR-Medium",
         marginHorizontal: regWidth*12, 
         color: "#606060"
     },
