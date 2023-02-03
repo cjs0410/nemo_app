@@ -13,6 +13,7 @@ import {
 } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { AlbumList, BookList, UserList, } from '../components';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import analytics from '@react-native-firebase/analytics';
 
@@ -30,7 +31,8 @@ const Search = ({navigation}) => {
     const dispatch = useDispatch();
     const [searchInput, setSearchInput] = useState('');
     const { recentSearch, } = useSelector(userSelector);
-    const searchRecord = [...recentSearch].reverse();
+    const [searchRecord, setSearchRecord] = useState([]);
+    // [...recentSearch].reverse();
     const debounceVal = useDebounce(searchInput);
     const [bookSearchResultList, setBookSearchResultList] = useState(null);
     const [userSearchResultList, setUserSearchResultList] = useState(null);
@@ -42,6 +44,8 @@ const Search = ({navigation}) => {
 
     const [ctg, setCtg] = useState("book");
     const searchBarValue = useRef(new Animated.Value(0)).current;
+    const [headerHeight, setHeaderHeight] = useState(regWidth * 99);
+    const insets = useSafeAreaInsets();
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -55,6 +59,13 @@ const Search = ({navigation}) => {
         dispatch(setSearchKeyword(debounceVal))
     }, [debounceVal, ctg]);
 
+
+    useEffect(() => {
+        if (recentSearch) {
+            setSearchRecord([...recentSearch].reverse());
+        }
+        
+    }, [recentSearch]);
 
     const showSearchBar = () => {
         Animated.timing(searchBarValue, {
@@ -136,9 +147,22 @@ const Search = ({navigation}) => {
         }
     }
 
+    const onLayout = (e) => {
+        console.log(e.nativeEvent);
+        setHeaderHeight(e.nativeEvent.layout.height);
+    }
+
     return (
         <View style={styles.container}>
-            <SafeAreaView >
+            <View
+                style={{
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right,
+                }}
+                onLayout={onLayout}
+            >
                 <View style={styles.header} >
                     <Animated.View
                         style={{
@@ -174,7 +198,7 @@ const Search = ({navigation}) => {
                             }}
                             onChangeText={onChangeSearchInput}
                             onSubmitEditing={autoSearch}
-                            autoFocus="true"
+                            autoFocus={true}
                             value={searchInput}
                         />
                         <Pressable
@@ -201,9 +225,148 @@ const Search = ({navigation}) => {
                         </Text>
                     </Pressable>
                 </View>
-            </SafeAreaView>
+            </View>
+                <TopTab.Navigator
+                    tabBar={(props) => <MyTabBar {...props} />}
+                    style={{
+                        // position: "absolute",
+                        opacity: debounceVal.length > 0 ? 1 : 0,
+                        zIndex: debounceVal.length > 0 ? 10 : 0,
+                    }}
+                >
+                    <TopTab.Screen 
+                        name="Book" 
+                        component={BookResultScreen} 
+                        initialParams={{ searchInput: debounceVal, bookSearchResultList: bookSearchResultList, }}
+                    />
+                    <TopTab.Screen 
+                        name="NemoList" 
+                        component={NemolistResultScreen} 
+                        initialParams={{ searchInput: debounceVal, albumSearchResultList: albumSearchResultList, }}
+                    />
+                    <TopTab.Screen 
+                        name="User" 
+                        component={UserResultScreen} 
+                        initialParams={{ searchInput: debounceVal, userSearchResultList: userSearchResultList, }}
+                    />
+                </TopTab.Navigator>
+            <View
+                style={{
+                    position: "absolute",
+                    opacity: debounceVal.length > 0 ? 0 : 1,
+                    zIndex: debounceVal.length > 0 ? 0 : 10,
+                    marginTop: headerHeight,
+                }}
+            >
+                <Text 
+                    style={{ 
+                        fontSize: regWidth * 17, 
+                        fontFamily: "NotoSansKR-Black", 
+                        marginHorizontal: regWidth * 12, 
+                        marginTop: regHeight * 12, 
+                    }}
+                >
+                    Recent searches
+                </Text>
+                <ScrollView>
+                    {searchRecord && searchRecord.map((item, index) => {
+                        if (item.ctg === "book") {
+                            return (
+                                <Pressable 
+                                    onPress={async() => 
+                                        {
+                                            navigation.navigate('BookProfile', {
+                                                bookId: item.book_id, 
+                                            })
+                                            await analytics().logEvent('searchBook', {
+                                                search_book_title: item.book_title,
+                                            })
+                                            dispatch(addRecentSearch({...item, "ctg": "book"}));
+                                        }
+                                    }
+                                    style={{ justifyContent: "center", }}
+                                    key={index}
+                                >
+                                    <BookList book={item} navigation={navigation}  />
+                                    <Pressable
+                                        onPress={() => dispatch(deleteRecentSearch(searchRecord.length - index - 1))}
+                                        style={{
+                                            position: "absolute",
+                                            right: regWidth * 18,
+                                        }}
+                                    >
+                                        <Feather name="x" size={regWidth * 24} color={colors.bgdDark} />
+                                    </Pressable>
+                                </Pressable>
+                            )
+                        }
+                        if (item.ctg === "album") {
+                            return (
+                                <Pressable 
+                                    onPress={async() => 
+                                        {
+                                            navigation.navigate('AlbumProfile', {
+                                                albumId: item.nemolist_id,
+                                            })
+                                            await analytics().logEvent('searchAlbum', {
+                                                search_album_title: item.nemolist_title,
+                                            })
+                                            dispatch(addRecentSearch({...item, "ctg": "album"}));
+                                        }
+                                    }
+                                    style={{ justifyContent: "center", }}
+                                    key={index}
+                                >
+                                    <AlbumList album={item} navigation={navigation} isDefault={false} />
+                                    <Pressable
+                                        onPress={() => dispatch(deleteRecentSearch(searchRecord.length - index - 1))}
+                                        style={{
+                                            position: "absolute",
+                                            right: regWidth * 18,
+                                        }}
+                                    >
+                                        <Feather name="x" size={regWidth * 24} color={colors.bgdDark} />
+                                    </Pressable>
+                                </Pressable>
+                            )
+                        }
+                        if (item.ctg === "user") {
+                            return (
+                                <Pressable
+                                    onPress={async() => 
+                                        {
+                                            navigation.navigate('OtherProfile', {
+                                                userTag: item.user_tag, 
+                                            })
+                                            await analytics().logEvent('searchUser', {
+                                                search_user_tag: item.user_tag,
+                                            })
+                                            dispatch(addRecentSearch({...item, "ctg": "user"}));
+                                        }
+                                    }
+                                    style={{ justifyContent: "center", }}
+                                    key={index}
+                                >
+                                    <UserList user={item} navigation={navigation} />
+                                    <Pressable
+                                        onPress={() => dispatch(deleteRecentSearch(searchRecord.length - index - 1))}
+                                        style={{
+                                            position: "absolute",
+                                            right: regWidth * 18,
+                                        }}
+                                    >
+                                        <Feather name="x" size={regWidth * 24} color={colors.bgdDark} />
+                                    </Pressable>
+                                </Pressable>
+                            )
 
-            {debounceVal.length > 0 ? 
+                        }
+                    })}
+                </ScrollView>
+            </View>
+
+
+            {/* {debounceVal.length > 0 ? 
                 <TopTab.Navigator
                     tabBar={(props) => <MyTabBar {...props} />}
                 >
@@ -224,7 +387,7 @@ const Search = ({navigation}) => {
                     />
                 </TopTab.Navigator>
                 :
-                <>
+                <View>
                     <Text 
                         style={{ 
                             fontSize: regWidth * 17, 
@@ -236,7 +399,7 @@ const Search = ({navigation}) => {
                         Recent searches
                     </Text>
                     <ScrollView>
-                        {searchRecord.map((item, index) => {
+                        {searchRecord && searchRecord.map((item, index) => {
                             if (item.ctg === "book") {
                                 return (
                                     <Pressable 
@@ -281,9 +444,19 @@ const Search = ({navigation}) => {
                                                 dispatch(addRecentSearch({...item, "ctg": "album"}));
                                             }
                                         }
+                                        style={{ justifyContent: "center", }}
                                         key={index}
                                     >
                                         <AlbumList album={item} navigation={navigation} isDefault={false} />
+                                        <Pressable
+                                            onPress={() => dispatch(deleteRecentSearch(searchRecord.length - index - 1))}
+                                            style={{
+                                                position: "absolute",
+                                                right: regWidth * 18,
+                                            }}
+                                        >
+                                            <Feather name="x" size={regWidth * 24} color={colors.bgdDark} />
+                                        </Pressable>
                                     </Pressable>
                                 )
                             }
@@ -301,17 +474,27 @@ const Search = ({navigation}) => {
                                                 dispatch(addRecentSearch({...item, "ctg": "user"}));
                                             }
                                         }
+                                        style={{ justifyContent: "center", }}
                                         key={index}
                                     >
-                                        <UserList user={item} navigation={navigation}  />
+                                        <UserList user={item} navigation={navigation} />
+                                        <Pressable
+                                            onPress={() => dispatch(deleteRecentSearch(searchRecord.length - index - 1))}
+                                            style={{
+                                                position: "absolute",
+                                                right: regWidth * 18,
+                                            }}
+                                        >
+                                            <Feather name="x" size={regWidth * 24} color={colors.bgdDark} />
+                                        </Pressable>
                                     </Pressable>
                                 )
 
                             }
                         })}
                     </ScrollView>
-                </>
-            }
+                </View>
+            } */}
             {/* <View style={{ flexDirection: "row", alignItems: "center", marginLeft: 20, marginTop: 8, }}>
                 <Pressable
                     onPress={() => setCtg("book")}
@@ -909,8 +1092,8 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "pink",
-        marginVertical: regHeight * 8,
-        marginHorizontal: 20,
+        marginTop: regHeight * 8,
+        marginHorizontal: regWidth * 20,
         // paddingBottom: regHeight * 8,
         flexDirection: "row",
         justifyContent: "space-between",

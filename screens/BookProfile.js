@@ -28,6 +28,7 @@ import iconAlert from '../assets/icons/iconAlert.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { setShouldBookRefresh, } from '../modules/user';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -42,6 +43,7 @@ const BookProfile = ({route, navigation}) => {
     const [reportContents, setReportContents] = useState('');
     const [isLike, setIsLike] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         fetchBook();
@@ -141,9 +143,13 @@ const BookProfile = ({route, navigation}) => {
         <View style={styles.container}>
             {bookInfo !== null ? 
                 <>
-                    <SafeAreaView 
+                    <View 
                         style={{
                             backgroundColor: bookInfo.background ? bookInfo.background : colors.nemoLight,
+                            paddingTop: insets.top,
+                            paddingBottom: 0,
+                            paddingLeft: insets.left,
+                            paddingRight: insets.right,
                         }} 
                     >
                         <View style={styles.header}>
@@ -177,7 +183,7 @@ const BookProfile = ({route, navigation}) => {
                             </Pressable>
                         </View>
 
-                    </SafeAreaView>
+                    </View>
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         bounces={false}

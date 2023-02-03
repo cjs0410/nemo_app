@@ -22,7 +22,7 @@ import Api from "../lib/Api";
 import bookCover from '../assets/images/steve.jpeg';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import iconCamera from '../assets/images/iconCamera.png';
-import iconImage from '../assets/images/iconImage.png';
+import iconImage from '../assets/icons/iconImage.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import iconPlusNemoNormal from '../assets/icons/iconPlusNemoNormal.png';
 import iconPlusNemoDark from '../assets/icons/iconPlusNemoDark.png';
@@ -61,7 +61,7 @@ import LinearGradient from 'react-native-linear-gradient';
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const EditAlbum = ({route, navigation}) => {
-    const { albumInfo, } = route.params;
+    const { albumInfo, albumId, } = route.params;
     const albumCoverValue = useRef(new Animated.Value(0)).current;
     const [loading, setLoading] = useState(false);
     const [orderedBookmarks, setOrderedBookmarks] = useState(null);
@@ -72,6 +72,7 @@ const EditAlbum = ({route, navigation}) => {
         setOrderedBookmarks(
             orderedNumbering.map((number) => albumInfo.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
         )
+        console.log(albumInfo);
     }, [])
 
     const showAlbumCover = () => {
@@ -103,7 +104,7 @@ const EditAlbum = ({route, navigation}) => {
             try {
                 await Api
                 .post("api/v4/album/deletebookmark/", {
-                    nemolist_id: albumInfo.nemolist_id,
+                    nemolist_id: albumId,
                     bookmark_id: bookmarkIds,
                 })
                 .then((res) => {

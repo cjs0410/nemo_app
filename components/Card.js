@@ -36,6 +36,8 @@ const Card = (props) => {
 
     const [lineList, setLineList] = useState([]);
     const [fontSize, setFontSize] = useState(16);
+    const [fontLoading, setFontLoading] = useState(false);
+    const textValue = useRef(new Animated.Value(0)).current;
 
     // useEffect(() => {
     //     fetchBookmarking();
@@ -51,7 +53,24 @@ const Card = (props) => {
             setFontSize(fontSize - 0.1);
             setLineList([]);
         }
+        if (lineList.length === contents.length && lineList.indexOf(2) === -1) {
+            setFontLoading(true);
+        }
     }, [lineList]);
+
+    useEffect(() => {
+        if (fontLoading) {
+            showText();
+        }
+    }, [fontLoading]);
+
+    const showText = () => {
+        Animated.timing(textValue, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: false,
+        }).start();
+    }
 
     const onReverse = () => {
         setIsReverse(!isReverse);
@@ -214,8 +233,9 @@ const Card = (props) => {
                         </Text>
                     </Pressable> */}
                 </View>
-                <View style={{
+                <Animated.View style={{
                     ...styles.bookmarkContentsTextBox,
+                    opacity: textValue,
                     // alignItems: "center",
                 }}>
                     {/* <RenderHtml 
@@ -243,7 +263,7 @@ const Card = (props) => {
                             {line.replace(/\n/g, '')}
                         </Text> 
                     ))}
-                </View>
+                </Animated.View>
                 <View style={styles.postContentsWatermark}>
                     <Pressable
                         onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })}
@@ -1290,7 +1310,7 @@ const styles = StyleSheet.create({
     bookmarkContentsBook: {
         // backgroundColor: "pink",
         // flex: 0.6,
-        height: regWidth * 43,
+        height: regWidth * 44,
         flexDirection: "row", 
         justifyContent: "space-between",
         alignItems: "center",
@@ -1312,8 +1332,8 @@ const styles = StyleSheet.create({
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
         // flex: 4,
-        height: regWidth * 264,
-        marginTop: regHeight *20,
+        height: regWidth * 270,
+        marginTop: regHeight * 2,
         // justifyContent: "center",
         justifyContent: "flex-start", 
         paddingHorizontal: regWidth * 7,
@@ -1349,10 +1369,10 @@ const styles = StyleSheet.create({
     postContentsWatermark: {
         // backgroundColor: "blue",
         // flex: 0.3,
-        height: regWidth * 21,
+        height: regWidth * 24,
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: regWidth * 9,
+        marginTop: regWidth * 4,
         zIndex: 10,
     },
     searchList: {

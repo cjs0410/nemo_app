@@ -9,6 +9,7 @@ import user from "../modules/user";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { bookmarkSelector } from '../modules/hooks';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -18,6 +19,7 @@ const BookmarkNewDetail = ({route, navigation}) => {
     const [ref, setRef] = useState(null);
     const flatListRef = useRef();
     const [scrollLoading, setScrollLoading] = useState(false);
+    const insets = useSafeAreaInsets();
 
     // useEffect(() => {
     //     console.log(index);
@@ -56,7 +58,15 @@ const BookmarkNewDetail = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <TouchableOpacity onPress={() => navigation.goBack()} >
                     <Ionicons name="chevron-back" size={28} color="black" />
                 </TouchableOpacity>
@@ -78,7 +88,7 @@ const BookmarkNewDetail = ({route, navigation}) => {
                 <View style={{ opacity: 0, }} >
                     <MaterialCommunityIcons name="square-outline" size={30} color="black" />
                 </View>
-            </SafeAreaView>
+            </View>
             {/* <ScrollView 
                 showsVerticalScrollIndicator={false}
                 ref={(ref) => {

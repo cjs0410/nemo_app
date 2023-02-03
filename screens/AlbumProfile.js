@@ -41,6 +41,7 @@ import {
     useFocusEffect,
     useScrollToTop,
 } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -70,6 +71,7 @@ const AlbumProfile = ({route, navigation}) => {
     const [isFollow, setIsFollow] = useState(false);
     const [isDefault, setIsDefault] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         fetchUserTag();
@@ -130,9 +132,9 @@ const AlbumProfile = ({route, navigation}) => {
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.likes);
                 if (res.data.is_like) {
-                    Alert.alert(albumInfo.album_title, "is added to your library");
+                    Alert.alert(albumInfo.nemolist_title, "is added to your library");
                 } else {
-                    Alert.alert(albumInfo.album_title, "is deleted from your library");
+                    Alert.alert(albumInfo.nemolist_title, "is deleted from your library");
                 }
                 dispatch(setShouldNemolistRefresh(true));
             })
@@ -212,13 +214,13 @@ const AlbumProfile = ({route, navigation}) => {
             await Api
             .post("/api/v4/album/insertbookmark/", {
                 bookmark_id: bookmarkIds,
-                album_id: albumId,
+                nemolist_id: albumId,
             })
             .then((res) => {
-                setAddModalVisible(false);
                 setSelectedBookmarks([]);
                 fetchAlbum();
-                dispatch(setShouldUserRefresh(true));
+                onCloseAddNemos();
+                // dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -233,13 +235,14 @@ const AlbumProfile = ({route, navigation}) => {
     }, []);
 
     const deleteAlbum = async() => {
-        Alert.alert("Are you sure?", "Once you delete your Nemo, it can't be restored.", [
+        Alert.alert("Are you sure?", "Once you delete your Nemolist, it can't be restored.", [
             {
                 text: "Yes",
+                style: 'destructive',
                 onPress: async() => {
                     try {
                         await Api.post("/api/v4/album/delete/", {
-                            album_id: albumId,
+                            nemolist_id: albumId,
                         })
                         .then((res) => {
                             setAlbumModalVisible(false);
@@ -337,9 +340,13 @@ const AlbumProfile = ({route, navigation}) => {
         >
             {albumInfo !== null ? 
                 <>
-                    <SafeAreaView 
+                    <View 
                         style={{
                             backgroundColor: albumInfo.background ? albumInfo.background : colors.nemoLight,
+                            paddingTop: insets.top,
+                            paddingBottom: 0,
+                            paddingLeft: insets.left,
+                            paddingRight: insets.right,
                         }}
                     >
                         <View style={styles.header}>
@@ -370,7 +377,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 />
                             </Pressable>
                         </View>
-                    </SafeAreaView>
+                    </View>
                     <ScrollView
                         style={{
                             // marginTop: -headerHeight,
@@ -515,7 +522,7 @@ const AlbumProfile = ({route, navigation}) => {
 
                                     :
                                     <Pressable
-                                            onPress={onLike}
+                                        onPress={onLike}
                                     >
                                         <Image 
                                             source={isLike ? iconHeart : iconHeartOutline}
@@ -630,7 +637,7 @@ const AlbumProfile = ({route, navigation}) => {
                             <Pressable 
                                 style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}
                                 onPress={() => {
-                                    navigation.navigate("EditAlbum", { albumInfo: albumInfo, });
+                                    navigation.navigate("EditAlbum", { albumInfo: albumInfo, albumId: albumId, });
                                     onPressClose();
                                 }}
                             >
@@ -719,7 +726,7 @@ const AlbumProfile = ({route, navigation}) => {
                             Add Nemos
                         </Text>
                         <Pressable
-                            onPress={onCloseAddNemos}
+                            onPress={onAddBookmark}
                         >
                             <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
                                 Done

@@ -4,6 +4,7 @@ import { Entypo, Feather, AntDesign, Ionicons, FontAwesome, } from '@expo/vector
 import bookCover from '../assets/images/steve.jpeg';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import likedNemos from '../assets/images/likedNemos.png';
+import longLikedNemos from '../assets/images/longLikedNemos.png';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -20,32 +21,52 @@ const AlbumTile = (props) => {
         }).start();
     }
     return (
-        <View style={styles.AlbumTileContainer}>
+        <View 
+            style={{
+                ...styles.AlbumTileContainer,
+                width: isDefault ? SCREEN_WIDTH : SCREEN_WIDTH / 2,
+            }}
+        >
             <View style={{ alignItems: "center", }}>
                 <Animated.Image 
-                    source={ isDefault ? likedNemos : { uri: album.nemolist_cover }} 
+                    source={ isDefault ? longLikedNemos : { uri: album.nemolist_cover }} 
                     style={{
                         ...styles.AlbumImage,
-                        opacity: albumCoverValue
+                        opacity: albumCoverValue,
+                        width: isDefault ? regWidth * 350 : regWidth * 165,
+                        height: isDefault ? regWidth * 165 : regWidth * 165,
                     }} 
                     onLoadEnd={showAlbumCover}
                 />
                 <View 
                     style={{ 
-                        width: regWidth * 165, 
+                        width: isDefault ? regWidth * 350 : regWidth * 165,
                         marginTop: regHeight * 8,
                     }}
                 >
                     <Text 
-                        style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", }}
+                        style={{ 
+                            fontSize: regWidth * 15, 
+                            fontFamily: "NotoSansKR-Bold", 
+                        }}
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
                         {album.nemolist_title}
                     </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", width: "70%", }}>
+                    <View 
+                        style={{ 
+                            flexDirection: "row", 
+                            alignItems: "center", 
+                            width: "100%", 
+                        }}
+                    >
                         <Text 
-                            style={{ ...styles.AlbumInfoText, marginRight: regWidth*3 }}
+                            style={{ 
+                                ...styles.AlbumInfoText, 
+                                marginRight: regWidth*3,
+                                maxWidth: "45%",
+                            }}
                             numberOfLines={1}
                             ellipsizeMode="tail"
                         >
@@ -53,7 +74,10 @@ const AlbumTile = (props) => {
                         </Text>
                         <Entypo name="dot-single" size={16} color="#808080" />
                         <Text 
-                            style={{ ...styles.AlbumInfoText, marginLeft: regWidth*3, }}
+                            style={{ 
+                                ...styles.AlbumInfoText, 
+                                marginLeft: regWidth*3, 
+                            }}
                             // numberOfLines={1}
                             // ellipsizeMode="tail"
                         >

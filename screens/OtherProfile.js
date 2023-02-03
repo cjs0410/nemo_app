@@ -4,6 +4,7 @@ import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Api from "../lib/Api";
 import blankAvatar from '../assets/images/peopleicon.png';
+import blankBgd from '../assets/images/blankBgd.png';
 import { BookmarkList, AlbumList, BookList, } from '../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
@@ -29,10 +30,16 @@ import {
     BottomSheetModalProvider,
     BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
+import { he } from "date-fns/locale";
+import { Tabs } from 'react-native-collapsible-tab-view';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const TopTab = createMaterialTopTabNavigator();
+
+const Max_Header_Height = 200;
+const Min_Header_Height = 70;
+const Scroll_Distance = Max_Header_Height - Min_Header_Height;
 
 const OtherProfile = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -50,6 +57,21 @@ const OtherProfile = ({navigation, route}) => {
     const [profileModalVisible, setProfileModalVisible] = useState(false);
     const [reportVisible, setReportVisible] = useState(false);
     const [reportContents, setReportContents] = useState('');
+
+    const scrollOffsetY = useRef(new Animated.Value(0)).current;
+    const [ headerHeight, setHeaderHeight ] = useState(0);
+    const headerTranslateY = scrollOffsetY.interpolate({
+        inputRange: [0, headerHeight],
+        outputRange: [0, -headerHeight],
+        extrapolate: "clamp"
+    });
+
+    const headerOnLayout = useCallback((event)=>{
+        const { height } = event.nativeEvent.layout;
+        setHeaderHeight(height);
+        console.log(height);
+    }, []);
+
 
     useEffect(() => {
         fetchProfile();
@@ -88,7 +110,7 @@ const OtherProfile = ({navigation, route}) => {
             await Api
             .post("api/v1/user/profile/", { user_tag: userTag })
             .then((res) => {
-                // console.log(res.data);
+                console.log(res.data);
                 setProfile(res.data);
                 setIsFollow(res.data.is_follow);
                 setFollowers(res.data.followers);
@@ -148,12 +170,203 @@ const OtherProfile = ({navigation, route}) => {
     }
 
 
+    // return (
+    //     <View 
+    //         style={{
+    //             flex: 1,
+    //             backgroundColor: "white",
+    //         }}
+    //         stickyHeaderIndices={[0]}
+    //     >
+    //         <ImageBackground 
+    //             source={profile && profile.backgroundimg ? profile.backgroundimg : blankBgd} 
+    //             resizeMode= "cover" 
+    //             style={{ height: SCREEN_WIDTH * (110 / 375),  width:"100%", zIndex: 0,}}
+    //         >
+    //             <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: regWidth * 13, marginTop: regHeight * 45, }}>
+    //                 <Pressable
+    //                     onPress={() => navigation.goBack()}
+    //                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+    //                 >
+    //                     <Image 
+    //                         source={vectorLeftImage} 
+    //                         style={{ width: regWidth*35, height: regWidth*35 }}
+    //                     />
+    //                 </Pressable>
+    //                 {/* <Pressable
+    //                     onPress={() => navigation.navigate('UserSetting')}
+    //                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+    //                 >
+    //                     <Image 
+    //                         source={settings} 
+    //                         style={{ width: regWidth*35, height: regWidth*35 }}
+    //                     />
+    //                 </Pressable> */}
+    //             </View>
+    //         </ImageBackground>
+    //         <Tabs.Container
+    //             renderTabBar={(props) => <MyTabBar {...props} />}
+    //             headerHeight={250}
+    //             renderHeader={() => (
+    //                 <View 
+    //                     style={{ 
+    //                         // alignItems: "center", 
+    //                         // marginTop: -regHeight*40, 
+    //                         // height: "30%", 
+    //                         backgroundColor: "white",
+    //                         paddingHorizontal: regWidth * 13,
+    //                         zIndex: 10,
+    //                     }}
+    //                     onLayout={headerOnLayout}
+    //                 >
+    //                     {profile === null ? 
+    //                         <ActivityIndicator 
+    //                             color="white" 
+    //                             style={{ marginTop: 10 }} 
+    //                             size="large"
+    //                         />
+    //                         :
+    //                         <>
+    //                             <View 
+    //                                 style={{ 
+    //                                     marginTop: -regHeight * 25, 
+    //                                     justifyContent: "space-between",
+    //                                     alignItems: "center", 
+    //                                     flexDirection: "row",
+    //                                 }}
+    //                             >
+    //                                 <View style={{ flexDirection: "row", alignItems: "flex-end"}}>
+    //                                     <Animated.Image 
+    //                                         source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
+    //                                         style={{ ...styles.profileAvatar, opacity: avatarValue }} 
+    //                                         onLoadEnd={showAvatarImage}
+    //                                     />
+    //                                     <View
+    //                                         style={{
+    //                                             marginTop: 40,
+    //                                             marginHorizontal: regWidth * 7,
+    //                                         }}
+    //                                     >
+    //                                         <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: colors.nemoNormal, lineHeight: 20, }}>
+    //                                             {`@${profile.user_tag}`}
+    //                                         </Text>
+    //                                         <Text style={{ fontSize: regWidth * 23, fontWeight: "900", color: colors.textDark, lineHeight: 33, }}>
+    //                                             {profile.name}
+    //                                         </Text>
+    //                                     </View>
+    //                                 </View>
+    //                                 <Pressable 
+    //                                     style={{
+    //                                         ...styles.followBtn,
+    //                                         backgroundColor: isFollow ? "white" : colors.textNormal,
+    //                                     }} 
+    //                                     onPress={onFollow}
+    //                                 >
+    //                                     <Text 
+    //                                         style={{ 
+    //                                             fontSize: regWidth * 13, 
+    //                                             // fontWeight: "500",
+    //                                             color: isFollow ? colors.textDark : "white",
+    //                                             fontFamily: "NotoSansKR-Bold",
+    //                                         }}
+    //                                     >
+    //                                         {isFollow ? "Following" : "Follow"}
+    //                                     </Text>
+    //                                 </Pressable>
+    //                             </View>
+    //                             <View style={{ marginTop: regHeight * 10, }}>
+    //                                 <Text
+    //                                     style={{ 
+    //                                         width: "50%", 
+    //                                         lineHeight: regHeight*19, 
+    //                                         color: "#404040",
+    //                                         fontSize: regWidth * 13,
+    //                                         fontWeight: "500",
+    //                                     }}
+    //                                     numberOfLines={3}
+    //                                     ellipsizeMode='tail'
+    //                                 >
+    //                                     {profile.intro}
+    //                                 </Text>
+    //                             </View>
+    //                             <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 13, }}>
+    //                                 <Text style={ styles.boldNumberTxt }>
+    //                                     {profile.nemos}
+    //                                 </Text>
+    //                                 <Text style={ styles.followTxt }>
+    //                                     Nemos
+    //                                 </Text>
+    //                                 <Pressable
+    //                                     style={{ flexDirection: "row", alignItems: "center", }}
+    //                                     onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag })}
+    //                                 >
+    //                                     <Text style={styles.boldNumberTxt}>
+    //                                         {followers}
+    //                                     </Text>
+    //                                     <Text style={ styles.followTxt }>
+    //                                         Followers
+    //                                     </Text>
+    //                                 </Pressable>
+    //                                 <Pressable
+    //                                     style={{ flexDirection: "row", alignItems: "center", }}
+    //                                     onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로잉", userTag: profile.user_tag })}
+    //                                 >
+    //                                     <Text style={styles.boldNumberTxt}>
+    //                                         {profile.followings}
+    //                                     </Text>
+    //                                     <Text style={ styles.followTxt }>
+    //                                         Following
+    //                                     </Text>
+    //                                 </Pressable>
+    //                             </View>
+    //                             <View style={ styles.followedByContainer}>
+    //                                 {profile.know_together.map((user, index) => (
+    //                                     <Animated.Image 
+    //                                         source={ user.avatar !== null ? { uri: user.avatar } : blankAvatar} 
+    //                                         style={{
+    //                                             ...styles.smallAvatar, 
+    //                                             opacity: avatarValue,
+    //                                             marginLeft: index === 0 ? 0 : -regWidth*15
+    //                                         }} 
+    //                                         onLoadEnd={showAvatarImage}
+    //                                         key={index}
+    //                                     />
+    //                                 ))}
+    //                                 <Text style={{ marginLeft: regWidth*11, width: "70%", color: "#606060" }}
+    //                                     numberOfLines={2}
+    //                                 >
+    //                                         {`Followed by ${profile.know_together.map((user, index) => `${index === 0 ? '' : ' '}${user.name}`)} ${profile.know_together_counts - profile.know_together.length === 0 ? "" : `and ${profile.know_together_counts - profile.know_together.length} other`}`}
+    //                                 </Text>
+    //                             </View>
+    //                         </>
+    //                     }
+    //                 </View>
+    //             )}
+    //             // headerHeight={HEADER_HEIGHT}
+    //         >
+    //             <Tabs.Tab name="Nemo">
+    //             <Tabs.ScrollView>
+    //                 <NemoScreen navigation={navigation} userTag={userTag} />
+    //             </Tabs.ScrollView>
+    //             </Tabs.Tab>
+    //             <Tabs.Tab name="B">
+    //             <Tabs.ScrollView>
+    //                 <View style={[styles.box, styles.boxA]} />
+    //                 <View style={[styles.box, styles.boxB]} />
+    //             </Tabs.ScrollView>
+    //             </Tabs.Tab>
+    //         </Tabs.Container>
+    //     </View>
+    // )
+
+
     return (
         <View 
             style={{
                 flex: 1,
                 backgroundColor: "white",
             }}
+            
             stickyHeaderIndices={[0]}
         >
             {/* <View 
@@ -162,9 +375,9 @@ const OtherProfile = ({navigation, route}) => {
                 }}
             > */}
                 <ImageBackground 
-                    source={ require('../assets/images/userImage.jpeg') } 
+                    source={profile && profile.backgroundimg ? profile.backgroundimg : blankBgd} 
                     resizeMode= "cover" 
-                    style={{ height: regHeight * 110, width:"100%", zIndex: 0,}}
+                    style={{ height: SCREEN_WIDTH * (110 / 375),  width:"100%", zIndex: 0,}}
                 >
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: regWidth * 13, marginTop: regHeight * 45, }}>
                         <Pressable
@@ -176,7 +389,7 @@ const OtherProfile = ({navigation, route}) => {
                                 style={{ width: regWidth*35, height: regWidth*35 }}
                             />
                         </Pressable>
-                        <Pressable
+                        {/* <Pressable
                             onPress={() => navigation.navigate('UserSetting')}
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         >
@@ -184,11 +397,11 @@ const OtherProfile = ({navigation, route}) => {
                                 source={settings} 
                                 style={{ width: regWidth*35, height: regWidth*35 }}
                             />
-                        </Pressable>
+                        </Pressable> */}
                     </View>
                 </ImageBackground>
             {/* </View> */}
-            <View 
+            <Animated.View 
                 style={{ 
                     // alignItems: "center", 
                     // marginTop: -regHeight*40, 
@@ -197,6 +410,7 @@ const OtherProfile = ({navigation, route}) => {
                     paddingHorizontal: regWidth * 13,
                     zIndex: 10,
                 }}
+                onLayout={headerOnLayout}
             >
                 {profile === null ? 
                     <ActivityIndicator 
@@ -265,7 +479,7 @@ const OtherProfile = ({navigation, route}) => {
                                 numberOfLines={3}
                                 ellipsizeMode='tail'
                             >
-                                {profile.introduce}
+                                {profile.intro}
                             </Text>
                         </View>
                         <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 13, }}>
@@ -275,18 +489,28 @@ const OtherProfile = ({navigation, route}) => {
                             <Text style={ styles.followTxt }>
                                 Nemos
                             </Text>
-                            <Text style={styles.boldNumberTxt}>
-                                {followers}
-                            </Text>
-                            <Text style={ styles.followTxt }>
-                                Followers
-                            </Text>
-                            <Text style={styles.boldNumberTxt}>
-                                {profile.followings}
-                            </Text>
-                            <Text style={ styles.followTxt }>
-                                Following
-                            </Text>
+                            <Pressable
+                                style={{ flexDirection: "row", alignItems: "center", }}
+                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag })}
+                            >
+                                <Text style={styles.boldNumberTxt}>
+                                    {followers}
+                                </Text>
+                                <Text style={ styles.followTxt }>
+                                    Followers
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                style={{ flexDirection: "row", alignItems: "center", }}
+                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로잉", userTag: profile.user_tag })}
+                            >
+                                <Text style={styles.boldNumberTxt}>
+                                    {profile.followings}
+                                </Text>
+                                <Text style={ styles.followTxt }>
+                                    Following
+                                </Text>
+                            </Pressable>
                         </View>
                         <View style={ styles.followedByContainer}>
                             {profile.know_together.map((user, index) => (
@@ -309,7 +533,7 @@ const OtherProfile = ({navigation, route}) => {
                         </View>
                     </>
                 }
-            </View>
+            </Animated.View>
             {profile ? 
                 <TopTab.Navigator
                     tabBar={(props) => <MyTabBar {...props} />}
@@ -339,7 +563,7 @@ const OtherProfile = ({navigation, route}) => {
 };
 
 
-const NemoScreen = ({route, navigation}) => {
+const NemoScreen = ({route, navigation,}) => {
     const dispatch = useDispatch();
     const { userTag, } = route.params;
     const sortList = [ "recents", "book", ];
@@ -1156,6 +1380,10 @@ function MyTabBar({ state, descriptors, navigation, position }) {
     const [measures, setMeasures] = useState(null);
 
     useEffect(() => {
+        console.log(state);
+    })
+
+    useEffect(() => {
         if (viewRef.current) {
           const temp = [];
 
@@ -1416,6 +1644,17 @@ const styles = StyleSheet.create({
         alignItems: "center", 
         marginTop: regHeight * 24, 
         justifyContent: "space-between",
+    },
+
+    box: {
+        height: 250,
+        width: '100%',
+    },
+    boxA: {
+        backgroundColor: 'white',
+    },
+    boxB: {
+        backgroundColor: '#D8D8D8',
     },
 })
 

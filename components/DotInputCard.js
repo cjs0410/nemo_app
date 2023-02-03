@@ -340,7 +340,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                         borderWidth: 0.5,
                         borderStyle: 'dashed',
                         // backgroundColor: "green",
-                        height: regWidth * 284 + extraHeight,
+                        height: regWidth * 270 + extraHeight,
                     }} 
                     // onLayout={(e) => console.log(e.nativeEvent)}
                 >
@@ -361,7 +361,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                     fontSize: regWidth * 16,
                                     lineHeight: regWidth * 28,
                                     paddingHorizontal: regWidth * 7,
-                                    height: regWidth * 284 + extraHeight,
+                                    height: regWidth * 270 + extraHeight,
                                     textAlignVertical: "top",
                                     fontWeight: "500",
                                     // fontFamily: "NotoSansKR-Medium",
@@ -418,7 +418,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                         borderWidth: 0.3,
                                         // backgroundColor: "black",
                                         // top: regHeight * 28 * 9 * (index + 1) + regHeight * 12,
-                                        top: lineBarList[index] + regHeight * 2,
+                                        top: lineBarList[index] + regHeight * 4,
                                     }}
                                     key={index}
                                 />
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     bookmarkContentsBook: {
         // backgroundColor: "pink",
         // flex: 0.6,
-        height: regWidth * 43,
+        height: regWidth * 44,
         flexDirection: "row", 
         // justifyContent: "space-between",
         alignItems: "center",
@@ -557,8 +557,8 @@ const styles = StyleSheet.create({
     bookmarkContentsInput: {
         // backgroundColor: "pink",
         // flex: 4,
-        height: regWidth * 284,
-        marginTop: regHeight * 6,
+        height: regWidth * 270,
+        marginTop: regHeight * 2,
         justifyContent: "flex-start",
     },
     richTextEditorStyle: {
@@ -577,11 +577,11 @@ const styles = StyleSheet.create({
     postContentsWatermark: {
         // backgroundColor: "blue",
         // flex: 0.3,
-        height: regWidth * 21,
+        height: regWidth * 24,
         flexDirection: "row",
         justifyContent: "space-between",
         marginTop: regWidth * 4,
-        // alignItems: "flex-end",
+        alignItems: "center",
     },
     searchList: {
         backgroundColor: "#D9D9D9",

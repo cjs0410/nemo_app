@@ -8,7 +8,7 @@ import Api from "../lib/Api";
 import bookCover from '../assets/images/steve.jpeg';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import iconCamera from '../assets/images/iconCamera.png';
-import iconImage from '../assets/images/iconImage.png';
+import iconImage from '../assets/icons/iconImage.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
 import iconBook from '../assets/icons/iconBook.png';
@@ -22,9 +22,9 @@ import { BookList, } from '../components';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { addRecentRead, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SelectBook = ({navigation, route}) => {
     const { index, isLib, } = route.params;
@@ -33,6 +33,7 @@ const SelectBook = ({navigation, route}) => {
     const [bookList, setBookList] = useState(null);
     const [recentRead, setRecentRead] = useState([]);
     const debounceVal = useDebounce(keyword);
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         searchBook();
@@ -82,6 +83,7 @@ const SelectBook = ({navigation, route}) => {
             },
             {
                 text: "확인", 
+                style: 'destructive',
                 onPress: () => navigation.goBack()
             }
         ]);
@@ -89,18 +91,26 @@ const SelectBook = ({navigation, route}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header}>
-                <Text style={{ fontSize: regWidth * 24, fontWeight: "900", color: colors.textDark, }}>
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
+                <Text style={{ fontSize: regWidth * 24, fontFamily: "NotoSansKR-Black", color: colors.textDark, }}>
                     What are you reading?
                 </Text>
                 <Pressable
                     onPress={onExit}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: colors.textNormal, }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", color: colors.textNormal, }}>
                         Cancel
                     </Text>
                 </Pressable>
-            </SafeAreaView>
+            </View>
 
             <View 
                 style={styles.searchInputContainer}
@@ -210,7 +220,7 @@ const SelectBook = ({navigation, route}) => {
                             key={index}
                             onPress={() => {
                                 navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: book, });
-                                dispatch(addRecentRead(book));
+                                // dispatch(addRecentRead(book));
                             }}
                             disabled={isLib ? true : false}
                             style={{ justifyContent: "center", }}

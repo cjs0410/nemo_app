@@ -8,7 +8,8 @@ import Api from "../lib/Api";
 import bookCover from '../assets/images/steve.jpeg';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import iconCamera from '../assets/images/iconCamera.png';
-import iconImage from '../assets/images/iconImage.png';
+import iconImage from '../assets/icons/iconImage.png';
+import iconCheckmarkCircle from '../assets/icons/iconCheckmarkCircle.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
@@ -22,6 +23,7 @@ import { userSelector } from '../modules/hooks';
 import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setShouldNemoRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -96,6 +98,7 @@ const CreateBookmark = ({navigation, route}) => {
     
     const isEmpty = (frontContent.length === 0) || (selectedBook === null);
     const [showMenu, setShowMenu] = useState(false);
+    const insets = useSafeAreaInsets();
    
 
 
@@ -760,8 +763,19 @@ const CreateBookmark = ({navigation, route}) => {
     //////////////////////////////////////////////////CROP IMAGE////////////////////////////////////////////////////////////////////////////////////////
 
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+        <KeyboardAvoidingView 
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable 
                     onPress={reSelectBook}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -821,7 +835,7 @@ const CreateBookmark = ({navigation, route}) => {
                         </Pressable>
                     }
                 </View> */}
-            </SafeAreaView>
+            </View>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -1922,40 +1936,77 @@ const CreateBookmark = ({navigation, route}) => {
                                         selectColor("#D9D9D9");
                                         setBackgroundImage(null);
                                     }}
-                                />
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#D9D9D9" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
                                 <Pressable 
                                     style={{
                                         ...styles.optionBox, 
-                                        backgroundColor: "#FFCECE",
-                                        borderColor: color === "#FFCECE" ? "#FF4040" : "black"
+                                        backgroundColor: "#FED2B5",
                                     }} 
                                     onPress={() => {
-                                        selectColor("#FFCECE");
+                                        selectColor("#FED2B5");
                                         setBackgroundImage(null);
                                     }}
-                                />
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#FED2B5" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
                                 <Pressable 
                                     style={{
                                         ...styles.optionBox, 
-                                        backgroundColor: "#FFF0BC",
-                                        borderColor: color === "#FFF0BC" ? "#FF4040" : "black"
+                                        backgroundColor: "#EDF3C3",
                                     }} 
                                     onPress={() => {
-                                        selectColor("#FFF0BC");
+                                        selectColor("#EDF3C3");
                                         setBackgroundImage(null);
                                     }}
-                                />
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#EDF3C3" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
                                 <Pressable 
                                     style={{
                                         ...styles.optionBox, 
-                                        backgroundColor: "#A0D88D",
-                                        borderColor: color === "#A0D88D" ? "#FF4040" : "black"
+                                        backgroundColor: "#DBE5F1",
                                     }} 
                                     onPress={() => {
-                                        selectColor("#A0D88D");
+                                        selectColor("#DBE5F1");
                                         setBackgroundImage(null);
                                     }}
-                                />
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#DBE5F1" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
                                 {/* <Pressable>
                                     <Image 
                                         source={iconImage}
@@ -2043,7 +2094,7 @@ const CreateBookmark = ({navigation, route}) => {
                 : 
                 null
             } */}
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 

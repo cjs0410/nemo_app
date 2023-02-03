@@ -1,3 +1,5 @@
+import { Animated, } from "react-native";
+import React, { useRef, } from "react";
 import { createSlice } from '@reduxjs/toolkit';
 import jwt_decode from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,6 +21,7 @@ const initialState = {
     shouldBookRefresh: false,
     recentSearch: [],
     searchKeyword: '',
+    // scrollY: useRef(new Animated.Value(0)).current,
 }
 
 export const userSlice = createSlice({

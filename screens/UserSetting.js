@@ -19,9 +19,11 @@ import iconCheckmark from '../assets/icons/iconCheckmark.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { resetRefreshToken, resetAvatar, } from '../modules/user';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const UserSetting = ({navigation}) => {
+const UserSetting = ({route, navigation}) => {
     const dispatch = useDispatch();
+    const { profile, } = route.params;
     const [withDrawModalVisible, setWithDrawModalVisible] = useState(false);
     const [passwordModalVisible, setPasswordModalVisible] = useState(false);
     const [newPwdModalVisible, setNewPwdModalVisible] = useState(false);
@@ -29,6 +31,7 @@ const UserSetting = ({navigation}) => {
     const [newPassword1, setNewPassword1] = useState('');
     const [newPassword2, setNewPassword2] = useState('');
     const [warning, setWarning] = useState('');
+    const insets = useSafeAreaInsets();
 
     const onChangeNewPassword1 = (payload) => setNewPassword1(payload);
     const onChangeNewPassword2 = (payload) => setNewPassword2(payload);
@@ -110,7 +113,15 @@ const UserSetting = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable
                     onPress={() => navigation.goBack()}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -134,10 +145,10 @@ const UserSetting = ({navigation}) => {
                         style={{ width: regWidth*35, height: regWidth*35 }}
                     />
                 </Pressable>
-            </SafeAreaView>
+            </View>
             <Pressable 
                 style={styles.menuContainer}
-                onPress={() => navigation.navigate('AccountInfo')}
+                onPress={() => navigation.navigate('AccountInfo', { profile: profile, })}
             >
                 <Image 
                     source={iconPerson}
@@ -436,10 +447,9 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "pink",
-        marginVertical: 10,
-        marginHorizontal: 20,
-        // paddingBottom: 30,
-        paddingBottom: 8,
+        marginVertical: regHeight * 10,
+        marginHorizontal: regWidth * 13,
+        paddingBottom: regHeight * 8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",

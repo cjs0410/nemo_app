@@ -1,8 +1,8 @@
 import {Dimensions, StyleSheet, } from 'react-native';
 
 export const basicDimensions = { // 디자이너가 작업하고 있는 XD파일 스크린의 세로,가로
-    height: 844,
-    width: 390,
+    height: 812,
+    width: 375,
 };
 
 export const regHeight = ( // 높이 변환 작업

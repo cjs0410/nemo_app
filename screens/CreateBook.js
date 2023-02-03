@@ -8,7 +8,7 @@ import Api from "../lib/Api";
 import bookCover from '../assets/images/steve.jpeg';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import iconCamera from '../assets/images/iconCamera.png';
-import iconImage from '../assets/images/iconImage.png';
+import iconImage from '../assets/icons/iconImage.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import addBookCover from '../assets/images/addBookCover.png';
 import iconBook from '../assets/icons/iconBook.png';

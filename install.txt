@@ -47,3 +47,4 @@ npm i @invertase/react-native-apple-authentication
 npm install @react-native-google-signin/google-signin
 npm install --save @react-native-masked-view/masked-view
 npm install react-native-linear-gradient --save
+npm install @react-navigation/stack

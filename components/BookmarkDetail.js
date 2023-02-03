@@ -38,6 +38,9 @@ import iconTrash from '../assets/icons/iconTrash.png';
 import iconAlert from '../assets/icons/iconAlert.png';
 import iconFollow from '../assets/icons/iconFollow.png';
 import iconEyeoff from '../assets/icons/iconEyeoff.png';
+import iconLayers from '../assets/icons/iconLayers.png';
+import iconHeart from '../assets/icons/iconHeart.png';
+import iconHeartOutline from '../assets/icons/iconHeartOutline.png';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -65,6 +68,8 @@ const BookmarkDetail = (props) => {
 
     const [pushLike, setPushLike] = useState(false);
     const [pushScrap, setPushScrap] = useState(false);
+
+    const [isFollow, setIsFollow] = useState(false);
 
     useEffect(() => {
         // console.log(bookmark);
@@ -193,6 +198,11 @@ const BookmarkDetail = (props) => {
                         book_id: bookmark.book_id,
                     })
                 }
+                if (res.data.is_like) {
+                    Alert.alert("Added to your library");
+                } else {
+                    Alert.alert("Deleted from your library");
+                }
             })
         } catch (err) {
             console.error(err);
@@ -246,16 +256,10 @@ const BookmarkDetail = (props) => {
     }
 
     const deleteBookmark = async() => {
-        Alert.alert("북마크를 삭제하시겠습니까?", "확인 버튼을 누르면 삭제됩니다.", [
+        Alert.alert("Are you sure", "Once you delete your Nemo, it can't be restored.", [
             {
-                text: "취소",
-                // onPress: () => {
-                //     setBookmarkModalVisible(false);
-                //     setReportVisible(false);
-                // }
-            },
-            {
-                text: "확인", 
+                text: "Yes",
+                style: 'destructive',
                 onPress: async() => {
                     try {
                         // console.log(bookmark.bookmark_id);
@@ -273,6 +277,9 @@ const BookmarkDetail = (props) => {
                         console.error(err);
                     }
                 }
+            },
+            {
+                text: "Cancel", 
             }
         ]);
     }
@@ -311,6 +318,24 @@ const BookmarkDetail = (props) => {
         }),
         (error) => console.error("Oops, snapshot failed", error);
     };
+
+    const onFollow = async() => {
+        // setIsFollow(!isFollow);
+        try {
+            await Api
+            .post("api/v1/user/follow/", {
+                user_tag: albumInfo.user_tag,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                setIsFollow(res.data.is_follow);
+                // setFollowers(res.data.count);
+                // dispatch(setShouldUserRefresh(true));
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
 
     const renderBackdrop = useCallback(
@@ -475,7 +500,6 @@ const BookmarkDetail = (props) => {
 
                 <View style={styles.bookmarkLikes}>
                     <Pressable 
-                        activeOpacity={1} 
                         style={{ 
                             flexDirection: "row", 
                             alignItems: "center", 
@@ -487,11 +511,17 @@ const BookmarkDetail = (props) => {
                         hitSlop={{ bottom: 20, left: 60, right: 60, top: 20 }}
                         onPress={onLike}
                     >
-                        <Entypo 
-                            // name={ !pushLike ? (bookmark.is_like ? "heart" : "heart-outlined") : (isLike ? "heart" : "heart-outlined") } 
+                        {/* <Entypo 
                             name={isLike ? "heart" : "heart-outlined"}
                             size={regWidth * 26} 
                             color={isLike ? "red" : "black"}
+                        /> */}
+                        <Image 
+                            source={isLike ? iconHeart : iconHeartOutline}
+                            style={{
+                                width: regWidth * 25,
+                                height: regWidth * 25,
+                            }}
                         />
                     </Pressable>
                     <Pressable 
@@ -503,7 +533,7 @@ const BookmarkDetail = (props) => {
                             paddingVertical: regHeight * 8,
                         }}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                        onPress={() => navigation.push('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
+                        // onPress={() => navigation.push('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
                     >
                         <Text style={styles.bookmarkLikesText}>
                             {/* { !pushLike ? bookmark.likes : likeCount } */}
@@ -519,18 +549,25 @@ const BookmarkDetail = (props) => {
 
                         }}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                        onPress={onScrap}
+                        onPress={() => {
+                            fetchAlbumList();
+                        }}
                         disabled={userTag === bookmark.user_tag}
                     >
-                        <Feather 
+                        {/* <Feather 
                             name="download" 
                             size={regWidth * 25}
-                            // color={ userTag === bookmark.user_tag ? "#008000" : (!pushScrap ? (bookmark.is_scrap ? "red" : "black") : (isScrap ? "red" : "black")) }
                             color={ userTag === bookmark.user_tag ? "#C9C9C9" : (isScrap ? "#298CFF" : "black") }
                             style={{
                                 width: regWidth * 30,
+                            }} 
+                        /> */}
+                        <Image 
+                            source={iconLayers}
+                            style={{
+                                width: regWidth * 25,
+                                height: regWidth * 25,
                             }}
-                            // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
                         />
                         <Text 
                             style={{

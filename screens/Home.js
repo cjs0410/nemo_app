@@ -37,6 +37,7 @@ import { loadBookmarks } from '../modules/bookmarks';
 
 import analytics from '@react-native-firebase/analytics';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 const TopTab = createMaterialTopTabNavigator();
@@ -80,6 +81,7 @@ const Home = ({route, navigation}) => {
     const [ctg, setCtg] = useState("book");
     const [isInitial, setIsInitial] = useState(true);
     const searchBarValue = useRef(new Animated.Value(0)).current;
+    const insets = useSafeAreaInsets();
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -87,11 +89,12 @@ const Home = ({route, navigation}) => {
     useEffect(() => {
         if (route.params) {
             if (route.params.cancel) {
-                Animated.timing(searchBarValue, {
-                    toValue: 0,
-                    duration: 0,
-                    useNativeDriver: false,
-                }).start();
+                // Animated.timing(searchBarValue, {
+                //     toValue: 0,
+                //     duration: 0,
+                //     useNativeDriver: false,
+                // }).start();
+                searchBarValue.setValue(0);
                 showSearchBar();
                 setIsInitial(false);
 
@@ -393,7 +396,14 @@ const Home = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView  >
+            <View
+                style={{
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <View style={styles.header}>
                     <AnimatedPressable
                         style={{
@@ -428,11 +438,15 @@ const Home = ({route, navigation}) => {
                         />
                     </AnimatedPressable>
                 </View>
-            </SafeAreaView>
+            </View>
             <TopTab.Navigator
                 screenOptions={{
                     swipeEnabled: false,
-                    tabBarLabelStyle: { fontSize: regWidth * 17, fontWeight: "900", textTransform: 'none', },
+                    tabBarLabelStyle: { 
+                        fontSize: regWidth * 17, 
+                        fontFamily: "NotoSansKR-Black",
+                        textTransform: 'none', 
+                    },
                     tabBarActiveTintColor: colors.nemoDark,
                     tabBarInactiveTintColor: colors.bgdDark,
                     tabBarItemStyle: { width: regWidth * 120, paddingBottom: 0, },
@@ -625,6 +639,7 @@ const FollowingScreen = ({route, navigation}) => {
     const [scrollLoading, setScrollLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [feed, setFeed] = useState(null);
+
     const ref = useRef();
     useScrollToTop(ref);
 
@@ -722,6 +737,9 @@ const ExploreScreen = ({route, navigation}) => {
     const [sort, setSort] = useState(3);
     const [loading, setLoading] = useState(false);
 
+    const ref = useRef();
+    useScrollToTop(ref);
+
     useEffect(() => {
         fetchTrending();
     }, [sort]);
@@ -748,7 +766,9 @@ const ExploreScreen = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
+            <ScrollView
+                ref={ref}
+            >
                 <View 
                     style={{ 
                         flexDirection: "row", 
@@ -1120,9 +1140,9 @@ const styles = StyleSheet.create({
     },
     header: {
         // backgroundColor: "red",
-        marginVertical: regHeight * 8,
-        marginHorizontal: 20,
-        paddingBottom: regHeight * 8,
+        marginTop: regHeight * 8,
+        marginHorizontal: regWidth * 20,
+        // paddingBottom: regHeight * 8,
         justifyContent: "center",
         // alignItems: "center",
     },

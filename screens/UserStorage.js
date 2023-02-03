@@ -11,6 +11,7 @@ import { BookmarkList, AlbumList } from '../components';
 import Api from "../lib/Api";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import blankAvatar from '../assets/images/peopleicon.png';
+import blankBgd from '../assets/images/blankBgd.png';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import cal1P from '../assets/images/cal1P.png';
 import cal2P from '../assets/images/cal2P.png';
@@ -182,9 +183,9 @@ const UserStorage = ({route, navigation}) => {
                 }}
             > */}
                 <ImageBackground 
-                    source={ require('../assets/images/userImage.jpeg') } 
+                    source={profile && profile.backgroundimg ? profile.backgroundimg : blankBgd} 
                     resizeMode= "cover" 
-                    style={{ height: regHeight * 110, width:"100%", zIndex: 0,}}
+                    style={{ height: SCREEN_WIDTH * (110 / 375),  width:"100%", zIndex: 0,}}
                 >
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: regWidth * 13, marginTop: regHeight * 45, }}>
                         <Pressable
@@ -197,7 +198,7 @@ const UserStorage = ({route, navigation}) => {
                             />
                         </Pressable>
                         <Pressable
-                            onPress={() => navigation.navigate('UserSetting')}
+                            onPress={() => navigation.navigate('UserSetting', { profile: profile, })}
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         >
                             <Image 
@@ -276,15 +277,12 @@ const UserStorage = ({route, navigation}) => {
                                     lineHeight: regHeight*19, 
                                     color: "#404040",
                                     fontSize: regWidth * 13,
-                                    fontWeight: "500",
+                                    fontFamily: "NotoSansKR-Medium",
                                 }}
                                 numberOfLines={3}
                                 ellipsizeMode='tail'
                             >
-                                I literally have no idea.
-                                CEO of the Nemo project.
-                                Majoring PHYS at Korea.
-                                길어지면 이렇게 됨길어지면길어지면길어지면
+                                {profile.bio}
                             </Text>
                         </View>
                         <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 13, }}>
@@ -311,7 +309,7 @@ const UserStorage = ({route, navigation}) => {
                             style={{ 
                                 flexDirection: "row", 
                                 alignItems: "center",
-                                marginTop: regHeight * 60,
+                                marginTop: regHeight * 40,
                                 justifyContent: "space-between" 
                             }}
                         >

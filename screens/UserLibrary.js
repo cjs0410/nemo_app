@@ -51,6 +51,7 @@ import {
 import { loadBookmarks } from '../modules/bookmarks';
 import blankAvatar from '../assets/images/peopleicon.png';
 import sortCheck from '../assets/images/sortCheck.png';
+import longLikedNemos from '../assets/images/longLikedNemos.png';
 import iconRepeat from '../assets/icons/iconRepeat.png';
 import iconGrid from '../assets/icons/iconGrid.png';
 import iconList from '../assets/icons/iconList.png';
@@ -65,6 +66,7 @@ import {
 } from '@gorhom/bottom-sheet';
 // import BottomSheet from '@gorhom/bottom-sheet';
 import { Portal, PortalHost } from '@gorhom/portal';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -76,6 +78,7 @@ const UserLibrary = ({navigation, route }) => {
     const { isAlarm, avatar, } = useSelector(userSelector);
     const [loading, setLoading] = useState(true);
     const snapPoints = useMemo(() => [regHeight * 250], []);
+    const insets = useSafeAreaInsets();
     // const snapPoints = useMemo(() => ['25%','65%'], []);
 
 
@@ -186,7 +189,15 @@ const UserLibrary = ({navigation, route }) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Pressable
                         onPress={() => navigation.navigate('UserStorage')}
@@ -250,7 +261,7 @@ const UserLibrary = ({navigation, route }) => {
                         }
                     </Pressable>
                 </View>
-            </SafeAreaView>
+            </View>
             {loading ? 
                 null
                 :
@@ -757,6 +768,7 @@ const NemoListScreen = ({navigation}) => {
                                 marginVertical: regHeight * 10,
                                 alignItems: "center",
                                 justifyContent: "space-between",
+                                // backgroundColor:"pink"
                             }}
                         >
                             <Pressable
@@ -1407,8 +1419,8 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                 style={{ 
                                     opacity,
                                     fontSize: regWidth * 16,
-                                    fontWeight: "700",
-                                    fontFamily: "NotoSansKR-Regular",
+                                    // fontWeight: "700",
+                                    fontFamily: "NotoSansKR-Bold",
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}
@@ -1446,8 +1458,8 @@ const styles = StyleSheet.create({
     },
     header: {
       // backgroundColor: "red",
-      marginVertical: 10,
-      marginHorizontal: 20,
+      marginVertical: regHeight * 8,
+      marginHorizontal: regWidth * 13,
       paddingBottom: 8,
       flexDirection: "row",
       justifyContent: "space-between"

@@ -45,10 +45,18 @@ const BookTile = (props) => {
                     >
                         {book.book_title}
                     </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", width: "70%", }}>
+                    <View 
+                        style={{ 
+                            flexDirection: "row", 
+                            alignItems: "center", 
+                            width: "100%", 
+                        }}
+                    >
                         <Text 
                             style={{ 
-                                ...styles.BookInfoText, marginRight: regWidth*3
+                                ...styles.BookInfoText, 
+                                marginRight: regWidth*3,
+                                maxWidth: "45%"
                             }}
                             numberOfLines={1}
                             ellipsizeMode='tail'
@@ -57,7 +65,10 @@ const BookTile = (props) => {
                         </Text>
                         <Entypo name="dot-single" size={16} color="#808080" />
                         <Text 
-                            style={{ ...styles.BookInfoText, marginHorizontal: regWidth*3, }}
+                            style={{ 
+                                ...styles.BookInfoText, 
+                                marginHorizontal: regWidth*3, 
+                            }}
                             // numberOfLines={1}
                             // ellipsizeMode="tail"
                         >

@@ -46,6 +46,7 @@ import {
     getDaysInMonth,
     differenceInMonths,
 } from 'date-fns';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -65,6 +66,7 @@ const NemoCalender = ({navigation}) => {
     const [dateWidth, setDateWidth] = useState(0);
     const [history, setHistory] = useState(null);
     const scrollViewRef = useRef();
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         fetchCal();
@@ -251,7 +253,15 @@ const NemoCalender = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header}>
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable
                     onPress={() => navigation.goBack()}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -277,7 +287,7 @@ const NemoCalender = ({navigation}) => {
                         opacity: 0,
                     }}
                 />
-            </SafeAreaView>
+            </View>
             <ScrollView
                 ref={scrollViewRef}
                 onContentSizeChange={() => {

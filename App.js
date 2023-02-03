@@ -3,6 +3,9 @@ import React, { useEffect, useState, useCallback, useRef, useLayoutEffect, } fro
 import { NavigationContainer, useNavigationContainerRef, getFocusedRouteNameFromRoute, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import { CardStyleInterpolators } from '@react-navigation/stack';
+import { TransitionPresets } from '@react-navigation/stack';
 import {
   BaseButton,
   GestureHandlerRootView,
@@ -26,6 +29,7 @@ import { FindId, FindId2, } from "./screens/FindId";
 import { FindPassword, FindPassword2, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
 import { SubmitEditedPost } from "./screens/EditPost";
+import { ChangeUsername, } from "./screens/AccountInfo";
 import { 
   Welcome, 
   Login, 
@@ -78,14 +82,14 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Portal, PortalHost, PortalProvider } from '@gorhom/portal';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const HomeStack = createNativeStackNavigator();
-const SearchStack = createNativeStackNavigator();
-const PostStack = createNativeStackNavigator();
-const BookmarkStack = createNativeStackNavigator();
-const ProfileStack = createNativeStackNavigator();
-const UserLibraryStack = createNativeStackNavigator();
+const HomeStack = createStackNavigator();
+const SearchStack = createStackNavigator();
+const PostStack = createStackNavigator();
+const BookmarkStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
+const UserLibraryStack = createStackNavigator();
 
 const SIGN_KEY = "@isSignedIn";
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -292,7 +296,7 @@ const App = () => {
                 headerShown: false,
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
-                  if ((routeName === 'SelectBook0' || routeName === 'CreateBook0' || routeName === 'CreateBookmark0') && (Platform.OS === 'android')) {
+                  if ((routeName === 'SelectBook0' || routeName === 'CreateBook0' || routeName === 'CreateBookmark0')) {
                     return { display: "none", }
                   }
                   if (routeName === 'NemoCalender') {
@@ -439,8 +443,8 @@ const UserLibraryScreen = ({route, navigation}) => {
         name="SelectBook0" 
         component={SelectBook}
         options={{
-          presentation: "fullScreenModal",
-          // animation: "fade",
+          // presentation: "modal",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
         }}
       />
       <UserLibraryStack.Screen 
@@ -467,31 +471,59 @@ const UserLibraryScreen = ({route, navigation}) => {
           // animation: "fade",
         }}
       />
-      <UserLibraryStack.Screen name="UserStorage" component={UserStorage} />
+      <UserLibraryStack.Screen 
+        name="UserStorage" 
+        component={UserStorage} 
+        options={{
+          // presentation: "fullScreenModal",
+          // gestureDirection: "horizontal-inverted",
+        }}
+      />
       <UserLibraryStack.Screen 
         name="UserSetting" 
         component={UserSetting}
+        options={{
+          // gestureDirection: "vertical",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
+
+        }}
       />
       <UserLibraryStack.Screen name="AlarmScreen" component={AlarmScreen} />
       <UserLibraryStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
       <UserLibraryStack.Screen name="AlbumProfile" component={AlbumProfile} />
       <UserLibraryStack.Screen name="BookProfile" component={BookProfile} />
       <UserLibraryStack.Screen name="OtherProfile" component={OtherProfile} />
-      <UserLibraryStack.Screen name="AccountInfo" component={AccountInfo} />
+      <UserLibraryStack.Screen 
+        name="AccountInfo" 
+        component={AccountInfo} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangeUsername" 
+        component={ChangeUsername} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
       <UserLibraryStack.Screen 
         name="NemoCalender" 
         component={NemoCalender}
         options={{
-          presentation: "fullScreenModal",
-          // presentation: "card"
+          // presentation: "transparentModal",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
         }} 
       />
       <UserLibraryStack.Screen 
         name="ProfileEdit" 
         component={ProfileEdit}
         options={{
-          presentation: "transparentModal",
-          // animation: "horizontal",
+          // presentation: "transparentModal",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
         }}
       />
       <UserLibraryStack.Screen 
@@ -549,7 +581,7 @@ const HomeScreen = ({route, navigation}) => {
         name="SelectBook2" 
         component={SelectBook}
         options={{
-          presentation: "fullScreenModal",
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
         }}
       />
       <HomeStack.Screen 
@@ -609,7 +641,8 @@ const HomeScreen = ({route, navigation}) => {
         name="Search" 
         component={Search} 
         options={{
-          animation: "none",
+          animationEnabled: false,
+          gestureEnabled: false,
         }}
       />
     </HomeStack.Navigator>

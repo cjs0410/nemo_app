@@ -19,32 +19,62 @@ import iconCheckmark from '../assets/icons/iconCheckmark.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { resetRefreshToken, resetAvatar, } from '../modules/user';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const AccountInfo = ({navigation}) => {
+const AccountInfo = ({route, navigation}) => {
     const dispatch = useDispatch();
+    const { profile, } = route.params;
+    const insets = useSafeAreaInsets();
+
+    useEffect(() => {
+        if (profile) {
+            console.log(profile);
+        }
+    }, [profile]);
 
     const logout = async() => {
-        const refreshToken = await AsyncStorage.getItem('refresh');
-        try {
-            await Api
-            .post("/api/v1/user/logout/", {
-                refresh_token: refreshToken,
-            })
-            .then(async(res) => {
-                // navigation.popToTop();
-                await AsyncStorage.removeItem('access');
-                await AsyncStorage.removeItem('refresh');
-                dispatch(resetRefreshToken());
-                dispatch(resetAvatar());
-            })
-        } catch (err) {
-            console.error(err);
-        }
+        Alert.alert("Dongin Jung", "Are you sure you want to log out of Nemo?", [
+            {
+                text: "Log out",
+                style: 'destructive',
+                onPress: async() => {
+                    const refreshToken = await AsyncStorage.getItem('refresh');
+                    try {
+                        await Api
+                        .post("/api/v1/user/logout/", {
+                            refresh_token: refreshToken,
+                        })
+                        .then(async(res) => {
+                            // navigation.popToTop();
+                            await AsyncStorage.removeItem('access');
+                            await AsyncStorage.removeItem('refresh');
+                            dispatch(resetRefreshToken());
+                            dispatch(resetAvatar());
+                        })
+                    } catch (err) {
+                        console.error(err);
+                    }
+                } 
+            },
+            {
+                text: "Cancel", 
+                
+            }
+        ]);
+
     }
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable
                     onPress={() => navigation.goBack()}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -56,7 +86,7 @@ const AccountInfo = ({navigation}) => {
                 </Pressable>
                 <Text style={{
                     fontSize: regWidth * 18,
-                    fontWeight: "700",
+                    fontFamily: "NotoSansKR-Bold",
                 }}>
                     Account information
                 </Text>
@@ -68,46 +98,49 @@ const AccountInfo = ({navigation}) => {
                         style={{ width: regWidth*35, height: regWidth*35 }}
                     />
                 </Pressable>
-            </SafeAreaView>
+            </View>
             <View 
                 style={{
-                    ...styles.infoContainter,
+                    ...styles.infoContainer,
                     marginTop: regHeight * 60,        
                 }}
             >
                 <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
                     Username
                 </Text>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
+                <Pressable 
+                    style={{ flexDirection: "row", alignItems: "center", }}
+                    onPress={() => navigation.navigate("ChangeUsername", { userTag: profile.user_tag, })}    
+                >
                     <Text style={styles.infoTxt}>
-                        @jungdonginn
+                        {`@${profile.user_tag}`}
                     </Text>
                     <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
-                </View>
+                </Pressable>
             </View>
-            <View style={styles.infoContainter}>
+            <View style={styles.infoContainer}>
                 <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
                     Phone
                 </Text>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Text style={styles.infoTxt}>
-                        +82 10-0000-0000
+                        {profile.hp ? `+82 ${profile.hp}` : "-" }
                     </Text>
                     <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
                 </View>
             </View>
-            <View style={styles.infoContainter}>
+            <View style={styles.infoContainer}>
                 <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
                     Email
                 </Text>
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Text style={styles.infoTxt}>
-                        Add
+                        {profile.email ? profile.email : "-" }
                     </Text>
                     <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
                 </View>
             </View>
-            <View style={styles.infoContainter}>
+            <View style={styles.infoContainer}>
                 <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
                     Gender
                 </Text>
@@ -131,6 +164,112 @@ const AccountInfo = ({navigation}) => {
     )
 }
 
+const ChangeUsername = ({navigation, route}) => {
+    const insets = useSafeAreaInsets();
+    const { userTag, } = route.params;
+    const [newUserTag, setNewUserTag] = useState('');
+
+    const onChangeUsername = async() => {
+        try {
+            // await Api
+            // .post("", {
+
+            // })
+            // .then((res) => {
+
+            // })
+            Alert.alert("Your username is updated.", "", [
+                {
+                    text: "OK", 
+                    onPress: () => navigation.goBack()
+                }
+            ]);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
+                <Pressable
+                    onPress={() => navigation.goBack()}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                        Cancel
+                    </Text>
+                </Pressable>
+                <Text style={{
+                    fontSize: regWidth * 18,
+                    fontFamily: "NotoSansKR-Bold",
+                }}>
+                    Change username
+                </Text>
+                <Pressable
+                    onPress={onChangeUsername}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                        Done
+                    </Text>
+                </Pressable>
+            </View>
+            <View 
+                style={{
+                    marginTop: regHeight * 60,   
+                    marginHorizontal: regWidth * 13,     
+                }}
+            >
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                    Current
+                </Text>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", marginTop: regHeight * 20, }}>
+                    {`@${userTag}`}
+                </Text>
+            </View>
+            <View 
+                style={{
+                    marginTop: regHeight * 60,   
+                    marginHorizontal: regWidth * 13,     
+                }}
+            >
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                    New username
+                </Text>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderBottomWidth: 1,
+                        marginTop: regHeight * 20,
+                    }}
+                >
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",  }}>
+                        @
+                    </Text>
+                    <TextInput 
+                        onChangeText={(payload) => setNewUserTag(payload)}
+                        style={{
+                            fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",
+                            width: "90%",
+                        }}
+                    />
+                </View>
+            </View>
+        </View>
+    )
+
+}
+
 
 const styles = StyleSheet.create({
     container: {
@@ -138,14 +277,14 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-        marginVertical: 10,
-        marginHorizontal: 20,
-        paddingBottom: 8,
+        marginVertical: regHeight * 10,
+        marginHorizontal: regWidth * 13,
+        paddingBottom: regHeight * 8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
-    infoContainter: {
+    infoContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginHorizontal: regWidth * 13,
@@ -161,3 +300,4 @@ const styles = StyleSheet.create({
 })
 
 export default AccountInfo;
+export {ChangeUsername};

@@ -21,7 +21,7 @@ import Api from "../lib/Api";
 import bookCover from '../assets/images/steve.jpeg';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import iconCamera from '../assets/images/iconCamera.png';
-import iconImage from '../assets/images/iconImage.png';
+import iconImage from '../assets/icons/iconImage.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import iconPlusNemoNormal from '../assets/icons/iconPlusNemoNormal.png';
 import iconPlusNemoDark from '../assets/icons/iconPlusNemoDark.png';
@@ -63,6 +63,7 @@ const CreateNemolist1 = ({navigation}) => {
         Alert.alert("Discard changes?", "If you go back now, you’ll lose your changes.", [
             {
                 text: "Discard",
+                style: 'destructive',
                 onPress: () => navigation.goBack()
             },
             {
@@ -142,6 +143,7 @@ const CreateNemolist2 = ({navigation, route}) => {
         Alert.alert("Discard changes?", "If you go back now, you’ll lose your changes.", [
             {
                 text: "Discard",
+                style: 'destructive',
                 onPress: () => navigation.goBack()
             },
             {
