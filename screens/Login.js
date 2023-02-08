@@ -1,5 +1,5 @@
 import { View, SafeAreaView, ScrollView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, Image, Animated, } from "react-native";
-import React, { useEffect, useState, useRef, } from "react";
+import React, { useEffect, useState, useRef, useCallback, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
@@ -9,6 +9,7 @@ import { userSelector } from '../modules/hooks';
 import { setUserInfo, setRefreshToken, } from '../modules/user';
 import Api from '../lib/Api';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
+import messaging from '@react-native-firebase/messaging';
 
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -81,6 +82,7 @@ const Login = ({ navigation }) => {
         try {
           await AsyncStorage.setItem('refresh', res.data.refresh);
           await AsyncStorage.setItem('access', res.data.access);
+          getFcmToken();
           dispatch(setRefreshToken(res.data.refresh));
         } catch (err) {
           console.error(err);
@@ -98,6 +100,26 @@ const Login = ({ navigation }) => {
     }
     setLoading(false);
   }
+
+  const getFcmToken = useCallback(async () => {
+    const fcmToken = await messaging().getToken();
+    // Alert.alert(fcmToken);
+    // console.log(fcmToken);
+
+    try {
+      console.log(fcmToken);
+      await Api
+      .post("/api/v1/user/fcm_token/", {
+        token: fcmToken,
+      })
+      // .then((res) => {
+      //   console.log(res.data);
+      // })
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
     return (
       <View style={{backgroundColor:"white", flex:1}}>
         <SafeAreaView style={ styles.header } >

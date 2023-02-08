@@ -63,6 +63,7 @@ import {
     BottomSheetModal,
     BottomSheetModalProvider,
     BottomSheetBackdrop,
+    BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 // import BottomSheet from '@gorhom/bottom-sheet';
 import { Portal, PortalHost } from '@gorhom/portal';
@@ -1034,7 +1035,7 @@ const BookScreen = ({navigation}) => {
                 items: 0,
             })
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 setBooks(res.data);
                 setNewBookNum(res.data.length);
             })

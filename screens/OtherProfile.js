@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef, createRef, useMemo, useCallback, } 
 import writerImage from '../assets/images/userImage.jpeg';
 import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Api from "../lib/Api";
-import blankAvatar from '../assets/images/peopleicon.png';
+import blankAvatar from '../assets/images/blankAvatar.png';
 import blankBgd from '../assets/images/blankBgd.png';
 import { BookmarkList, AlbumList, BookList, } from '../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -69,7 +69,7 @@ const OtherProfile = ({navigation, route}) => {
     const headerOnLayout = useCallback((event)=>{
         const { height } = event.nativeEvent.layout;
         setHeaderHeight(height);
-        console.log(height);
+        // console.log(height);
     }, []);
 
 
@@ -107,6 +107,7 @@ const OtherProfile = ({navigation, route}) => {
 
     const fetchProfile = async() => {
         try {
+            console.log(userTag);
             await Api
             .post("api/v1/user/profile/", { user_tag: userTag })
             .then((res) => {
@@ -375,9 +376,10 @@ const OtherProfile = ({navigation, route}) => {
                 }}
             > */}
                 <ImageBackground 
-                    source={profile && profile.backgroundimg ? profile.backgroundimg : blankBgd} 
+                    source={profile && profile.backgroundimg ? {uri: profile.backgroundimg} : blankBgd} 
                     resizeMode= "cover" 
-                    style={{ height: SCREEN_WIDTH * (110 / 375),  width:"100%", zIndex: 0,}}
+                    style={{ height: SCREEN_WIDTH * (110 / 375),  width:"100%", zIndex: 0, }}
+                    imageStyle= {{ opacity: 0.7, }}
                 >
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: regWidth * 13, marginTop: regHeight * 45, }}>
                         <Pressable
@@ -407,7 +409,7 @@ const OtherProfile = ({navigation, route}) => {
                     // marginTop: -regHeight*40, 
                     // height: "30%", 
                     backgroundColor: "white",
-                    paddingHorizontal: regWidth * 13,
+                    marginHorizontal: regWidth * 13,
                     zIndex: 10,
                 }}
                 onLayout={headerOnLayout}
@@ -452,7 +454,11 @@ const OtherProfile = ({navigation, route}) => {
                                 style={{
                                     ...styles.followBtn,
                                     backgroundColor: isFollow ? "white" : colors.textNormal,
+                                    opacity: myTag === userTag ? 0 : 1,
+                                    position: "absolute",
+                                    right: 0,
                                 }} 
+                                disabled={ myTag === userTag ? true : false }
                                 onPress={onFollow}
                             >
                                 <Text 
@@ -461,6 +467,7 @@ const OtherProfile = ({navigation, route}) => {
                                         // fontWeight: "500",
                                         color: isFollow ? colors.textDark : "white",
                                         fontFamily: "NotoSansKR-Bold",
+                                        // width: 
                                     }}
                                 >
                                     {isFollow ? "Following" : "Follow"}
@@ -479,7 +486,7 @@ const OtherProfile = ({navigation, route}) => {
                                 numberOfLines={3}
                                 ellipsizeMode='tail'
                             >
-                                {profile.intro}
+                                {profile.bio}
                             </Text>
                         </View>
                         <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 13, }}>
@@ -512,25 +519,30 @@ const OtherProfile = ({navigation, route}) => {
                                 </Text>
                             </Pressable>
                         </View>
-                        <View style={ styles.followedByContainer}>
-                            {profile.know_together.map((user, index) => (
-                                <Animated.Image 
-                                    source={ user.avatar !== null ? { uri: user.avatar } : blankAvatar} 
-                                    style={{
-                                        ...styles.smallAvatar, 
-                                        opacity: avatarValue,
-                                        marginLeft: index === 0 ? 0 : -regWidth*15
-                                    }} 
-                                    onLoadEnd={showAvatarImage}
-                                    key={index}
-                                />
-                            ))}
-                            <Text style={{ marginLeft: regWidth*11, width: "70%", color: "#606060" }}
-                                numberOfLines={2}
-                            >
+                        {(userTag === myTag) || (profile.know_together_counts === 0) ? 
+                            null
+                            : 
+                            <View style={ styles.followedByContainer}>
+                                {profile.know_together.map((user, index) => (
+                                    <Animated.Image 
+                                        source={ user.avatar !== null ? { uri: user.avatar } : blankAvatar} 
+                                        style={{
+                                            ...styles.smallAvatar, 
+                                            opacity: avatarValue,
+                                            marginLeft: index === 0 ? 0 : -regWidth*15
+                                        }} 
+                                        onLoadEnd={showAvatarImage}
+                                        key={index}
+                                    />
+                                ))}
+                                <Text style={{ marginLeft: regWidth*11, width: "70%", color: "#606060" }}
+                                    numberOfLines={2}
+                                >
                                     {`Followed by ${profile.know_together.map((user, index) => `${index === 0 ? '' : ' '}${user.name}`)} ${profile.know_together_counts - profile.know_together.length === 0 ? "" : `and ${profile.know_together_counts - profile.know_together.length} other`}`}
-                            </Text>
-                        </View>
+                                </Text>
+                            </View>
+                        }
+
                     </>
                 }
             </Animated.View>
@@ -1378,10 +1390,6 @@ function MyTabBar({ state, descriptors, navigation, position }) {
         Array.from({ length: state.routes.length }, () => createRef())
     ).current;
     const [measures, setMeasures] = useState(null);
-
-    useEffect(() => {
-        console.log(state);
-    })
 
     useEffect(() => {
         if (viewRef.current) {

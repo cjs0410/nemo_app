@@ -36,17 +36,19 @@ const BookList = (props) => {
                             fontSize: regWidth * 20, 
                             fontWeight: "700", 
                             marginHorizontal: 12,
-                            lineHeight: regWidth * 28,
+                            lineHeight: regWidth * 23,
                         }}
                         numberOfLines={2}
                         ellipsizeMode='tail'
                     >
                         {book.book_title}
                     </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", width: "70%", }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", }}>
                         <Text 
                             style={{ 
-                                ...styles.BookInfoText, marginRight: regWidth*3
+                                ...styles.BookInfoText, 
+                                marginRight: regWidth * 3,
+                                maxWidth: "50%",
                             }}
                             numberOfLines={1}
                             ellipsizeMode='tail'
@@ -55,7 +57,7 @@ const BookList = (props) => {
                         </Text>
                         <Entypo name="dot-single" size={16} color="#808080" />
                         <Text 
-                            style={{ ...styles.BookInfoText, width: "40%", marginHorizontal: regWidth*3, }}
+                            style={{ ...styles.BookInfoText, marginHorizontal: regWidth*3, }}
                             // numberOfLines={1}
                             // ellipsizeMode="tail"
                         >
@@ -86,8 +88,8 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
     },
     BookInfoText: {
-        fontSize: regWidth*11, 
-        fontWeight: "500", 
+        fontSize: regWidth * 11, 
+        fontFamily: "NotoSansKR-Regular",
         marginHorizontal: regWidth*12, 
         color: "#606060",
         

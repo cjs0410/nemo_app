@@ -31,15 +31,24 @@ const AlbumList = (props) => {
                 />
                 <View style={{ width: "80%" }}>
                     <Text 
-                        style={{ fontSize: regWidth*20, fontFamily: "NotoSansKR-Bold", marginHorizontal: 12 }}
+                        style={{ 
+                            fontSize: regWidth*20, 
+                            fontFamily: "NotoSansKR-Bold", 
+                            marginHorizontal: regWidth * 12,
+                            lineHeight: regWidth * 23,
+                        }}
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >
                         {album.nemolist_title}
                     </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", width: "70%", }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", }}>
                         <Text 
-                            style={{ ...styles.AlbumInfoText, marginRight: regWidth*3 }}
+                            style={{ 
+                                ...styles.AlbumInfoText, 
+                                marginRight: regWidth*3,
+                                maxWidth: "50%",
+                            }}
                             numberOfLines={1}
                             ellipsizeMode="tail"
                         >
@@ -47,7 +56,7 @@ const AlbumList = (props) => {
                         </Text>
                         <Entypo name="dot-single" size={16} color="#808080" />
                         <Text 
-                            style={{ ...styles.AlbumInfoText, width: "40%", marginHorizontal: regWidth*3, }}
+                            style={{ ...styles.AlbumInfoText, marginHorizontal: regWidth*3, }}
                             // numberOfLines={1}
                             // ellipsizeMode="tail"
                         >

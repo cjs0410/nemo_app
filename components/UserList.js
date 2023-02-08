@@ -5,7 +5,7 @@ import bookCover from '../assets/images/steve.jpeg';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import likedNemos from '../assets/images/likedNemos.png';
 import { Use } from "react-native-svg";
-import blankAvatar from '../assets/images/peopleicon.png';
+import blankAvatar from '../assets/images/blankAvatar.png';
 
 const UserList = (props) => {
     const user = props.user;
@@ -21,7 +21,7 @@ const UserList = (props) => {
             <View style={{ marginHorizontal: regWidth * 10, }}>
                 <Text 
                     style={{ 
-                        fontSize: regWidth * 18, 
+                        fontSize: regWidth * 20, 
                         fontFamily: "NotoSansKR-Bold",
                         width: regWidth * 220, 
                         lineHeight: regWidth * 23,
@@ -33,12 +33,12 @@ const UserList = (props) => {
                 </Text>
                 <Text 
                     style={{ 
-                        fontSize: regWidth * 15, 
+                        fontSize: regWidth * 11, 
                         fontFamily: "NotoSansKR-Regular",
                         width: regWidth * 180,
                         marginTop: regHeight * 2,
                         color: colors.nemoNormal,
-                        lineHeight: regWidth * 14.5,
+                        lineHeight: regWidth * 15,
                     }}
                     numberOfLines={1}
                     ellipsizeMode='tail'

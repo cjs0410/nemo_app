@@ -156,6 +156,7 @@ const Join1 = ({ navigation }) => {
     }
 
     const onChangeHpOrEmail = (payload) => {
+        const onlyNum = payload.replace(/-/g, '');
         setHpOrEmail(payload);
         setHpOrEmailValue(payload);
         const emailRegex = /([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
@@ -168,8 +169,8 @@ const Join1 = ({ navigation }) => {
             setType("email");
             setIsHpOrEmailValid(true);
         } else {
-            if (hpRegex.test(payload) || hpValueRegex.test(payload)) {
-                setHpOrEmail(payload.replace(/-/g, ''));
+            if (hpRegex.test(onlyNum) || hpValueRegex.test(payload)) {
+                setHpOrEmail(onlyNum);
                 setHpOrEmailValue(payload.replace(/(\d{3})(\d{4})(\d)/, "$1-$2-$3"));
                 setType("hp");
                 setIsHpOrEmailValid(true);
@@ -969,7 +970,7 @@ const Join4 = ({ navigation, route }) => {
         if (debounceVal.length > 0) {
             try {
                 await Api.post("/api/v1/user/verify_username/", {
-                    user_tag: debounceVal,
+                    username: debounceVal,
                 })
                 .then((res) => {
                     console.log(res.data);
@@ -1069,13 +1070,13 @@ const Join4 = ({ navigation, route }) => {
                     />
 
                     {isUsernameValid ? 
-                            <Image 
-                                source={Check}
-                                style={ styles.checkIcon }
-                                // onLoadEnd={showLogo}
-                            />
-                            :
-                            null
+                        <Image 
+                            source={Check}
+                            style={ styles.checkIcon }
+                            // onLoadEnd={showLogo}
+                        />
+                        :
+                        null
                     }
                 </View>
                 <Text style={{
@@ -1336,7 +1337,7 @@ const styles = StyleSheet.create({
         height: regHeight*25,
         marginBottom: regHeight*7,
         marginLeft: -regWidth*24,
-        resizeMode: "contain"
+        resizeMode: "contain",
     },
     eyeIcon: {
         width: regWidth*30,

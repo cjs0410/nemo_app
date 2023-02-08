@@ -12,8 +12,8 @@ import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAva
 const AlarmScreen = ({navigation}) => {
     const dispatch = useDispatch();
     const [alarms, setAlarms] = useState(null);
-    const ctg = ["BS", "FS", "BL", ];
-    const answer = ["의 북마크를 저장했습", "을 팔로우하기 시작했습", "의 북마크를 좋아합", ];
+    const ctg = ["NS", "FS", "NL", "NLL", ];
+    const answer = ["의 Nemo를 저장했습", "을 팔로우하기 시작했습", "의 Nemo를 좋아합", "의 Nemolist를 좋아합" ];
     // const [whichCtg, setWhichCtg] = useState()
 
     useEffect(() => {
@@ -26,6 +26,7 @@ const AlarmScreen = ({navigation}) => {
             await Api
             .get("/api/v1/user/alarm/")
             .then((res) => {
+                console.log(res.data);
                 setAlarms(res.data);
             })
         } catch (err) {

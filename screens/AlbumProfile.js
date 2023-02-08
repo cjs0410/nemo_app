@@ -1,4 +1,4 @@
-import { StyleSheet, View, SafeAreaView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, ImageBackground, } from "react-native";
+import { StyleSheet, View, SafeAreaView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, ImageBackground, Vibration, } from "react-native";
 import React, { useEffect, useState, useRef, useCallback, useMemo, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
@@ -133,6 +133,7 @@ const AlbumProfile = ({route, navigation}) => {
                 setLikeCount(res.data.likes);
                 if (res.data.is_like) {
                     Alert.alert(albumInfo.nemolist_title, "is added to your library");
+                    Vibration.vibrate(30);
                 } else {
                     Alert.alert(albumInfo.nemolist_title, "is deleted from your library");
                 }
@@ -322,7 +323,7 @@ const AlbumProfile = ({route, navigation}) => {
     }, [menuModalRef]);
 
     const addModalRef = useRef();
-    const addSnapPoints = useMemo(() => [regHeight * 780], []);
+    const addSnapPoints = useMemo(() => [regHeight * 765], []);
     const onPressAddNemos = useCallback(() => {
         addModalRef.current.present();
     }, [addModalRef]);

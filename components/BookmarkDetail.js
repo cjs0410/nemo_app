@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable, Modal, Alert, } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Pressable, Modal, Alert, Vibration, FlatList, ActivityIndicator, } from "react-native";
 import React, { useEffect, useState, useRef, useCallback, useMemo, } from "react";
 import { Entypo } from '@expo/vector-icons'; 
 import { Feather } from '@expo/vector-icons';
@@ -9,7 +9,7 @@ import writerImage from '../assets/images/userImage.jpeg';
 import bookCover from '../assets/images/steve.jpeg';
 import Card from './Card';
 import Api from '../lib/Api';
-import blankAvatar from '../assets/images/peopleicon.png';
+import blankAvatar from '../assets/images/blankAvatar.png';
 import BottomSheet, { BottomSheetView, BottomSheetFooter } from '@gorhom/bottom-sheet';
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
@@ -32,6 +32,7 @@ import {
     BottomSheetModal,
     BottomSheetModalProvider,
     BottomSheetBackdrop,
+    BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 import iconEdit from '../assets/icons/iconEdit.png';
 import iconTrash from '../assets/icons/iconTrash.png';
@@ -40,7 +41,13 @@ import iconFollow from '../assets/icons/iconFollow.png';
 import iconEyeoff from '../assets/icons/iconEyeoff.png';
 import iconLayers from '../assets/icons/iconLayers.png';
 import iconHeart from '../assets/icons/iconHeart.png';
+import iconRepeat from '../assets/icons/iconRepeat.png';
 import iconHeartOutline from '../assets/icons/iconHeartOutline.png';
+import sortCheck from '../assets/images/sortCheck.png';
+import iconPlus from '../assets/images/iconPlus.png';
+import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
+import iconPlusCirclePurple from '../assets/icons/iconPlusCirclePurple.png';
+import AlbumList from './AlbumList';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -64,12 +71,18 @@ const BookmarkDetail = (props) => {
     const [reportContents, setReportContents] = useState('');
     const [albumModalVisible, setAlbumModalVisible] = useState(false);
     const modalValue = useRef(new Animated.Value(0)).current;
-    const [albums, setAlbums] = useState(null);
+    const [nemolists, setNemolists] = useState(null);
 
     const [pushLike, setPushLike] = useState(false);
     const [pushScrap, setPushScrap] = useState(false);
 
     const [isFollow, setIsFollow] = useState(false);
+
+    const sortList = [ "recents", "alphabetical", "creator", ];
+    const [sort, setSort] = useState(0);
+    const [newNemolistNum, setNewNemolistNum] = useState(0);
+    const [scrollLoading, setScrollLoading] = useState(false);
+    const [selectedNemolists, setSelectedNemolists] = useState([]);
 
     useEffect(() => {
         // console.log(bookmark);
@@ -200,6 +213,7 @@ const BookmarkDetail = (props) => {
                 }
                 if (res.data.is_like) {
                     Alert.alert("Added to your library");
+                    Vibration.vibrate(100);
                 } else {
                     Alert.alert("Deleted from your library");
                 }
@@ -242,18 +256,99 @@ const BookmarkDetail = (props) => {
         }
     }
 
-    const fetchAlbumList = async() => {
+    const fetchNemolist = async(sortNum) => {
         try {
+            console.log( bookmark.bookmark_id)
             await Api
-            .get("/api/v4/album/list/")
+            .post("/api/v4/album/list/", {
+                bookmark_id: bookmark.bookmark_id,
+                sort: sortList[sortNum],
+                items: 0,
+            })
             .then((res) => {
                 console.log(res.data);
-                setAlbums(res.data);
+                setNemolists(res.data);
+                setNewNemolistNum(res.data.length);
+                onPressScrap();
             })
         } catch (err) {
             console.error(err);
         }
     }
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemolist();
+        }
+    };
+
+    const getNemolist = async() => {
+        if (nemolists.length >= 16 && newNemolistNum >= 16) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("/api/v4/album/list/", {
+                    sort: sortList[sort],
+                    items: nemolists.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setNemolists([...nemolists, ...res.data.Nemolists, ]);
+                    setNewNemolistNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
+    }
+
+    const onSort = (sortNum) => {
+        setSort(sortNum);
+        onPressSortClose();
+        fetchNemolist(sortNum);
+    }
+
+    const selectNemolist = (nemolist) => {
+        if (selectedNemolists.findIndex(selectedNemolist => selectedNemolist.nemolist_id === nemolist.nemolist_id) === -1) {
+            setSelectedNemolists([
+                ...selectedNemolists,
+                nemolist,
+            ]);
+        } else {
+            setSelectedNemolists(
+                selectedNemolists.filter(selectedNemolist => selectedNemolist.nemolist_id !== nemolist.nemolist_id)
+            )
+        }
+    }
+
+
+
+    const renderAlbum = ({ item, index }) => (
+        <View
+            onPress={() => selectNemolist(item)}
+            style={{ justifyContent: "center",  }}
+        >
+            <AlbumList album={item} navigation={navigation} isDefault={false} />
+            <Pressable
+                onPress={() => selectNemolist(item)}
+                style={{
+                    position: "absolute",
+                    right: 0,
+                    marginHorizontal: regWidth * 12,
+                }}
+            >
+                <Image 
+                    source={selectedNemolists.findIndex(selectedNemolist => selectedNemolist.nemolist_id === item.nemolist_id) === -1 ? iconPlusCircleOutline : iconPlusCirclePurple}
+                    style={{
+                        width: regWidth * 40,
+                        height: regWidth * 40,
+                    }}
+                />
+            </Pressable>
+        </View>
+    )
 
     const deleteBookmark = async() => {
         Alert.alert("Are you sure", "Once you delete your Nemo, it can't be restored.", [
@@ -285,15 +380,17 @@ const BookmarkDetail = (props) => {
     }
 
     const addToAlbum = async(albumId) => {
-        console.log(albumId);
+        // console.log(albumId);
+        const nemolistIds = selectedNemolists.map((selectedNemolist) => (selectedNemolist.nemolist_id));
+        console.log(nemolistIds);
         try {
             await Api
             .post("/api/v4/album/addbookmark/", {
-                album_id: albumId,
+                nemolist_id: nemolistIds,
                 bookmark_id: bookmark.bookmark_id,
             })
             .then((res) => {
-                setAlbumModalVisible(false);
+                onPressScrapClose();
                 console.log("added!");
             })
         } catch (err) {
@@ -364,6 +461,28 @@ const BookmarkDetail = (props) => {
         menuModalRef.current.dismiss();
     }, [menuModalRef]);
 
+    const scrapModalRef = useRef();
+    const scrapSnapPoints = useMemo(() => [regHeight * 765], []);
+    const onPressScrap = useCallback(() => {
+        scrapModalRef.current.present();
+    }, [scrapModalRef]);
+
+    const onPressScrapClose = useCallback(() => {
+        // @ts-ignore
+        scrapModalRef.current.dismiss();
+    }, [scrapModalRef]);
+
+    const sortModalRef = useRef();
+
+    const onPressSort = useCallback(() => {
+        sortModalRef.current.present();
+    }, [sortModalRef]);
+
+    const onPressSortClose = useCallback(() => {
+        // @ts-ignore
+        sortModalRef.current.dismiss();
+    }, [sortModalRef]);
+
 
     if (bookmark === null) {
         return;
@@ -412,10 +531,10 @@ const BookmarkDetail = (props) => {
                     </Pressable>
                 </View>
                 <ViewShot
-                            ref={captureRef}
-                            options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}
-                            // key={index}
-                        >
+                    ref={captureRef}
+                    options={{ fileName: "Your-File-Name", format: "jpg", quality: 0.9 }}
+                    // key={index}
+                >
                 <ScrollView
                     pagingEnabled
                     showsHorizontalScrollIndicator={false}
@@ -550,9 +669,9 @@ const BookmarkDetail = (props) => {
                         }}
                         hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         onPress={() => {
-                            fetchAlbumList();
+                            fetchNemolist();
                         }}
-                        disabled={userTag === bookmark.user_tag}
+                        // disabled={userTag === bookmark.user_tag}
                     >
                         {/* <Feather 
                             name="download" 
@@ -572,7 +691,7 @@ const BookmarkDetail = (props) => {
                         <Text 
                             style={{
                                 ...styles.bookmarkLikesText, 
-                                color: userTag === bookmark.user_tag ? "#C9C9C9" : "black",
+                                // color: userTag === bookmark.user_tag ? "#C9C9C9" : "black",
                             }}
                         >
                             {/* { !pushScrap ? bookmark.scraps : scrapCount } */}
@@ -652,7 +771,7 @@ const BookmarkDetail = (props) => {
                             onPress={() => {
                                 setBookmarkModalVisible(false);
                                 setAlbumModalVisible(true);
-                                fetchAlbumList();
+                                fetchNemolist();
                             }}
                         >
                             <AntDesign name="pluscircleo" size={24} color="black" />
@@ -806,7 +925,7 @@ const BookmarkDetail = (props) => {
                             onPress={() => {
                                 setBookmarkModalVisible(false);
                                 setAlbumModalVisible(true);
-                                fetchAlbumList();
+                                fetchNemolist();
                             }}
                         >
                             <AntDesign name="pluscircleo" size={24} color="black" />
@@ -854,7 +973,7 @@ const BookmarkDetail = (props) => {
                                     </Text>
                                 </View>
                             </Pressable>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                            {/* <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
                                 <Image 
                                     source={iconEyeoff}
                                     style={{
@@ -868,7 +987,7 @@ const BookmarkDetail = (props) => {
                                         {`Block @${bookmark.user_tag}`}
                                     </Text>
                                 </View>
-                            </Pressable>
+                            </Pressable> */}
                             <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
                                 <Image 
                                     source={iconAlert}
@@ -950,6 +1069,174 @@ const BookmarkDetail = (props) => {
                         </>
                     }
 
+                </View>
+            </BottomSheetModal>
+            <BottomSheetModal
+                index={0}
+                ref={scrapModalRef}
+                snapPoints={scrapSnapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={{ flex: 1, }}
+                >
+                    <View style={styles.modalHeader}>
+                        <Pressable
+                            onPress={onPressScrapClose}
+                        >
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: "#606060", }}>
+                                Cancel
+                            </Text>
+                        </Pressable>
+                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Bold", }}>
+                            Add Nemos
+                        </Text>
+                        <Pressable
+                            onPress={addToAlbum}
+                        >
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: colors.textLight, }}>
+                                Done
+                            </Text>
+                        </Pressable>
+                    </View>
+
+                    <BottomSheetFlatList 
+                        data={nemolists}
+                        renderItem={renderAlbum}
+                        // key={isTile ? '_' : "#"}
+                        // keyExtractor={isTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
+                        keyExtractor={nemolist => nemolist.nemolist_id}
+                        showsVerticalScrollIndicator={false}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={0.3}
+                        ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                        // ListHeaderComponent={
+                        //     <>
+                        //         <View
+                        //             style={{
+                        //                 flexDirection: "row",
+                        //                 marginHorizontal: regWidth * 13,
+                        //                 marginVertical: regHeight * 10,
+                        //                 alignItems: "center",
+                        //                 justifyContent: "space-between",
+                        //                 // backgroundColor:"pink"
+                        //             }}
+                        //         >
+                        //             <Pressable
+                        //                 style={{
+                        //                     flexDirection: "row",
+                        //                     alignItems: "center",
+                        //                 }}
+                        //                 onPress={onPressSort}
+                        //             >
+                        //                 <Image 
+                        //                     source={iconRepeat}
+                        //                     style={{
+                        //                         width: regWidth * 15,
+                        //                         height: regWidth * 15,
+                        //                     }}
+                        //                 />
+                        //                 <Text
+                        //                     style={{
+                        //                         fontSize: 13,
+                        //                         fontWeight: "700",
+                        //                         marginHorizontal: regWidth * 5,
+                        //                     }}
+                        //                 >
+                        //                     {/* {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")} */}
+                        //                     Recents
+                        //                 </Text>
+                        //             </Pressable>
+                        //         </View>
+                        //     </>
+                        // }
+                    />
+                </View>
+            </BottomSheetModal>
+
+            <BottomSheetModal
+                index={0}
+                ref={sortModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={styles.modalContainer}
+                >
+                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        Sort by
+                    </Text>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(0)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Recents
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 0 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(1)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Alphabetical
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 1 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
+                    <Pressable 
+                        style={styles.sortBtn}
+                        onPress={() => onSort(2)}
+                    >
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 14, 
+                                fontWeight: "700", 
+                                color: sort === 2 ? colors.nemoDark : colors.textDark, 
+                            }}
+                        >
+                            Creator
+                        </Text>
+                        <Image 
+                            source={sortCheck}
+                            style={{
+                                width: regWidth * 20,
+                                height: regWidth * 20,
+                                resizeMode: "contain",
+                                opacity: sort === 2 ? 1 : 0,
+                            }}
+                        />
+                    </Pressable>
                 </View>
             </BottomSheetModal>
 
@@ -1183,6 +1470,20 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         marginHorizontal: regWidth * 20,
+    },
+    modalHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginVertical: regHeight * 8,
+        alignItems: "center",
+        marginHorizontal: regWidth * 20,
+        // marginHorizontal: regWidth * 18, 
+    },
+    sortBtn: {
+        flexDirection: "row", 
+        alignItems: "center", 
+        marginTop: regHeight * 24, 
+        justifyContent: "space-between",
     },
 })
 

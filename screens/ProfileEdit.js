@@ -75,13 +75,20 @@ const ProfileEdit = ({route, navigation}) => {
     // const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
     const [userTag, setUserTag] = useState(profile.user_tag);
     const [name, setName] = useState(profile.name);
+    const [bio, setBio] = useState(profile.bio);
+    const [birth, setBirth] = useState(profile.birth);
     const [isChange, setIsChange] = useState(false);
+    const [isBgdChange, setIsBgdChange] = useState(false);
     const [editLoading, setEditLoading] = useState(false);
 
     const [date, setDate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const insets = useSafeAreaInsets();
+
+    useEffect(() => {
+        console.log(profile);
+    }, [profile]);
     
     useEffect(() => {
         console.log(isChange);
@@ -165,7 +172,7 @@ const ProfileEdit = ({route, navigation}) => {
             setUserTag(payload);
         }
     };
-    const changeName = (payload) => {
+    const onChangeName = (payload) => {
         if (payload.length === 0) {
             setName(profile.name);
         } else {
@@ -173,9 +180,29 @@ const ProfileEdit = ({route, navigation}) => {
         }
     };
 
+    const onChangeBio = (payload) => {
+        if (payload.length === 0) {
+            setBio(profile.bio);
+        } else {
+            setBio(payload);
+        }
+    }
+
     const onEdit = async() => {
         const formData = new FormData();
         setEditLoading(true);
+
+        if (bgdImage !== null) {
+            const filename = bgdImage.split('/').pop();
+            const match = /\.(\w+)$/.exec(filename ?? '');
+            const type = match ? `image/${match[1]}` : `image`;
+            formData.append('backgroundimg', {
+                uri: bgdImage,
+                type: type,
+                name: filename
+            });
+        } 
+
         if (image !== null) {
             const filename = image.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -190,9 +217,11 @@ const ProfileEdit = ({route, navigation}) => {
         //     formData.append('avatar', blankAvatar)
         // }
 
-        formData.append('user_tag', userTag);
         formData.append('name', name);
-        formData.append('is_change', isChange);
+        formData.append('avatar_change', isChange);
+        formData.append('backimg_change', isBgdChange);
+        formData.append('bio', bio);
+        formData.append('birth', birth);
         console.log(formData);
         try {
             await Api.put('/api/v1/user/myprofile/edit/', formData, 
@@ -204,13 +233,13 @@ const ProfileEdit = ({route, navigation}) => {
             )
             .then(async(res) => {
                 // console.log(res.data);
-                await AsyncStorage.setItem('refresh', res.data.refresh);
-                await AsyncStorage.setItem('access', res.data.access);
-                dispatch(setRefreshToken(res.data.refresh));
+                // await AsyncStorage.setItem('refresh', res.data.refresh);
+                // await AsyncStorage.setItem('access', res.data.access);
+                // dispatch(setRefreshToken(res.data.refresh));
 
                 navigation.goBack();
-                dispatch(setShouldHomeRefresh(true));
-                dispatch(setShouldStorageRefresh(true));
+                // dispatch(setShouldHomeRefresh(true));
+                // dispatch(setShouldStorageRefresh(true));
                 dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
@@ -230,6 +259,7 @@ const ProfileEdit = ({route, navigation}) => {
 
     const handleConfirm = (date) => {
         console.log(date);
+        setBirth(date.format("yyyy-MM-dd"));
         setDate(date.format("M dd, yyyy"));
         hideDatePicker();
     };
@@ -275,15 +305,13 @@ const ProfileEdit = ({route, navigation}) => {
                 width: SCREEN_WIDTH,
                 height: SCREEN_WIDTH * (110 / 375),
                 cropping: true,
-                // freeStyleCropEnabled: true,
                 cropperCircleOverlay: true,
             }).then(image => {
                 console.log(image);
-                // setAvatar(`file://${image.path}`);
     
                 setBgdImage(`file://${image.path}`);
                 setBgdImageSrc({uri: `file://${image.path}`});
-                // setIsChange(true);
+                setIsBgdChange(true);
                 onCloseBgdImg();
             });
       
@@ -298,14 +326,12 @@ const ProfileEdit = ({route, navigation}) => {
                 width: SCREEN_WIDTH,
                 height: SCREEN_WIDTH * (110 / 375),
                 cropping: true,
-                // freeStyleCropEnabled: true,
             }).then(image => {
                 console.log(image);
-                // setAvatar(`file://${image.path}`);
     
                 setBgdImage(`file://${image.path}`);
                 setBgdImageSrc({uri: `file://${image.path}`});
-                // setIsChange(true);
+                setIsBgdChange(true);
                 onCloseBgdImg();
             });
       
@@ -400,7 +426,7 @@ const ProfileEdit = ({route, navigation}) => {
                         />
                         :
                         <Pressable 
-                            // onPress={onEdit}
+                            onPress={onEdit}
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         >
                             <Text 
@@ -515,7 +541,7 @@ const ProfileEdit = ({route, navigation}) => {
                             <TextInput 
                                 placeholder={profile.name}
                                 style={{ fontSize: 15, fontWeight: "500", }}
-                                onChangeText={changeName}
+                                onChangeText={onChangeName}
                             />
                         </View> */}
                         <View
@@ -530,7 +556,7 @@ const ProfileEdit = ({route, navigation}) => {
                                 <TextInput 
                                     placeholder={profile.name}
                                     style={styles.profileInput}
-                                    onChangeText={changeName}
+                                    onChangeText={onChangeName}
                                 />
                             </View>
                             <View style={styles.profileEdit}>
@@ -538,9 +564,9 @@ const ProfileEdit = ({route, navigation}) => {
                                     Bio
                                 </Text>
                                 <TextInput 
-                                    placeholder="Bio"
+                                    placeholder={profile.bio}
                                     style={styles.profileInput}
-                                    onChangeText={changeName}
+                                    onChangeText={onChangeBio}
                                 />
                             </View>
                             <View style={styles.profileEdit}>
@@ -558,7 +584,7 @@ const ProfileEdit = ({route, navigation}) => {
                                             fontFamily: "NotoSansKR-Medium", 
                                             width: "80%"
                                         }}
-                                        onChangeText={changeName}
+                                        onChangeText={onChangeName}
                                         editable={false}
                                         pointerEvents="none"
                                         value={date}
@@ -592,7 +618,7 @@ const ProfileEdit = ({route, navigation}) => {
                                     setting, visit
                                 </Text>
                                 <Pressable
-                                    onPress={() => navigation.navigate('UserSetting')}
+                                    onPress={() => navigation.navigate('UserSetting', { profile: profile, })}
                                 >
                                     <Text
                                         style={{
@@ -635,7 +661,7 @@ const ProfileEdit = ({route, navigation}) => {
                                             fontFamily: "NotoSansKR-Medium", 
                                             width: "80%"
                                         }}
-                                        onChangeText={changeName}
+                                        onChangeText={onChangeName}
                                         editable={false}
                                     />
                                 </View>
@@ -649,7 +675,7 @@ const ProfileEdit = ({route, navigation}) => {
                                     placeholder={profile.email ? profile.email : "-"}
                                     placeholderTextColor={colors.textDark}
                                     style={styles.profileInput}
-                                    onChangeText={changeName}
+                                    onChangeText={onChangeName}
                                     editable={false}
                                 />
                             </View>
@@ -661,7 +687,7 @@ const ProfileEdit = ({route, navigation}) => {
                                     placeholder={profile.hp ? profile.hp : "-"}
                                     placeholderTextColor={colors.textDark}
                                     style={styles.profileInput}
-                                    onChangeText={changeName}
+                                    onChangeText={onChangeName}
                                     editable={false}
                                 />
                             </View>
@@ -688,9 +714,9 @@ const ProfileEdit = ({route, navigation}) => {
                     <Pressable 
                         style={styles.sortBtn}
                         onPress={() => {
-                            if (imageSoruce !== blankAvatar) {
-                                setImageSource(blankAvatar);
-                                setIsChange(true);
+                            if (imageSoruce !== blankBgd) {
+                                setBgdImageSrc(blankBgd);
+                                setIsBgdChange(true);
                             }
                             onCloseBgdImg();
                         }}

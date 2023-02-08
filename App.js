@@ -1,4 +1,4 @@
-import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, Platform, } from "react-native";
+import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, Platform, Alert, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, useLayoutEffect, } from "react";
 import { NavigationContainer, useNavigationContainerRef, getFocusedRouteNameFromRoute, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -29,7 +29,7 @@ import { FindId, FindId2, } from "./screens/FindId";
 import { FindPassword, FindPassword2, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
 import { SubmitEditedPost } from "./screens/EditPost";
-import { ChangeUsername, } from "./screens/AccountInfo";
+import { ChangeUsername, ChangeHp1, ChangeHp2, ChangeHp3, } from "./screens/AccountInfo";
 import { 
   Welcome, 
   Login, 
@@ -64,6 +64,7 @@ import {
   UserLibrary,
   NemoCalender,
   AccountInfo,
+  ChangeGender,
   EditAlbum,
 } from "./screens";
 
@@ -81,6 +82,7 @@ import {
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import { Portal, PortalHost, PortalProvider } from '@gorhom/portal';
+import messaging from '@react-native-firebase/messaging';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -113,6 +115,19 @@ const appRedux = () => (
   </Provider>
 );
 
+async function requestUserPermission() {
+  const authStatus = await messaging().requestPermission();
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  if (enabled) {
+    console.log('Authorization status:', authStatus);
+  }
+}
+
+
+
 const App = () => {
   const dispatch = useDispatch();
   const { decodedRefresh, avatar, isAlarm, } = useSelector(userSelector);
@@ -127,11 +142,29 @@ const App = () => {
 
 ////////////////////////////////////////////////////////////백엔드 연결/////////////////////////////////////////////////////////////////////////////////////////////////
 
-
   useEffect(() => {
-    // fetchRefreshToken();
-    // fetchAvatar();
+    requestUserPermission();
+    // getFcmToken();
   }, [])
+
+  const getFcmToken = useCallback(async () => {
+    const fcmToken = await messaging().getToken();
+    // Alert.alert(fcmToken);
+    // console.log(fcmToken);
+
+    try {
+      console.log(fcmToken);
+      await Api
+      .post("/api/v1/user/test/", {
+        token: fcmToken,
+      })
+      // .then((res) => {
+      //   console.log(res.data);
+      // })
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   // const fetchRefreshToken = async() => {
   //   const refreshToken = await AsyncStorage.getItem('refresh');
@@ -195,6 +228,25 @@ const App = () => {
   //   </NavigationContainer>
   // )
 
+  // messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+  //   console.log('Message handled in the background!', remoteMessage);
+  //   //  여기에 로직을 작성한다.
+  //   //  remoteMessage.data로 메세지에 접근가능
+  //   //  remoteMessage.from 으로 topic name 또는 message identifier
+  //   //  remoteMessage.messageId 는 메시지 고유값 id
+  //   //  remoteMessage.notification 메시지와 함께 보내진 추가 데이터
+  //   //  remoteMessage.sentTime 보낸시간
+  // });
+
+  // Foreground 상태인 경우
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      remoteMessage.notification;
+    });
+    return unsubscribe;
+  }, []);
+  
   return (
     
       <NavigationContainer
@@ -504,6 +556,34 @@ const UserLibraryScreen = ({route, navigation}) => {
       <UserLibraryStack.Screen 
         name="ChangeUsername" 
         component={ChangeUsername} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangeHp1" 
+        component={ChangeHp1} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangeHp2" 
+        component={ChangeHp2} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangeHp3" 
+        component={ChangeHp3} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangeGender" 
+        component={ChangeGender} 
         options={{
           gestureDirection: "horizontal-inverted",
         }}

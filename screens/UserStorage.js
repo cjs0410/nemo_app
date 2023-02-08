@@ -10,7 +10,7 @@ import { Entypo, Feather, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { BookmarkList, AlbumList } from '../components';
 import Api from "../lib/Api";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import blankAvatar from '../assets/images/peopleicon.png';
+import blankAvatar from '../assets/images/blankAvatar.png';
 import blankBgd from '../assets/images/blankBgd.png';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import cal1P from '../assets/images/cal1P.png';
@@ -183,9 +183,10 @@ const UserStorage = ({route, navigation}) => {
                 }}
             > */}
                 <ImageBackground 
-                    source={profile && profile.backgroundimg ? profile.backgroundimg : blankBgd} 
+                    source={profile && profile.backgroundimg ? {uri: profile.backgroundimg} : blankBgd} 
                     resizeMode= "cover" 
-                    style={{ height: SCREEN_WIDTH * (110 / 375),  width:"100%", zIndex: 0,}}
+                    style={{ height: SCREEN_WIDTH * (110 / 375),  width:"100%", zIndex: 0, }}
+                    imageStyle= {{ opacity: 0.7, }}
                 >
                     <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: regWidth * 13, marginTop: regHeight * 45, }}>
                         <Pressable

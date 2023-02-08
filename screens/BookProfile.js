@@ -1,4 +1,4 @@
-import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, ImageBackground, } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, ImageBackground, Vibration, } from "react-native";
 import React, { useEffect, useState, useCallback, useMemo, useRef, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
@@ -104,6 +104,7 @@ const BookProfile = ({route, navigation}) => {
                 setLikeCount(res.data.likes);
                 if (res.data.is_like) {
                     Alert.alert(bookInfo.book_title, "is added to your library");
+                    Vibration.vibrate(100);
                 } else {
                     Alert.alert(bookInfo.book_title, "is deleted from your library");
                 }

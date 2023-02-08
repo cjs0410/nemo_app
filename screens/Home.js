@@ -89,12 +89,12 @@ const Home = ({route, navigation}) => {
     useEffect(() => {
         if (route.params) {
             if (route.params.cancel) {
-                // Animated.timing(searchBarValue, {
-                //     toValue: 0,
-                //     duration: 0,
-                //     useNativeDriver: false,
-                // }).start();
-                searchBarValue.setValue(0);
+                Animated.timing(searchBarValue, {
+                    toValue: 0,
+                    duration: 0,
+                    useNativeDriver: false,
+                }).start();
+                // searchBarValue.setValue(0);
                 showSearchBar();
                 setIsInitial(false);
 

@@ -31,4 +31,5 @@ export { default as LikeUsers } from './LikeUsers';
 export { default as UserLibrary } from './UserLibrary';
 export { default as NemoCalender } from './NemoCalender';
 export { default as AccountInfo } from './AccountInfo';
+export { default as ChangeGender } from './ChangeGender';
 export { default as EditAlbum } from './EditAlbum';
