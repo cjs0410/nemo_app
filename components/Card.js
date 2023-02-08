@@ -50,7 +50,7 @@ const Card = (props) => {
 
     useEffect(() => {
         if (lineList.length === contents.length && lineList.indexOf(2) !== -1) {
-            setFontSize(fontSize - 0.1);
+            setFontSize(fontSize - 0.3);
             setLineList([]);
         }
         if (lineList.length === contents.length && lineList.indexOf(2) === -1) {

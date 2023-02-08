@@ -5,7 +5,7 @@ import { Entypo, Feather, MaterialIcons, Ionicons, MaterialCommunityIcons } from
 import Api from "../lib/Api";
 import blankAvatar from '../assets/images/blankAvatar.png';
 import blankBgd from '../assets/images/blankBgd.png';
-import { BookmarkList, AlbumList, BookList, } from '../components';
+import { BookmarkList, AlbumList, BookList, AlbumTile, BookTile, } from '../components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
@@ -20,10 +20,17 @@ import settings from '../assets/icons/settings.png';
 import sortCheck from '../assets/images/sortCheck.png';
 import iconRepeat from '../assets/icons/iconRepeat.png';
 import iconGrid from '../assets/icons/iconGrid.png';
+import iconList from '../assets/icons/iconList.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import { 
+    setShouldHomeRefresh, 
+    setShouldStorageRefresh, 
+    setShouldUserRefresh, 
+    toggleAlbumTile,
+    toggleBookTile,
+} from '../modules/user';
 
 import {
     BottomSheetModal,
@@ -848,8 +855,9 @@ const NemoListScreen = ({route, navigation}) => {
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const sortList = [ "recents", "alphabetical", "creator", ];
     const [sort, setSort] = useState(0);
-    const { shouldLibraryRefresh } = useSelector(userSelector);
+    const { shouldLibraryRefresh, } = useSelector(userSelector);
     const [scrollLoading, setScrollLoading] = useState(false);
+    const [isTile, setIsTile] = useState(false);
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -864,7 +872,11 @@ const NemoListScreen = ({route, navigation}) => {
             activeOpacity={1}
             onPress={() => navigation.navigate('AlbumProfile', { albumId: item.nemolist_id, })} 
         >
-            <AlbumList album={item} navigation={navigation} isDefault={false} />
+            {isTile ? 
+                <AlbumTile album={item} navigation={navigation} isDefault={false} />
+                :
+                <AlbumList album={item} navigation={navigation} isDefault={false} />
+            }
         </Pressable>
     )
 
@@ -961,7 +973,9 @@ const NemoListScreen = ({route, navigation}) => {
             <FlatList 
                 data={nemolists}
                 renderItem={renderAlbum}
-                keyExtractor={nemolist => nemolist.nemolist_id}
+                key={isTile ? '_' : "#"}
+                keyExtractor={isTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
+                numColumns={isTile ? 2 : 1}
                 showsVerticalScrollIndicator={false}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
@@ -1004,9 +1018,11 @@ const NemoListScreen = ({route, navigation}) => {
                                     Recent
                                 </Text>
                             </Pressable>
-                            <Pressable>
+                            <Pressable
+                                onPress={() => setIsTile(!isTile)}
+                            >
                                 <Image 
-                                    source={iconGrid}
+                                    source={isTile ? iconList : iconGrid}
                                     style={{
                                         width: regWidth * 20,
                                         height: regWidth * 20,
@@ -1019,7 +1035,11 @@ const NemoListScreen = ({route, navigation}) => {
                                 activeOpacity={1}
                                 onPress={() => navigation.navigate('AlbumProfile', { albumId: likedNemos.nemolist_id, })} 
                             >
-                                <AlbumList album={likedNemos} navigation={navigation} isDefault={true} />
+                                {isTile ? 
+                                    <AlbumTile album={likedNemos} navigation={navigation} isDefault={true} />
+                                    :
+                                    <AlbumList album={likedNemos} navigation={navigation} isDefault={true} />
+                                }
                             </TouchableOpacity>
                             :
                             null
@@ -1116,7 +1136,7 @@ const NemoListScreen = ({route, navigation}) => {
     )
 }
 
-const BookScreen = ({route, navigatoin}) => {
+const BookScreen = ({route, navigation}) => {
     const dispatch = useDispatch();
     const { userTag, } = route.params;
     const [books, setBooks] = useState(null);
@@ -1128,6 +1148,7 @@ const BookScreen = ({route, navigatoin}) => {
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const [scrollLoading, setScrollLoading] = useState(false);
+    const [isBookTile, setIsBookTile] = useState(false);
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -1171,14 +1192,14 @@ const BookScreen = ({route, navigatoin}) => {
                 .post("api/v1/user/library/", {
                     ctg: "books",
                     sort: sortList[sort],
-                    items: nemolists.length,
+                    items: books.length,
                     user_tag: userTag,
                 })
                 .then((res) => {
                     // console.log([...bookmarks, ...res.data, ]);
                     // console.log(res.data);
-                    setNemolists([...books, ...res.data, ]);
-                    setNewNemolistNum(res.data.length);
+                    setBooks([...books, ...res.data, ]);
+                    setNewBookNum(res.data.length);
                 })
             } catch (err) {
                 console.error(err);
@@ -1201,7 +1222,11 @@ const BookScreen = ({route, navigatoin}) => {
                 bookId: item.book_id, 
             })}
         >
-            <BookList book={item} />
+            {isBookTile ? 
+                <BookTile book={item} />
+                :
+                <BookList book={item} />
+            }
         </Pressable>
     );
 
@@ -1239,7 +1264,9 @@ const BookScreen = ({route, navigatoin}) => {
             <FlatList 
                 data={books}
                 renderItem={renderBook}
-                keyExtractor={book => book.book_id}
+                key={isBookTile ? '_' : "#"}
+                keyExtractor={isBookTile ? book => "_" + book.book_id : book => "#" + book.book_id}
+                numColumns={isBookTile ? 2 : 1}
                 showsVerticalScrollIndicator={false}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
@@ -1282,9 +1309,11 @@ const BookScreen = ({route, navigatoin}) => {
                                     {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
                                 </Text>
                             </Pressable>
-                            <Pressable>
+                            <Pressable
+                                onPress={() => setIsBookTile(!isBookTile)}
+                            >
                                 <Image 
-                                    source={iconGrid}
+                                    source={isBookTile ? iconList : iconGrid}
                                     style={{
                                         width: regWidth * 20,
                                         height: regWidth * 20,

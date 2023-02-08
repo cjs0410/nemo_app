@@ -21,6 +21,8 @@ const initialState = {
     shouldBookRefresh: false,
     recentSearch: [],
     searchKeyword: '',
+    isAlbumTile: false,
+    isBookTile: false,
     // scrollY: useRef(new Animated.Value(0)).current,
 }
 
@@ -123,6 +125,12 @@ export const userSlice = createSlice({
         },
         setSearchKeyword: (state, action) => {
             state.searchKeyword = action.payload;
+        },
+        toggleAlbumTile: (state, action) => {
+            state.isAlbumTile = !state.isAlbumTile;
+        },
+        toggleBookTile: (state, action) => {
+            state.isBookTile = !state.isBookTile;
         }
     }
 })
@@ -135,6 +143,7 @@ export const {
     setIsStaff,
     addRecentSearch, deleteRecentSearch,
     setSearchKeyword,
+    toggleAlbumTile, toggleBookTile,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -31,20 +31,36 @@ const UserList = (props) => {
                 >
                     {user.name}
                 </Text>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 11, 
-                        fontFamily: "NotoSansKR-Regular",
-                        width: regWidth * 180,
-                        marginTop: regHeight * 2,
-                        color: colors.nemoNormal,
-                        lineHeight: regWidth * 15,
-                    }}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                >
-                    {`@${user.user_tag}`}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 2, }}>
+                    <Text 
+                        style={{ 
+                            fontSize: regWidth * 11, 
+                            fontFamily: "NotoSansKR-Medium",
+                            maxWidth: "50%",
+                            
+                            color: colors.nemoNormal,
+                            lineHeight: regWidth * 15,
+                            marginRight: regWidth*3,
+                        }}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
+                    >
+                        {`@${user.user_tag}`}
+                    </Text>
+                    {user.nemos ? 
+                        <>
+                            <Entypo name="dot-single" size={16} color="#808080" />
+                            <Text 
+                                style={{ ...styles.userInfoText, marginHorizontal: regWidth*3, }}
+                            >
+                                {user.nemos} Nemos
+                            </Text>
+                        </>
+                        : 
+                        null
+                    }
+                    
+                </View>
             </View>
         </View>
     )
@@ -62,6 +78,12 @@ const styles = StyleSheet.create({
         height: regWidth * 50,
         borderRadius: 999,
         resizeMode: "cover",
+    },
+    userInfoText: {
+        fontSize: regWidth*11, 
+        fontFamily: "NotoSansKR-Medium",
+        marginHorizontal: regWidth*12, 
+        color: "#606060"
     },
 })
 

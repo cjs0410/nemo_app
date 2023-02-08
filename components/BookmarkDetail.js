@@ -652,7 +652,7 @@ const BookmarkDetail = (props) => {
                             paddingVertical: regHeight * 8,
                         }}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                        // onPress={() => navigation.push('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
+                        onPress={() => navigation.push('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
                     >
                         <Text style={styles.bookmarkLikesText}>
                             {/* { !pushLike ? bookmark.likes : likeCount } */}

@@ -61,19 +61,55 @@ import LinearGradient from 'react-native-linear-gradient';
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const EditAlbum = ({route, navigation}) => {
-    const { albumInfo, albumId, } = route.params;
+    const { albumId, } = route.params;
+    const [albumInfo, setAlbumInfo] = useState(null);
     const albumCoverValue = useRef(new Animated.Value(0)).current;
     const [loading, setLoading] = useState(false);
     const [orderedBookmarks, setOrderedBookmarks] = useState(null);
     const [selectToDelete, setSelectToDelete] = useState([]);
+    const [bookmarks, setBookmarks] = useState(null);
+    const [selectedBookmarks, setSelectedBookmarks] = useState([]);
+    const [rgb, setRgb] = useState(null);
+
+    // useEffect(() => {
+    //     const orderedNumbering = (albumInfo.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+    //     setOrderedBookmarks(
+    //         orderedNumbering.map((number) => albumInfo.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
+    //     )
+    //     console.log(albumInfo);
+    // }, [])
 
     useEffect(() => {
-        const orderedNumbering = (albumInfo.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
-        setOrderedBookmarks(
-            orderedNumbering.map((number) => albumInfo.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
-        )
-        console.log(albumInfo);
-    }, [])
+        fetchAlbum();
+    }, [albumId])
+
+    const fetchAlbum = async() => {
+        try {
+            setLoading(true);
+            await Api.post("/api/v4/album/view/", {
+                nemolist_id: albumId,
+            })
+            .then((res) => {
+                const bgdColor = res.data.background;
+                if (bgdColor) {
+                    setRgb(bgdColor.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0));
+                }
+                setAlbumInfo(res.data);
+                // setIsLike(res.data.is_like);
+                // setLikeCount(res.data.likes);
+                // setIsFollow(res.data.is_follow);
+                // setIsDefault(res.data.default);
+
+                const orderedNumbering = (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                setOrderedBookmarks(
+                    orderedNumbering.map((number) => res.data.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
+                )
+            })
+        } catch (err) {
+            console.error(err);
+        }
+        setLoading(false);
+    }
 
     const showAlbumCover = () => {
         Animated.timing(albumCoverValue, {
@@ -81,6 +117,56 @@ const EditAlbum = ({route, navigation}) => {
             duration: 300,
             useNativeDriver: false,
         }).start();
+    }
+
+    const fetchBookmarks = async() => {
+        try {
+            await Api
+            .post("/api/v4/album/bookmarklist/", {
+                nemolist_id: albumId,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setBookmarks(res.data);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const selectBookmark = (bookmark) => {
+        if (selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1) {
+            setSelectedBookmarks([
+                ...selectedBookmarks,
+                bookmark,
+            ]);
+        } else {
+            setSelectedBookmarks(
+                selectedBookmarks.filter(selectedBookmark => selectedBookmark.bookmark_id !== bookmark.bookmark_id)
+            )
+        }
+    }
+
+    const onAddBookmark = async() => {
+        const bookmarkIds = selectedBookmarks.map((selectedBookmark) => (selectedBookmark.bookmark_id));
+
+        try {
+            console.log(bookmarkIds);
+            console.log(albumId);
+            await Api
+            .post("/api/v4/album/insertbookmark/", {
+                bookmark_id: bookmarkIds,
+                nemolist_id: albumId,
+            })
+            .then((res) => {
+                setSelectedBookmarks([]);
+                fetchAlbum();
+                onCloseAddNemos();
+                // dispatch(setShouldUserRefresh(true));
+            })
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     const onSelectToDelete = (bookmark) => {
@@ -123,6 +209,30 @@ const EditAlbum = ({route, navigation}) => {
         navigation.goBack();
     }
 
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                // animatedIndex={{
+                //     value: 0,
+                // }}
+            />
+        ),
+        []
+    );
+
+    const addModalRef = useRef();
+    const addSnapPoints = useMemo(() => [regHeight * 765], []);
+    const onPressAddNemos = useCallback(() => {
+        addModalRef.current.present();
+    }, [addModalRef]);
+    const onCloseAddNemos = useCallback(() => {
+        addModalRef.current.dismiss();
+    }, [addModalRef]);
+
     return (
         <View 
             style={{
@@ -133,7 +243,7 @@ const EditAlbum = ({route, navigation}) => {
                 <>
                     <SafeAreaView 
                         style={{
-                            backgroundColor: albumInfo.background ? albumInfo.background : colors.nemoLight,
+                            backgroundColor: albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
                         }}
                     >
                         <View style={styles.header}>
@@ -154,7 +264,7 @@ const EditAlbum = ({route, navigation}) => {
                             <Text
                                 style={{
                                     fontSize: regWidth * 17,
-                                    fontWeight: "700",
+                                    fontFamily: "NotoSansKR-Bold",
                                 }}
                             >
                                 {albumInfo.nemolist_title}
@@ -180,12 +290,20 @@ const EditAlbum = ({route, navigation}) => {
                             // marginTop: -headerHeight,
                             zIndex: 0,
                         }}
-                        bounces={false}
+
                         showsVerticalScrollIndicator={false}
                     >
+                        <View
+                            style={{
+                                backgroundColor: albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
+                                width: "100%",
+                                height: regHeight * 500,
+                                marginTop: -regHeight * 500,
+                            }}
+                        />
                         <LinearGradient 
                             colors={[
-                                albumInfo.background ? albumInfo.background : colors.nemoLight, 
+                                albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight, 
                                 // 'white',
                                 'white'
                             ]} 
@@ -358,6 +476,74 @@ const EditAlbum = ({route, navigation}) => {
                 :
                 null
             }
+
+            <BottomSheetModal
+                index={0}
+                ref={addModalRef}
+                snapPoints={addSnapPoints}
+                backdropComponent={renderBackdrop}
+                // backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                {/* <View 
+                    // style={{ 
+                    //     paddingBottom: 45, 
+                    // }}
+                > */}
+                    <View style={styles.modalHeader}>
+                        <Pressable
+                            onPress={onCloseAddNemos}
+                        >
+                            <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
+                                Cancel
+                            </Text>
+                        </Pressable>
+                        <Text style={{ fontSize: regWidth * 19, fontWeight: "900", }}>
+                            Add Nemos
+                        </Text>
+                        <Pressable
+                            onPress={onAddBookmark}
+                        >
+                            <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
+                                Done
+                            </Text>
+                        </Pressable>
+                    </View>
+                    <BottomSheetScrollView
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {bookmarks !== null && bookmarks.map((bookmark, index) => (
+                            <Pressable
+                                key={index}
+                                onPress={() => selectBookmark(bookmark)}
+                                style={{ 
+                                    // opacity: selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1 ? 1 : 0.5,
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <UnTouchableBookmarkList bookmark={bookmark} navigation={navigation} />
+                                {selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id) === -1 ?
+                                    <Image 
+                                        source={iconPlusCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 50,
+                                            height: regWidth * 50,
+                                            right: 0,
+                                            marginRight: 22,
+                                        }}
+                                    />
+                                    :
+                                    <View style={styles.numbering}>
+                                        <Text style={{ fontSize: 16, fontWeight: "500", color: "white", }}>
+                                            {Number(selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id)) + 1}
+                                        </Text>
+                                    </View>
+                                }
+                            </Pressable>
+                        ))}
+                    </BottomSheetScrollView>
+                {/* </View> */}
+            </BottomSheetModal>
         </View>
 
     )

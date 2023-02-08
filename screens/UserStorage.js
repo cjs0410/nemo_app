@@ -195,7 +195,7 @@ const UserStorage = ({route, navigation}) => {
                         >
                             <Image 
                                 source={vectorLeftImage} 
-                                style={{ width: regWidth*35, height: regWidth*35 }}
+                                style={{ width: regWidth*30, height: regWidth*30 }}
                             />
                         </Pressable>
                         <Pressable
@@ -293,18 +293,28 @@ const UserStorage = ({route, navigation}) => {
                             <Text style={ styles.followTxt }>
                                 Nemos
                             </Text>
-                            <Text style={styles.boldNumberTxt}>
-                                {profile.followers}
-                            </Text>
-                            <Text style={ styles.followTxt }>
-                                Followers
-                            </Text>
-                            <Text style={styles.boldNumberTxt}>
-                                {profile.followings}
-                            </Text>
-                            <Text style={ styles.followTxt }>
-                                Following
-                            </Text>
+                            <Pressable
+                                style={{ flexDirection: "row", alignItems: "center", }}
+                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
+                            >
+                                <Text style={styles.boldNumberTxt}>
+                                    {profile.followers}
+                                </Text>
+                                <Text style={ styles.followTxt }>
+                                    Followers
+                                </Text>
+                            </Pressable>
+                            <Pressable
+                                style={{ flexDirection: "row", alignItems: "center", }}
+                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로잉", userTag: profile.user_tag, name: profile.name, })}
+                            >
+                                <Text style={styles.boldNumberTxt}>
+                                    {profile.followings}
+                                </Text>
+                                <Text style={ styles.followTxt }>
+                                    Following
+                                </Text>
+                            </Pressable>
                         </View>
                         <View 
                             style={{ 

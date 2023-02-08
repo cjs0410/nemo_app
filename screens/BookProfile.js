@@ -44,6 +44,7 @@ const BookProfile = ({route, navigation}) => {
     const [isLike, setIsLike] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const insets = useSafeAreaInsets();
+    const [rgb, setRgb] = useState(null);
 
     useEffect(() => {
         fetchBook();
@@ -56,6 +57,10 @@ const BookProfile = ({route, navigation}) => {
                 book_id: bookId,
             })
             .then((res) => {
+                const bgdColor = res.data.background;
+                if (bgdColor) {
+                    setRgb(bgdColor.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0));
+                }
                 // console.log(res.data);
                 setBookInfo(res.data);
                 setLikeCount(res.data.likes);
@@ -146,7 +151,7 @@ const BookProfile = ({route, navigation}) => {
                 <>
                     <View 
                         style={{
-                            backgroundColor: bookInfo.background ? bookInfo.background : colors.nemoLight,
+                            backgroundColor: bookInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
                             paddingTop: insets.top,
                             paddingBottom: 0,
                             paddingLeft: insets.left,
@@ -160,14 +165,14 @@ const BookProfile = ({route, navigation}) => {
                             >
                                 <Image 
                                     source={vectorLeftImage} 
-                                    style={{ width: regWidth*35, height: regWidth*35 }}
+                                    style={{ width: regWidth*30, height: regWidth*30 }}
                                 />
                             </Pressable>
                             <View style={{ alignItems: "center", }}>
                                 <TouchableOpacity>
                                 <Text style={{
-                                    fontSize: 16,
-                                    fontWeight: "500",
+                                    fontSize: regWidth * 16,
+                                    fontFamily: "NotoSansKR-Bold",
                                 }}>
                                     {bookInfo.book_title}
                                 </Text>
@@ -187,11 +192,18 @@ const BookProfile = ({route, navigation}) => {
                     </View>
                     <ScrollView
                         showsVerticalScrollIndicator={false}
-                        bounces={false}
                     >
+                        <View
+                            style={{
+                                backgroundColor: bookInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
+                                width: "100%",
+                                height: regHeight * 500,
+                                marginTop: -regHeight * 500,
+                            }}
+                        />
                         <LinearGradient 
                             colors={[
-                                bookInfo.background ? bookInfo.background : colors.nemoLight,
+                                bookInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
                                 // 'white',
                                 'white'
                             ]} 
@@ -204,57 +216,33 @@ const BookProfile = ({route, navigation}) => {
                             }}
                         />
                         <View style={{ alignItems: "center",}}>
-                            <ImageBackground
-                                source={bookShelf}
+                            <View
                                 style={{
-                                    width: regWidth * 200,
-                                    height: regWidth * 203,
                                     alignItems: "center",
                                     justifyContent: "center",
                                     marginTop: regHeight * 18,
+                                    // backgroundColor:"pink"
+                                    ...Platform.select({
+                                        ios: {
+                                          shadowColor: "black",
+                                          shadowOffset: { width: 0, height: 8 },
+                                          shadowOpacity: 0.5,
+                                          shadowRadius: 8,
+                                        },
+                                        android: {
+                                          elevation: 3,
+                                        },
+                                    }),
                                 }}
                             >
                                 <Image 
                                     source={ bookInfo.book_cover !== null ? { uri: bookInfo.book_cover } : blankBookCover} 
                                     style={styles.bookImage}
+                                    onLoad={(e) => console.log(e.nativeEvent)}
                                 />
-                            </ImageBackground>
-                            {/* <Text style={{ fontSize: 20, fontWeight: "700", marginVertical: 10,}}>
-                                {bookInfo.book_title}
-                            </Text>
-                            <Text style={{ fontSize: 13, fontWeight: "400", marginVertical: 8,}}>
-                                {bookInfo.book_author}
-                            </Text> */}
-                            <Pressable
-                                style={{
-                                    borderWidth: 2,
-                                    borderColor: colors.nemoDark,
-                                    borderRadius: regWidth * 30,
-                                    paddingHorizontal: regWidth * 14,
-                                    paddingVertical: regHeight * 8,
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    marginTop: regHeight * 31,
-                                }}
-                                onPress={() => navigation.navigate("CreateBookmark", { selectedBook: bookInfo, })}
-                            >
-                                <Image 
-                                    source={iconPlusNemoDark}
-                                    style={{
-                                        width: regWidth * 28,
-                                        height: regWidth * 28,
-                                    }}
-                                />
-                                <Text
-                                    style={{
-                                        fontSize: regWidth * 19,
-                                        color: colors.nemoDark,
-                                        fontFamily: "NotoSansKR-Black"
-                                    }}
-                                >
-                                    Create Nemo from this book
-                                </Text>
-                            </Pressable>
+                            </View>
+
+
                         </View>
                         <View
                             style={{ 
@@ -277,12 +265,17 @@ const BookProfile = ({route, navigation}) => {
                                     {bookInfo.book_title}
                                 </Text>
                                 <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
-                                    <Text style={styles.bookInfoTxt}>
-                                        {likeCount}
-                                    </Text>
-                                    <Text style={styles.bookInfoTxt}>
-                                        {' likes'}
-                                    </Text>
+                                    <Pressable
+                                        onPress={() => navigation.push('LikeUsers', { ctg: "nemolist", })}
+                                        style={{ flexDirection: "row", alignItems: "center", }}
+                                    >
+                                        <Text style={styles.bookInfoTxt}>
+                                            {likeCount}
+                                        </Text>
+                                        <Text style={styles.bookInfoTxt}>
+                                            {' likes'}
+                                        </Text>
+                                    </Pressable>
                                     <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
                                     <Text style={styles.bookInfoTxt}>
                                         {bookInfo.nemos}
@@ -304,6 +297,40 @@ const BookProfile = ({route, navigation}) => {
                                 />
                             </Pressable>
                         </View>
+
+                        <Pressable
+                                style={{
+                                    borderWidth: 2,
+                                    borderColor: colors.nemoDark,
+                                    borderRadius: regWidth * 30,
+                                    paddingHorizontal: regWidth * 14,
+                                    paddingVertical: regHeight * 8,
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginTop: regHeight * 31,
+                                    marginHorizontal: regWidth * 23,
+                                }}
+                                onPress={() => navigation.navigate("CreateBookmark", { selectedBook: bookInfo, })}
+                            >
+                                <Image 
+                                    source={iconPlusNemoDark}
+                                    style={{
+                                        width: regWidth * 28,
+                                        height: regWidth * 28,
+                                    }}
+                                />
+                                <Text
+                                    style={{
+                                        fontSize: regWidth * 19,
+                                        color: colors.nemoDark,
+                                        fontFamily: "NotoSansKR-Black",
+                                        lineHeight: regWidth * 28,
+                                    }}
+                                >
+                                    Create Nemo from this book
+                                </Text>
+                            </Pressable>
                         {loading ? 
                             <ActivityIndicator 
                                 color="black" 
@@ -594,14 +621,12 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         resizeMode: "contain",
+        // backgroundColor:"pink",
 
         // ...Platform.select({
         //     ios: {
         //       shadowColor: "black",
-        //       shadowOffset: {
-        //         width: 5,
-        //         // height: 5,
-        //       },
+        //       shadowOffset: { width: 0, height: 10 },
         //       shadowOpacity: 0.5,
         //     //   shadowRadius: 10,
         //     },

@@ -130,7 +130,7 @@ const Home = ({route, navigation}) => {
     const showSearchBar = () => {
         Animated.timing(searchBarValue, {
             toValue: 1,
-            duration: 300,
+            duration: 400,
             useNativeDriver: false,
         }).start();
     }

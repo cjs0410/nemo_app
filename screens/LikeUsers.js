@@ -8,14 +8,19 @@ import { Card, BookmarkTile, BookmarkDetail } from '../components';
 import user from "../modules/user";
 import Api from '../lib/Api';
 import blankAvatar from '../assets/images/peopleicon.png';
+import vectorLeftImage from '../assets/icons/vector_left.png';
+import { colors, regHeight, regWidth } from "../config/globalStyles";
+
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LikeUsers = ({route, navigation}) => {
-    const { bookmarkId, } = route.params;
+    // const { bookmarkId, } = route.params;
     const [users, setUsers] = useState(null);
+    const insets = useSafeAreaInsets();
 
-    useEffect(() => {
-        fetchUsers();
-    }, [])
+    // useEffect(() => {
+    //     fetchUsers();
+    // }, [])
 
     const fetchUsers = async() => {
         try {
@@ -34,25 +39,40 @@ const LikeUsers = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
-                <TouchableOpacity onPress={() => navigation.goBack()} >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </TouchableOpacity>
-                <View style={{ alignItems: "center", }}>
-                    <TouchableOpacity
+            <View 
+                style={{
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right,
+                }}
+            >
+                <View style={styles.header} >
+                    <Pressable
+                        onPress={() => navigation.goBack()}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     >
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: "500",
-                        }}>
-                            좋아요
-                        </Text>
-                    </TouchableOpacity>
+                        <Image 
+                            source={vectorLeftImage} 
+                            style={{ width: regWidth*30, height: regWidth*30 }}
+                        />
+                    </Pressable>
+                    <Text style={{
+                        fontSize: regWidth * 19,
+                        fontFamily: "NotoSansKR-Black",
+                    }}>
+                        Liked by
+                    </Text>
+                    <Pressable
+                        style={{ opacity: 0, }}
+                    >
+                        <Image 
+                            source={vectorLeftImage} 
+                            style={{ width: regWidth*30, height: regWidth*30 }}
+                        />
+                    </Pressable>
                 </View>
-                <View style={{ opacity: 0, }} >
-                    <MaterialCommunityIcons name="square-outline" size={30} color="black" />
-                </View>
-            </SafeAreaView>
+            </View>
             { users && users.map((user, index) => (
                 <UserList user={user} navigation={navigation} key={index} />
             ))}
@@ -87,13 +107,11 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-        // backgroundColor: "pink",
-        marginVertical: 10,
-        marginHorizontal: 10,
-        paddingBottom: 8,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
+      paddingHorizontal: regWidth * 10,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: regHeight * 8,
     },
     List: {
         // backgroundColor: "blue",

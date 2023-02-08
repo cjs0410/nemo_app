@@ -47,6 +47,8 @@ import {
     resetAvatar, 
     setAvatar, 
     setIsStaff, 
+    toggleAlbumTile,
+    toggleBookTile,
 } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
 import blankAvatar from '../assets/images/peopleicon.png';
@@ -626,9 +628,8 @@ const NemoListScreen = ({navigation}) => {
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const sortList = [ "recents", "alphabetical", "creator", ];
     const [sort, setSort] = useState(0);
-    const { shouldNemolistRefresh } = useSelector(userSelector);
+    const { shouldNemolistRefresh, isAlbumTile, } = useSelector(userSelector);
     const [scrollLoading, setScrollLoading] = useState(false);
-    const [isTile, setIsTile] = useState(false);
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -649,12 +650,11 @@ const NemoListScreen = ({navigation}) => {
             activeOpacity={1}
             onPress={() => navigation.navigate('AlbumProfile', { albumId: item.nemolist_id, })} 
         >
-            {isTile ? 
+            {isAlbumTile ? 
                 <AlbumTile album={item} navigation={navigation} isDefault={false} />
                 :
                 <AlbumList album={item} navigation={navigation} isDefault={false} />
             }
-            
         </Pressable>
     )
 
@@ -750,8 +750,8 @@ const NemoListScreen = ({navigation}) => {
             <FlatList 
                 data={nemolists}
                 renderItem={renderAlbum}
-                key={isTile ? '_' : "#"}
-                keyExtractor={isTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
+                key={isAlbumTile ? '_' : "#"}
+                keyExtractor={isAlbumTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
                 showsVerticalScrollIndicator={false}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
@@ -759,7 +759,7 @@ const NemoListScreen = ({navigation}) => {
                 onEndReached={onEndReached}
                 onEndReachedThreshold={0.3}
                 ListFooterComponent={scrollLoading && <ActivityIndicator />}
-                numColumns={isTile ? 2 : 1}
+                numColumns={isAlbumTile ? 2 : 1}
                 ListHeaderComponent={
                     <>
                         <View
@@ -797,10 +797,10 @@ const NemoListScreen = ({navigation}) => {
                                 </Text>
                             </Pressable>
                             <Pressable
-                                onPress={() => setIsTile(!isTile)}
+                                onPress={() => dispatch(toggleAlbumTile())}
                             >
                                 <Image 
-                                    source={isTile ? iconList : iconGrid}
+                                    source={isAlbumTile ? iconList : iconGrid}
                                     style={{
                                         width: regWidth * 20,
                                         height: regWidth * 20,
@@ -813,7 +813,7 @@ const NemoListScreen = ({navigation}) => {
                                 activeOpacity={1}
                                 onPress={() => navigation.navigate('AlbumProfile', { albumId: likedNemos.nemolist_id, })} 
                             >
-                                {isTile ? 
+                                {isAlbumTile ? 
                                     <AlbumTile album={likedNemos} navigation={navigation} isDefault={true} />
                                     :
                                     <AlbumList album={likedNemos} navigation={navigation} isDefault={true} />
@@ -1005,11 +1005,10 @@ const BookScreen = ({navigation}) => {
     const [loading, setLoading] = useState(false);
     const sortList = [ "recents", "alphabetical", "creator", ];
     const [sort, setSort] = useState(0);
-    const { shouldBookRefresh } = useSelector(userSelector);
+    const { shouldBookRefresh, isBookTile, } = useSelector(userSelector);
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const [scrollLoading, setScrollLoading] = useState(false);
-    const [isTile, setIsTile] = useState(false);
 
     const ref = useRef();
     useScrollToTop(ref);
@@ -1088,7 +1087,7 @@ const BookScreen = ({navigation}) => {
                 bookId: item.book_id, 
             })}
         >
-            {isTile ? 
+            {isBookTile ? 
                 <BookTile book={item} />
                 :
                 <BookList book={item} />
@@ -1131,8 +1130,8 @@ const BookScreen = ({navigation}) => {
             <FlatList 
                 data={books}
                 renderItem={renderBook}
-                key={isTile ? '_' : "#"}
-                keyExtractor={isTile ? book => "_" + book.book_id : book => "#" + book.book_id}
+                key={isBookTile ? '_' : "#"}
+                keyExtractor={isBookTile ? book => "_" + book.book_id : book => "#" + book.book_id}
                 showsVerticalScrollIndicator={false}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
@@ -1140,7 +1139,7 @@ const BookScreen = ({navigation}) => {
                 onEndReached={onEndReached}
                 onEndReachedThreshold={0.3}
                 ListFooterComponent={scrollLoading && <ActivityIndicator />}
-                numColumns={isTile ? 2 : 1}
+                numColumns={isBookTile ? 2 : 1}
                 ListHeaderComponent={
                     <>
                         <View
@@ -1177,10 +1176,10 @@ const BookScreen = ({navigation}) => {
                                 </Text>
                             </Pressable>
                             <Pressable
-                                onPress={() => setIsTile(!isTile)}
+                                onPress={() => dispatch(toggleBookTile())}
                             >
                                 <Image 
-                                    source={isTile ? iconList : iconGrid}
+                                    source={isBookTile ? iconList : iconGrid}
                                     style={{
                                         width: regWidth * 20,
                                         height: regWidth * 20,
@@ -1351,6 +1350,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
         <View
             style={{
                 borderBottomWidth: 0.3,
+                borderColor: colors.bgdLight,
                 marginBottom: 2,
             }}
             ref={viewRef}

@@ -72,6 +72,7 @@ const AlbumProfile = ({route, navigation}) => {
     const [isDefault, setIsDefault] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const insets = useSafeAreaInsets();
+    const [rgb, setRgb] = useState(null);
 
     useEffect(() => {
         fetchUserTag();
@@ -86,12 +87,16 @@ const AlbumProfile = ({route, navigation}) => {
     const fetchAlbum = async() => {
         try {
             setLoading(true);
+            console.log(albumId);
             await Api.post("/api/v4/album/view/", {
                 nemolist_id: albumId,
             })
             .then((res) => {
-                // console.log(res.data);
-                // console.log(res.data.bookmarks);
+                const bgdColor = res.data.background;
+                if (bgdColor) {
+                    setRgb(bgdColor.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0));
+                }
+                console.log(res.data.bookmarks);
                 setAlbumInfo(res.data);
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.likes);
@@ -343,7 +348,7 @@ const AlbumProfile = ({route, navigation}) => {
                 <>
                     <View 
                         style={{
-                            backgroundColor: albumInfo.background ? albumInfo.background : colors.nemoLight,
+                            backgroundColor: albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : "#baa2ff",
                             paddingTop: insets.top,
                             paddingBottom: 0,
                             paddingLeft: insets.left,
@@ -357,13 +362,13 @@ const AlbumProfile = ({route, navigation}) => {
                             >
                                 <Image 
                                     source={vectorLeftImage} 
-                                    style={{ width: regWidth*35, height: regWidth*35 }}
+                                    style={{ width: regWidth*30, height: regWidth*30 }}
                                 />
                             </Pressable>
                             <Text
                                 style={{
                                     fontSize: regWidth * 17,
-                                    fontWeight: "700",
+                                    fontFamily: "NotoSansKR-Bold",
                                 }}
                             >
                                 {albumInfo.nemolist_title}
@@ -384,12 +389,19 @@ const AlbumProfile = ({route, navigation}) => {
                             // marginTop: -headerHeight,
                             zIndex: 0,
                         }}
-                        bounces={false}
                         showsVerticalScrollIndicator={false}
                     >
+                        <View
+                            style={{
+                                backgroundColor: albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : "#baa2ff",
+                                width: "100%",
+                                height: regHeight * 500,
+                                marginTop: -regHeight * 500,
+                            }}
+                        />
                         <LinearGradient 
                             colors={[
-                                albumInfo.background ? albumInfo.background : colors.nemoLight, 
+                                albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : "#baa2ff", 
                                 // 'white',
                                 'white'
                             ]} 
@@ -402,7 +414,7 @@ const AlbumProfile = ({route, navigation}) => {
                             }}
                         />
                         <View style={{ alignItems: "center", }}>
-                            <ImageBackground
+                            {/* <ImageBackground
                                 source={shadow}
                                 style={{
                                     width: regWidth * 220,
@@ -411,6 +423,25 @@ const AlbumProfile = ({route, navigation}) => {
                                     justifyContent: "center",
                                     // marginTop: headerHeight + regHeight * 40,
                                     marginTop: regHeight * 40,
+                                }}
+                            > */}
+                            <View
+                                style={{
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginTop: regHeight * 40,
+                                    // backgroundColor:"pink"
+                                    ...Platform.select({
+                                        ios: {
+                                          shadowColor: "black",
+                                          shadowOffset: { width: 0, height: 8 },
+                                          shadowOpacity: 0.5,
+                                          shadowRadius: 8,
+                                        },
+                                        android: {
+                                          elevation: 3,
+                                        },
+                                    }),
                                 }}
                             >
                                 <Animated.Image 
@@ -422,7 +453,8 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                     onLoadEnd={showAlbumCover}
                                 />
-                            </ImageBackground>
+                            {/* </ImageBackground> */}
+                            </View>
                         </View>
                         <View
                             style={{
@@ -448,23 +480,38 @@ const AlbumProfile = ({route, navigation}) => {
                                 }}
                             >
                                 <View>
-                                    <Text
-                                        style={{
-                                            fontSize: regWidth * 14,
-                                            fontWeight: "700",
-                                            color: colors.nemoDark,
-                                        }}
+                                    <Pressable
+                                        onPress={() => navigation.navigate("OtherProfile", { userTag: albumInfo.user_tag,  })}
                                     >
-                                        {`@${albumInfo.user_tag}`}
-                                    </Text>
+                                        <Text
+                                            style={{
+                                                fontSize: regWidth * 14,
+                                                fontWeight: "700",
+                                                color: colors.nemoDark,
+                                            }}
+                                        >
+                                            {`@${albumInfo.user_tag}`}
+                                        </Text>
+                                    </Pressable>
                                     <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
-                                        <Text style={styles.albumInfoTxt}>
-                                            {likeCount}
-                                        </Text>
-                                        <Text style={styles.albumInfoTxt}>
-                                            {' likes'}
-                                        </Text>
-                                        <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
+                                        {isDefault ? 
+                                            null
+                                        : 
+                                            <Pressable
+                                                onPress={() => navigation.push('LikeUsers', { ctg: "nemolist", })}
+                                                style={{ flexDirection: "row", alignItems: "center", }}
+                                            >
+                                                <Text style={styles.albumInfoTxt}>
+                                                    {likeCount}
+                                                </Text>
+                                                <Text style={styles.albumInfoTxt}>
+                                                    {' likes'}
+                                                </Text>
+                                                <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
+                                            </Pressable>
+                                        }
+
+                                        
                                         <Text style={styles.albumInfoTxt}>
                                             {albumInfo.nemos}
                                         </Text>

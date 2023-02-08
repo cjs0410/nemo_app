@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, TextInput, ScrollView, Pressable, Image, Animated, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, TextInput, ScrollView, Pressable, Image, Animated, Dimensions, } from "react-native";
 import React, { useEffect, useState, useRef, createRef, useMemo, } from "react";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
@@ -25,6 +25,7 @@ import {
     deleteRecentSearch,
 } from '../modules/user';
 
+const {height:SCREEN_HEIGHT} = Dimensions.get('window');
 const TopTab = createMaterialTopTabNavigator();
 
 const Search = ({navigation}) => {
@@ -226,36 +227,16 @@ const Search = ({navigation}) => {
                     </Pressable>
                 </View>
             </View>
-                <TopTab.Navigator
-                    tabBar={(props) => <MyTabBar {...props} />}
-                    style={{
-                        // position: "absolute",
-                        opacity: debounceVal.length > 0 ? 1 : 0,
-                        zIndex: debounceVal.length > 0 ? 10 : 0,
-                    }}
-                >
-                    <TopTab.Screen 
-                        name="Book" 
-                        component={BookResultScreen} 
-                        initialParams={{ searchInput: debounceVal, bookSearchResultList: bookSearchResultList, }}
-                    />
-                    <TopTab.Screen 
-                        name="NemoList" 
-                        component={NemolistResultScreen} 
-                        initialParams={{ searchInput: debounceVal, albumSearchResultList: albumSearchResultList, }}
-                    />
-                    <TopTab.Screen 
-                        name="User" 
-                        component={UserResultScreen} 
-                        initialParams={{ searchInput: debounceVal, userSearchResultList: userSearchResultList, }}
-                    />
-                </TopTab.Navigator>
+                        
             <View
                 style={{
                     position: "absolute",
                     opacity: debounceVal.length > 0 ? 0 : 1,
                     zIndex: debounceVal.length > 0 ? 0 : 10,
                     marginTop: headerHeight,
+                    // backgroundColor:"pink",
+                    // height: SCREEN_HEIGHT - headerHeight,
+                    height: "90%",
                 }}
             >
                 <Text 
@@ -364,6 +345,31 @@ const Search = ({navigation}) => {
                     })}
                 </ScrollView>
             </View>
+
+            <TopTab.Navigator
+                tabBar={(props) => <MyTabBar {...props} />}
+                style={{
+                    opacity: debounceVal.length > 0 ? 1 : 0,
+                    zIndex: debounceVal.length > 0 ? 10 : 0,
+                }}
+            >
+                <TopTab.Screen 
+                    name="Book" 
+                    component={BookResultScreen} 
+                    initialParams={{ searchInput: debounceVal, bookSearchResultList: bookSearchResultList, }}
+                />
+                <TopTab.Screen 
+                    name="NemoList" 
+                    component={NemolistResultScreen} 
+                    initialParams={{ searchInput: debounceVal, albumSearchResultList: albumSearchResultList, }}
+                />
+                <TopTab.Screen 
+                    name="User" 
+                    component={UserResultScreen} 
+                    initialParams={{ searchInput: debounceVal, userSearchResultList: userSearchResultList, }}
+                />
+            </TopTab.Navigator>
+
 
 
             {/* {debounceVal.length > 0 ? 
@@ -714,7 +720,7 @@ const UserResultScreen = ({route, navigation}) => {
                     ctg: "user",
                 })
                 .then((res) => {
-                    // console.log(res.data);
+                    console.log(res.data);
                     setUserSearchResultList(res.data);
                 })
             } catch (err) {

@@ -341,6 +341,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                         borderStyle: 'dashed',
                         // backgroundColor: "green",
                         height: regWidth * 270 + extraHeight,
+                        paddingHorizontal: regWidth * 7,
                     }} 
                     // onLayout={(e) => console.log(e.nativeEvent)}
                 >
@@ -360,7 +361,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 style={{         
                                     fontSize: regWidth * 16,
                                     lineHeight: regWidth * 28,
-                                    paddingHorizontal: regWidth * 7,
+                                    // paddingHorizontal: regWidth * 7,
                                     height: regWidth * 270 + extraHeight,
                                     textAlignVertical: "top",
                                     fontWeight: "500",
@@ -381,7 +382,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 value={frontContent}
                                 scrollEnabled="false"
                                 onContentSizeChange={(e) => {
-                                    // console.log(e.nativeEvent);
+                                    console.log(e.nativeEvent);
                                     const contentHeight = e.nativeEvent.contentSize.height;
                                     const lineNum = parseInt(contentHeight / (regWidth * 28));
                                     if (lineNum === 0) {
@@ -409,7 +410,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 }}
                                 // textAlign={align === "center" ? "center" : "left"}
                             />
-                            {lineBarList.length !== 0 && cardFlag.map((flag, index) => (
+                            {/* {lineBarList.length !== 0 && cardFlag.map((flag, index) => ( */}
+                            {cardFlag.map((flag, index) => (
                                 <View
                                     style={{
                                         position: "absolute",
@@ -417,8 +419,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                         borderStyle: 'dashed',
                                         borderWidth: 0.3,
                                         // backgroundColor: "black",
-                                        // top: regHeight * 28 * 9 * (index + 1) + regHeight * 12,
-                                        top: lineBarList[index] + regHeight * 4,
+                                        top: regHeight * 28 * 9 * (index + 1) + regHeight * 6,
+                                        // top: lineBarList[index] + regHeight * 4,
                                     }}
                                     key={index}
                                 />
@@ -432,6 +434,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                     height: "100%",
                                     zIndex: -10,
                                     opacity: 0,
+                                    // paddingHorizontal: regWidth * 7,
+                                    
                                 }}
                                 scrollEnabled={false}
                             >
@@ -440,7 +444,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                         fontWeight: "500",
                                         color: "blue",
                                         fontSize: regWidth * 16,
-                                        lineHeight: 28,
+                                        lineHeight: regWidth * 28,
+                                        
                                     }} 
                                     onTextLayout={textInputLineNum}
                                 >

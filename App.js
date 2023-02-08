@@ -29,7 +29,9 @@ import { FindId, FindId2, } from "./screens/FindId";
 import { FindPassword, FindPassword2, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
 import { SubmitEditedPost } from "./screens/EditPost";
-import { ChangeUsername, ChangeHp1, ChangeHp2, ChangeHp3, } from "./screens/AccountInfo";
+import { ChangeUsername, } from "./screens/AccountInfo";
+import { ChangeHp1, ChangeHp2, ChangeHp3, } from "./screens/ChangeHp";
+import { ChangeEmail1, ChangeEmail2, ChangeEmail3, } from "./screens/ChangeEmail";
 import { 
   Welcome, 
   Login, 
@@ -497,6 +499,7 @@ const UserLibraryScreen = ({route, navigation}) => {
         options={{
           // presentation: "modal",
           cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
         }}
       />
       <UserLibraryStack.Screen 
@@ -512,6 +515,7 @@ const UserLibraryScreen = ({route, navigation}) => {
         component={CreateBookmark}
         options={{
           presentation: "fullScreenModal",
+          gestureEnabled: false,
           // animation: "fade",
         }}
       />
@@ -520,6 +524,7 @@ const UserLibraryScreen = ({route, navigation}) => {
         component={CreateBookmark}
         options={{
           presentation: "fullScreenModal",
+          gestureEnabled: false,
           // animation: "fade",
         }}
       />
@@ -582,6 +587,27 @@ const UserLibraryScreen = ({route, navigation}) => {
         }}
       />
       <UserLibraryStack.Screen 
+        name="ChangeEmail1" 
+        component={ChangeEmail1} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangeEmail2" 
+        component={ChangeEmail2} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangeEmail3" 
+        component={ChangeEmail3} 
+        options={{
+          gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
         name="ChangeGender" 
         component={ChangeGender} 
         options={{
@@ -636,6 +662,8 @@ const UserLibraryScreen = ({route, navigation}) => {
           // animation: "fade",
         }}
       />
+      <UserLibraryStack.Screen name="FollowScreen" component={FollowScreen} />
+      <UserLibraryStack.Screen name="LikeUsers" component={LikeUsers} />
     </UserLibraryStack.Navigator>
   )
 }
@@ -662,6 +690,7 @@ const HomeScreen = ({route, navigation}) => {
         component={SelectBook}
         options={{
           cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
         }}
       />
       <HomeStack.Screen 
@@ -677,6 +706,7 @@ const HomeScreen = ({route, navigation}) => {
         component={CreateBookmark}
         options={{
           presentation: "fullScreenModal",
+          gestureEnabled: false,
         }}
       />
       <HomeStack.Screen 
@@ -684,6 +714,7 @@ const HomeScreen = ({route, navigation}) => {
         component={CreateBookmark}
         options={{
           presentation: "fullScreenModal",
+          gestureEnabled: false,
         }}
       />
       <HomeStack.Screen 

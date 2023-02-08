@@ -684,7 +684,7 @@ const ProfileEdit = ({route, navigation}) => {
                                     Phone
                                 </Text>
                                 <TextInput 
-                                    placeholder={profile.hp ? profile.hp : "-"}
+                                    placeholder={profile.hp ? `+82 0${String(profile.hp).replace(/(\d{2})(\d{4})(\d)/, "$1-$2-$3")}` : "-"}
                                     placeholderTextColor={colors.textDark}
                                     style={styles.profileInput}
                                     onChangeText={onChangeName}
