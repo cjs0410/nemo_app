@@ -452,8 +452,8 @@ const Home = ({route, navigation}) => {
                     tabBarItemStyle: { width: regWidth * 120, paddingBottom: 0, },
                     tabBarContentContainerStyle: { 
                         justifyContent: "center", 
-                        borderBottomWidth: 0.3, 
-                        borderBottomColor: colors.bgdNormal, 
+                        // borderBottomWidth: 0.1, 
+                        // borderBottomColor: colors.bgdNormal, 
                     },
                     tabBarIndicatorStyle: {opacity: 0},
                     animationEnabled: false,
@@ -709,7 +709,7 @@ const FollowingScreen = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            { bookmarks !== null ? 
+            { bookmarks && bookmarks.length !== 0 ? 
                 <FlatList 
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.3}
@@ -725,7 +725,23 @@ const FollowingScreen = ({route, navigation}) => {
                     ref={ref}
                 />
                 :
-                null
+                <View
+                    style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 17,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        }}
+                    >
+                        Follow and explore more insightful Nemo
+                    </Text>
+                </View>
             }
         </View>
     )
@@ -768,7 +784,62 @@ const ExploreScreen = ({route, navigation}) => {
         <View style={styles.container}>
             <ScrollView
                 ref={ref}
+                showsVerticalScrollIndicator={false}
             >
+                <View
+                    style={{
+                        flexDirection: "row", 
+                        alignItems: "center", 
+                        justifyContent: "space-evenly",
+                        marginTop: regHeight * 15,
+                    }}    
+                >
+                    <Pressable
+                        style={{
+                            ...styles.selectContainer,
+                            backgroundColor: sort === 3 ? colors.nemoLight : "white",
+                        }}
+                        onPress={() => setSort(3)}
+                    >
+                        <Text style={{ 
+                            fontSize: regWidth * 16, 
+                            fontFamily: "NotoSansKR-Bold", 
+                            color: sort === 3 ? "white" : colors.nemoLight,
+                        }}>
+                            Now
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        style={{
+                            ...styles.selectContainer,
+                            backgroundColor: sort === 14 ? colors.nemoLight : "white",
+                        }}
+                        onPress={() => setSort(14)}
+                    >
+                        <Text style={{ 
+                            fontSize: regWidth * 16, 
+                            fontFamily: "NotoSansKR-Bold", 
+                            color: sort === 14 ? "white" : colors.nemoLight,
+                        }}>
+                            Weekly
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        style={{
+                            ...styles.selectContainer,
+                            backgroundColor: sort === 30 ? colors.nemoLight : "white",
+                        }}
+                        onPress={() => setSort(30)}
+                    >
+                        <Text style={{ 
+                            fontSize: regWidth * 16, 
+                            fontFamily: "NotoSansKR-Bold", 
+                            color: sort === 30 ? "white" : colors.nemoLight,
+                        }}>
+                            Monthly
+                        </Text>
+                    </Pressable>
+                </View>
                 <View 
                     style={{ 
                         flexDirection: "row", 
@@ -796,53 +867,14 @@ const ExploreScreen = ({route, navigation}) => {
                         <Text
                             style={{
                                 fontSize: regWidth * 17,
-                                fontWeight: "900",
+                                fontFamily: "NotoSansKR-Black",
                                 marginHorizontal: regWidth * 5,
                             }}
                         >
                             Trending on Nemo
                         </Text>
                     </View>
-                    <View
-                        style={{
-                            flexDirection: "row", 
-                            alignItems: "center", 
-                        }}    
-                    >
-                        <Pressable
-                            style={{
-                                ...styles.selectContainer,
-                                backgroundColor: sort === 3 ? colors.nemoLight : "white",
-                            }}
-                            onPress={() => setSort(3)}
-                        >
-                            <Text style={{ fontSize: regWidth * 9, fontWeight: "700", }}>
-                                Now
-                            </Text>
-                        </Pressable>
-                        <Pressable
-                            style={{
-                                ...styles.selectContainer,
-                                backgroundColor: sort === 14 ? colors.nemoLight : "white",
-                            }}
-                            onPress={() => setSort(14)}
-                        >
-                            <Text style={{ fontSize: regWidth * 9, fontWeight: "700", }}>
-                                Weekly
-                            </Text>
-                        </Pressable>
-                        <Pressable
-                            style={{
-                                ...styles.selectContainer,
-                                backgroundColor: sort === 30 ? colors.nemoLight : "white",
-                            }}
-                            onPress={() => setSort(30)}
-                        >
-                            <Text style={{ fontSize: regWidth * 9, fontWeight: "700", }}>
-                                Monthly
-                            </Text>
-                        </Pressable>
-                    </View>
+
                 </View>
                 {loading ? 
                     <ActivityIndicator 
@@ -866,7 +898,7 @@ const ExploreScreen = ({route, navigation}) => {
                                             width: regWidth * 19,
                                             height: regWidth * 19,
                                             borderRadius: 999,
-                                            resizeMode: "contain",
+                                            resizeMode: "cover",
                                         }}
                                     />
                                     <Pressable 
@@ -876,7 +908,7 @@ const ExploreScreen = ({route, navigation}) => {
                                         <Text
                                             style={{
                                                 fontSize: regWidth * 13,
-                                                fontWeight: "700",
+                                                fontFamily: "NotoSansKR-Bold",
                                                 marginLeft: regWidth * 6,
                                             }}
                                         >
@@ -901,6 +933,7 @@ const ExploreScreen = ({route, navigation}) => {
                         marginHorizontal: regWidth * 13, 
                         marginTop: regHeight * 45, 
                         marginBottom: regHeight * 17, 
+                        opacity: loading ? 0 : 1,
                     }}
                 >
                     <Image 
@@ -913,7 +946,7 @@ const ExploreScreen = ({route, navigation}) => {
                     <Text
                         style={{
                             fontSize: regWidth * 17,
-                            fontWeight: "900",
+                            fontFamily: "NotoSansKR-Black",
                             marginHorizontal: regWidth * 5,
                         }}
                     >
@@ -921,11 +954,7 @@ const ExploreScreen = ({route, navigation}) => {
                     </Text>
                 </View>
                 {loading ? 
-                    <ActivityIndicator 
-                        color="black" 
-                        style={{marginTop: regHeight * 50,}} 
-                        size="large"
-                    />
+                    null
                     : 
                     <>
                         {trendNemolists && trendNemolists.map((nemolist, index) => (
@@ -942,7 +971,7 @@ const ExploreScreen = ({route, navigation}) => {
                                             width: regWidth * 19,
                                             height: regWidth * 19,
                                             borderRadius: 999,
-                                            resizeMode: "contain",
+                                            resizeMode: "cover",
                                         }}
                                     />
                                     <Pressable 
@@ -952,7 +981,7 @@ const ExploreScreen = ({route, navigation}) => {
                                         <Text
                                             style={{
                                                 fontSize: regWidth * 13,
-                                                fontWeight: "700",
+                                                fontFamily: "NotoSansKR-Bold",
                                                 marginLeft: regWidth * 6,
                                             }}
                                         >
@@ -1227,16 +1256,20 @@ const styles = StyleSheet.create({
     },
     numberTxt: {
         fontSize: regWidth * 27, 
-        fontWeight: "900", 
+        fontFamily: "NotoSansKR-Black",
         color: colors.bgdNormal, 
         width: regWidth * 45,
     },
     selectContainer: {
         // backgroundColor: colors.nemoLight,
-        borderRadius: 12,
-        paddingHorizontal: regWidth * 5,
-        paddingVertical: regWidth * 2,
+        borderRadius: regWidth * 15,
+        paddingHorizontal: regWidth * 9,
+        paddingVertical: regWidth * 3,
         marginHorizontal: regWidth * 8,
+        borderWidth: 1,
+        borderColor: colors.nemoLight,
+        justifyContent: "center",
+        alignItems: "center",
     }
 })
 

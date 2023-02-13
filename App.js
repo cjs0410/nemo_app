@@ -1,4 +1,4 @@
-import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, Platform, Alert, } from "react-native";
+import { View, Text, Button, Dimensions, Image, StyleSheet, TextInput, Pressable, StatusBar, Platform, Alert, BackHandler, } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, useLayoutEffect, } from "react";
 import { NavigationContainer, useNavigationContainerRef, getFocusedRouteNameFromRoute, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -26,12 +26,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Join1, Join2, Join3, Join4, Join5, Join6} from "./screens/Join";
 import { CreateNemolist1, CreateNemolist2, CreateNemolist3, } from "./screens/CreateNemolist";
 import { FindId, FindId2, } from "./screens/FindId";
-import { FindPassword, FindPassword2, } from "./screens/FindPassword";
+import { FindPassword, FindPassword2, FindPassword3, } from "./screens/FindPassword";
 import { SubmitPost } from "./screens/CreatePost";
 import { SubmitEditedPost } from "./screens/EditPost";
 import { ChangeUsername, } from "./screens/AccountInfo";
 import { ChangeHp1, ChangeHp2, ChangeHp3, } from "./screens/ChangeHp";
+import { ChangePsw1, ChangePsw2, } from "./screens/ChangePsw";
 import { ChangeEmail1, ChangeEmail2, ChangeEmail3, } from "./screens/ChangeEmail";
+import { Deactivate1, Deactivate2, } from "./screens/Deactivate";
+
 import { 
   Welcome, 
   Login, 
@@ -68,14 +71,17 @@ import {
   AccountInfo,
   ChangeGender,
   EditAlbum,
+  Contact,
+  Report,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from './modules/hooks';
-import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, resetAvatar, setIsAlarm, } from './modules/user';
+import { setUserInfo, setAccessToken, setIsAlarm, } from './modules/user';
 import blankAvatar from './assets/images/peopleicon.png';
+import NemoLogo from './assets/NemoLogo.png';
 import userLibraryLogo from './assets/icons/userLibraryLogo.png';
 
 import analytics from '@react-native-firebase/analytics';
@@ -85,6 +91,10 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Portal, PortalHost, PortalProvider } from '@gorhom/portal';
 import messaging from '@react-native-firebase/messaging';
+import { regWidth } from "./config/globalStyles";
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -140,12 +150,15 @@ const App = () => {
   const routeNameRef = useRef();
   // const [avatar, setAvatar] = useState(null);
   // const [decodedRefresh, setDecodedRefresh] = useState(null);
+  const [preparing, setPreparing] = useState(true);
+  const [loading, setLoading] = useState(false);
 
 
 ////////////////////////////////////////////////////////////백엔드 연결/////////////////////////////////////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     requestUserPermission();
+    
     // getFcmToken();
   }, [])
 
@@ -243,11 +256,91 @@ const App = () => {
   // Foreground 상태인 경우
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      remoteMessage.notification;
+      console.log(remoteMessage);
+      if (remoteMessage.notification.title === "Patch") {
+        Alert.alert(remoteMessage.notification.body, "", [
+          {
+              text: "OK", 
+              onPress: () => setLoading(true)
+          }
+        ]);
+      } 
+      if (remoteMessage.notification.title === "Notice") {
+        Alert.alert(remoteMessage.notification.body, "", [
+          {
+              text: "OK", 
+          }
+        ]);
+      }
+      else {
+        dispatch(setIsAlarm(true));
+      }
+      // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      // remoteMessage.notification;
     });
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    firstPrepare();
+    // setTimeout(() => {
+    //   setPreparing(false);
+    // }, 2000)
+  }, []);
+
+  useEffect(() => {
+    if (!preparing) {
+      SplashScreen.hideAsync();
+    }
+  }, [preparing]);
+
+  const firstPrepare = async() => {
+    try {
+      await Api
+      .get("/api/v1/user/check_announce/")
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.accessible) {
+          setPreparing(false);
+          if (res.data.message !== "No Announce") {
+            Alert.alert(res.data.message, "", [
+              {
+                  text: "OK", 
+              }
+            ]);
+          }
+
+        } else {
+          setPreparing(true);
+          Alert.alert(res.data.message, "", [
+            {
+                text: "OK", 
+                // onPress: () => BackHandler.exitApp()
+                // onPress: () => {throw {}}
+            }
+          ]);
+        }
+      })
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Image 
+          source={NemoLogo}
+          style={{
+            width: regWidth * 150,
+            height: regWidth * 150,
+          }}
+        />
+      </View>
+    )
+
+  }
   
   return (
     
@@ -294,6 +387,7 @@ const App = () => {
             <Stack.Screen name="FindId2" component={FindId2} options={{ headerShown: false, }} />
             <Stack.Screen name="FindPassword" component={FindPassword} options={{ headerShown: false, }} />
             <Stack.Screen name="FindPassword2" component={FindPassword2} options={{ headerShown: false, }} />
+            <Stack.Screen name="FindPassword3" component={FindPassword3} options={{ headerShown: false, }} />
           </Stack.Navigator>
         ) 
         : 
@@ -356,6 +450,9 @@ const App = () => {
                   if (routeName === 'NemoCalender') {
                     return { display: "none", }
                   }
+                  if (routeName === 'EditBookmark') {
+                    return { display: "none", }
+                  }
                   return
                 })(route),
               })}
@@ -385,6 +482,9 @@ const App = () => {
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
                   if ((routeName === 'SelectBook2' || routeName === 'CreateBook2' || routeName === 'CreateBookmark2') && (Platform.OS === 'android')) {
+                    return { display: "none", }
+                  }
+                  if (routeName === 'EditBookmark') {
                     return { display: "none", }
                   }
                   return
@@ -555,63 +655,98 @@ const UserLibraryScreen = ({route, navigation}) => {
         name="AccountInfo" 
         component={AccountInfo} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeUsername" 
         component={ChangeUsername} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeHp1" 
         component={ChangeHp1} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeHp2" 
         component={ChangeHp2} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeHp3" 
         component={ChangeHp3} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeEmail1" 
         component={ChangeEmail1} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeEmail2" 
         component={ChangeEmail2} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeEmail3" 
         component={ChangeEmail3} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangePsw1" 
+        component={ChangePsw1} 
+        options={{
+          // gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="ChangePsw2" 
+        component={ChangePsw2} 
+        options={{
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
         name="ChangeGender" 
         component={ChangeGender} 
         options={{
-          gestureDirection: "horizontal-inverted",
+          // gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="Contact" 
+        component={Contact} 
+        options={{
+          // gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="Deactivate1" 
+        component={Deactivate1} 
+        options={{
+          // gestureDirection: "horizontal-inverted",
+        }}
+      />
+      <UserLibraryStack.Screen 
+        name="Deactivate2" 
+        component={Deactivate2} 
+        options={{
+          // gestureDirection: "horizontal-inverted",
         }}
       />
       <UserLibraryStack.Screen 
@@ -662,8 +797,24 @@ const UserLibraryScreen = ({route, navigation}) => {
           // animation: "fade",
         }}
       />
+      <UserLibraryStack.Screen 
+        name="Report" 
+        component={Report} 
+        options={{
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
+        }}
+      />
       <UserLibraryStack.Screen name="FollowScreen" component={FollowScreen} />
       <UserLibraryStack.Screen name="LikeUsers" component={LikeUsers} />
+      <UserLibraryStack.Screen 
+        name="EditBookmark" 
+        component={EditBookmark}
+        options={{
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          gestureEnabled: false,
+        }}
+      />
     </UserLibraryStack.Navigator>
   )
 }
@@ -753,6 +904,14 @@ const HomeScreen = ({route, navigation}) => {
         component={Search} 
         options={{
           animationEnabled: false,
+          gestureEnabled: false,
+        }}
+      />
+      <HomeStack.Screen 
+        name="Report" 
+        component={Report} 
+        options={{
+          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
           gestureEnabled: false,
         }}
       />
@@ -1026,3 +1185,12 @@ const Auth = async() => {
     }
   }, []);
 }
+
+const styles = StyleSheet.create({
+  container: {
+      flex: 1,
+      backgroundColor: "white",
+      justifyContent: "center",
+      alignItems: "center",
+  },
+})

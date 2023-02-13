@@ -191,7 +191,7 @@ const Search = ({navigation}) => {
                     >
                         <Feather name="search" size={regWidth * 18} color="#606060" />
                         <TextInput 
-                            placeholder="Search Accounts, Books, and Nemolists"
+                            // placeholder="Search Accounts, Books, and Nemolists"
                             placeholderTextColor={"#606060"}
                             style={{
                                 height: "100%",
@@ -234,7 +234,7 @@ const Search = ({navigation}) => {
                     opacity: debounceVal.length > 0 ? 0 : 1,
                     zIndex: debounceVal.length > 0 ? 0 : 10,
                     marginTop: headerHeight,
-                    // backgroundColor:"pink",
+                    width: "100%",
                     // height: SCREEN_HEIGHT - headerHeight,
                     height: "90%",
                 }}
@@ -265,7 +265,7 @@ const Search = ({navigation}) => {
                                             dispatch(addRecentSearch({...item, "ctg": "book"}));
                                         }
                                     }
-                                    style={{ justifyContent: "center", }}
+                                    style={{ justifyContent: "center",}}
                                     key={index}
                                 >
                                     <BookList book={item} navigation={navigation}  />
@@ -295,7 +295,7 @@ const Search = ({navigation}) => {
                                             dispatch(addRecentSearch({...item, "ctg": "album"}));
                                         }
                                     }
-                                    style={{ justifyContent: "center", }}
+                                    style={{ justifyContent: "center",}}
                                     key={index}
                                 >
                                     <AlbumList album={item} navigation={navigation} isDefault={false} />
@@ -325,7 +325,7 @@ const Search = ({navigation}) => {
                                             dispatch(addRecentSearch({...item, "ctg": "user"}));
                                         }
                                     }
-                                    style={{ justifyContent: "center", }}
+                                    style={{ justifyContent: "center",}}
                                     key={index}
                                 >
                                     <UserList user={item} navigation={navigation} />
@@ -625,26 +625,47 @@ const BookResultScreen = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
-                {bookSearchResultList && bookSearchResultList.map((searchResult, index) => (
-                    <Pressable 
-                        onPress={async() => 
-                            {
-                                navigation.navigate('BookProfile', {
-                                    bookId: searchResult.book_id, 
-                                })
-                                await analytics().logEvent('searchBook', {
-                                    search_book_title: searchResult.book_title,
-                                })
-                                dispatch(addRecentSearch({...searchResult, "ctg": "book"}));
+            {bookSearchResultList && bookSearchResultList.length !== 0 ? 
+                <ScrollView>
+                    {bookSearchResultList && bookSearchResultList.map((searchResult, index) => (
+                        <Pressable 
+                            onPress={async() => 
+                                {
+                                    navigation.navigate('BookProfile', {
+                                        bookId: searchResult.book_id, 
+                                    })
+                                    await analytics().logEvent('searchBook', {
+                                        search_book_title: searchResult.book_title,
+                                    })
+                                    dispatch(addRecentSearch({...searchResult, "ctg": "book"}));
+                                }
                             }
-                        }
-                        key={index}
+                            key={index}
+                        >
+                            <BookList book={searchResult} navigation={navigation}  />
+                        </Pressable>
+                    ))}
+                </ScrollView>
+                :
+                <View
+                    style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 20,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        }}
                     >
-                        <BookList book={searchResult} navigation={navigation}  />
-                    </Pressable>
-                ))}
-            </ScrollView>
+                        No Result!
+                    </Text>
+                </View>
+            }
+
         </View>
     )
 }
@@ -678,26 +699,47 @@ const NemolistResultScreen = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
-                {albumSearchResultList && albumSearchResultList.map((searchResult, index) => (
-                    <Pressable 
-                        onPress={async() => 
-                            {
-                                navigation.navigate('AlbumProfile', {
-                                    albumId: searchResult.nemolist_id,
-                                })
-                                await analytics().logEvent('searchAlbum', {
-                                    search_album_title: searchResult.nemolist_title,
-                                })
-                                dispatch(addRecentSearch({...searchResult, "ctg": "album"}));
+            {albumSearchResultList && albumSearchResultList.length !== 0 ? 
+                <ScrollView>
+                    {albumSearchResultList && albumSearchResultList.map((searchResult, index) => (
+                        <Pressable 
+                            onPress={async() => 
+                                {
+                                    navigation.navigate('AlbumProfile', {
+                                        albumId: searchResult.nemolist_id,
+                                    })
+                                    await analytics().logEvent('searchAlbum', {
+                                        search_album_title: searchResult.nemolist_title,
+                                    })
+                                    dispatch(addRecentSearch({...searchResult, "ctg": "album"}));
+                                }
                             }
-                        }
-                        key={index}
+                            key={index}
+                        >
+                            <AlbumList album={searchResult} navigation={navigation} isDefault={false} />
+                        </Pressable>
+                    ))}
+                </ScrollView>
+                :
+                <View
+                    style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 20,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        }}
                     >
-                        <AlbumList album={searchResult} navigation={navigation} isDefault={false} />
-                    </Pressable>
-                ))}
-            </ScrollView>
+                        No Result!
+                    </Text>
+                </View>
+            }
+
         </View>
     )
 }
@@ -731,26 +773,47 @@ const UserResultScreen = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
-                {userSearchResultList && userSearchResultList.map((searchResult, index) => (
-                    <Pressable
-                        onPress={async() => 
-                            {
-                                navigation.navigate('OtherProfile', {
-                                    userTag: searchResult.user_tag, 
-                                })
-                                await analytics().logEvent('searchUser', {
-                                    search_user_tag: searchResult.user_tag,
-                                })
-                                dispatch(addRecentSearch({...searchResult, "ctg": "user"}));
+            {userSearchResultList && userSearchResultList.length !== 0 ? 
+                <ScrollView>
+                    {userSearchResultList && userSearchResultList.map((searchResult, index) => (
+                        <Pressable
+                            onPress={async() => 
+                                {
+                                    navigation.navigate('OtherProfile', {
+                                        userTag: searchResult.user_tag, 
+                                    })
+                                    await analytics().logEvent('searchUser', {
+                                        search_user_tag: searchResult.user_tag,
+                                    })
+                                    dispatch(addRecentSearch({...searchResult, "ctg": "user"}));
+                                }
                             }
-                        }
-                        key={index}
+                            key={index}
+                        >
+                            <UserList user={searchResult} navigation={navigation}  />
+                        </Pressable>
+                    ))}
+                </ScrollView>
+                : 
+                <View
+                    style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 20,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        }}
                     >
-                        <UserList user={searchResult} navigation={navigation}  />
-                    </Pressable>
-                ))}
-            </ScrollView>
+                        No Result!
+                    </Text>
+                </View>
+            }
+
         </View>
     )
 }
@@ -991,6 +1054,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
             style={{
                 borderBottomWidth: 0.3,
                 marginBottom: 2,
+                borderColor: colors.bgdLight,
             }}
             ref={viewRef}
         >
@@ -1059,8 +1123,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                 style={{ 
                                     opacity,
                                     fontSize: regWidth * 16,
-                                    fontWeight: "700",
-                                    fontFamily: "NotoSansKR-Regular",
+                                    fontFamily: "NotoSansKR-Bold",
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}

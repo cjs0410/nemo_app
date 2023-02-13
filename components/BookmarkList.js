@@ -15,10 +15,10 @@ const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const BookmarkList = (props) => {
     const bookmark = props.bookmark;
+    const date = bookmark.created_date.split('T')[0].split('-');
     const navigation = props.navigation;
     const { bookmarked, } = useSelector(bookmarkSelector);
     const backgroundImageValue = useRef(new Animated.Value(0)).current;
-
 
     const showBackgroundImage = () => {
         Animated.timing(backgroundImageValue, {
@@ -84,9 +84,9 @@ const BookmarkList = (props) => {
                         onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     >
-                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Bold", }} >{`@${bookmark.user_tag}`}</Text>
                     </Pressable>
-                    <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060" }} >{bookmark.created_date.split('T')[0]}</Text>
+                    <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Medium", color: "#606060" }} >{date.join('. ')}</Text>
                 </View>
             </View>
             
@@ -100,6 +100,7 @@ const UnTouchableBookmarkList = (props) => {
     const navigation = props.navigation;
     const { bookmarked, } = useSelector(bookmarkSelector);
     const backgroundImageValue = useRef(new Animated.Value(0)).current;
+    const date = bookmark.created_date.split('T')[0].split('-');
 
 
     const showBackgroundImage = () => {
@@ -168,8 +169,8 @@ const UnTouchableBookmarkList = (props) => {
                         </Text>
                     </View>
                     <View style={styles.bookmarkContentsWatermark}>
-                        <Text style={{ fontSize: regWidth * 11, fontWeight: "700", fontFamily: "NotoSansKR-Regular", }} >{`@${bookmark.user_tag}`}</Text>
-                        <Text style={{ fontSize: regWidth * 11, fontWeight: "500", color: "#606060", fontFamily: "NotoSansKR-Regular", }} >{bookmark.created_date.split('T')[0]}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Bold", }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text style={{ fontSize: regWidth * 11, color: "#606060", fontFamily: "NotoSansKR-Medium", }} >{date.join('. ')}</Text>
                     </View>
                 </View>
             </MaskedView>
@@ -210,14 +211,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     bookmarkContentsBookTitle: {
-        fontWeight: "400",
+        // fontWeight: "400",
         fontSize: regWidth * 10,
         fontFamily: "NotoSansKR-Regular",
     },
     bookmarkContentsBookChapter: {
-        fontWeight: "700",
+        // fontWeight: "700",
         fontSize: regWidth * 15,
-        fontFamily: "NotoSansKR-Regular",
+        fontFamily: "NotoSansKR-Bold",
     },
     bookmarkContentsBookChapterInput: {
         fontWeight: "400",

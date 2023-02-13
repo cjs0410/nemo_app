@@ -21,6 +21,7 @@ import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 import { BookList, } from '../components';
 
 import { useSelector, useDispatch } from 'react-redux';
+import { setShouldBookRefresh, } from '../modules/user';
 import { userSelector } from '../modules/hooks';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -76,6 +77,29 @@ const SelectBook = ({navigation, route}) => {
         }
     };
 
+    const onLike = async(book) => {
+        try {
+            await Api
+            .post("api/v3/book/like/", {
+                book_id: book.book_id,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                if (res.data.is_like) {
+                    Alert.alert(book.book_title, "is added to your library");
+                    navigation.popToTop();
+                    // Vibration.vibrate(100);
+                } else {
+                    Alert.alert(book.book_title, "is deleted from your library");
+                    navigation.popToTop();
+                }
+                dispatch(setShouldBookRefresh(true));
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const onExit = () => {
         Alert.alert("북마크 생성을 취소하시겠습니까?", "확인 버튼을 누르면 취소됩니다.", [
             {
@@ -104,7 +128,7 @@ const SelectBook = ({navigation, route}) => {
                     What are you reading?
                 </Text>
                 <Pressable
-                    onPress={onExit}
+                    onPress={() => navigation.goBack()}
                 >
                     <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", color: colors.textNormal, }}>
                         Cancel
@@ -185,7 +209,7 @@ const SelectBook = ({navigation, route}) => {
                                         right: 0,
                                         marginHorizontal: regWidth * 12,
                                     }}
-                                    onPress={() => console.log("1")}
+                                    onPress={() => onLike(book)}
                                 >
                                     <Image 
                                         source={iconPlusCircleOutline}
@@ -233,7 +257,7 @@ const SelectBook = ({navigation, route}) => {
                                         right: 0,
                                         marginHorizontal: regWidth * 12,
                                     }}
-                                    onPress={() => console.log("1")}
+                                    onPress={() => onLike(book)}
                                 >
                                     <Image 
                                         source={iconPlusCircleOutline}

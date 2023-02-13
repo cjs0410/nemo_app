@@ -9,14 +9,16 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
 import Check from '../assets/images/Check.png';
 import Eye from '../assets/images/Eye.png';
+import EyeOpen from '../assets/images/EyeOpen.png';
 import ProfileImage from '../assets/images/ProfileImage.png';
 import Arrow from '../assets/icons/LeftArrow.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setUserInfo, setRefreshToken, } from '../modules/user';
+import { setUserInfo, setRefreshToken, setFcmToken, } from '../modules/user';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ImagePicker from 'react-native-image-crop-picker';
+import messaging from '@react-native-firebase/messaging';
 
 Date.prototype.format = function(f) {
     if (!this.valueOf()) return " ";
@@ -805,6 +807,7 @@ const Join3 = ({ navigation, route }) => {
     const [isPswValid, setIsPswValid] = useState(false);
     const [isPswCheckValid, setIsPswCheckValid] = useState(false);
     const isValid = isPswValid && isPswCheckValid;
+    const [visible, setVisible] = useState(false);
 
     const onChangePsw = (payload) => {
         const pswRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/
@@ -873,14 +876,14 @@ const Join3 = ({ navigation, route }) => {
                             onChangeText={onChangePsw}
                             // placeholder="Password"
                             // placeholderTextColor={"#606060"}
-                            secureTextEntry={true}
+                            secureTextEntry={visible ? false : true}
                         />
                         <Pressable
-                            // onPress={() => navigation.goBack()} 
+                            onPress={() => setVisible(!visible)}
                             hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                         >
                             <Image 
-                                source={Eye}
+                                source={visible ? EyeOpen : Eye}
                                 style={ styles.eyeIcon }
                                 // onLoadEnd={showLogo}
                             />
@@ -1227,33 +1230,56 @@ const Join6 = ({ navigation, route }) => {
 
     const onLogin = async() => {
         try {
-          await Api
-          .post("/api/v1/user/login/", {
-            hp_or_email: hpOrEmail,
-            type: type,
-            password: psw,
-          })
-          .then(async(res) => {
-            // console.log(res.data);
-            try {
-              await AsyncStorage.setItem('refresh', res.data.refresh);
-              await AsyncStorage.setItem('access', res.data.access);
-              dispatch(setRefreshToken(res.data.refresh));
-            } catch (err) {
-              console.error(err);
-            }
-    
-          })
+            await Api
+            .post("/api/v1/user/login/", {
+                hp_or_email: hpOrEmail,
+                type: type,
+                password: psw,
+            })
+            .then(async(res) => {
+                // console.log(res.data);
+                try {
+                    await AsyncStorage.setItem('refresh', res.data.refresh);
+                    await AsyncStorage.setItem('access', res.data.access);
+                    dispatch(setRefreshToken(res.data.refresh));
+                    getFcmToken();
+                } catch (err) {
+                    console.error(err);
+                }
+        
+            })
         } catch (err) {
-          // console.error(err);
-          if (err.response.status === 401) {
-            setWarning('잘못된 비밀번호입니다');
-          }
-          if (err.response.status === 404) {
-            setWarning('존재하지 않는 계정입니다');
-          }
+            // console.error(err);
+            if (err.response.status === 401) {
+                setWarning('잘못된 비밀번호입니다');
+            }
+            if (err.response.status === 404) {
+                setWarning('존재하지 않는 계정입니다');
+            }
         }
-      }
+    }
+
+    const getFcmToken = useCallback(async () => {
+        const fcmToken = await messaging().getToken();
+        // Alert.alert(fcmToken);
+        // console.log(fcmToken);
+    
+        try {
+          console.log(fcmToken);
+          await Api
+          .post("/api/v1/user/fcm_token/", {
+            token: fcmToken,
+          })
+          .then((res) => {
+            dispatch(setFcmToken(fcmToken));
+          })
+          // .then((res) => {
+          //   console.log(res.data);
+          // })
+        } catch (err) {
+          console.error(err);
+        }
+    }, []);
 
     return (
         <View style={{backgroundColor:"white", flex:1}} >

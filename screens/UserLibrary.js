@@ -51,7 +51,7 @@ import {
     toggleBookTile,
 } from '../modules/user';
 import { loadBookmarks } from '../modules/bookmarks';
-import blankAvatar from '../assets/images/peopleicon.png';
+import blankAvatar from '../assets/images/blankAvatar.png';
 import sortCheck from '../assets/images/sortCheck.png';
 import longLikedNemos from '../assets/images/longLikedNemos.png';
 import iconRepeat from '../assets/icons/iconRepeat.png';
@@ -60,6 +60,7 @@ import iconList from '../assets/icons/iconList.png';
 import iconNemolist from '../assets/icons/iconNemolist.png';
 import iconBook from '../assets/icons/iconBook.png';
 import iconAlarm from '../assets/icons/iconAlarm.png';
+import iconPlusPurple from '../assets/icons/iconPlusPurple.png';
 import { colors, regHeight, regWidth } from "../config/globalStyles";
 import {
     BottomSheetModal,
@@ -111,7 +112,7 @@ const UserLibrary = ({navigation, route }) => {
                     .then(async() => await AsyncStorage.setItem('access', res.data.access))
                     .then(() => {
                         fetchAvatar();
-                        fetchNewAlarm();
+                        // fetchNewAlarm();
                     })
                     dispatch(setRefreshToken(res.data.refresh));
                     // console.log(res.data.is_staff);
@@ -211,13 +212,13 @@ const UserLibrary = ({navigation, route }) => {
                                 width: regWidth * 32,
                                 height: regWidth * 32,
                                 resizeMode: "cover",
-                                borderRadius: 50,
+                                borderRadius: 999,
                                 borderColor: "black",
                             }} 
                         />
                     </Pressable>
                     <Text style={{
-                        fontSize: 24,
+                        fontSize: regWidth * 24,
                         fontFamily: "NotoSansKR-Black",
                         marginHorizontal: regWidth * 10,
                         lineHeight: regWidth * 34,
@@ -252,7 +253,7 @@ const UserLibrary = ({navigation, route }) => {
                                 style={{
                                     position: "absolute",
                                     backgroundColor: "#7341ffcc",
-                                    borderRadius: 50,
+                                    borderRadius: 999,
                                     height: regWidth * 8,
                                     width: regWidth * 8,
                                     right: 0,
@@ -291,7 +292,7 @@ const UserLibrary = ({navigation, route }) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
                         Create
                     </Text>
                     <Pressable 
@@ -309,11 +310,11 @@ const UserLibrary = ({navigation, route }) => {
                                 resizeMode: "contain",
                             }}
                         />
-                        <View>
-                            <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                        <View style={{ justifyContent: "center", marginHorizontal: regWidth * 8, }}>
+                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                 New Nemolist
                             </Text>
-                            <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                 Add Nemos to a new Nemolist
                             </Text>
                         </View>
@@ -333,11 +334,11 @@ const UserLibrary = ({navigation, route }) => {
                                 resizeMode: "contain",
                             }}
                         />
-                        <View>
-                            <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                        <View style={{ justifyContent: "center", marginHorizontal: regWidth * 8, }}>
+                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                 New Book
                             </Text>
-                            <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                 Add new Book to your library
                             </Text>
                         </View>
@@ -370,7 +371,7 @@ const NemoScreen = ({route, navigation}) => {
 
     useEffect(() => {
         if (shouldNemoRefresh === true) {
-            console.log("auto");
+            // console.log("auto");
             fetchBookmarkList(sort);
             dispatch(setShouldNemoRefresh(false));
         }
@@ -378,7 +379,7 @@ const NemoScreen = ({route, navigation}) => {
 
     const renderBookmark = ({ item, index }) => (
         <Pressable
-            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: "My Library", title: "Bookmarks", index: index, })} 
+            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: "My Library", title: "Nemos", index: index, })} 
         >
             <BookmarkList bookmark={item} navigation={navigation} />
         </Pressable>
@@ -523,7 +524,7 @@ const NemoScreen = ({route, navigation}) => {
                                     <Text
                                         style={{
                                             fontSize: 13,
-                                            fontWeight: "700",
+                                            fontFamily: "NotoSansKR-Bold",
                                             marginHorizontal: regWidth * 5,
                                         }}
                                     >
@@ -544,13 +545,35 @@ const NemoScreen = ({route, navigation}) => {
                 >
                     <Text
                         style={{
-                        fontSize: regWidth * 20,
-                        fontWeight: "500",
-                        color: "grey",
+                        fontSize: regWidth * 17,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
                         }}
                     >
-                        북마크를 생성해보세요
+                        Let's start creating Nemo!
                     </Text>
+                    <Text
+                        style={{
+                        fontSize: regWidth * 17,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        marginTop: regHeight * 8,
+                        }}
+                    >
+                        It'll be worthwhile.
+                    </Text>
+                    <Pressable 
+                        style={{ marginTop: regHeight * 24, }}
+                        onPress={() => navigation.navigate("SelectBook0", { index: 0, isLib: false, })}
+                    >
+                        <Image 
+                            source={iconPlusPurple}
+                            style={{
+                                width: regWidth * 50,
+                                height: regWidth * 50,
+                            }}
+                        />
+                    </Pressable>
                 </View>
             }
             <BottomSheetModal
@@ -563,7 +586,7 @@ const NemoScreen = ({route, navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -573,7 +596,7 @@ const NemoScreen = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 0 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -596,7 +619,7 @@ const NemoScreen = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 1 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -789,7 +812,7 @@ const NemoListScreen = ({navigation}) => {
                                 <Text
                                     style={{
                                         fontSize: 13,
-                                        fontWeight: "700",
+                                        fontFamily: "NotoSansKR-Bold",
                                         marginHorizontal: regWidth * 5,
                                     }}
                                 >
@@ -920,7 +943,7 @@ const NemoListScreen = ({navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -930,7 +953,7 @@ const NemoListScreen = ({navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 0 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -953,7 +976,7 @@ const NemoListScreen = ({navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 1 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -976,7 +999,7 @@ const NemoListScreen = ({navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 2 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -1058,13 +1081,13 @@ const BookScreen = ({navigation}) => {
                 .post("api/v1/user/library/", {
                     ctg: "books",
                     sort: sortList[sort],
-                    items: nemolists.length,
+                    items: books.length,
                 })
                 .then((res) => {
                     // console.log([...bookmarks, ...res.data, ]);
                     // console.log(res.data);
-                    setNemolists([...books, ...res.data, ]);
-                    setNewNemolistNum(res.data.length);
+                    setBooks([...books, ...res.data, ]);
+                    setNewBookNum(res.data.length);
                 })
             } catch (err) {
                 console.error(err);
@@ -1127,69 +1150,102 @@ const BookScreen = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <FlatList 
-                data={books}
-                renderItem={renderBook}
-                key={isBookTile ? '_' : "#"}
-                keyExtractor={isBookTile ? book => "_" + book.book_id : book => "#" + book.book_id}
-                showsVerticalScrollIndicator={false}
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                ref={ref}
-                onEndReached={onEndReached}
-                onEndReachedThreshold={0.3}
-                ListFooterComponent={scrollLoading && <ActivityIndicator />}
-                numColumns={isBookTile ? 2 : 1}
-                ListHeaderComponent={
-                    <>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                marginHorizontal: regWidth * 13,
-                                marginVertical: regHeight * 10,
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                            }}
-                        >
-                            <Pressable
+            { books && books.length !== 0 ? 
+                <FlatList 
+                    data={books}
+                    renderItem={renderBook}
+                    key={isBookTile ? '_' : "#"}
+                    keyExtractor={isBookTile ? book => "_" + book.book_id : book => "#" + book.book_id}
+                    showsVerticalScrollIndicator={false}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    ref={ref}
+                    onEndReached={onEndReached}
+                    onEndReachedThreshold={0.3}
+                    ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                    numColumns={isBookTile ? 2 : 1}
+                    ListHeaderComponent={
+                        <>
+                            <View
                                 style={{
                                     flexDirection: "row",
+                                    marginHorizontal: regWidth * 13,
+                                    marginVertical: regHeight * 10,
                                     alignItems: "center",
+                                    justifyContent: "space-between",
                                 }}
-                                onPress={onPressSort}
                             >
-                                <Image 
-                                    source={iconRepeat}
+                                <Pressable
                                     style={{
-                                        width: regWidth * 15,
-                                        height: regWidth * 15,
+                                        flexDirection: "row",
+                                        alignItems: "center",
                                     }}
-                                />
-                                <Text
-                                    style={{
-                                        fontSize: 13,
-                                        fontWeight: "700",
-                                        marginHorizontal: regWidth * 5,
-                                    }}
+                                    onPress={onPressSort}
                                 >
-                                    {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
-                                </Text>
-                            </Pressable>
-                            <Pressable
-                                onPress={() => dispatch(toggleBookTile())}
-                            >
-                                <Image 
-                                    source={isBookTile ? iconList : iconGrid}
-                                    style={{
-                                        width: regWidth * 20,
-                                        height: regWidth * 20,
-                                    }}
-                                />
-                            </Pressable>
-                        </View>
-                    </>
-                }
-            />
+                                    <Image 
+                                        source={iconRepeat}
+                                        style={{
+                                            width: regWidth * 15,
+                                            height: regWidth * 15,
+                                        }}
+                                    />
+                                    <Text
+                                        style={{
+                                            fontSize: 13,
+                                            fontFamily: "NotoSansKR-Bold",
+                                            marginHorizontal: regWidth * 5,
+                                        }}
+                                    >
+                                        {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
+                                    </Text>
+                                </Pressable>
+                                <Pressable
+                                    onPress={() => dispatch(toggleBookTile())}
+                                >
+                                    <Image 
+                                        source={isBookTile ? iconList : iconGrid}
+                                        style={{
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                        }}
+                                    />
+                                </Pressable>
+                            </View>
+                        </>
+                    }
+                />
+                : 
+                <View 
+                    style={{
+                        alignItems: "center", 
+                        justifyContent: "center",
+                        marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 17,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        lineHeight: regWidth * 24,
+                        }}
+                    >
+                        Let's create a new book that you like.
+                    </Text>
+                    <Text
+                        style={{
+                        fontSize: regWidth * 17,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        lineHeight: regWidth * 24,
+                        marginTop: regHeight * 8,
+                        }}
+                    >
+                        Click + button above to create a new book.
+                    </Text>
+                </View>
+            }
+
             <BottomSheetModal
                 index={0}
                 ref={sortModalRef}
@@ -1200,7 +1256,7 @@ const BookScreen = ({navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -1210,7 +1266,7 @@ const BookScreen = ({navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 0 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -1233,7 +1289,7 @@ const BookScreen = ({navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 1 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -1256,7 +1312,7 @@ const BookScreen = ({navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold", 
                                 color: sort === 2 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -1420,7 +1476,6 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                 style={{ 
                                     opacity,
                                     fontSize: regWidth * 16,
-                                    // fontWeight: "700",
                                     fontFamily: "NotoSansKR-Bold",
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",

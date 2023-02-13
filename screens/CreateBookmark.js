@@ -1,8 +1,8 @@
 import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, ActivityIndicator, Alert, ImageBackground, } from "react-native";
-import React, { useEffect, useState, useCallback, useRef, } from "react";
+import React, { useEffect, useState, useCallback, useRef, useMemo, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, FontAwesome, } from '@expo/vector-icons'; 
 import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
-import { InputCard, InvisibleCard, DotInputCard, } from '../components';
+import { InputCard, InvisibleCard, DotInputCard, AlbumList, } from '../components';
 import Api from "../lib/Api";
 // import * as ImagePicker from 'expo-image-picker';
 import bookCover from '../assets/images/steve.jpeg';
@@ -10,17 +10,28 @@ import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
 import iconCamera from '../assets/images/iconCamera.png';
 import iconImage from '../assets/icons/iconImage.png';
 import iconCheckmarkCircle from '../assets/icons/iconCheckmarkCircle.png';
+import iconArrowForward from '../assets/icons/iconArrowForward.png';
 import iconPlus from '../assets/images/iconPlus.png';
+import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
+import iconPlusCirclePurple from '../assets/icons/iconPlusCirclePurple.png';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
 import RenderHtml from 'react-native-render-html';
 import HTML from 'react-native-render-html';
 import { UnTouchableBookmarkList, } from "../components/BookmarkList";
+import {
+    BottomSheetModal,
+    BottomSheetModalProvider,
+    BottomSheetBackdrop,
+    BottomSheetScrollView,
+    BottomSheetTextInput,
+    BottomSheetFlatList,
+} from '@gorhom/bottom-sheet';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setShouldNemoRefresh, } from '../modules/user';
+import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setShouldNemoRefresh, setShouldNemolistRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -99,6 +110,12 @@ const CreateBookmark = ({navigation, route}) => {
     const isEmpty = (frontContent.length === 0) || (selectedBook === null);
     const [showMenu, setShowMenu] = useState(false);
     const insets = useSafeAreaInsets();
+    const tagRef = useRef();
+
+    const [nemolists, setNemolists] = useState(null);
+    const [newNemolistNum, setNewNemolistNum] = useState(0);
+    const [scrollLoading, setScrollLoading] = useState(false);
+    const [selectedNemolists, setSelectedNemolists] = useState([]);
    
 
 
@@ -354,6 +371,9 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const onAddBookmark = async() => {
+        const nemolistIds = selectedNemolists.map((selectedNemolist) => (selectedNemolist.nemolist_id));
+        console.log(typeof(JSON.stringify(tags)));
+        console.log(typeof(JSON.stringify(nemolistIds)));
         if (isEmpty === false) {
             setCreateBookmarkLoading(true);
             const formData = new FormData();
@@ -365,7 +385,7 @@ const CreateBookmark = ({navigation, route}) => {
             formData.append('hex', color);
             formData.append('text', info);
             formData.append('tags', JSON.stringify(tags));
-            formData.append('nemolist_id', albumId);
+            formData.append('nemolist_id', JSON.stringify(nemolistIds));
             // if (backgroundImage !== null) {
             //     const filename = backgroundImage.split('/').pop();
             //     const match = /\.(\w+)$/.exec(filename ?? '');
@@ -393,6 +413,7 @@ const CreateBookmark = ({navigation, route}) => {
                     // dispatch(setShouldLibraryRefresh(true));
                     // dispatch(setShouldUserRefresh(true));
                     dispatch(setShouldNemoRefresh(true));
+                    dispatch(setShouldNemolistRefresh(true));
                 })
             } catch (err) {
                 console.error(err);
@@ -439,7 +460,7 @@ const CreateBookmark = ({navigation, route}) => {
         } catch (error) {
           console.error(error);
         }
-      };
+    };
 
     // const pickImage = async () => {
     //     try {
@@ -596,18 +617,22 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const changeInfo = (payload) => setInfo(payload);
+    const changeTag = (e) => {
+        console.log(e.nativeEvent.text);
+        setTagValue(e.nativeEvent.text);
+    };
 
-    const changeTag = (payload) => {
-        if (payload.indexOf(",") !== -1) {
-            setTags([
-                ...tags,
-                payload.split(",")[0]
-            ]);
-            setTagValue('');
-        } else {
-            setTagValue(payload);
-        }
-    }
+    // const changeTag = (payload) => {
+    //     if (payload.indexOf(",") !== -1) {
+    //         setTags([
+    //             ...tags,
+    //             payload.split(",")[0]
+    //         ]);
+    //         setTagValue('');
+    //     } else {
+    //         setTagValue(payload);
+    //     }
+    // }
 
     const submitTag = (e) => {
         if (tagValue.length > 0) {
@@ -616,6 +641,7 @@ const CreateBookmark = ({navigation, route}) => {
                 tagValue,
             ]);
             setTagValue('');
+            tagRef.current.clear();
         }
     }
 
@@ -733,6 +759,124 @@ const CreateBookmark = ({navigation, route}) => {
         setTags(bookmark.tags.map((tag) => tag.tag));
     }
 
+    const selectNemolist = (nemolist) => {
+        if (selectedNemolists.findIndex(selectedNemolist => selectedNemolist.nemolist_id === nemolist.nemolist_id) === -1) {
+            setSelectedNemolists([
+                ...selectedNemolists,
+                nemolist,
+            ]);
+        } else {
+            setSelectedNemolists(
+                selectedNemolists.filter(selectedNemolist => selectedNemolist.nemolist_id !== nemolist.nemolist_id)
+            )
+        }
+    }
+
+    const renderAlbum = ({ item, index }) => (
+        <View
+            onPress={() => selectNemolist(item)}
+            style={{ justifyContent: "center",  }}
+        >
+            <AlbumList album={item} navigation={navigation} isDefault={false} />
+            <Pressable
+                onPress={() => selectNemolist(item)}
+                style={{
+                    position: "absolute",
+                    right: 0,
+                    marginHorizontal: regWidth * 12,
+                }}
+            >
+                <Image 
+                    source={selectedNemolists.findIndex(selectedNemolist => selectedNemolist.nemolist_id === item.nemolist_id) === -1 ? iconPlusCircleOutline : iconPlusCirclePurple}
+                    style={{
+                        width: regWidth * 40,
+                        height: regWidth * 40,
+                    }}
+                />
+            </Pressable>
+        </View>
+    )
+
+    const fetchNemolist = async(sortNum) => {
+        try {
+            await Api
+            .post("/api/v4/album/list/", {
+                sort: "recents",
+                items: 0,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setNemolists(res.data);
+                setNewNemolistNum(res.data.length);
+                onPressAlbum();
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemolist();
+        }
+    };
+
+    const getNemolist = async() => {
+        if (nemolists.length >= 16 && newNemolistNum >= 16) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("/api/v4/album/list/", {
+                    sort: sortList[sort],
+                    items: nemolists.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setNemolists([...nemolists, ...res.data.Nemolists, ]);
+                    setNewNemolistNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
+    }
+
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                // animatedIndex={{
+                //     value: 0,
+                // }}
+            />
+        ),
+        []
+    );
+
+    const tagModalRef = useRef();
+    const snapPoints = useMemo(() => [regHeight * 765], []);
+    const onPressTag = useCallback(() => {
+        tagModalRef.current.present();
+    }, [tagModalRef]);
+
+    const onCloseTag = useCallback(() => {
+        tagModalRef.current.dismiss();
+    }, [tagModalRef]);
+
+    const albumModalRef = useRef();
+    const onPressAlbum = useCallback(() => {
+        albumModalRef.current.present();
+    }, [albumModalRef]);
+
+    const onCloseAlbum = useCallback(() => {
+        albumModalRef.current.dismiss();
+    }, [albumModalRef]);
+
     //////////////////////////////////////////////////CROP IMAGE////////////////////////////////////////////////////////////////////////////////////////
     // if (ocrImage !== null) {
     //     return (
@@ -791,16 +935,24 @@ const CreateBookmark = ({navigation, route}) => {
                     }}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     onPress={onAddBookmark}
+                    disabled={createBookmarkLoading ? true : false}
                 >
-                    <Text
-                        style={{
-                            color: "white",
-                            fontSize: regWidth * 17,
-                            fontWeight: "700",
-                        }}
-                    >
-                        Create Nemo
-                    </Text>
+                    {createBookmarkLoading ? 
+                        <ActivityIndicator 
+                            size="small"
+                        />
+                        :
+                        <Text
+                            style={{
+                                color: "white",
+                                fontSize: regWidth * 17,
+                                fontWeight: "700",
+                            }}
+                        >
+                            Create Nemo
+                        </Text>
+                    }
+
                 </Pressable>
                 {/* <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Pressable 
@@ -1318,11 +1470,10 @@ const CreateBookmark = ({navigation, route}) => {
                 </View> */}
                 <Pressable 
                     style={styles.TagAddBox} 
-                    // onPress={() => setInfoVisible(true)}
                 >
-                    {/* <Entypo name="edit" size={regWidth * 20} color="black" /> */}
                     <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Description</Text>
                     <TextInput 
+                        onChangeText={changeInfo}
                         placeholder="Add a description"
                         style={{
                             height: 90,
@@ -1339,25 +1490,51 @@ const CreateBookmark = ({navigation, route}) => {
                         multiline={true}
                     />
                 </Pressable>
-                <Pressable 
+                <View 
                     style={styles.TagAddBox} 
                     // onPress={() => setTagVisible(true)}    
                 >
                     <Text style={{ fontSize: regWidth * 14, fontWeight: "700",  }} >Tags</Text>
-                    <TextInput 
-                        placeholder="Add your tags"
+                    <Pressable
                         style={{
                             width: "70%",
-                            textAlignVertical: "top",
-                            // marginLeft: regWidth * 18,
-                            fontSize: regWidth * 14,
-                            fontWeight: "500",
-                            // lineHeight: regWidth * 20,
-                            // backgroundColor:"pink"
+                            // backgroundColor:"pink",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
                         }}
-                    />
-                </Pressable>
-                <Pressable 
+                        onPress={onPressTag}
+                        // onPress={() => {
+                        //     setTagVisible(true);
+                        // }}
+                    >
+                        <TextInput 
+                            placeholder="Add your tags"
+                            style={{
+                                width: "70%",
+                                textAlignVertical: "top",
+                                // marginLeft: regWidth * 18,
+                                fontSize: regWidth * 14,
+                                fontWeight: "500",
+                                // lineHeight: regWidth * 20,
+                                // backgroundColor:"pink"
+                                color: colors.nemoDark,
+                            }}
+                            editable={false}
+                            pointerEvents="none"
+                            value={tags.map((tag) => `#${tag}`).join(', ')}
+                            multiline={true}
+                        />
+                        <Image 
+                            source={iconArrowForward}
+                            style={{
+                                width: regWidth * 24,
+                                height: regWidth * 24,
+                            }}
+                        />
+                    </Pressable>
+                </View>
+                <View 
                     style={{
                         ...styles.TagAddBox,
                         borderBottomWidth: 0.5,
@@ -1368,19 +1545,43 @@ const CreateBookmark = ({navigation, route}) => {
                     // }}    
                 >
                     <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Nemolists</Text>
-                    <TextInput 
-                        placeholder="Add to your Nemolists"
+                    <Pressable
                         style={{
                             width: "70%",
-                            textAlignVertical: "top",
-                            // marginLeft: regWidth * 18,
-                            fontSize: regWidth * 14,
-                            fontWeight: "500",
-                            // lineHeight: regWidth * 20,
-                            // backgroundColor:"pink"
+                            // backgroundColor:"pink",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
                         }}
-                    />
-                </Pressable>
+                        onPress={() => {
+                            fetchNemolist();
+                        }}
+                    >
+                        <TextInput 
+                            placeholder="Add to your Nemolists"
+                            style={{
+                                width: "70%",
+                                textAlignVertical: "top",
+                                // marginLeft: regWidth * 18,
+                                fontSize: regWidth * 14,
+                                fontWeight: "500",
+                                // lineHeight: regWidth * 20,
+                                // backgroundColor:"pink"
+                            }}
+                            editable={false}
+                            pointerEvents="none"
+                            value={selectedNemolists.map((nemolist) => nemolist.nemolist_title).join(', ')}
+                            multiline={true}
+                        />
+                        <Image 
+                            source={iconArrowForward}
+                            style={{
+                                width: regWidth * 24,
+                                height: regWidth * 24,
+                            }}
+                        />
+                    </Pressable>
+                </View>
 
                 {/* <Pressable 
                     style={styles.TagAddBox} 
@@ -1394,6 +1595,140 @@ const CreateBookmark = ({navigation, route}) => {
 
                 {/* <View style={{height: 200}} ></View> */}
             </ScrollView>
+
+
+            <BottomSheetModal
+                index={0}
+                ref={tagModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View style={styles.modalHeader}>
+                    <Pressable
+                        // onPress={onCloseTag}
+                        style={{opacity: 0}}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Done
+                        </Text>
+                    </Pressable>
+                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                        Tags
+                    </Text>
+                    <Pressable
+                        onPress={onCloseTag}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Done
+                        </Text>
+                    </Pressable>
+                </View>
+                <View
+                    style={{
+                        marginHorizontal: regWidth * 13,
+                        marginTop: regWidth * 13,
+                    }}
+                >
+                    <View
+                        style={{
+                            backgroundColor: "white",
+                            width: regWidth * 350,
+                            height: regHeight * 40,
+                            borderRadius: regWidth * 10,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            paddingHorizontal: regWidth * 12,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontSize: regWidth * 14,
+                                fontFamily: "NotoSansKR-Medium",
+                            }}
+                        >
+                            {"# "}
+                        </Text>
+                        <TextInput 
+                            style={{
+                                // backgroundColor: "pink",
+                                height: "100%",
+                                width: "90%",
+                                fontSize: regWidth * 14,
+                                fontFamily: "NotoSansKR-Medium",
+                            }}
+                            // value={tagValue}
+                            onChange={changeTag}
+                            onSubmitEditing={submitTag}
+                            blurOnSubmit={false}
+                            ref={tagRef}
+                        />
+                    </View>
+                    {tags.map((tag, index) => (
+                        <View 
+                            style={{
+                                marginTop: regHeight * 18,
+                                flexDirection: "row",
+                                alignItems: "center",
+                                marginHorizontal: regWidth * 12,
+                            }}
+                            key={index}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 14,
+                                    fontFamily: "NotoSansKR-Medium",
+                                    color: colors.nemoDark,
+                                }}
+                            >
+                                {`# ${tag}`}
+                            </Text>
+                            <Pressable
+                                onPress={() => deleteTag(index)}
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                style={{ marginHorizontal: regWidth * 4, }}
+                            >
+                                <Feather name="x" size={20} color={colors.textDark} />
+                            </Pressable>
+                        </View>
+                    ))}
+                </View>
+            </BottomSheetModal>
+
+            <BottomSheetModal
+                index={0}
+                ref={albumModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View style={styles.modalHeader}>
+                    <Pressable
+                        // onPress={onCloseAlbum}
+                        style={{ opacity: 0, }}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Cancel
+                        </Text>
+                    </Pressable>
+                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                        Add to Nemolist
+                    </Text>
+                    <Pressable
+                        onPress={onCloseAlbum}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Done
+                        </Text>
+                    </Pressable>
+                </View>
+                <BottomSheetFlatList 
+                    data={nemolists}
+                    renderItem={renderAlbum}
+                />
+            </BottomSheetModal>
+
+
 
             <Modal
                 animationType="fade"
@@ -1597,6 +1932,7 @@ const CreateBookmark = ({navigation, route}) => {
                         onChangeText={changeTag}
                         onSubmitEditing={submitTag}
                         value={tagValue}
+                        blurOnSubmit={false}
                     />
                     <View style={{ flexDirection: "row", }}>
                     <ScrollView
@@ -2173,8 +2509,10 @@ const styles = StyleSheet.create({
     modalHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: regHeight * 10,
-        marginHorizontal: regWidth * 18, 
+        marginVertical: regHeight * 8,
+        alignItems: "center",
+        marginHorizontal: regWidth * 20,
+        // marginHorizontal: regWidth * 18, 
     },
     modalInput: {
         backgroundColor: "#EEEEEE",

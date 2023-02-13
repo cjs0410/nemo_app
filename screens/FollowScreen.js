@@ -10,10 +10,13 @@ import { AlbumList, BookList, UserList, } from '../components';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { colors, regHeight, regWidth } from "../config/globalStyles";
-import { useDispatch } from "react-redux";
+
 import { 
-    setShouldUserRefresh, 
+    setShouldUserRefresh,
+    setShouldFollowingRefresh, 
 } from '../modules/user';
+import { useSelector } from "react-redux";
+import { userSelector } from "../modules/hooks";
 
 const TopTab = createMaterialTopTabNavigator();
 
@@ -158,39 +161,39 @@ const FollowerScreen = ({navigation, route}) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
-                {users && users.map((user, index) => (
-                    <View style={{ justifyContent: "center" }} key={index}>
-                        <Pressable
-                            onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
-                        >
-                            <UserList user={user} navigation={navigation} key={index} />
-                        </Pressable>
-                        <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
-                        {/* <Pressable 
-                            style={{
-                                ...styles.followBtn,
-                                backgroundColor: user.is_follow ? "white" : colors.textNormal,
-                                position: "absolute",
-                                right: 0,
-                                marginHorizontal: regWidth * 8,
-                            }} 
-                            // disabled={ myTag === userTag ? true : false }
-                            // onPress={onFollow}
-                        >
-                            <Text 
-                                style={{ 
-                                    fontSize: regWidth * 13, 
-                                    color: user.is_follow ? colors.textDark : "white",
-                                    fontFamily: "NotoSansKR-Bold",
-                                }}
+            {users && users.length !== 0 ? 
+                <ScrollView>
+                    {users && users.map((user, index) => (
+                        <View style={{ justifyContent: "center" }} key={index}>
+                            <Pressable
+                                onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
                             >
-                                {user.is_follow ? "Following" : "Follow"}
-                            </Text>
-                        </Pressable> */}
-                    </View>
-                ))}
-            </ScrollView>
+                                <UserList user={user} navigation={navigation} key={index} />
+                            </Pressable>
+                            <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
+                        </View>
+                    ))}
+                </ScrollView>
+                : 
+                <View
+                    style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 17,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        }}
+                    >
+                        No one followed you yet...
+                    </Text>
+                </View>
+            }
+
         </View>
     )
 }
@@ -211,6 +214,7 @@ const FollowBtn = (props) => {
                 // console.log(res.data);
                 setIsFollow(res.data.is_follow);
                 dispatch(setShouldUserRefresh(true));
+                dispatch(setShouldFollowingRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -244,6 +248,15 @@ const FollowBtn = (props) => {
 const FollowingScreen = ({navigation, route}) => {
     const { userTag, } = route.params;
     const [users, setUsers] = useState(null);
+    const { shouldFollowingRefresh, } = useSelector(userSelector);
+
+    useEffect(() => {
+        if (shouldFollowingRefresh === true) {
+            fetchUser();
+            dispatch(setShouldFollowingRefresh(false));
+        }
+    }, [shouldFollowingRefresh]);
+
     useEffect(() => {
         fetchUser();
     }, [])
@@ -266,16 +279,37 @@ const FollowingScreen = ({navigation, route}) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView>
-                {users && users.map((user, index) => (
-                    <Pressable
-                        onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
-                        key={index}
+            {users && users.length !== 0 ? 
+                <ScrollView>
+                    {users && users.map((user, index) => (
+                        <Pressable
+                            onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
+                            key={index}
+                        >
+                            <UserList user={user} navigation={navigation} />
+                        </Pressable>
+                    ))}
+                </ScrollView>
+                : 
+                <View
+                    style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: regHeight * 200,
+                    }}
+                >
+                    <Text
+                        style={{
+                        fontSize: regWidth * 17,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.textDark,
+                        }}
                     >
-                        <UserList user={user} navigation={navigation} />
-                    </Pressable>
-                ))}
-            </ScrollView>
+                        Ooops..! You're not following anyone.
+                    </Text>
+                </View>
+            }
+
         </View>
     )
 }

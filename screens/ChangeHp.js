@@ -19,6 +19,7 @@ import iconCheckmark from '../assets/icons/iconCheckmark.png';
 import iconWarning from '../assets/icons/iconWarning.png';
 import Check from '../assets/images/Check.png';
 import Eye from '../assets/images/Eye.png';
+import EyeOpen from '../assets/images/EyeOpen.png';
 import Arrow from '../assets/icons/LeftArrow.png';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -29,6 +30,7 @@ const ChangeHp1 = ({navigation, route}) => {
     const insets = useSafeAreaInsets();
     const [psw, setPsw] = useState('');
     const { profile, } = route.params;
+    const [visible, setVisible] = useState(false);
 
     const onVerifyPsw = async() => {
         try {
@@ -103,17 +105,21 @@ const ChangeHp1 = ({navigation, route}) => {
                             fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",
                             width: "90%",
                         }}
-                        secureTextEntry={true}
+                        secureTextEntry={visible ? false : true}
                     />
-                    <Image 
-                        source={Eye}
-                        style={{
-                            width: regWidth * 25,
-                            height: regWidth * 25,
-                            marginRight: regWidth * 8,
+                    <Pressable
+                        onPress={() => setVisible(!visible)}
+                    >
+                        <Image 
+                            source={visible ? EyeOpen : Eye}
+                            style={{
+                                width: regWidth * 30,
+                                height: regWidth * 30,
+                                marginRight: regWidth * 8,
 
-                        }}
-                    />
+                            }}
+                        />
+                    </Pressable>
                 </View>
                 <View
                    style={{

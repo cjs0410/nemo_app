@@ -22,13 +22,15 @@ import Eye from '../assets/images/Eye.png';
 import Arrow from '../assets/icons/LeftArrow.png';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { resetRefreshToken, resetAvatar, setRefreshToken, setShouldUserRefresh, } from '../modules/user';
+import { userSelector } from '../modules/hooks';
+import { resetRefreshToken, resetAvatar, setRefreshToken, setShouldUserRefresh, resetFcmToken, } from '../modules/user';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const AccountInfo = ({route, navigation}) => {
     const dispatch = useDispatch();
     const { profile, } = route.params;
     const insets = useSafeAreaInsets();
+    const { fcmToken, } = useSelector(userSelector);
 
     const logout = async() => {
         Alert.alert(profile.name, "Are you sure you want to log out of Nemo?", [
@@ -41,6 +43,7 @@ const AccountInfo = ({route, navigation}) => {
                         await Api
                         .post("/api/v1/user/logout/", {
                             refresh_token: refreshToken,
+                            fcm_token: fcmToken,
                         })
                         .then(async(res) => {
                             // navigation.popToTop();
@@ -48,6 +51,7 @@ const AccountInfo = ({route, navigation}) => {
                             await AsyncStorage.removeItem('refresh');
                             dispatch(resetRefreshToken());
                             dispatch(resetAvatar());
+                            dispatch(resetFcmToken());
                         })
                     } catch (err) {
                         console.error(err);
@@ -59,7 +63,6 @@ const AccountInfo = ({route, navigation}) => {
                 
             }
         ]);
-
     }
 
     return (
@@ -79,7 +82,7 @@ const AccountInfo = ({route, navigation}) => {
                 >
                     <Image 
                         source={vectorLeftImage} 
-                        style={{ width: regWidth*35, height: regWidth*35 }}
+                        style={{ width: regWidth*30, height: regWidth*30 }}
                     />
                 </Pressable>
                 <Text style={{
@@ -122,12 +125,20 @@ const AccountInfo = ({route, navigation}) => {
                 </Text>
                 <Pressable 
                     style={{ flexDirection: "row", alignItems: "center", }}
-                    onPress={() => navigation.navigate("ChangeHp1", {profile: profile,})}    
+                    onPress={() => navigation.navigate("ChangeHp1", {profile: profile,})}
+                    disabled={profile.user_ctg === "APPLE" || profile.user_ctg === "GOOGLE" ? true : false}
                 >
                     <Text style={styles.infoTxt}>
                         {profile.hp ? `+82 0${String(profile.hp).replace(/(\d{2})(\d{4})(\d)/, "$1-$2-$3")}` : "-" }
                     </Text>
-                    <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+                    <Ionicons 
+                        name="chevron-forward" 
+                        size={24} 
+                        color={colors.textLight} 
+                        style={{
+                            opacity: profile.user_ctg === "APPLE" || profile.user_ctg === "GOOGLE" ? 0 : 1
+                        }}
+                    />
                 </Pressable>
             </View>
             <View style={styles.infoContainer}>
@@ -137,11 +148,19 @@ const AccountInfo = ({route, navigation}) => {
                 <Pressable 
                     style={{ flexDirection: "row", alignItems: "center", }}
                     onPress={() => navigation.navigate("ChangeEmail1", {profile: profile,})}
+                    disabled={profile.user_ctg === "APPLE" || profile.user_ctg === "GOOGLE" ? true : false}
                 >
                     <Text style={styles.infoTxt}>
                         {profile.email ? profile.email : "-" }
                     </Text>
-                    <Ionicons name="chevron-forward" size={24} color={colors.textLight} />
+                    <Ionicons 
+                        name="chevron-forward" 
+                        size={24} 
+                        color={colors.textLight} 
+                        style={{
+                            opacity: profile.user_ctg === "APPLE" || profile.user_ctg === "GOOGLE" ? 0 : 1
+                        }}
+                    />
                 </Pressable>
             </View>
             <View style={styles.infoContainer}>

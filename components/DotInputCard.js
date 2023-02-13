@@ -39,8 +39,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
 
     useEffect(() => {
         console.log(selectedBook);
-        // console.log(regWidth * 28);
-        // console.log(regHeight * 284);
+        console.log(color)
     }, [selectedBook]);
 
     useEffect(() => {
@@ -161,7 +160,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                     backgroundColor: color === null ? "#D9D9D9" : color, 
                 }}
             >
-                {backgroundImage !== null ? 
+                {/* {backgroundImage !== null ? 
                     <View style={styles.backgroungImageContainer}>
                         <Image 
                             source={{ uri: backgroundImage }}
@@ -170,7 +169,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                     </View>
                     :
                     null
-                }
+                } */}
 
                 <View 
                     style={{
@@ -342,13 +341,14 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                         // backgroundColor: "green",
                         height: regWidth * 270 + extraHeight,
                         paddingHorizontal: regWidth * 7,
+                        // width: "100%",
                     }} 
                     // onLayout={(e) => console.log(e.nativeEvent)}
                 >
                     {ocrLoading ? 
                         <ActivityIndicator 
-                            color="white" 
-                            style={{marginTop: 10}} 
+                            color={colors.nemoDark}
+                            style={{marginTop: regWidth * 135}} 
                             size="large"
                         />
                         :
@@ -361,12 +361,13 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 style={{         
                                     fontSize: regWidth * 16,
                                     lineHeight: regWidth * 28,
-                                    // paddingHorizontal: regWidth * 7,
                                     height: regWidth * 270 + extraHeight,
                                     textAlignVertical: "top",
                                     fontWeight: "500",
                                     // fontFamily: "NotoSansKR-Medium",
                                     // backgroundColor: "pink"
+                                    // paddingHorizontal: regWidth * 7,
+                                    // width: "100%",
                                 }} 
                                 placeholder="Write anything from your reading"
                                 multiline={true}
@@ -415,7 +416,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 <View
                                     style={{
                                         position: "absolute",
-                                        width: "100%",
+                                        // width: "100%",
+                                        width: SCREEN_WIDTH - regWidth * 2 * (13 + 3 + 0.3),
                                         borderStyle: 'dashed',
                                         borderWidth: 0.3,
                                         // backgroundColor: "black",
@@ -434,7 +436,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                     height: "100%",
                                     zIndex: -10,
                                     opacity: 0,
-                                    // paddingHorizontal: regWidth * 7,
+                                    // marginHorizontal: regWidth * 7,
+                                    // width: "100%",
                                     
                                 }}
                                 scrollEnabled={false}

@@ -395,7 +395,7 @@ const OtherProfile = ({navigation, route}) => {
                         >
                             <Image 
                                 source={vectorLeftImage} 
-                                style={{ width: regWidth*35, height: regWidth*35 }}
+                                style={{ width: regWidth*30, height: regWidth*30 }}
                             />
                         </Pressable>
                         {/* <Pressable
@@ -449,10 +449,10 @@ const OtherProfile = ({navigation, route}) => {
                                         marginHorizontal: regWidth * 7,
                                     }}
                                 >
-                                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: colors.nemoNormal, lineHeight: 20, }}>
+                                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", color: colors.nemoNormal, lineHeight: 20, }}>
                                         {`@${profile.user_tag}`}
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 23, fontWeight: "900", color: colors.textDark, lineHeight: 33, }}>
+                                    <Text style={{ fontSize: regWidth * 23, fontFamily: "NotoSansKR-Black", color: colors.textDark, lineHeight: 33, }}>
                                         {profile.name}
                                     </Text>
                                 </View>
@@ -505,7 +505,7 @@ const OtherProfile = ({navigation, route}) => {
                             </Text>
                             <Pressable
                                 style={{ flexDirection: "row", alignItems: "center", }}
-                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag })}
+                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
                             >
                                 <Text style={styles.boldNumberTxt}>
                                     {followers}
@@ -516,7 +516,7 @@ const OtherProfile = ({navigation, route}) => {
                             </Pressable>
                             <Pressable
                                 style={{ flexDirection: "row", alignItems: "center", }}
-                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로잉", userTag: profile.user_tag })}
+                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로잉", userTag: profile.user_tag, name: profile.name, })}
                             >
                                 <Text style={styles.boldNumberTxt}>
                                     {profile.followings}
@@ -529,7 +529,10 @@ const OtherProfile = ({navigation, route}) => {
                         {(userTag === myTag) || (profile.know_together_counts === 0) ? 
                             null
                             : 
-                            <View style={ styles.followedByContainer}>
+                            <Pressable 
+                                style={ styles.followedByContainer}
+                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
+                            >
                                 {profile.know_together.map((user, index) => (
                                     <Animated.Image 
                                         source={ user.avatar !== null ? { uri: user.avatar } : blankAvatar} 
@@ -547,7 +550,7 @@ const OtherProfile = ({navigation, route}) => {
                                 >
                                     {`Followed by ${profile.know_together.map((user, index) => `${index === 0 ? '' : ' '}${user.name}`)} ${profile.know_together_counts - profile.know_together.length === 0 ? "" : `and ${profile.know_together_counts - profile.know_together.length} other`}`}
                                 </Text>
-                            </View>
+                            </Pressable>
                         }
 
                     </>
@@ -675,7 +678,7 @@ const NemoScreen = ({route, navigation,}) => {
 
     const renderBookmark = ({ item, index }) => (
         <Pressable
-            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: "My Library", title: "Bookmarks", index: index, })} 
+            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: userTag, title: "Nemos", index: index, })} 
         >
             <BookmarkList bookmark={item} navigation={navigation} />
         </Pressable>
@@ -1648,7 +1651,7 @@ const styles = StyleSheet.create({
     },
     boldNumberTxt: {
         color: "#202020",
-        fontWeight: "900",
+        fontFamily: "NotoSansKR-Black",
         fontSize: regWidth*16,
         letterSpacing: -regWidth,
         // width: regWidth * 20,
@@ -1656,7 +1659,7 @@ const styles = StyleSheet.create({
     followTxt: {
         marginLeft: regWidth*8,
         marginRight: regWidth*15,
-        fontWeight: "500",
+        fontFamily: "NotoSansKR-Medium",
         color: "#404040",
     },
     followedByContainer: {

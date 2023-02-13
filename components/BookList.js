@@ -34,7 +34,7 @@ const BookList = (props) => {
                     <Text 
                         style={{ 
                             fontSize: regWidth * 20, 
-                            fontWeight: "700", 
+                            fontFamily: "NotoSansKR-Bold",
                             marginHorizontal: 12,
                             lineHeight: regWidth * 23,
                         }}

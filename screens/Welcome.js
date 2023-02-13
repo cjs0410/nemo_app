@@ -70,7 +70,7 @@ const Welcome = ({ navigation }) => {
       const userInfo = await GoogleSignin.signIn();
       // console.log(userInfo);
       // console.log(jwtDecode(userInfo.idToken));
-
+      console.log(userInfo.idToken);
       try {
         await Api
         .post("/api/v1/user/social_login/", {

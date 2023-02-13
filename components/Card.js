@@ -272,7 +272,7 @@ const Card = (props) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 11, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 // marginTop: regWidth * 9, 
                                 marginHorizontal: regWidth * 2, 
                             }}
@@ -1316,12 +1316,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     bookmarkContentsBookTitle: {
-        fontWeight: "400",
+        fontFamily: "NotoSansKR-Regular",
         fontSize: regWidth * 11,
         width: regWidth * 250,
     },
     bookmarkContentsBookChapter: {
-        fontWeight: "900",
+        fontFamily: "NotoSansKR-Bold",
         fontSize: regWidth * 15,
         width: regWidth * 230,
     },

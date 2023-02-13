@@ -1,45 +1,80 @@
-import { View, SafeAreaView, ScrollView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, Image, Animated, } from "react-native";
+import { View, SafeAreaView, ScrollView, Text, Button, StyleSheet, TouchableOpacity, Dimensions, TextInput, Pressable, Image, Animated, Alert, } from "react-native";
 import React, { useEffect, useState, useRef, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import vectorLeftImage from '../assets/icons/vector_left.png';
+import Arrow from '../assets/icons/LeftArrow.png';
+import iconWarning from '../assets/icons/iconWarning.png';
+import Eye from '../assets/images/Eye.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { setUserInfo, setRefreshToken, } from '../modules/user';
 import Api from '../lib/Api';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const FindPassword = ({navigation}) => {
+    const insets = useSafeAreaInsets();
     const logoValue = useRef(new Animated.Value(0)).current;
     const [username, setUsername] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [targetEmail, setTargetEmail] = useState('');
 
+    const [hpOrEmail, setHpOrEmail] = useState('');
+    const [hpOrEmailValue, setHpOrEmailValue] = useState('');
+    const [type, setType] = useState("hp");
+
     const onChangeUsername = (payload) => setUsername(payload);
     const onChangePhoneNumber = (payload) => setPhoneNumber(payload);
     const onChangeEmail = (payload) => setTargetEmail(payload);
 
-    const showLogo = () => {
-        Animated.timing(logoValue, {
-            toValue: 1,
-            duration: 100,
-            useNativeDriver: false,
-        }).start();
+    const onChangeHpOrEmail = (payload) => {
+        setHpOrEmail(payload);
+        setHpOrEmailValue(payload);
+        const emailRegex = /([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
+        const hpRegex = /^01(?:0|1|[6-9])(?:\d{3}|\d{4})\d{4}$/
+        const hpValueRegex = /^\d{2,3}-\d{3,4}-\d{4}$/
+    
+        if (emailRegex.test(payload)) {
+            setHpOrEmail(payload);
+            setHpOrEmailValue(payload);
+            setType("email");
+            // setIsHpOrEmailValid(true);
+        } else {
+            if (hpRegex.test(payload) || hpValueRegex.test(payload)) {
+                setHpOrEmail(payload.replace(/-/g, ''));
+                setHpOrEmailValue(payload.replace(/(\d{3})(\d{4})(\d)/, "$1-$2-$3"));
+                setType("hp");
+                // setIsHpOrEmailValid(true);
+            } else {
+                // setIsHpOrEmailValid(false);
+            }
+        }
     }
 
-    const findPassword = async() => {
+    const verifyUser = async() => {
         try {
-            console.log(username, phoneNumber, targetEmail);
+            console.log(hpOrEmail, type);
             await Api
-            .post("/api/v1/user/find_password/", {
-                username: username,
-                phone_number: phoneNumber,
-                target_email: targetEmail,
+            .post("/api/v1/user/forgot_password/", {
+                hp_or_email: hpOrEmail,
+                type: type,
             })
-            .then((res) => {
-                console.log(res.data);
-                navigation.navigate('FindPassword2');
+            .then(async(res) => {
+                try {
+                    await Api
+                    .post("/api/v1/user/send_authcode/", {
+                        hp_or_email: hpOrEmail,
+                        type: type,
+                    })
+                    .then((res) => {
+                        navigation.navigate('FindPassword2', {hpOrEmail: hpOrEmail});
+                    })
+                } catch (err) {
+                    console.error(err);
+                }
             })
         } catch (err) {
             console.error(err);
@@ -48,112 +83,488 @@ const FindPassword = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
-                <Pressable 
-                    onPress={() => navigation.goBack()} 
-                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </Pressable>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Animated.Image 
-                    source={NemoLogo}
-                    style={{
-                        ...styles.LogoImage,
-                        opacity: logoValue,
-                    }}
-                    onLoadEnd={showLogo}
-                    />
-                </View>
-                <Pressable 
-                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                    style={{ opacity: 0 }}
-                >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </Pressable>
-            </SafeAreaView>
-            <View style={styles.introduce} >
-                <Text style={styles.introduceText}>비밀번호 찾기</Text>
-                <TextInput 
-                    style={styles.input}
-                    placeholder="아이디를 입력해주세요"
-                    onChangeText={onChangeUsername}
-                    autoCapitalize="none"
-                />
-                <TextInput 
-                    style={styles.input}
-                    placeholder="전화번호를 입력해주세요"
-                    onChangeText={onChangePhoneNumber}
-                    value={phoneNumber}
-                    keyboardType="numeric"
-                />
-                <Text style={styles.introduceText}>임시 비밀번호를 전송할 이메일을 입력하세요</Text>
-                <TextInput 
-                    style={styles.input}
-                    placeholder="이메일을 입력해주세요"
-                    onChangeText={onChangeEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable
-                    onPress={findPassword}
-                    style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
-                    // disabled={!buttonActive}
+                    onPress={() => navigation.goBack()}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Text style={{...styles.btnText, color: "white",}} >찾기</Text>
+                    <Text
+                        style={{
+                            fontSize: regWidth * 16,
+                            fontFamily: "NotoSansKR-Regular",
+                        }}
+                    >
+                        Cancel
+                    </Text>
                 </Pressable>
+            </View>
+            <View style={{ marginHorizontal: regWidth * 24, marginTop: regHeight * 28, }}>
+                <Text
+                    style={{
+                        fontSize: regWidth * 22,
+                        fontFamily: "NotoSansKR-Black",
+                    }}
+                >
+                    Enter phone number or email
+                </Text>
+                <Text
+                    style={{
+                        fontSize: regWidth * 22,
+                        fontFamily: "NotoSansKR-Black",
+                    }}
+                >
+                    address of your account
+                </Text>
+                <TextInput 
+                    placeholder="Phone number or email address"
+                    style={{
+                        width: "100%",
+                        // backgroundColor:"pink",
+                        borderBottomWidth: 1,
+                        borderBottomColor: colors.textLight,
+                        marginTop: regHeight * 42,
+                        fontSize: regWidth * 16,
+                        fontFamily: "NotoSansKR-Regular",
+                    }}
+                    multiline={true}
+                    onChangeText={onChangeHpOrEmail}
+                    autoCapitalize="none"
+                    value={hpOrEmailValue}
+                    // onChangeText={(payload) => setFeedback(payload)}
+                />
+                <View
+                   style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginTop: regHeight * 80,
+                    }}
+                >
+                    <Pressable 
+                        style={styles.btn}
+                        onPress={verifyUser}
+                    >
+                        <Text style={styles.btnTxt}>
+                            Continue
+                        </Text>
+                    </Pressable>
+                </View>
             </View>
         </View>
     )
 }
 
 const FindPassword2 = ({route, navigation}) => {
-    const logoValue = useRef(new Animated.Value(0)).current;
+    const dispatch = useDispatch();
+    const { hpOrEmail, } = route.params;
+    const insets = useSafeAreaInsets();
+    const inputRefs = useRef([]);
+    const [authNumList, setAuthNumList] = useState(['', '', '', '', '', '',]);
 
-    const showLogo = () => {
-        Animated.timing(logoValue, {
-            toValue: 1,
-            duration: 100,
-            useNativeDriver: false,
-        }).start();
+    const onSetAuthNum = (payload, index) => {
+        console.log(payload);
+        if (payload.length === 6) {
+            let copy = [...authNumList];
+            for (i = 0; i < 6; i++) {
+                copy[i] = payload[i];
+                setAuthNumList(copy);
+            }
+
+            const next = inputRefs.current[5];
+            next.focus();
+        }
+        // let copy = [...authNumList];
+        // copy[index] = payload;
+        // setAuthNumList(copy);
+
+        // const next = inputRefs.current[index + 1];
+        // if (next && (payload.length === 1)) {
+        //     next.focus();
+        // }
+    }
+
+    const onKeyPress = (e, index) => {
+        const key = e.nativeEvent.key;
+        console.log(key);
+        if (key === "Backspace") {
+            let copy = [...authNumList];
+            copy[index] = '';
+            setAuthNumList(copy);
+
+            if (index !== 0) {
+                const prev = inputRefs.current[index - 1];
+                if (prev) {
+                    prev.focus();
+                }
+            }
+        } 
+        else {
+            let copy = [...authNumList];
+            if (copy[index].length === 0) {
+                copy[index] = key;
+            } else {
+                if (index < 5) {
+                    copy[index + 1] = key;
+                }
+            }
+            setAuthNumList(copy);
+    
+            const next = inputRefs.current[index + 1];
+            if (next && (key.length === 1)) {
+                next.focus();
+            }
+        }
+    }
+
+    const onInputAuth = async() => {
+        try {
+            await Api
+            .post("/api/v1/user/verify_sms/", {
+                hp_or_email: hpOrEmail,
+                auth_number: authNumList.join(''),
+            })
+            .then((res) => {
+                navigation.navigate('FindPassword3', { hpOrEmail: hpOrEmail, });
+            })
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable 
                     onPress={() => navigation.goBack()} 
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Ionicons name="chevron-back" size={28} color="black" />
+                    <Image 
+                        source={Arrow}
+                        style={{ width: regWidth*30, height: regHeight*30 }}
+                        // onLoadEnd={showLogo}
+                    />
                 </Pressable>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Animated.Image 
-                    source={NemoLogo}
+            </View>
+            <View style={{ marginHorizontal: regWidth * 30, }}>
+                <Text
                     style={{
-                        ...styles.LogoImage,
-                        opacity: logoValue,
+                        fontSize: regWidth * 22,
+                        fontFamily: "NotoSansKR-Black",
+                        lineHeight: regWidth * 44,
+                        color: colors.textDark,
                     }}
-                    onLoadEnd={showLogo}
+                >
+                    We sent you a code
+                </Text>
+                <Text
+                    style={{
+                        fontSize: regWidth * 13,
+                        fontFamily: "NotoSansKR-Medium",
+                        lineHeight: regWidth * 20,
+                        color: colors.textLight,
+                    }}
+                >
+                    {`Enter it below to verify phone number or email.`}
+                </Text>
+                <View style={{ flexDirection: "row", justifyContent: "center", marginTop: regHeight*25, }}>
+                    <TextInput 
+                        style={ styles.authInput }
+                        placeholderTextColor={"#000000"}
+                        keyboardType="numeric"
+                        // maxLength={1}
+                        // caretHidden="true"
+                        ref={el => inputRefs.current[0] = el}
+                        onChangeText={(text) => onSetAuthNum(text, 0)}
+                        onKeyPress={(e) => onKeyPress(e, 0)}
+                        autoFocus="true"
+                        value={authNumList[0]}
+                    />
+                    <TextInput 
+                        style={ styles.authInput }
+                        placeholderTextColor={"#000000"}
+                        keyboardType="numeric"
+                        maxLength={1}
+                        // caretHidden="true"
+                        ref={el => inputRefs.current[1] = el}
+                        // onChangeText={(text) => onSetAuthNum(text, 1)}
+                        onKeyPress={(e) => onKeyPress(e, 1)}
+                        value={authNumList[1]}
+                    />
+                    <TextInput 
+                        style={ styles.authInput }
+                        placeholderTextColor={"#606060"}
+                        keyboardType="numeric"
+                        maxLength={1}
+                        // caretHidden="true"
+                        ref={el => inputRefs.current[2] = el}
+                        // onChangeText={(text) => onSetAuthNum(text, 2)}
+                        onKeyPress={(e) => onKeyPress(e, 2)}
+                        value={authNumList[2]}
+                    />
+                    <TextInput 
+                        style={ styles.authInput }
+                        placeholderTextColor={"#606060"}
+                        keyboardType="numeric"
+                        maxLength={1}
+                        caretHidden="true"
+                        ref={el => inputRefs.current[3] = el}
+                        // onChangeText={(text) => onSetAuthNum(text, 3)}
+                        onKeyPress={(e) => onKeyPress(e, 3)}
+                        value={authNumList[3]}
+                    />
+                    <TextInput 
+                        style={ styles.authInput }
+                        placeholderTextColor={"#606060"}
+                        keyboardType="numeric"
+                        maxLength={1}
+                        // caretHidden="true"
+                        ref={el => inputRefs.current[4] = el}
+                        // onChangeText={(text) => onSetAuthNum(text, 4)}
+                        onKeyPress={(e) => onKeyPress(e, 4)}
+                        value={authNumList[4]}
+                    />
+                    <TextInput 
+                        style={ styles.authInput }
+                        placeholderTextColor={"#606060"}
+                        keyboardType="numeric"
+                        maxLength={1}
+                        // caretHidden="true"
+                        ref={el => inputRefs.current[5] = el}
+                        // onChangeText={(text) => onSetAuthNum(text, 5)}
+                        onKeyPress={(e) => onKeyPress(e, 5)}
+                        value={authNumList[5]}
                     />
                 </View>
-                <Pressable 
-                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                    style={{ opacity: 0 }}
-                >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </Pressable>
-            </SafeAreaView>
-            <View style={styles.introduce} >
-                <Text style={styles.introduceText}>임시 비밀번호를</Text>
-                <Text style={styles.introduceText}>입력하신 이메일로 전송했습니다</Text>
 
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Login')}
-                    style={{...styles.introduceBtn, backgroundColor: "#FF4040", }}
+                <View
+                    style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginTop: regHeight * 26,
+                    }}
                 >
-                    <Text style={{...styles.btnText, color: "white",}}>로그인하러 가기</Text>
-                </TouchableOpacity>
+                    <Pressable 
+                        style={styles.btn}
+                        onPress={onInputAuth}
+                        // disabled={isDup === false && isValid === true ? false : true}
+                    >
+                        <Text style={styles.btnTxt}>
+                            Next
+                        </Text>
+                    </Pressable>
+                </View>
+            </View>
+        </View>
+    )
+}
+
+const FindPassword3 = ({navigation, route}) => {
+    const insets = useSafeAreaInsets();
+    const { hpOrEmail, } = route.params;
+    const [psw, setPsw] = useState('');
+    const [pswCheck, setPswCheck] = useState('');
+    const [isPswValid, setIsPswValid] = useState(false);
+    const [isPswCheckValid, setIsPswCheckValid] = useState(false);
+    const isValid = isPswValid && isPswCheckValid;
+
+    const onChangePsw = (payload) => {
+        const pswRegex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/
+        setPsw(payload);
+
+        if (pswRegex.test(payload)) {
+            setIsPswValid(true);
+        } else {
+            setIsPswValid(false);
+        }
+
+        if ((payload === pswCheck)) {
+            setIsPswCheckValid(true);
+        } else {
+            setIsPswCheckValid(false);
+        }
+    }
+
+    const onChangePswCheck = (payload) => {
+        setPswCheck(payload);
+        if (psw === payload) {
+            setIsPswCheckValid(true);
+        } else {
+            setIsPswCheckValid(false);
+        }
+    }
+
+    const changePassword = async() => {
+        try {
+            await Api
+            .post("/api/v1/user/reset_password/", {
+                new_password1: psw,
+                new_password2: pswCheck,
+                hp_or_email: hpOrEmail,
+            })
+            .then((res) => {
+                console.log(res.data);
+                Alert.alert("Your password is updated.", "", [
+                    {
+                        text: "OK", 
+                        onPress: () => navigation.navigate("Login")
+                    }
+                ]);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    return (
+        <View style={styles.container}>
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
+                <Pressable
+                    // onPress={() => navigation.navigate("UserSetting", {profile: profile})}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    style={{opacity: 0,}}
+                >
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                        Done
+                    </Text>
+                </Pressable>
+                <Text style={{
+                    fontSize: regWidth * 18,
+                    fontFamily: "NotoSansKR-Bold",
+                }}>
+                    Change password
+                </Text>
+                <Pressable
+                    onPress={changePassword}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    disabled={isValid ? false : true}
+                    style={{ opacity: isValid ? 1 : 0 }}
+                >
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                        Done
+                    </Text>
+                </Pressable>
+            </View>
+            <View 
+                style={{
+                    marginTop: regHeight * 60,   
+                    marginHorizontal: regWidth * 13,     
+                }}
+            >
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                    New password
+                </Text>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderBottomWidth: 1,
+                        marginTop: regHeight * 20,
+                        paddingBottom: regHeight * 4,
+                    }}
+                >
+                    <TextInput 
+                        onChangeText={onChangePsw}
+                        placeholder="At least 8 characters"
+                        style={{
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Medium",
+                            width: "90%",
+                        }}
+                        autoCapitalize={false}
+                        secureTextEntry={true}
+                    />
+                    <Image 
+                        source={iconWarning}
+                        style={{
+                            width: regWidth * 30,
+                            height: regWidth * 30,
+                            opacity: psw.length > 0 && !isPswValid ? 1 : 0,
+                        }}
+                    />
+                </View>
+                <Text
+                    style={{
+                        fontSize: regWidth * 12,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.redNormal,
+                        opacity: psw.length > 0 && !isPswValid ? 1 : 0,
+                    }}
+                >
+                    {"Make sure to use letters, numbers, and specials(!@#$%^*+-)"}
+                </Text>
+            </View>
+
+            <View 
+                style={{
+                    marginTop: regHeight * 60,   
+                    marginHorizontal: regWidth * 13,     
+                }}
+            >
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                    Confirm password
+                </Text>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderBottomWidth: 1,
+                        marginTop: regHeight * 20,
+                        paddingBottom: regHeight * 4,
+                    }}
+                >
+                    <TextInput 
+                        onChangeText={onChangePswCheck}
+                        placeholder="At least 8 characters"
+                        style={{
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Medium",
+                            width: "90%",
+                        }}
+                        autoCapitalize={false}
+                        secureTextEntry={true}
+                    />
+                    <Image 
+                        source={iconWarning}
+                        style={{
+                            width: regWidth * 30,
+                            height: regWidth * 30,
+                            opacity: pswCheck.length > 0 && !isPswCheckValid ? 1 : 0,
+                        }}
+                    />
+                </View>
+                <Text
+                    style={{
+                        fontSize: regWidth * 12,
+                        fontFamily: "NotoSansKR-Medium",
+                        color: colors.redNormal,
+                        opacity: pswCheck.length > 0 && !isPswCheckValid ? 1 : 0,
+                    }}
+                >
+                    Confirm password is differ from your new password.
+                </Text>
             </View>
         </View>
     )
@@ -165,42 +576,25 @@ const styles = StyleSheet.create({
       backgroundColor: "white",
     },
     header: {
-      marginTop: regHeight * 58,
-      marginHorizontal: regWidth * 20,
-      paddingBottom: regHeight * 30,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    LogoImage: {
-      width: regWidth * 120,
-      height: regWidth * 40,
-      resizeMode: "contain",
-    },
-    introduce: {
-        // marginTop: -regHeight * 18,
-        justifyContent: "center",
-        marginHorizontal: regWidth * 38,
-    },
-    introduceText: {
-        fontSize: regWidth * 24,
-        fontWeight: "900",
-        marginTop: regHeight * 35,
-        textAlign: "center",
-    },
-    introduceBtn: {
-        height: regHeight * 50,
-        backgroundColor: "#EEEEEE",
-        // paddingVertical: 10,
         marginVertical: regHeight * 10,
-        alignContent: "center",
-        justifyContent: "center",
-        borderRadius: 10,
+        marginHorizontal: regWidth * 20,
+        paddingBottom: regHeight * 8,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
-    btnText: {
-        fontSize: regWidth * 16,
-        fontWeight: "500",
-        textAlign: "center",
+    btn: {
+        width: regWidth * 300,
+        height: regWidth * 60,
+        backgroundColor: colors.nemoDark,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: regWidth * 30,
+    },
+    btnTxt: {
+        fontSize: regWidth * 18,
+        fontFamily: "NotoSansKR-Black", 
+        color: "white",
     },
     input: {
         height: regHeight * 50,
@@ -217,6 +611,19 @@ const styles = StyleSheet.create({
         // color: "#FF4040",
         marginTop: regHeight * 8,
     },
+    authInput: {
+        height: regHeight * 40,
+        // backgroundColor: "white",
+        borderBottomWidth: 1,
+        borderBottomColor: "#000000",
+        width: regWidth*36, 
+        marginTop: regHeight*30, 
+        // paddingHorizontal: regWidth*10, 
+        marginHorizontal: regWidth*7.5, 
+        fontSize: regWidth*30, 
+        fontWeight: "900",
+        textAlign: "center"
+    },
 })
 
-export { FindPassword, FindPassword2, };
+export { FindPassword, FindPassword2, FindPassword3, };

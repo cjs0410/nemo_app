@@ -1,9 +1,10 @@
-import { StyleSheet, View, SafeAreaView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, ImageBackground, Vibration, } from "react-native";
+import { StyleSheet, View, SafeAreaView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, RefreshControl, ImageBackground, Vibration, FlatList, } from "react-native";
 import React, { useEffect, useState, useRef, useCallback, useMemo, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
 import blankAvatar from '../assets/images/peopleicon.png';
+import blankNemolistCover from '../assets/images/blankNemolistCover.png';
 import bookCover from '../assets/images/steve.jpeg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
@@ -25,6 +26,7 @@ import iconEdit from '../assets/icons/iconEdit.png';
 import iconTrash from '../assets/icons/iconTrash.png';
 import iconAlert from '../assets/icons/iconAlert.png';
 import iconFollow from '../assets/icons/iconFollow.png';
+import iconUnfollow from '../assets/icons/iconUnfollow.png';
 import iconEyeoff from '../assets/icons/iconEyeoff.png';
 import iconThreeDot from '../assets/icons/iconThreeDot.png';
 import vectorLeftImage from '../assets/icons/vector_left.png';
@@ -50,6 +52,7 @@ const AlbumProfile = ({route, navigation}) => {
     const { albumId, } = route.params;
     const [loading, setLoading] = useState(false);
     const [albumInfo, setAlbumInfo] = useState(null);
+    const [nemo, setNemo] = useState(null);
     const albumCoverValue = useRef(new Animated.Value(0)).current;
     const avatarValue = useRef(new Animated.Value(0)).current;
 
@@ -62,6 +65,7 @@ const AlbumProfile = ({route, navigation}) => {
 
     const [bookmarkNumbering, setBookmarkNumbering] = useState(null);
     const [orderedBookmarks, setOrderedBookmarks] = useState(null);
+    const [newBookmarkNum, setNewBookmarkNum] = useState(0);
 
     const [isDeleteMode, setIsDeleteMode] = useState(false);
     const [selectToDelete, setSelectToDelete] = useState([]);
@@ -73,6 +77,7 @@ const AlbumProfile = ({route, navigation}) => {
     const [likeCount, setLikeCount] = useState(0);
     const insets = useSafeAreaInsets();
     const [rgb, setRgb] = useState(null);
+    const [scrollLoading, setScrollLoading] = useState(false);
 
     useEffect(() => {
         fetchUserTag();
@@ -81,41 +86,105 @@ const AlbumProfile = ({route, navigation}) => {
     useFocusEffect(
         useCallback(() => {
             fetchAlbum();
+            fetchNemo();
         }, []),
     )
 
     const fetchAlbum = async() => {
         try {
             setLoading(true);
-            console.log(albumId);
+            // console.log(albumId);
             await Api.post("/api/v4/album/view/", {
                 nemolist_id: albumId,
             })
             .then((res) => {
                 const bgdColor = res.data.background;
                 if (bgdColor) {
-                    setRgb(bgdColor.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0));
+                    const rgbList = bgdColor.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0);
+                    setRgb(`rgba(${rgbList[0]}, ${rgbList[1]}, ${rgbList[2]}, 0.6)`);
                 }
-                console.log(res.data.bookmarks);
+                console.log(res.data);
                 setAlbumInfo(res.data);
                 setIsLike(res.data.is_like);
                 setLikeCount(res.data.likes);
                 setIsFollow(res.data.is_follow);
                 setIsDefault(res.data.default);
 
-                setBookmarkNumbering(
-                    (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a)
-                )
-                const orderedNumbering = (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
-                setOrderedBookmarks(
-                    orderedNumbering.map((number) => res.data.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
-                )
+                // setBookmarkNumbering(
+                //     (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a)
+                // )
+                // const orderedNumbering = (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                // setOrderedBookmarks(
+                //     orderedNumbering.map((number) => res.data.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
+                // )
             })
         } catch (err) {
             console.error(err);
         }
         setLoading(false);
     }
+
+    const renderBookmark = ({ item, index }) => (
+        <Pressable
+            onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: orderedBookmarks, subTitle: albumInfo.nemolist_title, title: "Nemos", index: index, })} 
+        >
+            <BookmarkList bookmark={item} navigation={navigation} />
+        </Pressable>
+    )
+
+    const fetchNemo = async() => {
+        try {
+            await Api
+            .post("/api/v4/album/scroll/", {
+                nemolist_id: albumId,
+                items: 0,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                const orderedNumbering = (res.data.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                setOrderedBookmarks(
+                    orderedNumbering.map((number) => res.data.find(bookmark => Number(bookmark.numbering) === Number(number)))
+                )
+                setNewBookmarkNum(res.data.length);
+            })
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemo();
+        }
+    };
+
+    const getNemo = async() => {
+        if (orderedBookmarks.length >= 4 && newBookmarkNum >= 4) {
+            // console.log(bookmarks[bookmarks.length - 1].nemo_num);
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("/api/v4/album/scroll/", {
+                    nemolist_id: albumId,
+                    items: orderedBookmarks.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    const orderedNumbering = (res.data.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                    const newBookmarks = orderedNumbering.map((number) => res.data.find(bookmark => Number(bookmark.numbering) === Number(number)));
+                    setOrderedBookmarks(
+                        [...orderedBookmarks, ...newBookmarks]
+                    )
+                    setNewBookmarkNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+            // setCursor(bookmarks.at(-1).cursor);
+        }
+    };
 
     const fetchUserTag = async() => {
         try {
@@ -161,6 +230,12 @@ const AlbumProfile = ({route, navigation}) => {
                 setIsFollow(res.data.is_follow);
                 // setFollowers(res.data.count);
                 // dispatch(setShouldUserRefresh(true));
+                if (res.data.is_follow) {
+                    Alert.alert(albumInfo.user_tag, `You followed ${albumInfo.user_tag}.`);
+                    Vibration.vibrate(30);
+                } else {
+                    Alert.alert(albumInfo.user_tag, `You unfollowed ${albumInfo.user_tag}.`);
+                }
             })
         } catch (err) {
             console.error(err);
@@ -190,7 +265,7 @@ const AlbumProfile = ({route, navigation}) => {
                 nemolist_id: albumId,
             })
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 setBookmarks(res.data);
             })
         } catch (err) {
@@ -224,8 +299,10 @@ const AlbumProfile = ({route, navigation}) => {
             })
             .then((res) => {
                 setSelectedBookmarks([]);
-                fetchAlbum();
+                // fetchAlbum();
+                fetchNemo();
                 onCloseAddNemos();
+                dispatch(setShouldNemolistRefresh(true));
                 // dispatch(setShouldUserRefresh(true));
             })
         } catch (err) {
@@ -251,9 +328,9 @@ const AlbumProfile = ({route, navigation}) => {
                             nemolist_id: albumId,
                         })
                         .then((res) => {
-                            setAlbumModalVisible(false);
+                            onPressClose();
                             navigation.goBack();
-                            dispatch(setShouldUserRefresh(true));
+                            dispatch(setShouldNemolistRefresh(true));
                         })
                     } catch (err) {
                         console.error(err);
@@ -348,7 +425,7 @@ const AlbumProfile = ({route, navigation}) => {
                 <>
                     <View 
                         style={{
-                            backgroundColor: albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : "#baa2ff",
+                            backgroundColor: albumInfo.background ? rgb : (isDefault ? "#baa2ff" : colors.bgdNormal),
                             paddingTop: insets.top,
                             paddingBottom: 0,
                             paddingLeft: insets.left,
@@ -376,6 +453,8 @@ const AlbumProfile = ({route, navigation}) => {
                             <Pressable
                                 onPress={onPressMenu}
                                 hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                                style={{ opacity: isDefault ? 0 : 1 }}
+                                disabled={isDefault ? true : false}
                             >
                                 <Image 
                                     source={iconThreeDot} 
@@ -384,7 +463,215 @@ const AlbumProfile = ({route, navigation}) => {
                             </Pressable>
                         </View>
                     </View>
-                    <ScrollView
+                    <FlatList 
+                        data={orderedBookmarks}
+                        renderItem={renderBookmark}
+                        keyExtractor={bookmark => bookmark.bookmark_id}
+                        showsVerticalScrollIndicator={false}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={0.3}
+                        ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                        ListHeaderComponent={
+                        <>
+                            <View
+                                style={{
+                                    backgroundColor: albumInfo.background ? rgb : (isDefault ? "#baa2ff" : colors.bgdNormal),
+                                    width: "100%",
+                                    height: regHeight * 500,
+                                    marginTop: -regHeight * 500,
+                                }}
+                            />
+                            <LinearGradient 
+                                colors={[
+                                    albumInfo.background ? rgb : (isDefault ? "#baa2ff" : colors.bgdNormal),
+                                    // 'white',
+                                    'white'
+                                ]} 
+                                style={{
+                                    width: "100%",
+                                    height: regHeight * 400,
+                                    // height: "100%",
+                                    position: "absolute",
+                                    // backgroundColor: "pink"
+                                }}
+                            />
+                            <View style={{ alignItems: "center", }}>
+                                {/* <ImageBackground
+                                    source={shadow}
+                                    style={{
+                                        width: regWidth * 220,
+                                        height: regWidth * 220,
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        // marginTop: headerHeight + regHeight * 40,
+                                        marginTop: regHeight * 40,
+                                    }}
+                                > */}
+                                <View
+                                    style={{
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginTop: regHeight * 40,
+                                        // backgroundColor:"pink"
+                                        ...Platform.select({
+                                            ios: {
+                                            shadowColor: "black",
+                                            shadowOffset: { width: 0, height: 8 },
+                                            shadowOpacity: 0.5,
+                                            shadowRadius: 8,
+                                            },
+                                            android: {
+                                            elevation: 3,
+                                            },
+                                        }),
+                                    }}
+                                >
+                                    <Animated.Image 
+                                        source={ albumInfo.nemolist_cover ? { uri: albumInfo.nemolist_cover} : (isDefault ? likedNemos : blankNemolistCover)} 
+                                        style={{
+                                            ...styles.albumCover,
+                                            opacity: albumCoverValue,
+                                            marginTop: -regWidth * 10,
+                                        }}
+                                        onLoadEnd={showAlbumCover}
+                                    />
+                                {/* </ImageBackground> */}
+                                </View>
+                            </View>
+                            <View
+                                style={{
+                                    marginTop: regHeight * 18,
+                                    marginHorizontal: regWidth * 18,
+                                    marginBottom: regHeight * 25,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        fontSize: regWidth * 14,
+                                        fontFamily: "NotoSansKR-Medium",
+                                        lineHeight: regWidth * 21,
+                                    }}
+                                >
+                                    {albumInfo.description}
+                                </Text>
+                                <View
+                                    style={{ 
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                        alignItems: "flex-end",
+                                        marginTop: regHeight * 9,
+                                    }}
+                                >
+                                    <View>
+                                        <Pressable
+                                            onPress={() => navigation.navigate("OtherProfile", { userTag: albumInfo.user_tag,  })}
+                                        >
+                                            <Text
+                                                style={{
+                                                    fontSize: regWidth * 14,
+                                                    fontFamily: "NotoSansKR-Bold",
+                                                    color: colors.nemoDark,
+                                                }}
+                                            >
+                                                {`@${albumInfo.user_tag}`}
+                                            </Text>
+                                        </Pressable>
+                                        <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
+                                            {isDefault ? 
+                                                null
+                                            : 
+                                                <Pressable
+                                                    onPress={() => navigation.push('LikeUsers', { ctg: "nemolist", id: albumId, })}
+                                                    style={{ flexDirection: "row", alignItems: "center", }}
+                                                >
+                                                    <Text style={styles.albumInfoTxt}>
+                                                        {likeCount}
+                                                    </Text>
+                                                    <Text style={styles.albumInfoTxt}>
+                                                        {' likes'}
+                                                    </Text>
+                                                    <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
+                                                </Pressable>
+                                            }
+
+                                            
+                                            <Text style={styles.albumInfoTxt}>
+                                                {albumInfo.nemos}
+                                            </Text>
+                                            <Text style={styles.albumInfoTxt}>
+                                                {' Nemos'}
+                                            </Text>
+                                        </View>
+
+                                    </View>
+                                    {albumInfo.user_tag === userTag ? 
+                                        <>
+                                            {isDefault ? 
+                                                <Text
+                                                    style={{
+                                                        fontSize: regWidth * 14,
+                                                        fontFamily: "NotoSansKR-Bold"
+                                                    }}
+                                                >
+                                                    Nemos that you liked
+                                                </Text>
+                                                :
+                                                <Pressable
+                                                    style={{
+                                                        borderWidth: 2,
+                                                        borderColor: colors.nemoDark,
+                                                        borderRadius: 20,
+                                                        paddingHorizontal: regWidth * 14,
+                                                        paddingVertical: regWidth * 4,
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                    }}
+                                                    onPress={() => {
+                                                        onPressAddNemos();
+                                                        fetchBookmarks();
+                                                    }}
+                                                >
+                                                    <Image 
+                                                        source={iconPlusNemoDark}
+                                                        style={{
+                                                            width: regWidth * 28,
+                                                            height: regWidth * 28,
+                                                        }}
+                                                    />
+                                                    <Text
+                                                        style={{
+                                                            fontSize: regWidth * 19,
+                                                            fontFamily: "NotoSansKR-Black",
+                                                            color: colors.nemoDark,
+                                                        }}
+                                                    >
+                                                        Add Nemos
+                                                    </Text>
+                                                </Pressable>
+                                            }
+                                        </>
+
+                                        :
+                                        <Pressable
+                                            onPress={onLike}
+                                        >
+                                            <Image 
+                                                source={isLike ? iconHeart : iconHeartOutline}
+                                                style={{
+                                                    width: regWidth * 35,
+                                                    height: regWidth * 35,
+                                                }}
+                                            />
+                                        </Pressable>
+                                    }
+
+                                </View>
+                            </View>
+                        </>
+                        }
+                    />
+
+                    {/* <ScrollView
                         style={{
                             // marginTop: -headerHeight,
                             zIndex: 0,
@@ -393,7 +680,7 @@ const AlbumProfile = ({route, navigation}) => {
                     >
                         <View
                             style={{
-                                backgroundColor: albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : "#baa2ff",
+                                backgroundColor: albumInfo.background ? rgb : (isDefault ? "#baa2ff" : colors.bgdNormal),
                                 width: "100%",
                                 height: regHeight * 500,
                                 marginTop: -regHeight * 500,
@@ -401,7 +688,7 @@ const AlbumProfile = ({route, navigation}) => {
                         />
                         <LinearGradient 
                             colors={[
-                                albumInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : "#baa2ff", 
+                                albumInfo.background ? rgb : (isDefault ? "#baa2ff" : colors.bgdNormal),
                                 // 'white',
                                 'white'
                             ]} 
@@ -414,17 +701,6 @@ const AlbumProfile = ({route, navigation}) => {
                             }}
                         />
                         <View style={{ alignItems: "center", }}>
-                            {/* <ImageBackground
-                                source={shadow}
-                                style={{
-                                    width: regWidth * 220,
-                                    height: regWidth * 220,
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    // marginTop: headerHeight + regHeight * 40,
-                                    marginTop: regHeight * 40,
-                                }}
-                            > */}
                             <View
                                 style={{
                                     alignItems: "center",
@@ -445,7 +721,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 }}
                             >
                                 <Animated.Image 
-                                    source={ albumInfo.nemolist_cover !== null ? { uri: albumInfo.nemolist_cover} : likedNemos} 
+                                    source={ albumInfo.nemolist_cover ? { uri: albumInfo.nemolist_cover} : (isDefault ? likedNemos : blankNemolistCover)} 
                                     style={{
                                         ...styles.albumCover,
                                         opacity: albumCoverValue,
@@ -453,12 +729,11 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                     onLoadEnd={showAlbumCover}
                                 />
-                            {/* </ImageBackground> */}
                             </View>
                         </View>
                         <View
                             style={{
-                                marginTop: regHeight * 8,
+                                marginTop: regHeight * 18,
                                 marginHorizontal: regWidth * 18,
                             }}
                         >
@@ -498,7 +773,7 @@ const AlbumProfile = ({route, navigation}) => {
                                             null
                                         : 
                                             <Pressable
-                                                onPress={() => navigation.push('LikeUsers', { ctg: "nemolist", })}
+                                                onPress={() => navigation.push('LikeUsers', { ctg: "nemolist", id: albumId, })}
                                                 style={{ flexDirection: "row", alignItems: "center", }}
                                             >
                                                 <Text style={styles.albumInfoTxt}>
@@ -604,7 +879,7 @@ const AlbumProfile = ({route, navigation}) => {
                             </View>
                         }
 
-                    </ScrollView>
+                    </ScrollView> */}
                 </>
                 :
                 null
@@ -622,7 +897,7 @@ const AlbumProfile = ({route, navigation}) => {
                     <Pressable
                         onPress={onPressClose}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
                             Cancel
                         </Text>
                     </Pressable>
@@ -633,7 +908,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 onPress={onFollow}
                             >
                                 <Image 
-                                    source={iconFollow}
+                                    source={isFollow ? iconUnfollow : iconFollow}
                                     style={{
                                         height: regWidth * 39,
                                         width: regWidth * 39,
@@ -641,12 +916,12 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                         {isFollow ? `Unfollow @${albumInfo.user_tag}` : `Follow @${albumInfo.user_tag}`}
                                     </Text>
                                 </View>
                             </Pressable>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                            {/* <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
                                 <Image 
                                     source={iconEyeoff}
                                     style={{
@@ -660,8 +935,14 @@ const AlbumProfile = ({route, navigation}) => {
                                         {`Block @${albumInfo.user_tag}`}
                                     </Text>
                                 </View>
-                            </Pressable>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                            </Pressable> */}
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
+                                onPress={() => {
+                                    onPressClose();
+                                    navigation.navigate('Report', {ctg: "nemolist", id: albumId});
+                                }}
+                            >
                                 <Image 
                                     source={iconAlert}
                                     style={{
@@ -671,10 +952,10 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                         Report
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                         Report your issue
                                     </Text>
                                 </View>
@@ -698,10 +979,10 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                         Edit
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                         Edit your Nemolist
                                     </Text>
                                 </View>
@@ -719,32 +1000,15 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                         Delete
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                         Delete Nemolist from your library
                                     </Text>
                                 </View>
                             </Pressable>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                                <Image 
-                                    source={iconAlert}
-                                    style={{
-                                        height: regWidth * 39,
-                                        width: regWidth * 39,
-                                        resizeMode: "contain",
-                                    }}
-                                />
-                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
-                                        Report
-                                    </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
-                                        Report your issue
-                                    </Text>
-                                </View>
-                            </Pressable>
+
                         </>
                     }
 
@@ -766,17 +1030,17 @@ const AlbumProfile = ({route, navigation}) => {
                         <Pressable
                             onPress={onCloseAddNemos}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
                                 Cancel
                             </Text>
                         </Pressable>
-                        <Text style={{ fontSize: regWidth * 19, fontWeight: "900", }}>
+                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
                             Add Nemos
                         </Text>
                         <Pressable
                             onPress={onAddBookmark}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
                                 Done
                             </Text>
                         </Pressable>
@@ -807,7 +1071,7 @@ const AlbumProfile = ({route, navigation}) => {
                                     />
                                     :
                                     <View style={styles.numbering}>
-                                        <Text style={{ fontSize: 16, fontWeight: "500", color: "white", }}>
+                                        <Text style={{ fontSize: regWidth * 16, fontFamily: "NotoSansKR-Medium", color: "white", }}>
                                             {Number(selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id)) + 1}
                                         </Text>
                                     </View>

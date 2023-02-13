@@ -128,7 +128,7 @@ const UserSetting = ({route, navigation}) => {
                 >
                     <Image 
                         source={vectorLeftImage} 
-                        style={{ width: regWidth*35, height: regWidth*35 }}
+                        style={{ width: regWidth*30, height: regWidth*30 }}
                     />
                 </Pressable>
                 <Text style={{
@@ -142,7 +142,7 @@ const UserSetting = ({route, navigation}) => {
                 >
                     <Image 
                         source={vectorLeftImage} 
-                        style={{ width: regWidth*35, height: regWidth*35 }}
+                        style={{ width: regWidth*30, height: regWidth*30 }}
                     />
                 </Pressable>
             </View>
@@ -167,27 +167,32 @@ const UserSetting = ({route, navigation}) => {
                 </View>
                 <Ionicons name="chevron-forward" size={24} color="black" />
             </Pressable>
+            {profile.user_ctg === "APPLE" || profile.user_ctg === "GOOGLE" ? 
+                null
+                : 
+                <Pressable 
+                    style={styles.menuContainer}
+                    onPress={() => navigation.navigate('ChangePsw1', { profile: profile, })}
+                >
+                    <Image 
+                        source={iconLock}
+                        style={styles.icon}
+                    />
+                    <View style={{ justifyContent: "center", width: "75%", }}>
+                        <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                            Change your password
+                        </Text>
+                        <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
+                            Whenever change it.
+                        </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={24} color="black" />
+                </Pressable>
+            }
+
             <Pressable 
                 style={styles.menuContainer}
-                onPress={() => setPasswordModalVisible(true)}
-            >
-                <Image 
-                    source={iconLock}
-                    style={styles.icon}
-                />
-                <View style={{ justifyContent: "center", width: "75%", }}>
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
-                        Change your password
-                    </Text>
-                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
-                        Whenever change it.
-                    </Text>
-                </View>
-                <Ionicons name="chevron-forward" size={24} color="black" />
-            </Pressable>
-            <Pressable 
-                style={styles.menuContainer}
-                // onPress={() => setPasswordModalVisible(true)}
+                onPress={() => navigation.navigate('Deactivate1', { profile: profile, })}
             >
                 <Image 
                     source={iconLoaderOutline}
@@ -205,7 +210,7 @@ const UserSetting = ({route, navigation}) => {
             </Pressable>
             <Pressable 
                 style={styles.menuContainer}
-                // onPress={() => setPasswordModalVisible(true)}
+                onPress={() => navigation.navigate('Contact', { profile: profile, })}
             >
                 <Image 
                     source={iconLock}

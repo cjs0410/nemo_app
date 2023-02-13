@@ -2,6 +2,7 @@ import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, Touchabl
 import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, FontAwesome, } from '@expo/vector-icons'; 
 import bookCover from '../assets/images/steve.jpeg';
+import blankNemolistCover from '../assets/images/blankNemolistCover.png';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import likedNemos from '../assets/images/likedNemos.png';
 import longLikedNemos from '../assets/images/longLikedNemos.png';
@@ -29,7 +30,7 @@ const AlbumTile = (props) => {
         >
             <View style={{ alignItems: "center", }}>
                 <Animated.Image 
-                    source={ isDefault ? longLikedNemos : { uri: album.nemolist_cover }} 
+                    source={album.nemolist_cover ? { uri: album.nemolist_cover } : (isDefault ? longLikedNemos : blankNemolistCover)} 
                     style={{
                         ...styles.AlbumImage,
                         opacity: albumCoverValue,

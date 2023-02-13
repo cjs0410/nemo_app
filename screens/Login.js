@@ -6,7 +6,7 @@ import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setUserInfo, setRefreshToken, } from '../modules/user';
+import { setUserInfo, setRefreshToken, setFcmToken, } from '../modules/user';
 import Api from '../lib/Api';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
 import messaging from '@react-native-firebase/messaging';
@@ -111,6 +111,9 @@ const Login = ({ navigation }) => {
       await Api
       .post("/api/v1/user/fcm_token/", {
         token: fcmToken,
+      })
+      .then((res) => {
+        dispatch(setFcmToken(fcmToken));
       })
       // .then((res) => {
       //   console.log(res.data);

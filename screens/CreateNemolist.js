@@ -11,6 +11,7 @@ import {
     ActivityIndicator, 
     Alert, 
     ImageBackground, 
+    FlatList,
 } from "react-native";
 import React, { useEffect, useState, useCallback, useRef, useMemo, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, FontAwesome, } from '@expo/vector-icons'; 
@@ -28,6 +29,7 @@ import iconPlusNemoDark from '../assets/icons/iconPlusNemoDark.png';
 import addBookCover from '../assets/images/addBookCover.png';
 import iconBook from '../assets/icons/iconBook.png';
 import addAlbumCover from '../assets/images/addAlbumCover.png';
+import blankNemolistCover from '../assets/images/blankNemolistCover.png';
 import shadow from '../assets/images/shadow.png';
 import iconPlusCircle from '../assets/icons/iconPlusCircle.png';
 
@@ -42,7 +44,7 @@ import { BookList, } from '../components';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, } from '../modules/user';
+import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setShouldNemolistRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
 import { color } from "react-native-reanimated";
@@ -55,6 +57,7 @@ import {
     BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CreateNemolist1 = ({navigation}) => {
     const [albumTitle, setAlbumTitle] = useState('');
@@ -114,7 +117,7 @@ const CreateNemolist1 = ({navigation}) => {
                         width: "80%",
                         alignItems: "center",
                         justifyContent: "center",
-                        paddingVertical: regWidth * 12,
+                        height: regWidth * 60,
                         borderRadius: 30,
                     }}
                     onPress={() => navigation.navigate('CreateNemolist2', { albumTitle: albumTitle, })}
@@ -135,6 +138,7 @@ const CreateNemolist1 = ({navigation}) => {
 }
 
 const CreateNemolist2 = ({navigation, route}) => {
+    const dispatch = useDispatch();
     const [albumCover, setAlbumCover] = useState(null);
     const { albumTitle, } = route.params;
     const [loading, setLoading] = useState(null);
@@ -170,14 +174,17 @@ const CreateNemolist2 = ({navigation, route}) => {
 
     const makeAlbum = async() => {
         const formData = new FormData();
-        const filename = albumCover.split('/').pop();
-        const match = /\.(\w+)$/.exec(filename ?? '');
-        const type = match ? `image/${match[1]}` : `image`;
-        formData.append('nemolist_cover', {
-            uri: albumCover,
-            type: type,
-            name: filename,
-        });
+        if (albumCover) {
+            const filename = albumCover.split('/').pop();
+            const match = /\.(\w+)$/.exec(filename ?? '');
+            const type = match ? `image/${match[1]}` : `image`;
+            formData.append('nemolist_cover', {
+                uri: albumCover,
+                type: type,
+                name: filename,
+            });
+        }
+
     
         formData.append('nemolist_title', albumTitle)
         
@@ -193,8 +200,8 @@ const CreateNemolist2 = ({navigation, route}) => {
             )
             .then((res) => {
                 console.log(res.data);
-                // dispatch(setShouldUserRefresh(true));
-                navigation.navigate('CreateNemolist3', { albumTitle: albumTitle, albumCover: albumCover, hex: res.data.hex, albumId: res.data.nemolist_id, })
+                dispatch(setShouldNemolistRefresh(true));
+                navigation.navigate('CreateNemolist3', { albumTitle: albumTitle, albumCover: albumCover, hex: res.data.hex ? res.data.hex : colors.bgdNormal, albumId: res.data.nemolist_id, })
             })
         } catch (err) {
           console.error(err);
@@ -256,16 +263,17 @@ const CreateNemolist2 = ({navigation, route}) => {
                         width: "80%",
                         alignItems: "center",
                         justifyContent: "center",
-                        paddingVertical: regWidth * 12,
                         borderRadius: 30,
+                        height: regWidth * 60,
                     }}
                     onPress={makeAlbum}
+                    disabled={loading ? true : false}
                 >
                     {loading ? 
                         <ActivityIndicator 
                             color="white" 
                             // style={{marginTop: 100}} 
-                            size="large"
+                            size="small"
                         />
                         :
                         <Text
@@ -286,6 +294,7 @@ const CreateNemolist2 = ({navigation, route}) => {
                         borderBottomColor: colors.textNormal,
                         marginTop: regHeight * 7,
                     }}
+                    disabled={loading ? true : false}
                 >
                     <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: colors.textNormal, }}>
                         Skip for now
@@ -308,10 +317,17 @@ const CreateNemolist3 = ({navigation, route}) => {
     const [albumInfo, setAlbumInfo] = useState(null);
     const [bookmarkNumbering, setBookmarkNumbering] = useState(null);
     const [orderedBookmarks, setOrderedBookmarks] = useState(null);
+    const [newBookmarkNum, setNewBookmarkNum] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [rgb, setRgb] = useState(null);
+    const insets = useSafeAreaInsets();
+    const [scrollLoading, setScrollLoading] = useState(false);
 
     useEffect(() => {
         fetchUserTag();
+        const rgbList = hex.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0);
+        console.log(rgbList);
+        setRgb(`rgba(${rgbList[0]}, ${rgbList[1]}, ${rgbList[2]}, 0.6)`);
     }, [])
 
     const showAlbumCover = () => {
@@ -345,16 +361,74 @@ const CreateNemolist3 = ({navigation, route}) => {
                 setBookmarkNumbering(
                     (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a)
                 )
-                const orderedNumbering = (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
-                setOrderedBookmarks(
-                    orderedNumbering.map((number) => res.data.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
-                )
+                // const orderedNumbering = (res.data.bookmarks.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                // setOrderedBookmarks(
+                //     orderedNumbering.map((number) => res.data.bookmarks.find(bookmark => Number(bookmark.numbering) === Number(number)))
+                // )
             })
         } catch (err) {
             console.error(err);
         }
         setLoading(false);
     }
+
+    const renderBookmark = ({ item, index }) => (
+        <BookmarkList bookmark={item} navigation={navigation} />
+    )
+
+    const fetchNemo = async() => {
+        try {
+            await Api
+            .post("/api/v4/album/scroll/", {
+                nemolist_id: albumId,
+                items: 0,
+            })
+            .then((res) => {
+                console.log(res.data);
+                const orderedNumbering = (res.data.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                setOrderedBookmarks(
+                    orderedNumbering.map((number) => res.data.find(bookmark => Number(bookmark.numbering) === Number(number)))
+                )
+                setNewBookmarkNum(res.data.length);
+            })
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemo();
+        }
+    };
+
+    const getNemo = async() => {
+        if (orderedBookmarks.length >= 4 && newBookmarkNum >= 4) {
+            // console.log(bookmarks[bookmarks.length - 1].nemo_num);
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("/api/v4/album/scroll/", {
+                    nemolist_id: albumId,
+                    items: orderedBookmarks.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    const orderedNumbering = (res.data.map((bookmark) => (Number(bookmark.numbering)))).sort((a, b) => b - a);
+                    const newBookmarks = orderedNumbering.map((number) => res.data.find(bookmark => Number(bookmark.numbering) === Number(number)));
+                    setOrderedBookmarks(
+                        [...orderedBookmarks, ...newBookmarks]
+                    )
+                    setNewBookmarkNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+            // setCursor(bookmarks.at(-1).cursor);
+        }
+    };
 
     const fetchBookmarks = async() => {
         try {
@@ -397,7 +471,9 @@ const CreateNemolist3 = ({navigation, route}) => {
             })
             .then((res) => {
                 setSelectedBookmarks([]);
-                fetchAlbum();
+                // fetchAlbum();
+                fetchNemo();
+                dispatch(setShouldNemolistRefresh(true));
                 // dispatch(setShouldLibraryRefresh(true));
                 onCloseAddNemos();
             })
@@ -444,9 +520,13 @@ const CreateNemolist3 = ({navigation, route}) => {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView 
+            <View 
                 style={{
-                    backgroundColor: hex ? hex : colors.nemoLight,
+                    backgroundColor: rgb ? rgb : colors.nemoLight,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right,
                 }}
             >
                 <View style={styles.albumHeader}>
@@ -491,8 +571,233 @@ const CreateNemolist3 = ({navigation, route}) => {
                         </Text>
                     </Pressable>
                 </View>
-            </SafeAreaView>
-            <ScrollView
+            </View>
+
+            <FlatList 
+                data={orderedBookmarks}
+                renderItem={renderBookmark}
+                keyExtractor={bookmark => bookmark.bookmark_id}
+                showsVerticalScrollIndicator={false}
+                onEndReached={onEndReached}
+                onEndReachedThreshold={0.3}
+                ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                ListHeaderComponent={
+                    <>
+                        <View
+                            style={{
+                                backgroundColor: rgb ? rgb : colors.nemoLight,
+                                width: "100%",
+                                height: regHeight * 500,
+                                marginTop: -regHeight * 500,
+                            }}
+                        />
+                        <LinearGradient 
+                            colors={[
+                                rgb ? rgb : colors.nemoLight,
+                                // 'white',
+                                'white'
+                            ]} 
+                            style={{
+                                width: "100%",
+                                height: regHeight * 400,
+                                // height: "100%",
+                                position: "absolute",
+                                // backgroundColor: "pink"
+                            }}
+                        />
+                        <View style={{ alignItems: "center", }}>
+                            <View
+                                style={{
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginTop: regHeight * 40,
+                                    // backgroundColor:"pink"
+                                    ...Platform.select({
+                                        ios: {
+                                            shadowColor: "black",
+                                            shadowOffset: { width: 0, height: 8 },
+                                            shadowOpacity: 0.5,
+                                            shadowRadius: 8,
+                                        },
+                                        android: {
+                                            elevation: 3,
+                                        },
+                                    }),
+                                }}
+                            >
+                                <Animated.Image 
+                                    source={albumCover ? {uri: albumCover} : blankNemolistCover} 
+                                    style={{
+                                        ...styles.albumCover,
+                                        opacity: albumCoverValue,
+                                        marginTop: -regWidth * 10,
+                                    }}
+                                    onLoadEnd={showAlbumCover}
+                                />
+                            </View>
+                        </View>
+                        <View
+                            style={{
+                                marginTop: regHeight * 18,
+                                marginHorizontal: regWidth * 18,
+                                marginBottom: regHeight * 25,
+                            }}
+                        >
+                            {addTextMode ? 
+                                <View>
+                                    <Text style={{ fontSize: regWidth * 13, fontWeight: "500", color: colors.nemoDark, }}>
+                                        Description
+                                    </Text>
+                                    <TextInput 
+                                        style={{
+                                            borderBottomWidth: 1,
+                                            fontSize: regWidth * 14,
+                                            fontFamily: "NotoSansKR-Medium",
+                                            marginTop: regHeight * 8,
+                                        }}
+                                        onChangeText={(payload) => setText(payload)}
+                                        multiline={true}
+                                    />
+                                </View>
+                                :
+                                <>
+                                    {text ? 
+                                        <Text
+                                            style={{
+                                                fontSize: regWidth * 14,
+                                                fontWeight: "500",
+                                                lineHeight: regWidth * 21,
+                                            }}
+                                        >
+                                            {text}
+                                        </Text>
+                                        : 
+                                        <View style={{ alignItems: "center", }}>
+                                            <Pressable
+                                                style={{
+                                                    marginVertical: regHeight * 8,
+                                                    borderWidth: 1,
+                                                    borderColor: colors.nemoNormal,
+                                                    borderRadius: 20,
+                                                    paddingHorizontal: regWidth * 14,
+                                                    paddingVertical: regWidth * 6,
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                }}
+                                                onPress={() => setAddTextMode(true)}
+                                            >
+                                                <Image 
+                                                    source={iconPlusNemoNormal}
+                                                    style={{
+                                                        width: regWidth * 25,
+                                                        height: regWidth * 25,
+                                                    }}
+                                                />
+                                                <Text
+                                                    style={{
+                                                        fontSize: regWidth * 17,
+                                                        fontWeight: "700",
+                                                        color: colors.nemoNormal,
+                                                    }}
+                                                >
+                                                    Add Description
+                                                </Text>
+                                            </Pressable>
+                                        </View>
+                                    }
+                                </>
+
+                            }
+
+                            <View
+                                style={{ 
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginTop: regHeight * 9,
+                                }}
+                            >
+                                <View>
+                                    <Text
+                                        style={{
+                                            fontSize: regWidth * 14,
+                                            fontWeight: "700",
+                                            color: colors.nemoDark,
+                                        }}
+                                    >
+                                        {`@${userTag}`}
+                                    </Text>
+                                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
+                                        <Text style={styles.albumInfoTxt}>
+                                            0
+                                        </Text>
+                                        <Text style={styles.albumInfoTxt}>
+                                            {' likes'}
+                                        </Text>
+                                        <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
+                                        <Text style={styles.albumInfoTxt}>
+                                            0
+                                        </Text>
+                                        <Text style={styles.albumInfoTxt}>
+                                            {' Nemos'}
+                                        </Text>
+                                    </View>
+
+                                </View>
+                            </View>
+                        </View>
+                        {orderedBookmarks === null ? 
+                            <View style={{ alignItems: "center", marginTop: regHeight * 80, }}>
+                                <Pressable
+                                    style={{
+                                        marginVertical: regHeight * 8,
+                                        borderWidth: 2,
+                                        borderColor: colors.nemoDark,
+                                        borderRadius: 20,
+                                        paddingHorizontal: regWidth * 14,
+                                        paddingVertical: regWidth * 4,
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                    }}
+                                    onPress={() => {
+                                        onPressAddNemos();
+                                        fetchBookmarks();
+                                    }}
+                                >
+                                    <Image 
+                                        source={iconPlusNemoDark}
+                                        style={{
+                                            width: regWidth * 28,
+                                            height: regWidth * 28,
+                                        }}
+                                    />
+                                    <Text
+                                        style={{
+                                            fontSize: regWidth * 19,
+                                            fontWeight: "900",
+                                            color: colors.nemoDark,
+                                        }}
+                                    >
+                                        Add Nemos
+                                    </Text>
+                                </Pressable>
+                                <Text
+                                    style={{
+                                        fontSize: regWidth * 17,
+                                        fontWeight: "700",
+                                        color: colors.nemoDark,
+                                    }}
+                                >
+                                    Add Nemos to your Nemolist
+                                </Text>
+                            </View>
+                            :
+                            null
+                        }
+                    </>
+                }
+            />
+            {/* <ScrollView
                 style={{
                     // marginTop: -headerHeight,
                     zIndex: 0,
@@ -502,7 +807,7 @@ const CreateNemolist3 = ({navigation, route}) => {
             >
                 <LinearGradient 
                     colors={[
-                        hex ? hex : colors.nemoLight,
+                        rgb ? rgb : colors.nemoLight,
                         // 'white',
                         'white'
                     ]} 
@@ -515,19 +820,27 @@ const CreateNemolist3 = ({navigation, route}) => {
                     }}
                 />
                 <View style={{ alignItems: "center", }}>
-                    <ImageBackground
-                        source={shadow}
+                    <View
                         style={{
-                            width: regWidth * 220,
-                            height: regWidth * 220,
                             alignItems: "center",
                             justifyContent: "center",
-                            // marginTop: headerHeight + regHeight * 40,
                             marginTop: regHeight * 40,
+                            // backgroundColor:"pink"
+                            ...Platform.select({
+                                ios: {
+                                    shadowColor: "black",
+                                    shadowOffset: { width: 0, height: 8 },
+                                    shadowOpacity: 0.5,
+                                    shadowRadius: 8,
+                                },
+                                android: {
+                                    elevation: 3,
+                                },
+                            }),
                         }}
                     >
                         <Animated.Image 
-                            source={{uri: albumCover}} 
+                            source={albumCover ? {uri: albumCover} : blankNemolistCover} 
                             style={{
                                 ...styles.albumCover,
                                 opacity: albumCoverValue,
@@ -535,11 +848,11 @@ const CreateNemolist3 = ({navigation, route}) => {
                             }}
                             onLoadEnd={showAlbumCover}
                         />
-                    </ImageBackground>
+                    </View>
                 </View>
                 <View
                     style={{
-                        marginTop: regHeight * 8,
+                        marginTop: regHeight * 18,
                         marginHorizontal: regWidth * 18,
                     }}
                 >
@@ -552,7 +865,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                 style={{
                                     borderBottomWidth: 1,
                                     fontSize: regWidth * 14,
-                                    fontWeight: "500",
+                                    fontFamily: "NotoSansKR-Medium",
                                     marginTop: regHeight * 8,
                                 }}
                                 onChangeText={(payload) => setText(payload)}
@@ -709,7 +1022,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                     </>
                 }
 
-            </ScrollView>
+            </ScrollView> */}
             <BottomSheetModal
                 index={0}
                 ref={addModalRef}

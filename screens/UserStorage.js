@@ -248,10 +248,10 @@ const UserStorage = ({route, navigation}) => {
                                         marginHorizontal: regWidth * 7,
                                     }}
                                 >
-                                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: colors.nemoNormal, lineHeight: 20, }}>
+                                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", color: colors.nemoNormal, lineHeight: 20, }}>
                                         {`@${profile.user_tag}`}
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 23, fontWeight: "900", color: colors.textDark, lineHeight: 33, }}>
+                                    <Text style={{ fontSize: regWidth * 23, fontFamily: "NotoSansKR-Black", color: colors.textDark, lineHeight: 33, }}>
                                         {profile.name}
                                     </Text>
                                 </View>
@@ -263,7 +263,7 @@ const UserStorage = ({route, navigation}) => {
                                 <Text 
                                     style={{ 
                                         fontSize: regWidth * 13, 
-                                        fontWeight: "500",
+                                        fontFamily: "NotoSansKR-Medium",
                                         color: colors.textDark,
                                     }}
                                 >
@@ -333,12 +333,16 @@ const UserStorage = ({route, navigation}) => {
                             >
                                 Nemo Calender
                             </Text>
-                            <TouchableOpacity 
-                                style={ styles.streakBtn } 
+                            <Pressable 
+                                style={{
+                                    ...styles.streakBtn,
+                                    opacity: profile.streak === 0 ? 0 : 1,
+                                }} 
                             >
                                 <Text style={{ fontSize: regWidth * 16, fontWeight: "700", color: "#FFFFFF" }} >
-                                    6-day streak!</Text>
-                            </TouchableOpacity>
+                                    {`${profile.streak}-day streak!`}
+                                </Text>
+                            </Pressable>
                         </View>
                         <View style={{ marginTop: regHeight * 15, }}>
                             <Text
@@ -351,7 +355,7 @@ const UserStorage = ({route, navigation}) => {
                             >
                                 {`You've made ${profile.month_nemos} Nemos this month!`}
                             </Text>
-                            <Text
+                            {/* <Text
                                 style={{ 
                                     lineHeight: regHeight*19, 
                                     color: "#404040",
@@ -360,7 +364,7 @@ const UserStorage = ({route, navigation}) => {
                                 }}
                             >
                                 15% more than the previous month. Great move!
-                            </Text>
+                            </Text> */}
                         </View>
                         <View 
                             style={ styles.boardContainer }
@@ -512,7 +516,7 @@ const styles = StyleSheet.create({
     },
     boldNumberTxt: {
         color: "#202020",
-        fontWeight: "900",
+        fontFamily: "NotoSansKR-Black",
         fontSize: regWidth*16,
         letterSpacing: -regWidth,
         // width: regWidth * 20,
@@ -520,7 +524,7 @@ const styles = StyleSheet.create({
     followTxt: {
         marginLeft: regWidth*8,
         marginRight: regWidth*15,
-        fontWeight: "500",
+        fontFamily: "NotoSansKR-Medium",
         color: "#404040",
     },
     followedByContainer: {

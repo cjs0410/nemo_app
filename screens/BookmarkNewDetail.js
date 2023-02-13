@@ -1,11 +1,13 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, Image, ScrollView, FlatList, Dimensions, TouchableOpacity, ActivityIndicator, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, Image, ScrollView, FlatList, Dimensions, TouchableOpacity, ActivityIndicator, Pressable, } from "react-native";
 import React, { useEffect, useState, useRef, useCallback, } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import SelectDropdown from 'react-native-select-dropdown'
 import { Entypo, Feather, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import bookCover from '../assets/images/steve.jpeg';
+import vectorLeftImage from '../assets/icons/vector_left.png';
 import { Card, BookmarkTile, BookmarkDetail } from '../components';
 import user from "../modules/user";
+import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { bookmarkSelector } from '../modules/hooks';
@@ -67,26 +69,35 @@ const BookmarkNewDetail = ({route, navigation}) => {
                     paddingRight: insets.right
                 }}
             >
-                <TouchableOpacity onPress={() => navigation.goBack()} >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </TouchableOpacity>
+                <Pressable
+                    onPress={() => navigation.goBack()}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Image 
+                        source={vectorLeftImage} 
+                        style={{ width: regWidth*30, height: regWidth*30 }}
+                    />
+                </Pressable>
                 <View style={{ alignItems: "center", }}>
-                    <Text style={{ fontSize: 10, fontWeight: "500", color: "#808080", }} >
+                    <Text style={{ fontSize: regWidth * 10, fontFamily: "NotoSansKR-Medium", color: "#808080", }} >
                         {subTitle}
                     </Text>
                     <TouchableOpacity
                         // onPress={autoScroll}
                     >
                         <Text style={{
-                            fontSize: 16,
-                            fontWeight: "500",
+                            fontSize: regWidth * 16,
+                            fontFamily: "NotoSansKR-Medium",
                         }}>
                             {title}
                         </Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{ opacity: 0, }} >
-                    <MaterialCommunityIcons name="square-outline" size={30} color="black" />
+                    <Image 
+                        source={vectorLeftImage} 
+                        style={{ width: regWidth*30, height: regWidth*30 }}
+                    />
                 </View>
             </View>
             {/* <ScrollView 

@@ -99,7 +99,7 @@ const ProfileEdit = ({route, navigation}) => {
         if (profile && profile.birth) {
             console.log(profile.birth.split("-"));
             const format = profile.birth.split("-");
-            const monthName = getMonthName(Number(format[1]))
+            const monthName = getMonthName(Number(format[1]));
             console.log(`${monthName} ${format[2]}, ${format[0]}`);
             setDate(`${monthName} ${format[2]}, ${format[0]}`);
         }

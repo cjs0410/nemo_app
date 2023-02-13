@@ -33,3 +33,5 @@ export { default as NemoCalender } from './NemoCalender';
 export { default as AccountInfo } from './AccountInfo';
 export { default as ChangeGender } from './ChangeGender';
 export { default as EditAlbum } from './EditAlbum';
+export { default as Contact } from './Contact';
+export { default as Report } from './Report';

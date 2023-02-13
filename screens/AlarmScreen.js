@@ -3,17 +3,25 @@ import React, { useEffect, useState, useRef, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import writerImage from '../assets/images/userImage.jpeg';
 import blankAvatar from '../assets/images/peopleicon.png';
+import vectorLeftImage from '../assets/icons/vector_left.png';
+import dailyRecord from '../assets/images/dailyRecord.png';
 import Api from '../lib/Api';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
 import { setUserInfo, setAccessToken, setRefreshToken, resetRefreshToken, setAvatar, setIsAlarm, } from '../modules/user';
+import { colors, regHeight, regWidth } from "../config/globalStyles";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { 
+    setShouldUserRefresh, 
+} from '../modules/user';
 
 const AlarmScreen = ({navigation}) => {
     const dispatch = useDispatch();
     const [alarms, setAlarms] = useState(null);
-    const ctg = ["NS", "FS", "NL", "NLL", ];
-    const answer = ["의 Nemo를 저장했습", "을 팔로우하기 시작했습", "의 Nemo를 좋아합", "의 Nemolist를 좋아합" ];
+    const ctg = ["NS", "FS", "NL", "NLL", "TR", "ST", ];
+    const answer = ["saved your Nemo.", "started following you.", "liked your Nemo.", "liked your Nemolist." ];
+    const insets = useSafeAreaInsets();
     // const [whichCtg, setWhichCtg] = useState()
 
     useEffect(() => {
@@ -34,47 +42,332 @@ const AlarmScreen = ({navigation}) => {
         }
     }
 
+    const fetchNemo = async(id) => {
+        console.log(id);
+        try {
+            await Api
+            .post("/api/v2/bookmark/read/", {
+                bookmark_id: id
+            })
+            .then((res) => {
+                console.log(res.data);
+                let singleList = [];
+                singleList.push(res.data);
+                navigation.navigate('BookmarkNewDetail', { bookmarks: singleList, subTitle: "Notifications", title: "Nemo", index: 0, })
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View style={styles.container}>
-            <SafeAreaView style={styles.header}>
-                <Pressable 
-                    onPress={() => navigation.goBack()} 
-                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </Pressable>
-                <Text style={{
-                    fontSize: 16,
-                    fontWeight: "500",
-                }}>
-                    알림
-                </Text>
-                <Pressable 
-                    style={{ opacity: 0, }}
-                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                >
-                    <Ionicons name="chevron-back" size={28} color="black" />
-                </Pressable>
-            </SafeAreaView>
-            <ScrollView>
-                {alarms !== null && alarms.map((alarm, index) => (
-                    <View style={styles.alarmList} key={index} >
+            <View 
+                style={{
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right,
+                }}
+            >
+                <View style={styles.header}>
+                    <Pressable
+                        onPress={() => navigation.goBack()}
+                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    >
                         <Image 
-                            source={ alarm.avatar !== null ? { uri: alarm.avatar } : blankAvatar} 
-                            style={styles.alarmImage}
+                            source={vectorLeftImage} 
+                            style={{ width: regWidth*30, height: regWidth*30 }}
                         />
-                        <Text 
-                            style={{ fontSize: 14, fontWeight: "500", marginHorizontal: 14, width: "85%", }}
-                            numberOfLines={2}
-                            ellipsizeMode='tail'
+                    </Pressable>
+                    <Text style={{
+                        fontSize: regWidth * 16,
+                        fontFamily: "NotoSansKR-Bold",
+                    }}>
+                        Notifications
+                    </Text>
+                    <Pressable
+                        style={{ opacity: 0, }}
+                    >
+                        <Image 
+                            source={vectorLeftImage} 
+                            style={{ width: regWidth*30, height: regWidth*30 }}
+                        />
+                    </Pressable>
+                </View>
+            </View>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+            >
+                {alarms && alarms.length === 0 ? 
+                    <View
+                        style={{alignItems: "center", marginTop: regHeight * 28,}}
+                    >
+                        <Text
+                            style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textLight,
+                            }}
                         >
-                            {`${alarm.from}님이 회원님${answer[ctg.indexOf(alarm.alarm)]}니다.`}
+                            There are no notifications for you at the moment.
                         </Text>
                     </View>
-                ))}
+                : 
+                    null
+                }
+                {alarms !== null && alarms.map((alarm, index) => 
+                    {
+                        if (alarm.alarm === "TR") {
+                            return (
+                                <View style={styles.alarmList} key={index} >
+                                    <Image 
+                                        source={dailyRecord} 
+                                        style={{...styles.alarmImage, borderRadius: 0, }}
+                                    />
+                                    <View style={{ justifyContent: "center", width: "95%" }}>
+                                        <Text 
+                                            style={{ 
+                                                fontSize: regWidth * 16, 
+                                                fontFamily: "NotoSansKR-Bold",
+                                                marginHorizontal: regWidth * 12, 
+                                                color: colors.redDark,
+                                            }}
+                                        >
+                                            Time to read!
+                                        </Text>
+                                        <Text 
+                                            style={{ 
+                                                fontSize: regWidth * 13, 
+                                                fontFamily: "NotoSansKR-Bold",
+                                                marginHorizontal: regWidth * 12, 
+                                                color: colors.textDark,
+                                            }}
+                                        >
+                                            Let's read what you want and create Nemo!
+                                        </Text>
+                                    </View>
+
+                                </View>
+                            )
+                        }
+
+                        if (alarm.alarm === "ST") {
+                            return (
+                                <View style={styles.alarmList} key={index} >
+                                    <View  
+                                        style={{        
+                                            width: regWidth * 50,
+                                            height: regWidth * 50, 
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                fontSize: regWidth * 50,
+                                                fontFamily: "NotoSansKR-Black",
+                                                color: colors.nemoDark,
+                                                lineHeight: regWidth * 60,
+                                            }}
+                                        >
+                                            {alarm.detail}
+                                        </Text>
+                                    </View>
+                                    <View style={{ justifyContent: "center", width: "95%" }}>
+                                        <Text 
+                                            style={{ 
+                                                fontSize: regWidth * 16, 
+                                                fontFamily: "NotoSansKR-Bold",
+                                                marginHorizontal: regWidth * 12, 
+                                                color: colors.nemoDark,
+                                            }}
+                                        >
+                                            {`${alarm.detail} days streak!`}
+                                        </Text>
+                                        <Text 
+                                            style={{ 
+                                                fontSize: regWidth * 13, 
+                                                fontFamily: "NotoSansKR-Bold",
+                                                marginHorizontal: regWidth * 12, 
+                                                color: colors.textDark,
+                                            }}
+                                        >
+                                            Doing really great!
+                                        </Text>
+                                    </View>
+
+                                </View>
+                            )
+                        }
+
+                        if (alarm.alarm === "FS") {
+                            return (
+                                <View 
+                                    style={styles.alarmList} 
+                                    key={index}
+                                >
+                                    <Image 
+                                        source={ alarm.avatar !== null ? { uri: alarm.avatar } : blankAvatar} 
+                                        style={styles.alarmImage}
+                                    />
+                                    <View style={{marginLeft: regWidth * 12, width: "80%"}}>
+                                        <View style={{ flexDirection: "row", }}>
+                                            <Pressable
+                                                style={{
+                                                    maxWidth: "40%"
+                                                }}
+                                                onPress={() => navigation.navigate('OtherProfile', {userTag: alarm.from_usertag})}
+                                            >
+                                                <Text 
+                                                    style={{ 
+                                                        fontSize: regWidth * 16, 
+                                                        fontFamily: "NotoSansKR-Bold",
+                                                        color: colors.nemoDark,
+                                                    }}
+                                                    numberOfLines={1}
+                                                    ellipsizeMode="tail"
+                                                >
+                                                    {`@${alarm.from_usertag} `}
+                                                    {/* @ㅁㄴㅇㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹ */}
+                                                </Text>
+                                            </Pressable>
+                                            <Text 
+                                                style={{ 
+                                                    fontSize: regWidth * 16, 
+                                                    fontFamily: "NotoSansKR-Medium",
+                                                    // width: "85%", 
+                                                    // backgroundColor:"pink"
+                                                }}
+                                                numberOfLines={2}
+                                            >
+                                                started
+                                            </Text>
+                                        </View>
+                                        <Text 
+                                            style={{ 
+                                                fontSize: regWidth * 16, 
+                                                fontFamily: "NotoSansKR-Medium",
+                                                // width: "85%", 
+                                                // backgroundColor:"pink"
+                                            }}
+                                            numberOfLines={2}
+                                        >
+                                            following you.
+                                        </Text>
+                                    </View>
+
+
+                                    <FollowBtn isFollow={alarm.is_follow} userTag={alarm.from_usertag} />
+                                </View>
+                            )
+                        
+                        }
+
+                        else {
+                            return (
+                                <Pressable 
+                                    style={styles.alarmList} 
+                                    key={index}
+                                    onPress={alarm.alarm === "NLL" ? 
+                                        () => navigation.navigate('AlbumProfile', { albumId: alarm.detail, })
+                                        : 
+                                        () => fetchNemo(alarm.detail)
+                                    }
+                                >
+                                    <Image 
+                                        source={ alarm.avatar !== null ? { uri: alarm.avatar } : blankAvatar} 
+                                        style={styles.alarmImage}
+                                    />
+                                        <Pressable
+                                            style={{
+                                                maxWidth: "40%"
+                                            }}
+                                            onPress={() => navigation.navigate('OtherProfile', {userTag: alarm.from_usertag})}
+                                        >
+                                            <Text 
+                                                style={{ 
+                                                    fontSize: regWidth * 16, 
+                                                    fontFamily: "NotoSansKR-Bold",
+                                                    marginLeft: regWidth * 12, 
+                                                    color: colors.nemoDark,
+                                                    
+                                                }}
+                                                numberOfLines={1}
+                                                ellipsizeMode="tail"
+                                            >
+                                                {`@${alarm.from_usertag}`}
+                                                {/* @ㅁㄴㅇㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹ */}
+                                            </Text>
+                                        </Pressable>
+                                        <Text 
+                                            style={{ 
+                                                fontSize: regWidth * 16, 
+                                                fontFamily: "NotoSansKR-Medium",
+                                                // width: "85%", 
+                                                // backgroundColor:"pink"
+                                            }}
+                                            numberOfLines={2}
+                                        >
+                                            {` ${answer[ctg.indexOf(alarm.alarm)]}`}
+                                            {/* asdfasdfasdfasdfasdfasdfasdfaasdfasfdfsd */}
+                                        </Text>
+                                </Pressable>
+                            )
+                        }
+
+                    }
+
+                )}
 
             </ScrollView>
         </View>
+    )
+}
+
+const FollowBtn = (props) => {
+    const dispatch = useDispatch();
+    const [isFollow, setIsFollow] = useState(props.isFollow);
+    const userTag = props.userTag;
+
+    const onFollow = async() => {
+        // setIsFollow(!isFollow);
+        try {
+            await Api
+            .post("api/v1/user/follow/", {
+                user_tag: userTag,
+            })
+            .then((res) => {
+                // console.log(res.data);
+                setIsFollow(res.data.is_follow);
+                dispatch(setShouldUserRefresh(true));
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    return (
+        <Pressable 
+            style={{
+                ...styles.followBtn,
+                backgroundColor: isFollow ? "white" : colors.textNormal,
+                position: "absolute",
+                right: 0,
+                marginHorizontal: regWidth * 8,
+            }} 
+            onPress={onFollow}
+        >
+            <Text 
+                style={{ 
+                    fontSize: regWidth * 13, 
+                    color: isFollow ? colors.textDark : "white",
+                    fontFamily: "NotoSansKR-Bold",
+                }}
+            >
+                {isFollow ? "Following" : "Follow"}
+            </Text>
+        </Pressable>
     )
 }
 
@@ -84,27 +377,32 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-        // backgroundColor: "pink",
-        marginVertical: 10,
-        marginHorizontal: 10,
-        paddingBottom: 8,
+        paddingHorizontal: regWidth * 10,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-    },
+        paddingVertical: regHeight * 8,
+      },
     alarmList: {
-        borderBottomWidth: 0.5,
-        borderBottomColor: "#CBCBCB",
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 12,
         paddingVertical: 10,
     },
     alarmImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 50,
-    }
+        width: regWidth * 50,
+        height: regWidth * 50,
+        borderRadius: 999,
+    },
+    followBtn: {
+        borderRadius: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        borderColor: colors.textDark,
+        borderWidth: 0.5, 
+        paddingHorizontal: regWidth * 18,
+        paddingVertical: regHeight * 5,
+    },
 })
 
 export default AlarmScreen;

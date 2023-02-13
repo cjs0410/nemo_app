@@ -1,21 +1,38 @@
 import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, ScrollView, Text, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Modal, Pressable, useWindowDimensions, Alert, ActivityIndicator, } from "react-native";
-import React, { useEffect, useState, useCallback, useRef, } from "react";
+import React, { useEffect, useState, useCallback, useRef, useMemo, } from "react";
 import { Entypo, Feather, AntDesign, Ionicons, MaterialIcons, } from '@expo/vector-icons'; 
-import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack } from "../components/Card";
+import { CardPreview, BlankCardFront, BlankCardChangable, AddBlankCardBack, BlankCardBack, } from "../components/Card";
+import { InputCard, InvisibleCard, DotInputCard, AlbumList, } from '../components';
 import Api from "../lib/Api";
-import * as ImagePicker from 'expo-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import bookCover from '../assets/images/steve.jpeg';
 import emptyAlbumImage from '../assets/images/emptyAlbumImage.jpeg';
+import iconCamera from '../assets/images/iconCamera.png';
+import iconImage from '../assets/icons/iconImage.png';
+import iconCheckmarkCircle from '../assets/icons/iconCheckmarkCircle.png';
+import iconArrowForward from '../assets/icons/iconArrowForward.png';
+import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
+import iconPlusCirclePurple from '../assets/icons/iconPlusCirclePurple.png';
+
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
 import RenderHtml from 'react-native-render-html';
 import HTML from 'react-native-render-html';
+import {
+    BottomSheetModal,
+    BottomSheetModalProvider,
+    BottomSheetBackdrop,
+    BottomSheetScrollView,
+    BottomSheetTextInput,
+    BottomSheetFlatList,
+} from '@gorhom/bottom-sheet';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, } from '../modules/user';
+import { setShouldHomeRefresh, setShouldStorageRefresh, setShouldUserRefresh, setShouldNemoRefresh, setShouldNemolistRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -45,8 +62,6 @@ const EditBookmark = ({navigation, route}) => {
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(null);
     const [backgroundImage, setBackgroundImage] = useState(null);
-    const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
-    const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
     const [newBookTitle, setNewBookTitle] = useState('');
     const [newBookAuthor, setNewBookAuthor] = useState('');
@@ -82,7 +97,16 @@ const EditBookmark = ({navigation, route}) => {
     const [editBookmarkLoading, setEditBookmarkLoading] = useState(false);
 
     const isEmpty = (frontContent.length === 0) || (selectedBook === null);
+    const [showMenu, setShowMenu] = useState(false);
+    const [align, setAlign] = useState('normal');
+    const tagRef = useRef();
+    const insets = useSafeAreaInsets();
     
+    const [nemolists, setNemolists] = useState(null);
+    const [newNemolistNum, setNewNemolistNum] = useState(0);
+    const [scrollLoading, setScrollLoading] = useState(false);
+    const [selectedNemolists, setSelectedNemolists] = useState([]);
+
     useEffect(() => {
         updateWatermark();
         
@@ -99,7 +123,7 @@ const EditBookmark = ({navigation, route}) => {
         setColor(bookmark.hex);
         setInfo(bookmark.text);
         setTags(bookmark.tags.map((tag) => tag.tag));
-
+        console.log(bookmark);
     }, []);
 
     useEffect(() => {
@@ -158,6 +182,9 @@ const EditBookmark = ({navigation, route}) => {
     }
 
     const editBookmark = async() => {
+        const nemolistIds = selectedNemolists.map((selectedNemolist) => (selectedNemolist.nemolist_id));
+        console.log(JSON.stringify(tags));
+        console.log(JSON.stringify(nemolistIds));
         if (isEmpty === false) {
             setEditBookmarkLoading(true);
             const formData = new FormData();
@@ -169,19 +196,21 @@ const EditBookmark = ({navigation, route}) => {
             formData.append('hex', color);
             formData.append('text', info);
             formData.append('tags', JSON.stringify(tags));
-            if (backgroundImage !== null) {
-                const filename = backgroundImage.split('/').pop();
-                const match = /\.(\w+)$/.exec(filename ?? '');
-                const type = match ? `image/${match[1]}` : `image`;
-                formData.append('backgroundimg', {
-                    uri: backgroundImage,
-                    type: type,
-                    name: filename
-                });
-            }
+            formData.append('nemolist_id', JSON.stringify(nemolistIds));
             formData.append('bookmark_id', bookmark.bookmark_id);
-    
+            // if (backgroundImage !== null) {
+            //     const filename = backgroundImage.split('/').pop();
+            //     const match = /\.(\w+)$/.exec(filename ?? '');
+            //     const type = match ? `image/${match[1]}` : `image`;
+            //     formData.append('backgroundimg', {
+            //         uri: backgroundImage,
+            //         type: type,
+            //         name: filename
+            //     });
+            // }
+            
             try {
+                console.log(formData);
                 await Api.post("/api/v2/bookmark/edit/", formData,
                     {
                         headers: {
@@ -190,11 +219,10 @@ const EditBookmark = ({navigation, route}) => {
                     },
                 )
                 .then((res) => {
-                    // console.log(res.data);
+                    console.log(res.data);
                     navigation.goBack();
-                    dispatch(setShouldHomeRefresh(true));
-                    dispatch(setShouldStorageRefresh(true));
-                    dispatch(setShouldUserRefresh(true));
+                    dispatch(setShouldNemoRefresh(true));
+                    dispatch(setShouldNemolistRefresh(true));
                 })
             } catch (err) {
                 console.error(err);
@@ -210,60 +238,71 @@ const EditBookmark = ({navigation, route}) => {
 
     }
 
-    const pickImage = async () => {
+    const makeOcrImage = async () => {
         try {
-          setLoading(true);
-          if (!status.granted) {
-            const permission = await requestPermission();
-            if (!permission.granted) {
-              return null;
-            }
-          }
-    
-          const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            quality: 1,
+          ImagePicker.openCamera({
+            width: 1200,
+            height: 1500,
+            cropping: true,
+            freeStyleCropEnabled: true,
+          }).then(image => {
+            console.log(image);
+            fetchOCR(`file://${image.path}`);
           });
-      
-        //   console.log(result.uri);
-      
-          if (!result.cancelled) {
-            setImage(result.uri);
-          }
+    
+        } catch (error) {
+          console.error(error);
+    
+        }
+    };
+    const pickOcrImage = async () => {
+        try {
+          ImagePicker.openPicker({
+            width: 1200,
+            height: 1500,
+            cropping: true,
+            freeStyleCropEnabled: true,
+          }).then(image => {
+            console.log(image);
+            fetchOCR(`file://${image.path}`);
+          });
+    
         } catch (error) {
           console.error(error);
         }
-        setLoading(false);
     };
 
-    const pickBackgroundImage = async () => {
-        try {
-          setLoading(true);
-          if (!status.granted) {
-            const permission = await requestPermission();
-            if (!permission.granted) {
-              return null;
-            }
-          }
-    
-          const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            aspect: [1, 1],
-            allowsEditing: true,
-            quality: 1,
-          });
-      
-        //   console.log(result.uri);
-      
-          if (!result.cancelled) {
-            setBackgroundImage(result.uri);
-            setColor(null);
+    const fetchOCR = async (ocrImage) => {
+        const formData = new FormData();
+        const filename = ocrImage.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename ?? '');
+        const type = match ? `image/${match[1]}` : `image`;
+        formData.append('image', {
+            uri: ocrImage,
+            type: type,
+            name: filename
+        });
 
-          }
-        } catch (error) {
-          console.error(error);
+        try {
+            setOcrLoading(true);
+            await Api
+            .put('/api/v2/bookmark/ocr/', formData, 
+            {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                },
+            }
+            )
+            .then((res) => {
+                console.log(res.data);
+                setFrontContent((prevState) => {
+                    return prevState + res.data.message;
+                })
+            })
+        } catch (err) {
+            console.error(err)
         }
-        setLoading(false);
+        setOcrLoading(false);
     };
 
 
@@ -334,17 +373,10 @@ const EditBookmark = ({navigation, route}) => {
 
     const changeInfo = (payload) => setInfo(payload);
 
-    const changeTag = (payload) => {
-        if (payload.indexOf(",") !== -1) {
-            setTags([
-                ...tags,
-                payload.split(",")[0]
-            ]);
-            setTagValue('');
-        } else {
-            setTagValue(payload);
-        }
-    }
+    const changeTag = (e) => {
+        console.log(e.nativeEvent.text);
+        setTagValue(e.nativeEvent.text);
+    };
 
     const submitTag = (e) => {
         if (tagValue.length > 0) {
@@ -353,6 +385,7 @@ const EditBookmark = ({navigation, route}) => {
                 tagValue,
             ]);
             setTagValue('');
+            tagRef.current.clear();
         }
     }
 
@@ -398,53 +431,181 @@ const EditBookmark = ({navigation, route}) => {
         ]);
     }
 
+    const selectNemolist = (nemolist) => {
+        if (selectedNemolists.findIndex(selectedNemolist => selectedNemolist.nemolist_id === nemolist.nemolist_id) === -1) {
+            setSelectedNemolists([
+                ...selectedNemolists,
+                nemolist,
+            ]);
+        } else {
+            setSelectedNemolists(
+                selectedNemolists.filter(selectedNemolist => selectedNemolist.nemolist_id !== nemolist.nemolist_id)
+            )
+        }
+    }
+
+    const renderAlbum = ({ item, index }) => (
+        <View
+            onPress={() => selectNemolist(item)}
+            style={{ justifyContent: "center",  }}
+        >
+            <AlbumList album={item} navigation={navigation} isDefault={false} />
+            <Pressable
+                onPress={() => selectNemolist(item)}
+                style={{
+                    position: "absolute",
+                    right: 0,
+                    marginHorizontal: regWidth * 12,
+                }}
+            >
+                <Image 
+                    source={selectedNemolists.findIndex(selectedNemolist => selectedNemolist.nemolist_id === item.nemolist_id) === -1 ? iconPlusCircleOutline : iconPlusCirclePurple}
+                    style={{
+                        width: regWidth * 40,
+                        height: regWidth * 40,
+                    }}
+                />
+            </Pressable>
+        </View>
+    )
+
+    const fetchNemolist = async(sortNum) => {
+        try {
+            await Api
+            .post("/api/v4/album/list/", {
+                bookmark_id: bookmark.bookmark_id,
+                sort: "recents",
+                items: 0,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setNemolists(res.data);
+                setNewNemolistNum(res.data.length);
+                onPressAlbum();
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemolist();
+        }
+    };
+
+    const getNemolist = async() => {
+        if (nemolists.length >= 16 && newNemolistNum >= 16) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("/api/v4/album/list/", {
+                    bookmark_id: bookmark.bookmark_id,
+                    sort: sortList[sort],
+                    items: nemolists.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setNemolists([...nemolists, ...res.data.Nemolists, ]);
+                    setNewNemolistNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
+    }
+
+    const renderBackdrop = useCallback(
+        (props) => (
+            <BottomSheetBackdrop
+                {...props}
+                pressBehavior="close"
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                // animatedIndex={{
+                //     value: 0,
+                // }}
+            />
+        ),
+        []
+    );
+
+    const tagModalRef = useRef();
+    const snapPoints = useMemo(() => [regHeight * 765], []);
+    const onPressTag = useCallback(() => {
+        tagModalRef.current.present();
+    }, [tagModalRef]);
+
+    const onCloseTag = useCallback(() => {
+        tagModalRef.current.dismiss();
+    }, [tagModalRef]);
+
+    const albumModalRef = useRef();
+    const onPressAlbum = useCallback(() => {
+        albumModalRef.current.present();
+    }, [albumModalRef]);
+
+    const onCloseAlbum = useCallback(() => {
+        albumModalRef.current.dismiss();
+    }, [albumModalRef]);
+
 
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={styles.header} >
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <Text style={{ fontSize: regWidth * 25, fontWeight: "900", marginRight: regWidth * 8, }} >북마크 수정</Text>
-                </View>
-                <View style={{ flexDirection: "row", alignItems: "center", }}>
-                    <TouchableOpacity onPress={exit}>
-                        <Text style={{ fontSize: regWidth * 15, fontWeight: "500", marginRight: regWidth * 32, }} >취소</Text>
-                    </TouchableOpacity>
+        <KeyboardAvoidingView 
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
+                <Pressable 
+                    onPress={() => navigation.goBack()}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                >
+                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginRight: regWidth * 8, }} >Cancel</Text>
+                </Pressable>
+                <Pressable
+                    style={{
+                        backgroundColor: colors.nemoDark,
+                        paddingVertical: regHeight * 5,
+                        paddingHorizontal: regWidth * 11,
+                        borderRadius: 10,
+                    }}
+                    hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                    onPress={editBookmark}
+                    disabled={editBookmarkLoading ? true : false}
+                >
                     {editBookmarkLoading ? 
                         <ActivityIndicator 
-                            color="#008000"
+                            size="small"
                         />
                         :
-                        <Pressable
-                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                            onPress={editBookmark}
+                        <Text
+                            style={{
+                                color: "white",
+                                fontSize: regWidth * 17,
+                                fontWeight: "700",
+                            }}
                         >
-                            <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }} >완료</Text>
-                        </Pressable>
+                            Edit Nemo
+                        </Text>
                     }
-                </View>
-            </SafeAreaView>
+
+                </Pressable>
+            </View>
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
             >
-                {/* <ScrollView
-                    pagingEnabled
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                >
-                    {contentsByNum.map((contents, index) => (
-                        <CardPreview 
-                            contents={contents}
-                            hex={color}
-                            backgroundImage={backgroundImage}
-                            bookCover={bookCover}
-                            watermark={watermark} 
-                            index={index}
-                            key={index}
-                        />
-                    ))}
-                </ScrollView> */}
-                <BlankCardChangable 
+                {/* <BlankCardChangable 
                     color={color} 
                     setBookTitle={setBookTitle} 
                     selectedBook={selectedBook}
@@ -461,56 +622,30 @@ const EditBookmark = ({navigation, route}) => {
                     setContentsByLine={setContentsByLine}
                     setContentsByCard={setContentsByCard}
                     ocrLoading={ocrLoading}
-                />
+                /> */}
                 
-                {/* <BlankCardFront 
+                <DotInputCard 
                     color={color} 
-                    setBookTitle={setBookTitle} 
                     selectedBook={selectedBook}
-                    setSelectedBook={setSelectedBook}
                     onChangeChapter={onChangeChapter} 
+                    whatChapter={whatChapter}
+                    frontContent={frontContent}
                     onChangeFront={onChangeFront} 
                     watermark={watermark} 
                     setModalVisible={setModalVisible}
-                    richText={richText}
-                    setIsFocused={setIsFocused}
-                    setRichText={setRichText}
-                    setFocusNum={setFocusNum}
-                    setFirstContents={setFirstContents}
                     backgroundImage={backgroundImage}
-                /> */}
-                {/* {addedContents.map((contents, index) => (
-                    <BlankCardBack 
-                        color={color} 
-                        onChangeBack={onChangeBack} 
-                        watermark={watermark} 
-                        richText={richText}
-                        setIsFocused={setIsFocused}
-                        setRichText={setRichText}
-                        setFocusNum={setFocusNum}
-                        contents={contents}
-                        index={index}
-                        writeCard={writeCard}
-                        deleteCard={deleteCard}
-                        addedContents={addedContents}
-                        backgroundImage={backgroundImage}
-                        key={index}
-                    />
-                ))} */}
-
-            {/* <Pressable
-                onPress={addCard}
-            >
-                <AddBlankCardBack
-                    color={color}
-                    backgroundImage={backgroundImage}
+                    setLineNum={setLineNum}
+                    contentsByLine={contentsByLine}
+                    setContentsByLine={setContentsByLine}
+                    setContentsByCard={setContentsByCard}
+                    ocrLoading={ocrLoading}
+                    setShowMenu={setShowMenu}
+                    align={align}
                 />
-            </Pressable> */}
-
                 
                 <View style={styles.optionBar}>
                     <View style={{ flexDirection: "row", }} >
-                        <TouchableOpacity 
+                        {/* <TouchableOpacity 
                             activeOpacity={1} 
                             style={{
                                 ...styles.optionBox, 
@@ -581,475 +716,258 @@ const EditBookmark = ({navigation, route}) => {
                                 selectColor("#D2BDFF");
                                 setBackgroundImage(null);
                             }}
-                        />
-                        {/* <TouchableOpacity 
-                            activeOpacity={1} 
-                            style={styles.optionBox} 
-                            onPress={pickBackgroundImage}
-                        >
-                            <MaterialIcons name="add-photo-alternate" size={24} color="black" />
-                        </TouchableOpacity> */}
+                        /> */}
                     </View>
                 </View>
                 
-                {/* <WebView
+                <Pressable 
                     style={styles.TagAddBox} 
-                    source={{ html: firstContents }}
-                /> */}
-                {/* <HTML source={{ html: firstContents }} contentWidth={250} /> */}
-
-                {/* <RenderHtml 
-                    style={styles.TagAddBox} 
-                    contentWidth={width}
-                    source={{ html: firstContents }}
-                    tagsStyles={tagsStyles}
-                /> */}
-                
-                {/* <RenderHtml 
-                    style={styles.TagAddBox} 
-                    contentWidth={width}
-                    source={{ html: '<div><i>asdfㅁㄴ이ㅏ럼;ㅣㄴ아러</i></div>' }}
-                    tagsStyles={tagsStyles}
-                /> */}
-
-
-                {/* <Pressable 
-                    style={styles.TagAddBox} 
-                    // onPress={() => setInfoVisible(true)}    
                 >
-                    <Entypo name="edit" size={20} color="black" />
-                    <Text 
-                        style={{ fontSize: 17, fontWeight: "500", marginHorizontal: 8, }}
-                        // onTextLayout={onTextLayout}
-                    >
-                        { frontContent }
-                    </Text>
-                </Pressable> */}
-                <View style={{ alignItems: "center", }}>
-                    <Pressable 
-                        style={styles.previewBtn} 
-                        onPress={() => setPreviewVisible(true)}    
-                    >
-                        <Text style={{ fontSize: regWidth * 14, fontWeight: "500", marginHorizontal: 8, color: "#D3D3D3", }} >미리보기</Text>
-                    </Pressable>
-                </View>
-                <Pressable 
-                    style={styles.TagAddBox} 
-                    onPress={() => setInfoVisible(true)}    
-                >
-                    <Entypo name="edit" size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >설명 추가</Text>
-                </Pressable>
-                <Pressable 
-                    style={styles.TagAddBox} 
-                    onPress={() => setTagVisible(true)}    
-                >
-                    <Feather name="hash" size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >태그 추가</Text>
-                </Pressable>
-                <Pressable 
-                    style={styles.TagAddBox} 
-                    onPress={() => {
-                        setAlbumVisible(true);
-                        fetchAlbumList();
-                    }}    
-                >
-                    <Feather name='folder' size={regWidth * 20} color="black" />
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginHorizontal: 8, }} >앨범 선택</Text>
-                </Pressable>
-                <View style={{height: 200}} ></View>
-            </ScrollView>
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={modalVisible}
-            >
-                <Pressable 
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                    ]}
-                    onPress={()=>
-                        {
-                            setModalVisible(false);
-                        }
-                    }
-                />
-                <View style={{...styles.modal, height: regHeight * 440, }}>
-                    <SafeAreaView style={styles.modalHeader}>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            onPress={() => {
-                                setModalVisible(false);
-                            }}
-                        >
-                            <Text style={{fontSize: 15, fontWeight: "500", }} >
-                                취소
-                            </Text>
-                        </Pressable>
-                        <Text style={{fontSize: 16, fontWeight: "700", }} >
-                            책 등록하기
-                        </Text>
-                        {createBookLoading ? 
-                            <ActivityIndicator 
-                                color="#008000"
-                            />
-                            :
-                            <Pressable
-                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                                activeOpacity={1}
-                                onPress={CreateBook}
-                            >
-                                <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
-                                    등록
-                                </Text>
-                            </Pressable>
-                        }
-                    </SafeAreaView>
-                    <View style={styles.addBook}>
-                        <View style={{ alignItems: 'center', }}>
-                            <Image 
-                                source={image === null ? emptyAlbumImage : { uri: image }} 
-                                style={styles.bookCoverImage}
-                            />
-                            <TouchableOpacity
-                                style={{ marginTop: 15, }}
-                                activeOpacity={1}
-                                onPress={pickImage}
-                            >
-                                <Text style={{ fontSize: 15, fontWeight: "500", color: "#FF4040", }}>
-                                    책 커버 가져오기
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View 
-                           style={{ alignItems: 'center', }}
-                        >
-                            <TextInput 
-                                placeholder="책 제목"
-                                style={{ fontSize: 18, fontWeight: "500",marginTop: 10, }}
-                                onChangeText={(payload) =>  setNewBookTitle(payload)}
-                            />
-                            <TextInput 
-                                placeholder="작가"
-                                style={{ fontSize: 18, fontWeight: "500", marginTop: 10, }}
-                                onChangeText={(payload) =>  setNewBookAuthor(payload)}
-                            />
-                        </View>
-                        {/* <TouchableOpacity
-                            activeOpacity={1}
-                            onPress={CreateBook}
-                        >
-                            <Text style={{ fontSize: 15, fontWeight: "500", color: "green", }}>
-                                등록
-                            </Text>
-                        </TouchableOpacity> */}
-                    </View>
-                </View>
-            </Modal>
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={infoVisible}
-            >
-                <Pressable 
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                    ]}
-                    onPress={()=>
-                        {
-                            setInfoVisible(false);
-                        }
-                    }
-                />
-                <View style={styles.modal}>
-                    <SafeAreaView style={styles.modalHeader}>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            style={{ opacity: 0 }}
-                            // onPress={() => {
-                            //     setInfoVisible(false);
-                            //     setInfo('');
-                            // }}
-                        >
-                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", }} >
-                                취소
-                            </Text>
-                        </Pressable>
-                        <Text style={{fontSize: regWidth * 16, fontWeight: "700", }} >
-                            북마크 설명 추가
-                        </Text>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            onPress={() => {
-                                setInfoVisible(false);
-                            }}
-                        >
-                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }}>
-                                완료
-                            </Text>
-                        </Pressable>
-                    </SafeAreaView>
+                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Description</Text>
                     <TextInput 
-                        placeholder="설명을 입력해주세요"
-                        style={{
-                            ...styles.modalInput,
-                            height: "55%",
-                        }}
                         onChangeText={changeInfo}
+                        placeholder="Add a description"
+                        style={{
+                            height: 90,
+                            width: "70%",
+                            textAlignVertical: "top",
+                            // marginLeft: regWidth * 18,
+                            fontSize: regWidth * 14,
+                            fontWeight: "500",
+                            lineHeight: regWidth * 20,
+                            padding: 0,
+                            // margin: 0,
+                            // backgroundColor:"pink"
+                        }}
                         multiline={true}
                         value={info}
                     />
-                </View>
-            </Modal>
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={tagVisible}
-            >
-
-                <Pressable 
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                    ]}
-                    onPress={()=>
-                        {
-                            setTagVisible(false);
-                        }
-                    }
-                />
-            {/* <KeyboardAvoidingView 
-                style={styles.modal}
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-            > */}
-                <View style={styles.modal}>
-                    <SafeAreaView style={styles.modalHeader}>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            style={{ opacity: 0 }}
-                            // onPress={() => {
-                            //     setTagVisible(false);
-                            // }}
-                        >
-                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", }} >
-                                취소
-                            </Text>
-                        </Pressable>
-                        <Text style={{fontSize: regWidth * 16, fontWeight: "700", }} >
-                            태그 추가하기
-                        </Text>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            onPress={() => setTagVisible(false)}
-                        >
-                            <Text style={{fontSize: regWidth * 15, fontWeight: "500", color: "#008000" }}>
-                                완료
-                            </Text>
-                        </Pressable>
-                    </SafeAreaView>
-                    <TextInput 
-                        placeholder="쉼표 혹은 엔터를 입력하여 태그를 등록하세요"
+                </Pressable>
+                <View 
+                    style={styles.TagAddBox} 
+                    // onPress={() => setTagVisible(true)}    
+                >
+                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700",  }} >Tags</Text>
+                    <Pressable
                         style={{
-                            ...styles.modalInput,
-                            height: regHeight * 50,
+                            width: "70%",
+                            // backgroundColor:"pink",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
                         }}
-                        onChangeText={changeTag}
-                        onSubmitEditing={submitTag}
-                        value={tagValue}
-                    />
-                    <View style={{ flexDirection: "row", }}>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
+                        onPress={onPressTag}
+                        // onPress={() => {
+                        //     setTagVisible(true);
+                        // }}
                     >
-                        {tags.map((tag, index) => (
-                            <View style={styles.tagContainer} key={index}>
-                                <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: "#9250FF", marginRight: 4,}}>
-                                    {`#${tag}`}
-                                </Text>
-                                <Pressable
-                                    onPress={() => deleteTag(index)}
-                                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                                >
-                                    <Feather name="x" size={20} color="#909090" />
-                                </Pressable>
-                            </View>
-                        ))}
-                    </ScrollView>
-                    </View>
-
+                        <TextInput 
+                            placeholder="Add your tags"
+                            style={{
+                                width: "70%",
+                                textAlignVertical: "top",
+                                // marginLeft: regWidth * 18,
+                                fontSize: regWidth * 14,
+                                fontWeight: "500",
+                                // lineHeight: regWidth * 20,
+                                // backgroundColor:"pink"
+                                color: colors.nemoDark,
+                            }}
+                            editable={false}
+                            pointerEvents="none"
+                            value={tags.map((tag) => `#${tag}`).join(', ')}
+                            multiline={true}
+                        />
+                        <Image 
+                            source={iconArrowForward}
+                            style={{
+                                width: regWidth * 24,
+                                height: regWidth * 24,
+                            }}
+                        />
+                    </Pressable>
                 </View>
-            {/* </KeyboardAvoidingView> */}
 
-            </Modal>
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={albumVisible}
-            >
-                <Pressable 
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                    ]}
-                    onPress={()=>
-                        {
-                            setAlbumVisible(false);
-                        }
-                    }
-                />
                 <View 
                     style={{
-                        ...styles.modal,
-                        height: regHeight * 480, 
-                        bottom: 0,
+                        ...styles.TagAddBox,
+                        borderBottomWidth: 0.5,
+                    }} 
+                    // onPress={() => {
+                    //     setAlbumVisible(true);
+                    //     fetchAlbumList();
+                    // }}    
+                >
+                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Nemolists</Text>
+                    <Pressable
+                        style={{
+                            width: "70%",
+                            // backgroundColor:"pink",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                        onPress={() => {
+                            fetchNemolist();
+                        }}
+                    >
+                        <TextInput 
+                            placeholder="Add to your Nemolists"
+                            style={{
+                                width: "70%",
+                                textAlignVertical: "top",
+                                // marginLeft: regWidth * 18,
+                                fontSize: regWidth * 14,
+                                fontWeight: "500",
+                                // lineHeight: regWidth * 20,
+                                // backgroundColor:"pink"
+                            }}
+                            editable={false}
+                            pointerEvents="none"
+                            value={selectedNemolists.map((nemolist) => nemolist.nemolist_title).join(', ')}
+                            multiline={true}
+                        />
+                        <Image 
+                            source={iconArrowForward}
+                            style={{
+                                width: regWidth * 24,
+                                height: regWidth * 24,
+                            }}
+                        />
+                    </Pressable>
+                </View>
+            </ScrollView>
+
+            <BottomSheetModal
+                index={0}
+                ref={tagModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View style={styles.modalHeader}>
+                    <Pressable
+                        // onPress={onCloseTag}
+                        style={{opacity: 0}}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Done
+                        </Text>
+                    </Pressable>
+                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                        Tags
+                    </Text>
+                    <Pressable
+                        onPress={onCloseTag}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Done
+                        </Text>
+                    </Pressable>
+                </View>
+                <View
+                    style={{
+                        marginHorizontal: regWidth * 13,
+                        marginTop: regWidth * 13,
                     }}
                 >
-                    <SafeAreaView style={{
-                        ...styles.modalHeader, 
-                        marginTop: regHeight * 28,
-                        justifyContent: "center",
-                    }}>
-                        {/* <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            onPress={() => setAlbumVisible(false)}
-                        >
-                            <Text style={{fontSize: 15, fontWeight: "500", }} >
-                                취소
-                            </Text>
-                        </Pressable> */}
-                        <Text style={{fontSize: 16, fontWeight: "700", }} >
-                            저장할 앨범 찾기
-                        </Text>
-                        {/* <Text style={{fontSize: 15, fontWeight: "500", color: "#008000" }}>
-                            완료
-                        </Text> */}
-                    </SafeAreaView>
-                    <View style={{ alignItems: "center", }}>
-                        <ScrollView
-                            style={styles.albumListContainer}
-                        >
-                            {albums !== null && albums.map((album, index) => (
-                                <Pressable 
-                                    style={styles.albumList}
-                                    key={index}
-                                    onPress={() => {
-                                        setAlbumId(album.album_id);
-                                        setAlbumVisible(false);
-                                    }}
-                                >
-                                    <Image 
-                                        source={{ uri: album.album_cover }}
-                                        style={styles.albumImage}
-                                    />
-                                    <Text style={{ fontSize: 15, fontWeight: "500", marginHorizontal: 8, }}>
-                                        {album.album_title}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </ScrollView>
-                    </View>
-                </View>
-            </Modal>
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={previewVisible}
-            >
-                <Pressable 
-                    style={[
-                        StyleSheet.absoluteFill,
-                        { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                    ]}
-                    onPress={()=>
-                        {
-                            setPreviewVisible(false);
-                            setCurrent(0);
-                        }
-                    }
-                />
-                <View style={{...styles.modal, height: regHeight * 480, }}>
-                    <SafeAreaView style={styles.modalHeader}>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            style={{ opacity: 0 }}
-                            onPress={() => {
-                                setPreviewVisible(false);
-                                setCurrent(0);
+                    <View
+                        style={{
+                            backgroundColor: "white",
+                            width: regWidth * 350,
+                            height: regHeight * 40,
+                            borderRadius: regWidth * 10,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            paddingHorizontal: regWidth * 12,
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontSize: regWidth * 14,
+                                fontFamily: "NotoSansKR-Medium",
                             }}
                         >
-                            <Text style={{fontSize: 15, fontWeight: "500", }} >
-                                닫기
-                            </Text>
-                        </Pressable>
-                        <Text style={{fontSize: 16, fontWeight: "700", }} >
-                            미리보기
+                            {"# "}
                         </Text>
-                        <Pressable
-                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                            style={{ opacity: 0, }}
-                        >
-                            <Text style={{fontSize: 15, fontWeight: "500", }} >
-                                닫기
-                            </Text>
-                        </Pressable>
-                    </SafeAreaView>
-                    <ScrollView
-                        pagingEnabled
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        onScroll={handleCurrentChange}
-                        scrollEventThrottle={16}
-                    >
-                        {/* {contentsByNum.map((contents, index) => (
-                            <CardPreview 
-                                bookTitle={selectedBook !== null ? selectedBook.book_title : "책 제목"}
-                                whatChapter={selectedBook !== null ? whatChapter : "챕터" }
-                                bookCover={selectedBook !== null ? selectedBook.book_cover : null }
-                                contents={contents}
-                                hex={color}
-                                backgroundImage={backgroundImage}
-                                watermark={watermark} 
-                                index={index}
-                                key={index}
-                            />
-                        ))} */}
-                        {contentsByCard.map((contents, index) => (
-                            <CardPreview 
-                                bookTitle={selectedBook !== null ? selectedBook.book_title : "책 제목"}
-                                whatChapter={selectedBook !== null ? whatChapter : "챕터" }
-                                bookCover={selectedBook !== null ? selectedBook.book_cover : null }
-                                contents={contents}
-                                hex={color}
-                                backgroundImage={backgroundImage}
-                                watermark={watermark} 
-                                index={index}
-                                key={index}
-                            />
-                        ))}
-                    </ScrollView>
-                    <View style={{
-                        flexDirection: "row", 
-                        alignItems: "center", 
-                        justifyContent: "center", 
-                        marginTop: -12, 
-                    }}>
-                        {contentsByCard.map((contents, index) => {
-                            if (index === current) {
-                                return <Entypo name="dot-single" size={24} color="red" style={{ marginHorizontal: -4, }} key={index} />
-                            }
-                            return <Entypo name="dot-single" size={24} color="grey" style={{ marginHorizontal: -4, }} key={index} />
-                        })}
+                        <TextInput 
+                            style={{
+                                // backgroundColor: "pink",
+                                height: "100%",
+                                width: "90%",
+                                fontSize: regWidth * 14,
+                                fontFamily: "NotoSansKR-Medium",
+                            }}
+                            // value={tagValue}
+                            onChange={changeTag}
+                            onSubmitEditing={submitTag}
+                            blurOnSubmit={false}
+                            ref={tagRef}
+                        />
                     </View>
+                    {tags.map((tag, index) => (
+                        <View 
+                            style={{
+                                marginTop: regHeight * 18,
+                                flexDirection: "row",
+                                alignItems: "center",
+                                marginHorizontal: regWidth * 12,
+                            }}
+                            key={index}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 14,
+                                    fontFamily: "NotoSansKR-Medium",
+                                    color: colors.nemoDark,
+                                }}
+                            >
+                                {`# ${tag}`}
+                            </Text>
+                            <Pressable
+                                onPress={() => deleteTag(index)}
+                                hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                style={{ marginHorizontal: regWidth * 4, }}
+                            >
+                                <Feather name="x" size={20} color={colors.textDark} />
+                            </Pressable>
+                        </View>
+                    ))}
                 </View>
-            </Modal>
+            </BottomSheetModal>
+            <BottomSheetModal
+                index={0}
+                ref={albumModalRef}
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View style={styles.modalHeader}>
+                    <Pressable
+                        // onPress={onCloseAlbum}
+                        style={{ opacity: 0, }}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Cancel
+                        </Text>
+                    </Pressable>
+                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                        Add to Nemolist
+                    </Text>
+                    <Pressable
+                        onPress={onCloseAlbum}
+                    >
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            Done
+                        </Text>
+                    </Pressable>
+                </View>
+                <BottomSheetFlatList 
+                    data={nemolists}
+                    renderItem={renderAlbum}
+                />
+            </BottomSheetModal>
+
             {/* {richText.length !== 0 ? 
                 <KeyboardAvoidingView 
                     style={{ 
@@ -1089,7 +1007,213 @@ const EditBookmark = ({navigation, route}) => {
                 : 
                 null
             } */}
-        </View>
+
+            {showMenu ? 
+                <KeyboardAvoidingView 
+                    style={styles.keyboardMenuContainer}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
+                    <View
+                        style={{
+                            height: regHeight * 60,
+                            
+                            flexDirection: "row",
+                            alignItems: "center",
+                        }}
+                    >
+                        <View
+                            style={{
+                                paddingHorizontal: regWidth * 8,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 9,
+                                    fontWeight: "400",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                Scan text from
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Pressable
+                                    onPress={makeOcrImage}
+                                >
+                                    <Image 
+                                        source={iconCamera}
+                                        style={styles.iconImage}
+                                    />
+                                </Pressable>
+                                <Pressable
+                                    onPress={pickOcrImage}
+                                >
+                                    <Image
+                                        source={iconImage}
+                                        style={{
+                                            ...styles.iconImage,
+                                            marginHorizontal: 8,
+                                        }}
+                                    />
+                                </Pressable>
+                            </View>
+                        </View>
+    
+                        <View style={styles.separator}/>
+    
+                        <View
+                            style={{
+                                paddingHorizontal: regWidth * 8,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 9,
+                                    fontWeight: "400",
+                                }}
+                            >
+                                Background
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#D9D9D9",
+                                        borderColor: color === "#D9D9D9" ? "#FF4040" : "black"
+                                    }}
+                                    onPress={() => {
+                                        selectColor("#D9D9D9");
+                                        setBackgroundImage(null);
+                                    }}
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#D9D9D9" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#FED2B5",
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#FED2B5");
+                                        setBackgroundImage(null);
+                                    }}
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#FED2B5" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#EDF3C3",
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#EDF3C3");
+                                        setBackgroundImage(null);
+                                    }}
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#EDF3C3" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
+                                        backgroundColor: "#DBE5F1",
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#DBE5F1");
+                                        setBackgroundImage(null);
+                                    }}
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#DBE5F1" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
+                                {/* <Pressable>
+                                    <Image 
+                                        source={iconImage}
+                                        style={{
+                                            ...styles.iconImage,
+                                            // marginLeft: 8,
+                                        }}
+                                    />
+                                </Pressable> */}
+                            </View>
+                        </View>
+
+                        {/* <View style={styles.separator}/>
+
+                        <View
+                            style={{
+                                paddingHorizontal: regWidth * 8,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 9,
+                                    fontWeight: "400",
+                                }}
+                            >
+                                Add sheet
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Pressable>
+                                    <Image 
+                                        source={iconPlus}
+                                        style={styles.iconImage}
+                                    />
+                                </Pressable>
+                            </View>
+                        </View> */}
+                    </View>
+                </KeyboardAvoidingView>
+                :
+                null
+            }
+        </KeyboardAvoidingView>
     )
 }
 
@@ -1121,26 +1245,28 @@ const styles = StyleSheet.create({
         justifyContent: "space-between", 
         alignItems: "center",
         marginHorizontal: 8,
-        marginTop: 20,
-        marginBottom: 50,
+        marginVertical: 20,
     },
     optionBox: {
-        borderWidth: 1,
-        borderColor: "black",
+        // borderWidth: 1,
+        // borderColor: "black",
         height: regWidth * 30,
         width: regWidth * 30,
+        marginTop: regWidth * 6,
         justifyContent: "center",
         alignItems: "center",
-        marginHorizontal: regWidth * 5,
+        marginRight: regWidth * 10,
+        borderRadius: 3,
     },
     TagAddBox: {
         flexDirection: "row",
-        borderTopWidth: 1,
-        borderTopColor: "grey",
-        borderBottomColor: "grey",
-        paddingVertical: 20,
-        paddingHorizontal: 10,
+        borderTopWidth: 0.5,
+        borderTopColor: colors.bgdNormal,
+        borderBottomColor: colors.bgdNormal,
+        paddingVertical: regHeight * 10,
+        marginHorizontal: regWidth * 13,
         alignItems: "center",
+        justifyContent: "space-between"
     },
     modal: {
         width: '100%', 
@@ -1166,8 +1292,10 @@ const styles = StyleSheet.create({
     modalHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: regHeight * 10,
-        marginHorizontal: regWidth * 18, 
+        marginVertical: regHeight * 8,
+        alignItems: "center",
+        marginHorizontal: regWidth * 20,
+        // marginHorizontal: regWidth * 18, 
     },
     modalInput: {
         backgroundColor: "#EEEEEE",
@@ -1218,6 +1346,24 @@ const styles = StyleSheet.create({
         width: 45,
         height: 45,
     },
+    keyboardMenuContainer: {
+        position: "absolute", 
+        bottom: 0, 
+        zIndex: 10, 
+        backgroundColor: "white", 
+        width: "100%", 
+        borderTopWidth: 0.3,
+        borderTopColor: "#7341ffcc",
+    },
+    iconImage: {
+        width: regWidth * 36,
+        height: regWidth * 36,
+    },
+    separator: {
+        width: 0.7,
+        height: regHeight * 49,
+        backgroundColor: "#7341ffcc",
+    }
 })
 
 const tagsStyles = {

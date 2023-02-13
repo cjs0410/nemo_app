@@ -1,4 +1,4 @@
-import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, ImageBackground, Vibration, } from "react-native";
+import { StyleSheet, View, SafeAreaView, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, Platform, ActivityIndicator, Modal, Alert, ImageBackground, Vibration, FlatList, } from "react-native";
 import React, { useEffect, useState, useCallback, useMemo, useRef, } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons, MaterialIcons, } from '@expo/vector-icons'; 
@@ -46,8 +46,13 @@ const BookProfile = ({route, navigation}) => {
     const insets = useSafeAreaInsets();
     const [rgb, setRgb] = useState(null);
 
+    const [bookmarks, setBookmarks] = useState(null);
+    const [scrollLoading, setScrollLoading] = useState(false);
+    const [newBookmarkNum, setNewBookmarkNum] = useState(0);
+
     useEffect(() => {
         fetchBook();
+        fetchNemo();
     }, [])
 
     const fetchBook = async() => {
@@ -59,7 +64,8 @@ const BookProfile = ({route, navigation}) => {
             .then((res) => {
                 const bgdColor = res.data.background;
                 if (bgdColor) {
-                    setRgb(bgdColor.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0));
+                    const rgbList = bgdColor.replace(/^#/, '').match(/.{2}/g).map(replacer => parseInt(replacer, 16) || 0);
+                    setRgb(`rgba(${rgbList[0]}, ${rgbList[1]}, ${rgbList[2]}, 0.6)`);
                 }
                 // console.log(res.data);
                 setBookInfo(res.data);
@@ -80,6 +86,58 @@ const BookProfile = ({route, navigation}) => {
         setIsBookmark(false);
     }
 
+    const renderBookmark = ({ item, index }) => (
+        <Pressable
+            onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookmarks, subTitle: bookInfo.book_title, title: "Nemos", index: index, })} 
+        >
+            <BookmarkList bookmark={item} navigation={navigation} />
+        </Pressable>
+    )
+
+    const fetchNemo = async() => {
+        try {
+            await Api
+            .post("/api/v3/book/scroll/", {
+                book_id: bookId,
+                items: 0,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setBookmarks(res.data);
+                setNewBookmarkNum(res.data.length);
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const onEndReached = () => {
+    	if(!scrollLoading) {
+        	getNemo();
+        }
+    };
+
+    const getNemo = async() => {
+        if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
+            // console.log(bookmarks[bookmarks.length - 1].nemo_num);
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("/api/v3/book/scroll/", {
+                    book_id: bookId,
+                    items: bookmarks.length,
+                })
+                .then((res) => {
+                    setBookmarks([...bookmarks, ...res.data, ]);
+                    setNewBookmarkNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+            // setCursor(bookmarks.at(-1).cursor);
+        }
+    };
 
     const onReport = async() => {
         try {
@@ -151,7 +209,7 @@ const BookProfile = ({route, navigation}) => {
                 <>
                     <View 
                         style={{
-                            backgroundColor: bookInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
+                            backgroundColor: bookInfo.background ? rgb : colors.nemoLight,
                             paddingTop: insets.top,
                             paddingBottom: 0,
                             paddingLeft: insets.left,
@@ -190,12 +248,164 @@ const BookProfile = ({route, navigation}) => {
                         </View>
 
                     </View>
-                    <ScrollView
+                    <FlatList 
+                        data={bookmarks}
+                        renderItem={renderBookmark}
+                        keyExtractor={bookmark => bookmark.bookmark_id}
+                        showsVerticalScrollIndicator={false}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={0.3}
+                        ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                        ListHeaderComponent={
+                            <>
+                                <View
+                                    style={{
+                                        backgroundColor: bookInfo.background ? rgb : colors.nemoLight,
+                                        width: "100%",
+                                        height: regHeight * 500,
+                                        marginTop: -regHeight * 500,
+                                    }}
+                                />
+                                <LinearGradient 
+                                    colors={[
+                                        bookInfo.background ? rgb : colors.nemoLight,
+                                        // 'white',
+                                        'white'
+                                    ]} 
+                                    style={{
+                                        width: "100%",
+                                        height: regHeight * 400,
+                                        // height: "100%",
+                                        position: "absolute",
+                                        // backgroundColor: "pink"
+                                    }}
+                                />
+                                <View style={{ alignItems: "center",}}>
+                                    <View
+                                        style={{
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            marginTop: regHeight * 18,
+                                            // backgroundColor:"pink"
+                                            ...Platform.select({
+                                                ios: {
+                                                shadowColor: "black",
+                                                shadowOffset: { width: 0, height: 8 },
+                                                shadowOpacity: 0.5,
+                                                shadowRadius: 8,
+                                                },
+                                                android: {
+                                                elevation: 3,
+                                                },
+                                            }),
+                                        }}
+                                    >
+                                        <Image 
+                                            source={ bookInfo.book_cover !== null ? { uri: bookInfo.book_cover } : blankBookCover} 
+                                            style={styles.bookImage}
+                                            // onLoad={(e) => console.log(e.nativeEvent)}
+                                        />
+                                    </View>
+
+
+                                </View>
+                                <View
+                                    style={{ 
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                        alignItems: "flex-end",
+                                        marginTop: regHeight * 28,
+                                        marginHorizontal: regWidth * 13,
+                                    }}
+                                >
+                                    <View>
+                                        <Text
+                                            style={{
+                                                fontSize: regWidth * 14,
+                                                fontFamily: "NotoSansKR-Bold",
+                                                lineHeight: regWidth * 20,
+                                                color: colors.textDark,
+                                            }}
+                                        >
+                                            {bookInfo.book_title}
+                                        </Text>
+                                        <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
+                                            <Pressable
+                                                onPress={() => navigation.push('LikeUsers', { ctg: "book", id: bookId,})}
+                                                style={{ flexDirection: "row", alignItems: "center", }}
+                                            >
+                                                <Text style={styles.bookInfoTxt}>
+                                                    {likeCount}
+                                                </Text>
+                                                <Text style={styles.bookInfoTxt}>
+                                                    {' likes'}
+                                                </Text>
+                                            </Pressable>
+                                            <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
+                                            <Text style={styles.bookInfoTxt}>
+                                                {bookInfo.nemos}
+                                            </Text>
+                                            <Text style={styles.bookInfoTxt}>
+                                                {' Nemos'}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                    <Pressable
+                                        onPress={onLike}
+                                    >
+                                        <Image 
+                                            source={isLike ? iconHeart : iconHeartOutline}
+                                            style={{
+                                                width: regWidth * 35,
+                                                height: regWidth * 35,
+                                            }}
+                                        />
+                                    </Pressable>
+                                </View>
+
+                                <Pressable
+                                    style={{
+                                        borderWidth: 2,
+                                        borderColor: colors.nemoDark,
+                                        borderRadius: regWidth * 30,
+                                        paddingHorizontal: regWidth * 14,
+                                        paddingVertical: regHeight * 8,
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        marginTop: regHeight * 31,
+                                        marginHorizontal: regWidth * 23,
+                                        marginBottom: regHeight * 25,
+                                    }}
+                                    onPress={() => navigation.navigate("CreateBookmark", { selectedBook: bookInfo, })}
+                                >
+                                    <Image 
+                                        source={iconPlusNemoDark}
+                                        style={{
+                                            width: regWidth * 28,
+                                            height: regWidth * 28,
+                                        }}
+                                    />
+                                    <Text
+                                        style={{
+                                            fontSize: regWidth * 19,
+                                            color: colors.nemoDark,
+                                            fontFamily: "NotoSansKR-Black",
+                                            lineHeight: regWidth * 28,
+                                        }}
+                                    >
+                                        Create Nemo from this book
+                                    </Text>
+                                </Pressable>
+                            </>
+                        }
+                    />
+                    {/* <ScrollView
                         showsVerticalScrollIndicator={false}
                     >
                         <View
                             style={{
-                                backgroundColor: bookInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
+                                backgroundColor: bookInfo.background ? rgb : colors.nemoLight,
                                 width: "100%",
                                 height: regHeight * 500,
                                 marginTop: -regHeight * 500,
@@ -203,7 +413,7 @@ const BookProfile = ({route, navigation}) => {
                         />
                         <LinearGradient 
                             colors={[
-                                bookInfo.background ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)` : colors.nemoLight,
+                                bookInfo.background ? rgb : colors.nemoLight,
                                 // 'white',
                                 'white'
                             ]} 
@@ -238,7 +448,7 @@ const BookProfile = ({route, navigation}) => {
                                 <Image 
                                     source={ bookInfo.book_cover !== null ? { uri: bookInfo.book_cover } : blankBookCover} 
                                     style={styles.bookImage}
-                                    onLoad={(e) => console.log(e.nativeEvent)}
+                                    // onLoad={(e) => console.log(e.nativeEvent)}
                                 />
                             </View>
 
@@ -266,7 +476,7 @@ const BookProfile = ({route, navigation}) => {
                                 </Text>
                                 <View style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 5, }}>
                                     <Pressable
-                                        onPress={() => navigation.push('LikeUsers', { ctg: "nemolist", })}
+                                        onPress={() => navigation.push('LikeUsers', { ctg: "book", id: bookId,})}
                                         style={{ flexDirection: "row", alignItems: "center", }}
                                     >
                                         <Text style={styles.bookInfoTxt}>
@@ -350,7 +560,7 @@ const BookProfile = ({route, navigation}) => {
                                 ))}
                             </View>
                         }
-                    </ScrollView>
+                    </ScrollView> */}
                 </>
                 : 
                 null
@@ -368,11 +578,11 @@ const BookProfile = ({route, navigation}) => {
                     <Pressable
                         onPress={onPressClose}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
                             Cancel
                         </Text>
                     </Pressable>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                    {/* <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
                         <Image 
                             source={iconHeartOutlineBlack}
                             style={{
@@ -386,8 +596,14 @@ const BookProfile = ({route, navigation}) => {
                                 Like all Nemos
                             </Text>
                         </View>
-                    </Pressable>
-                    <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                    </Pressable> */}
+                    <Pressable 
+                        style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
+                        onPress={() => {
+                            onPressClose();
+                            navigation.navigate('Report', {ctg: "book", id: bookId});
+                        }}
+                    >
                         <Image 
                             source={iconAlert}
                             style={{
@@ -397,10 +613,10 @@ const BookProfile = ({route, navigation}) => {
                             }}
                         />
                         <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                            <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                 Report
                             </Text>
-                            <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                 Report your issue
                             </Text>
                         </View>

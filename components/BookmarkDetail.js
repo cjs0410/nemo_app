@@ -23,7 +23,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { userSelector, bookmarkSelector, scrapSelector } from '../modules/hooks';
 import { addBookmark } from '../modules/bookmarks';
 import { addScrap, deleteScrap } from '../modules/scraps';
-import { setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, } from '../modules/user';
+import { setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, setShouldNemoRefresh, setShouldNemolistRefresh, } from '../modules/user';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
 import analytics from '@react-native-firebase/analytics';
@@ -38,6 +38,7 @@ import iconEdit from '../assets/icons/iconEdit.png';
 import iconTrash from '../assets/icons/iconTrash.png';
 import iconAlert from '../assets/icons/iconAlert.png';
 import iconFollow from '../assets/icons/iconFollow.png';
+import iconUnfollow from '../assets/icons/iconUnfollow.png';
 import iconEyeoff from '../assets/icons/iconEyeoff.png';
 import iconLayers from '../assets/icons/iconLayers.png';
 import iconHeart from '../assets/icons/iconHeart.png';
@@ -47,6 +48,7 @@ import sortCheck from '../assets/images/sortCheck.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
 import iconPlusCirclePurple from '../assets/icons/iconPlusCirclePurple.png';
+import iconShare from '../assets/icons/iconShare.png';
 import AlbumList from './AlbumList';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
@@ -56,6 +58,8 @@ const BookmarkDetail = (props) => {
     const captureRef = useRef();
     const { isStaff, } = useSelector(userSelector);
     const bookmark = props.bookmark;
+    // const date = bookmark.created_date.split('T')[0].split('-');
+    const [date, setDate] = useState('');
     const navigation = props.navigation;
     const [current, setCurrent] = useState(0);
     const [contentsByNum, setContentsByNum] = useState([]);
@@ -76,7 +80,7 @@ const BookmarkDetail = (props) => {
     const [pushLike, setPushLike] = useState(false);
     const [pushScrap, setPushScrap] = useState(false);
 
-    const [isFollow, setIsFollow] = useState(false);
+    const [isFollow, setIsFollow] = useState(bookmark.is_follow);
 
     const sortList = [ "recents", "alphabetical", "creator", ];
     const [sort, setSort] = useState(0);
@@ -85,7 +89,6 @@ const BookmarkDetail = (props) => {
     const [selectedNemolists, setSelectedNemolists] = useState([]);
 
     useEffect(() => {
-        // console.log(bookmark);
         fetchUserTag();
         // console.log(bookmark.is_like);
     }, [])
@@ -99,6 +102,51 @@ const BookmarkDetail = (props) => {
             fetchFactor();
         }, [])
     )
+
+    useEffect(() => {
+        const format = bookmark.created_date.split('T')[0].split('-');
+        const monthName = getMonthName(Number(format[1]));
+        setDate(`${monthName} ${format[2]}, ${format[0]}`);
+        // if (profile && profile.birth) {
+        //     console.log(profile.birth.split("-"));
+        //     const format = profile.birth.split("-");
+        //     const monthName = getMonthName(Number(format[1]))
+        //     console.log(`${monthName} ${format[2]}, ${format[0]}`);
+        //     setDate(`${monthName} ${format[2]}, ${format[0]}`);
+        // }
+    }, []);
+
+    const getMonthName = (month) => {
+        var monthWord = month;
+
+        if (monthWord === 1) {
+            monthWord = "Jan"
+        } else if (monthWord === 2) {
+            monthWord = "Feb"
+        } else if (monthWord === 3) {
+            monthWord = "Mar"
+        } else if (monthWord === 4) {
+            monthWord = "Apr"
+        } else if (monthWord === 5) {
+            monthWord = "May"
+        } else if (monthWord === 6) {
+            monthWord = "Jun"
+        } else if (monthWord === 7) {
+            monthWord = "Jul"
+        } else if (monthWord === 8) {
+            monthWord = "Aug"
+        } else if (monthWord === 9) {
+            monthWord = "Sep"
+        } else if (monthWord === 10) {
+            monthWord = "Oct"
+        } else if (monthWord === 11) {
+            monthWord = "Nov"
+        } else if (monthWord === 12) {
+            monthWord = "Dec"
+        }
+
+        return monthWord;
+    }
 
     // useEffect(() => {
     //     console.log(pushLike);
@@ -204,6 +252,7 @@ const BookmarkDetail = (props) => {
                 // dispatch(setShouldHomeRefresh(true));
                 // dispatch(setShouldLibraryRefresh(true));
                 // dispatch(setShouldUserRefresh(true));
+                dispatch(setShouldNemolistRefresh(true));
                 if (res.data.is_like) {
                     await analytics().logEvent('like', {
                         writer_tag: bookmark.user_tag,
@@ -362,11 +411,11 @@ const BookmarkDetail = (props) => {
                             bookmark_id: bookmark.bookmark_id,
                         })
                         .then((res) => {
-                            setBookmarkModalVisible(false);
-                            setReportVisible(false);
+                            onPressClose();
                             dispatch(setShouldHomeRefresh(true));
                             dispatch(setShouldLibraryRefresh(true));
                             dispatch(setShouldUserRefresh(true));
+                            dispatch(setShouldNemoRefresh(true));
                         })
                     } catch (err) {
                         console.error(err);
@@ -421,13 +470,19 @@ const BookmarkDetail = (props) => {
         try {
             await Api
             .post("api/v1/user/follow/", {
-                user_tag: albumInfo.user_tag,
+                user_tag: bookmark.user_tag,
             })
             .then((res) => {
                 // console.log(res.data);
                 setIsFollow(res.data.is_follow);
                 // setFollowers(res.data.count);
                 // dispatch(setShouldUserRefresh(true));
+                if (res.data.is_follow) {
+                    Alert.alert(bookmark.user_tag, `You followed ${bookmark.user_tag}.`);
+                    Vibration.vibrate(30);
+                } else {
+                    Alert.alert(bookmark.user_tag, `You unfollowed ${bookmark.user_tag}.`);
+                }
             })
         } catch (err) {
             console.error(err);
@@ -513,7 +568,7 @@ const BookmarkDetail = (props) => {
                         </Pressable>
                         <Entypo name="dot-single" size={10} color="#808080" />
                         <View>
-                            <Text style={styles.bookmarkDateText}>{bookmark.created_date.split('T')[0]}</Text>
+                            <Text style={styles.bookmarkDateText}>{date}</Text>
                         </View>
                     </View>
                     <Pressable
@@ -572,7 +627,7 @@ const BookmarkDetail = (props) => {
                             contents={content}
                             navigation={navigation} 
                             index={index}
-                            captureRef={captureRef}
+                            // captureRef={captureRef}
                             key={index} 
                         />
                         // </ViewShot>
@@ -616,132 +671,143 @@ const BookmarkDetail = (props) => {
 
 
                 </View>
-
                 <View style={styles.bookmarkLikes}>
-                    <Pressable 
-                        style={{ 
-                            flexDirection: "row", 
-                            alignItems: "center", 
-                            // width: regWidth * 35,
-                            paddingRight: regWidth * 8,
-                            paddingLeft: regWidth * 13,
-                            paddingVertical: regHeight * 8,
-                        }}
-                        hitSlop={{ bottom: 20, left: 60, right: 60, top: 20 }}
-                        onPress={onLike}
-                    >
-                        {/* <Entypo 
-                            name={isLike ? "heart" : "heart-outlined"}
-                            size={regWidth * 26} 
-                            color={isLike ? "red" : "black"}
-                        /> */}
-                        <Image 
-                            source={isLike ? iconHeart : iconHeartOutline}
-                            style={{
-                                width: regWidth * 25,
-                                height: regWidth * 25,
+                    <View style={{ flexDirection: "row", alignItems: "center", }}>
+                        <Pressable 
+                            style={{ 
+                                flexDirection: "row", 
+                                alignItems: "center", 
+                                // width: regWidth * 35,
+                                paddingRight: regWidth * 8,
+                                paddingVertical: regHeight * 8,
                             }}
-                        />
-                    </Pressable>
-                    <Pressable 
-                        activeOpacity={1} 
-                        style={{ 
-                            flexDirection: "row", 
-                            alignItems: "center", 
-                            width: regWidth * 60,
-                            paddingVertical: regHeight * 8,
-                        }}
-                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                        onPress={() => navigation.push('LikeUsers', { bookmarkId: bookmark.bookmark_id, })}
-                    >
-                        <Text style={styles.bookmarkLikesText}>
-                            {/* { !pushLike ? bookmark.likes : likeCount } */}
-                            { `${likeCount}` }
-                        </Text>
-                    </Pressable>
-                    <Pressable 
-                        activeOpacity={1} 
-                        style={{ 
-                            flexDirection: "row", 
-                            alignItems: "center", 
-                            paddingVertical: regHeight * 8,
-
-                        }}
-                        hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                        onPress={() => {
-                            fetchNemolist();
-                        }}
-                        // disabled={userTag === bookmark.user_tag}
-                    >
-                        {/* <Feather 
-                            name="download" 
-                            size={regWidth * 25}
-                            color={ userTag === bookmark.user_tag ? "#C9C9C9" : (isScrap ? "#298CFF" : "black") }
-                            style={{
-                                width: regWidth * 30,
-                            }} 
-                        /> */}
-                        <Image 
-                            source={iconLayers}
-                            style={{
-                                width: regWidth * 25,
-                                height: regWidth * 25,
-                            }}
-                        />
-                        <Text 
-                            style={{
-                                ...styles.bookmarkLikesText, 
-                                // color: userTag === bookmark.user_tag ? "#C9C9C9" : "black",
-                            }}
+                            hitSlop={{ bottom: 20, left: 60, right: 60, top: 20 }}
+                            onPress={onLike}
                         >
-                            {/* { !pushScrap ? bookmark.scraps : scrapCount } */}
-                            { scrapCount }
-                        </Text>
-                    </Pressable>
-
-                    {/* { userTag !== bookmark.user_tag ? 
+                            {/* <Entypo 
+                                name={isLike ? "heart" : "heart-outlined"}
+                                size={regWidth * 26} 
+                                color={isLike ? "red" : "black"}
+                            /> */}
+                            <Image 
+                                source={isLike ? iconHeart : iconHeartOutline}
+                                style={{
+                                    width: regWidth * 25,
+                                    height: regWidth * 25,
+                                }}
+                            />
+                        </Pressable>
                         <Pressable 
                             activeOpacity={1} 
                             style={{ 
                                 flexDirection: "row", 
                                 alignItems: "center", 
+                                width: regWidth * 60,
+                                paddingVertical: regHeight * 8,
                             }}
-                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
-                            onPress={onScrap}
+                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            onPress={() => navigation.push('LikeUsers', { ctg: "nemo", id: bookmark.bookmark_id, })}
                         >
-                            <Feather 
-                                name="download" 
-                                size={regWidth * 20}
-                                color={isScrap ? "red" : "black" }
-                                // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
-                            />
-                            <Text style={styles.bookmarkLikesText}>{scrapCount}</Text>
+                            <Text style={styles.bookmarkLikesText}>
+                                {/* { !pushLike ? bookmark.likes : likeCount } */}
+                                { `${likeCount}` }
+                            </Text>
                         </Pressable>
-                        :
-                        null
-                    } */}
-
-
-                    {/* {watermark === post.nickname ?
-                        null
-                        :
-                        <TouchableOpacity 
+                        <Pressable 
                             activeOpacity={1} 
                             style={{ 
                                 flexDirection: "row", 
                                 alignItems: "center", 
-                            }}
-                            onPress={onScrap}
-                        >
-                            <Feather 
-                                name="download" 
-                                size={24} 
-                                color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
-                            />
-                            <Text style={styles.bookmarkLikesText}>{scrapNum}</Text>
-                        </TouchableOpacity>
-                    } */}
+                                paddingVertical: regHeight * 8,
 
+                            }}
+                            hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                            onPress={() => {
+                                fetchNemolist();
+                            }}
+                            // disabled={userTag === bookmark.user_tag}
+                        >
+                            {/* <Feather 
+                                name="download" 
+                                size={regWidth * 25}
+                                color={ userTag === bookmark.user_tag ? "#C9C9C9" : (isScrap ? "#298CFF" : "black") }
+                                style={{
+                                    width: regWidth * 30,
+                                }} 
+                            /> */}
+                            <Image 
+                                source={iconLayers}
+                                style={{
+                                    width: regWidth * 25,
+                                    height: regWidth * 25,
+                                }}
+                            />
+                            <Text 
+                                style={{
+                                    ...styles.bookmarkLikesText, 
+                                    // color: userTag === bookmark.user_tag ? "#C9C9C9" : "black",
+                                }}
+                            >
+                                {/* { !pushScrap ? bookmark.scraps : scrapCount } */}
+                                { scrapCount }
+                            </Text>
+                        </Pressable>
+
+                        {/* { userTag !== bookmark.user_tag ? 
+                            <Pressable 
+                                activeOpacity={1} 
+                                style={{ 
+                                    flexDirection: "row", 
+                                    alignItems: "center", 
+                                }}
+                                hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
+                                onPress={onScrap}
+                            >
+                                <Feather 
+                                    name="download" 
+                                    size={regWidth * 20}
+                                    color={isScrap ? "red" : "black" }
+                                    // color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
+                                />
+                                <Text style={styles.bookmarkLikesText}>{scrapCount}</Text>
+                            </Pressable>
+                            :
+                            null
+                        } */}
+
+
+                        {/* {watermark === post.nickname ?
+                            null
+                            :
+                            <TouchableOpacity 
+                                activeOpacity={1} 
+                                style={{ 
+                                    flexDirection: "row", 
+                                    alignItems: "center", 
+                                }}
+                                onPress={onScrap}
+                            >
+                                <Feather 
+                                    name="download" 
+                                    size={24} 
+                                    color={scraps.findIndex(scrap => Number(scrap.post_id) === Number(post.post_id)) === -1 ? "black" : "red"} 
+                                />
+                                <Text style={styles.bookmarkLikesText}>{scrapNum}</Text>
+                            </TouchableOpacity>
+                        } */}
+
+                    </View>
+                <Pressable
+                    onPress={() => onCapture()}
+                >
+                    <Image 
+                        source={iconShare}
+                        style={{
+                            width: regWidth * 25,
+                            height: regWidth * 25,
+                        }}
+                    />
+                </Pressable>
                 </View>
             </View>
             {/* <Modal
@@ -952,15 +1018,18 @@ const BookmarkDetail = (props) => {
                     <Pressable
                         onPress={onPressClose}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
                             Cancel
                         </Text>
                     </Pressable>
                     {bookmark.user_tag !== userTag ? 
                         <>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}
+                                onPress={onFollow}
+                            >
                                 <Image 
-                                    source={iconFollow}
+                                    source={isFollow ? iconUnfollow : iconFollow}
                                     style={{
                                         height: regWidth * 39,
                                         width: regWidth * 39,
@@ -968,8 +1037,8 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
-                                        {`Follow @${bookmark.user_tag}`}
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                        {isFollow ? `Unfollow @${bookmark.user_tag}` : `Follow @${bookmark.user_tag}`}
                                     </Text>
                                 </View>
                             </Pressable>
@@ -988,7 +1057,13 @@ const BookmarkDetail = (props) => {
                                     </Text>
                                 </View>
                             </Pressable> */}
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}
+                                onPress={() => {
+                                    onPressClose();
+                                    navigation.navigate('Report', {ctg: "nemo", id: bookmark.bookmark_id});
+                                }}
+                            >
                                 <Image 
                                     source={iconAlert}
                                     style={{
@@ -998,10 +1073,10 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                         Report
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                         Report your issue
                                     </Text>
                                 </View>
@@ -1009,7 +1084,16 @@ const BookmarkDetail = (props) => {
                         </>
                         :
                         <>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}>
+                            <Pressable 
+                                style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 19, }}
+                                onPress={() => {
+                                    onPressClose();
+                                    navigation.navigate('EditBookmark', { 
+                                        bookmark: bookmark,
+                                    });
+                                }}
+
+                            >
                                 <Image 
                                     source={iconEdit}
                                     style={{
@@ -1019,10 +1103,10 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                         Edit
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                         Edit your Nemo
                                     </Text>
                                 </View>
@@ -1040,29 +1124,11 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
                                         Delete
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
                                         Delete Nemo from your library
-                                    </Text>
-                                </View>
-                            </Pressable>
-                            <Pressable style={{ flexDirection: "row", alignItems: "center", marginTop: regHeight * 24, }}>
-                                <Image 
-                                    source={iconAlert}
-                                    style={{
-                                        height: regWidth * 39,
-                                        width: regWidth * 39,
-                                        resizeMode: "contain",
-                                    }}
-                                />
-                                <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#202020", }}>
-                                        Report
-                                    </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontWeight: "500", color: "#606060", }}>
-                                        Report your issue
                                     </Text>
                                 </View>
                             </Pressable>
@@ -1175,7 +1241,7 @@ const BookmarkDetail = (props) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 0 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -1198,7 +1264,7 @@ const BookmarkDetail = (props) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
                                 color: sort === 1 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -1363,13 +1429,13 @@ const styles = StyleSheet.create({
         // backgroundColor: "red",
     },
     bookmakrWriterName: {
-        fontWeight: "700",
+        fontFamily: "NotoSansKR-Bold",
         fontSize: regWidth * 12.5,
         paddingHorizontal: regWidth * 5,
     },
     bookmarkDateText: {
         color: "#808080",
-        fontWeight: "500",
+        fontFamily: "NotoSansKR-Medium",
         fontSize: regWidth * 10,
         paddingHorizontal: regWidth * 5,
     },
@@ -1390,17 +1456,13 @@ const styles = StyleSheet.create({
         marginRight: regWidth * 8,
         color: "#9250FF",
     },
-
-
     bookmarkLikes: {
-        // backgroundColor: "pink",
-        // width: "40%",
+        flexDirection: "row", 
+        alignItems: "center", 
+        justifyContent: "space-between",
         marginTop: regHeight * 10,
         paddingVertical: regHeight * 4,
-        // paddingHorizontal: regWidth * 13,
-        flexDirection: "row",
-        alignItems: "center",
-        // justifyContent: "space-between",
+        marginHorizontal: regWidth * 13,
     },
     bookmarkLikesText: {
         fontWeight: "700",

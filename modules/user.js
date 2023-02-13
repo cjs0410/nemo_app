@@ -19,10 +19,12 @@ const initialState = {
     shouldNemoRefresh: false,
     shouldNemolistRefresh: false,
     shouldBookRefresh: false,
+    shouldFollowingRefresh: false,
     recentSearch: [],
     searchKeyword: '',
     isAlbumTile: false,
     isBookTile: false,
+    fcmToken: null,
     // scrollY: useRef(new Animated.Value(0)).current,
 }
 
@@ -55,7 +57,7 @@ export const userSlice = createSlice({
         resetRefreshToken: (state) => {
             state.refreshToken = null;
             state.decodedRefresh = null;
-            state.isStaff = true;
+            state.isStaff = false;
         },
         setAvatar: (state, action) => {
             state.avatar = action.payload;
@@ -83,6 +85,9 @@ export const userSlice = createSlice({
         },
         setShouldBookRefresh: (state, action) => {
             state.shouldBookRefresh = action.payload;
+        },
+        setShouldFollowingRefresh: (state, action) => {
+            state.shouldFollowingRefresh = action.payload;
         },
         setIsStaff: (state, action) => {
             state.isStaff = action.payload;
@@ -131,6 +136,12 @@ export const userSlice = createSlice({
         },
         toggleBookTile: (state, action) => {
             state.isBookTile = !state.isBookTile;
+        },
+        setFcmToken: (state, action) => {
+            state.fcmToken = action.payload;
+        },
+        resetFcmToken: (state, action) => {
+            state.fcmToken = null;
         }
     }
 })
@@ -140,10 +151,12 @@ export const {
     setAvatar, resetAvatar, setIsAlarm, 
     setShouldHomeRefresh, setShouldLibraryRefresh, setShouldUserRefresh, 
     setShouldNemoRefresh, setShouldNemolistRefresh, setShouldBookRefresh,
+    setShouldFollowingRefresh,
     setIsStaff,
     addRecentSearch, deleteRecentSearch,
     setSearchKeyword,
     toggleAlbumTile, toggleBookTile,
+    setFcmToken, resetFcmToken,
 } = userSlice.actions;
 
 export default userSlice.reducer;
