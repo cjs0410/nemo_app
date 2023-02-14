@@ -276,7 +276,7 @@ const NemoCalender = ({navigation}) => {
                     />
                 </Pressable>
                 <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: colors.bgdLight, }}>
-                    Nemo Calender
+                    Nemo Calendar
                 </Text>
                 <Image 
                     source={vectorLeftImage}

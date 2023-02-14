@@ -13,6 +13,8 @@ import {
     useFocusEffect,
     useScrollToTop,
 } from '@react-navigation/native';
+import SelectDropdown from 'react-native-select-dropdown';
+
 import blankAvatar from '../assets/images/peopleicon.png';
 import * as Font from "expo-font";
 import * as Update from "expo-updates";
@@ -753,14 +755,18 @@ const ExploreScreen = ({route, navigation}) => {
     const [sort, setSort] = useState(3);
     const [loading, setLoading] = useState(false);
 
+    const categories = ["Now", "Weekly", "Monthly", ];
+    const sortList = [3, 14, 30]
+    const [whichCategory, setWhichCategory] = useState(0);
+
     const ref = useRef();
     useScrollToTop(ref);
 
     useEffect(() => {
-        fetchTrending();
-    }, [sort]);
+        fetchTrending(3);
+    }, []);
 
-    const fetchTrending = async() => {
+    const fetchTrending = async(sort) => {
         try {
             setLoading(true);
             await Api
@@ -786,7 +792,7 @@ const ExploreScreen = ({route, navigation}) => {
                 ref={ref}
                 showsVerticalScrollIndicator={false}
             >
-                <View
+                {/* <View
                     style={{
                         flexDirection: "row", 
                         alignItems: "center", 
@@ -839,7 +845,7 @@ const ExploreScreen = ({route, navigation}) => {
                             Monthly
                         </Text>
                     </Pressable>
-                </View>
+                </View> */}
                 <View 
                     style={{ 
                         flexDirection: "row", 
@@ -874,7 +880,34 @@ const ExploreScreen = ({route, navigation}) => {
                             Trending on Nemo
                         </Text>
                     </View>
-
+                    <SelectDropdown 
+                        data={categories}
+                        onSelect={(selectedItem, index) => {
+                            setWhichCategory(index);
+                            fetchTrending(sortList[index]);
+                        }}
+                        buttonTextAfterSelection={(selectedItem, index) => {
+                            // text represented after item is selected
+                            // if data array is an array of objects then return selectedItem.property to render after item is selected
+                            return selectedItem
+                        }}
+                        rowTextForSelection={(item, index) => {
+                            // text represented for each item in dropdown
+                            // if data array is an array of objects then return item.property to represent item in dropdown
+                            return item
+                        }}
+                        defaultValueByIndex={0}
+                        dropdownStyle={{borderRadius: regWidth * 10, marginTop: regHeight * 8, }}
+                        buttonStyle={styles.arrange}
+                        buttonTextStyle={styles.arrangeText}
+                        renderDropdownIcon={isOpened => {
+                            return <Feather name={isOpened ? 'chevron-up' : 'chevron-down'} size={24} color="white" />
+                        }}
+                        dropdownIconPosition={'right'}
+                        rowStyle={styles.rowStyle}
+                        rowTextStyle={styles.rowText}
+                        // selectedRowStyle={{...styles.rowStyle, backgroundColor: "white", }}
+                    />
                 </View>
                 {loading ? 
                     <ActivityIndicator 
@@ -1270,6 +1303,33 @@ const styles = StyleSheet.create({
         borderColor: colors.nemoLight,
         justifyContent: "center",
         alignItems: "center",
+    },
+    arrange: {
+        backgroundColor: colors.nemoDark,
+        borderRadius: regWidth * 15,
+        alignItems: "center",
+        justifyContent: "center",
+        width: regWidth * 100,
+        height: regWidth * 30,
+    },
+    rowStyle: {
+        backgroundColor: "#DDDDDD",
+        alignItems: "center",
+        justifyContent: "center",
+        width: regWidth * 100,
+        height: regWidth * 30,
+    },
+    arrangeText: {
+        fontSize: regWidth * 13,
+        fontFamily: "NotoSansKR-Black",
+        marginHorizontal: -1,
+        color: "white",
+    },
+    rowText: {
+        fontSize: regWidth * 13,
+        fontFamily: "NotoSansKR-Regular",
+        marginHorizontal: -1,
+        color: "black",
     }
 })
 

@@ -80,9 +80,16 @@ import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from './modules/hooks';
 import { setUserInfo, setAccessToken, setIsAlarm, } from './modules/user';
+import {colors, regWidth, regHeight} from './config/globalStyles';
+
 import blankAvatar from './assets/images/peopleicon.png';
 import NemoLogo from './assets/NemoLogo.png';
 import userLibraryLogo from './assets/icons/userLibraryLogo.png';
+import unfocusUserLibrary from './assets/images/unfocusUserLibrary.png';
+import focusUserLibrary from './assets/images/focusUserLibrary.png';
+import createBookmark from './assets/images/createBookmark.png';
+import unfocusExplore from './assets/images/unfocusExplore.png';
+import focusExplore from './assets/images/focusExplore.png';
 
 import analytics from '@react-native-firebase/analytics';
 import {
@@ -91,7 +98,6 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Portal, PortalHost, PortalProvider } from '@gorhom/portal';
 import messaging from '@react-native-firebase/messaging';
-import { regWidth } from "./config/globalStyles";
 import * as SplashScreen from 'expo-splash-screen';
 
 SplashScreen.preventAutoHideAsync();
@@ -442,6 +448,19 @@ const App = () => {
               // options={{ headerShown: false, }} 
               options={({ route }) => ({
                 headerShown: false,
+                tabBarIcon: ({ focused }) => {
+                  return (
+                    <Image 
+                      // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
+                      source={focused ? focusUserLibrary : unfocusUserLibrary}
+                      style={{        
+                        width: regWidth * 28,
+                        height: regWidth * 28,
+                        resizeMode: "cover",
+                      }} 
+                    />
+                  )
+                },
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
                   if ((routeName === 'SelectBook0' || routeName === 'CreateBook0' || routeName === 'CreateBookmark0')) {
@@ -453,9 +472,13 @@ const App = () => {
                   if (routeName === 'EditBookmark') {
                     return { display: "none", }
                   }
+                  if (routeName === 'CreateBookmark') {
+                    return { display: "none", }
+                  }
                   return
                 })(route),
               })}
+
             />
             {/* <Tab.Screen 
               name="Search" 
@@ -467,6 +490,21 @@ const App = () => {
             <Tab.Screen 
               name="Post" 
               component={PostScreen}
+              options={{
+                tabBarIcon: ({ focused }) => {
+                  return (
+                    <Image 
+                      // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
+                      source={createBookmark}
+                      style={{        
+                        width: regWidth * 35,
+                        height: regWidth * 35,
+                        resizeMode: "cover",
+                      }} 
+                    />
+                  )
+                },
+              }}
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
                   e.preventDefault();
@@ -479,12 +517,28 @@ const App = () => {
               component={HomeScreen} 
               options={({ route }) => ({
                 headerShown: false,
+                tabBarIcon: ({ focused }) => {
+                  return (
+                    <Image 
+                      // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
+                      source={focused ? focusExplore : unfocusExplore}
+                      style={{        
+                        width: regWidth * 35,
+                        height: regWidth * 35,
+                        resizeMode: "cover",
+                      }} 
+                    />
+                  )
+                },
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
-                  if ((routeName === 'SelectBook2' || routeName === 'CreateBook2' || routeName === 'CreateBookmark2') && (Platform.OS === 'android')) {
+                  if ((routeName === 'SelectBook2' || routeName === 'CreateBook2' || routeName === 'CreateBookmark2')) {
                     return { display: "none", }
                   }
                   if (routeName === 'EditBookmark') {
+                    return { display: "none", }
+                  }
+                  if (routeName === 'CreateBookmark') {
                     return { display: "none", }
                   }
                   return

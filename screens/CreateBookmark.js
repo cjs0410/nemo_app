@@ -14,6 +14,7 @@ import iconArrowForward from '../assets/icons/iconArrowForward.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
 import iconPlusCirclePurple from '../assets/icons/iconPlusCirclePurple.png';
+import iconToBottom from '../assets/icons/iconToBottom.png';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
 // import HTMLView from 'react-native-htmlview';
@@ -70,7 +71,7 @@ const CreateBookmark = ({navigation, route}) => {
 
     const [newBookTitle, setNewBookTitle] = useState('');
     const [newBookAuthor, setNewBookAuthor] = useState('');
-    const { selectedBook, } = route.params;
+    const { selectedBook, normal, } = route.params;
 
     const [addedNum, setAddedNum] = useState(0);
     const [firstContents, setFirstContents] = useState('');
@@ -116,6 +117,8 @@ const CreateBookmark = ({navigation, route}) => {
     const [newNemolistNum, setNewNemolistNum] = useState(0);
     const [scrollLoading, setScrollLoading] = useState(false);
     const [selectedNemolists, setSelectedNemolists] = useState([]);
+
+    const scrollRef = useRef();
    
 
 
@@ -312,6 +315,7 @@ const CreateBookmark = ({navigation, route}) => {
         // if (ocrImage !== null) {
         //     fetchOCR(ocrImage);
         // }
+        console.log(navigation.getParent().name);
     }, []);
 
     useEffect(() => {
@@ -418,7 +422,7 @@ const CreateBookmark = ({navigation, route}) => {
             } catch (err) {
                 console.error(err);
             }
-            setCreateBookmarkLoading(false);
+            // setCreateBookmarkLoading(false);
         } else {
             Alert.alert("북마크를 완성해주세요", "네모를 완성해주세요!", [
                 {
@@ -675,17 +679,17 @@ const CreateBookmark = ({navigation, route}) => {
         }
     }
 
-    const reSelectBook = () => {
-        Alert.alert("Do you want to re-select book?", "확인 버튼을 누르면 취소됩니다.", [
-            {
-                text: "No",
-            },
-            {
-                text: "Yes", 
-                onPress: () => navigation.goBack()
-            }
-        ]);
-    }
+    // const reSelectBook = () => {
+    //     Alert.alert("Do you want to re-select book?", "확인 버튼을 누르면 취소됩니다.", [
+    //         {
+    //             text: "No",
+    //         },
+    //         {
+    //             text: "Yes", 
+    //             onPress: () => navigation.goBack()
+    //         }
+    //     ]);
+    // }
 
     const onTempCreate = async() => {
         const formData = new FormData();
@@ -921,7 +925,13 @@ const CreateBookmark = ({navigation, route}) => {
                 }}
             >
                 <Pressable 
-                    onPress={reSelectBook}
+                    onPress={() => {
+                        navigation.goBack();
+                        if (normal) {
+                            navigation.goBack();
+                        }
+                        
+                    }}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
                     <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginRight: regWidth * 8, }} >Cancel</Text>
@@ -991,6 +1001,7 @@ const CreateBookmark = ({navigation, route}) => {
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                ref={scrollRef}
                 // ref={(ref) => {
                 //     setRef(ref);
                 // }}
@@ -1488,6 +1499,12 @@ const CreateBookmark = ({navigation, route}) => {
                             // backgroundColor:"pink"
                         }}
                         multiline={true}
+                        onFocus={() => {
+                            setShowMenu(true);
+                        }}
+                        onBlur={() => {
+                            setShowMenu(false);
+                        }}
                     />
                 </Pressable>
                 <View 
@@ -2326,6 +2343,26 @@ const CreateBookmark = ({navigation, route}) => {
                                 <Pressable 
                                     style={{
                                         ...styles.optionBox, 
+                                        backgroundColor: "#ACD8D9",
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#ACD8D9");
+                                        setBackgroundImage(null);
+                                    }}
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#ACD8D9" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
                                         backgroundColor: "#DBE5F1",
                                     }} 
                                     onPress={() => {
@@ -2355,7 +2392,7 @@ const CreateBookmark = ({navigation, route}) => {
                             </View>
                         </View>
 
-                        {/* <View style={styles.separator}/>
+                        <View style={styles.separator}/>
 
                         <View
                             style={{
@@ -2368,7 +2405,7 @@ const CreateBookmark = ({navigation, route}) => {
                                     fontWeight: "400",
                                 }}
                             >
-                                Add sheet
+                                Bottom
                             </Text>
                             <View
                                 style={{
@@ -2377,14 +2414,18 @@ const CreateBookmark = ({navigation, route}) => {
                                     justifyContent: "center",
                                 }}
                             >
-                                <Pressable>
+                                <Pressable
+                                    onPress={() => {
+                                        scrollRef.current.scrollToEnd({ animated: true })
+                                    }}
+                                >
                                     <Image 
-                                        source={iconPlus}
+                                        source={iconToBottom}
                                         style={styles.iconImage}
                                     />
                                 </Pressable>
                             </View>
-                        </View> */}
+                        </View>
                     </View>
                 </KeyboardAvoidingView>
                 :

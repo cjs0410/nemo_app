@@ -370,6 +370,10 @@ const NemoScreen = ({route, navigation}) => {
     }, []);
 
     useEffect(() => {
+        console.log(sort);
+    }, [sort])
+
+    useEffect(() => {
         if (shouldNemoRefresh === true) {
             // console.log("auto");
             fetchBookmarkList(sort);
@@ -410,16 +414,16 @@ const NemoScreen = ({route, navigation}) => {
 
     const onRefresh = useCallback(async() => {
         setRefreshing(true);
-
+        console.log(sort)
         await fetchBookmarkList(sort)
         .then(() => setRefreshing(false));
-    }, []);
+    }, [sort]);
 
 
     const onSort = (sortNum) => {
         setSort(sortNum);
         onPressClose();
-        fetchBookmarkList(sortNum)
+        fetchBookmarkList(sortNum);
     }
 
     const onEndReached = () => {
@@ -737,7 +741,7 @@ const NemoListScreen = ({navigation}) => {
 
         await fetchNemoList(sort)
         .then(() => setRefreshing(false));
-    }, []);
+    }, [sort]);
 
     const onSort = (sortNum) => {
         setSort(sortNum);
@@ -1101,7 +1105,7 @@ const BookScreen = ({navigation}) => {
 
         await fetchBook(sort)
         .then(() => setRefreshing(false));
-    }, []);
+    }, [sort]);
 
     const renderBook = ({ item, index }) => (
         <Pressable

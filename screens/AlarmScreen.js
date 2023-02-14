@@ -77,7 +77,7 @@ const AlarmScreen = ({navigation}) => {
                     >
                         <Image 
                             source={vectorLeftImage} 
-                            style={{ width: regWidth*30, height: regWidth*30 }}
+                            style={{ width: regWidth*35, height: regWidth*35 }}
                         />
                     </Pressable>
                     <Text style={{

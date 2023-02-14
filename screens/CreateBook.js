@@ -26,6 +26,7 @@ import { resetUserInfo, setShouldHomeRefresh, setShouldLibraryRefresh, setShould
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import ImagePicker from 'react-native-image-crop-picker';
 import { color } from "react-native-reanimated";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const CreateBook = ({navigation, route}) => {
     const dispatch = useDispatch();
@@ -37,6 +38,8 @@ const CreateBook = ({navigation, route}) => {
     const [bookCover, setBookCover] = useState(null);
     const [bookTitle, setBookTitle] = useState('');
     const [bookAuthor, setBookAuthor] = useState('');
+    const [loading, setLoading] = useState(false);
+    const insets = useSafeAreaInsets();
 
     const pickBookCover = async () => {
         try {
@@ -44,7 +47,7 @@ const CreateBook = ({navigation, route}) => {
             width: 1000,
             height: 1300,
             cropping: true,
-            // freeStyleCropEnabled: true,
+            freeStyleCropEnabled: true,
           }).then(image => {
             console.log(image);
             setBookCover(`file://${image.path}`);
@@ -83,6 +86,7 @@ const CreateBook = ({navigation, route}) => {
         formData.append('book_author', bookAuthor);
 
         try {
+            setLoading(true);
             await Api
             .put("/api/v3/book/add/", formData,
                 {
@@ -93,9 +97,12 @@ const CreateBook = ({navigation, route}) => {
             )
             .then((res) => {
                 console.log(res.data);
-                navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: res.data, });
+                dispatch(setShouldBookRefresh(true));
+                if (!isLib) {
+                    navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: res.data, normal: true, });
+                }
                 if (isLib) {
-                    dispatch(setShouldBookRefresh(true));
+                    navigation.popToTop();
                 }
             })
         } catch (err) {
@@ -104,8 +111,19 @@ const CreateBook = ({navigation, route}) => {
     }
 
     return (
-        <View style={styles.container}>
-            <SafeAreaView style={styles.header}>
+        <KeyboardAvoidingView 
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <View style={{ flexDirection: "row", alignItems: "center", }}>
                     <Image 
                         source={iconBook}
@@ -118,7 +136,7 @@ const CreateBook = ({navigation, route}) => {
                     <Text 
                         style={{ 
                             fontSize: regWidth * 24, 
-                            fontWeight: "900", 
+                            fontFamily: "NotoSansKR-Black",
                             color: colors.textDark, 
                             marginHorizontal: regWidth * 5, 
                         }}
@@ -127,99 +145,110 @@ const CreateBook = ({navigation, route}) => {
                     </Text>
                 </View>
                 <Pressable
-                    onPress={onExit}
+                    onPress={() => navigation.goBack()}
                 >
                     <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: colors.textNormal, }}>
                         Cancel
                     </Text>
                 </Pressable>
-            </SafeAreaView>
-            <View style={{ alignItems: "center", marginTop: regHeight * 45, }}>
-                <Pressable
-                    style={{ alignItems: "center", }}
-                    onPress={pickBookCover}
-                >
-                    <Image 
-                        source={bookCover === null ? addBookCover : {uri: bookCover}}
-                        style={{
-                            width: regWidth * 120,
-                            height: regWidth * 160,
-                            resizeMode: "contain",
-                        }}
-                    />
+            </View>
+            <ScrollView>
+                <View style={{ alignItems: "center", marginTop: regHeight * 45, }}>
+                    <Pressable
+                        style={{ alignItems: "center", }}
+                        onPress={pickBookCover}
+                    >
+                        <Image 
+                            source={bookCover === null ? addBookCover : {uri: bookCover}}
+                            style={{
+                                width: regWidth * 120,
+                                height: regWidth * 160,
+                                resizeMode: "contain",
+                            }}
+                        />
+                        <Text
+                            style={{
+                                fontSize: regWidth * 13,
+                                fontFamily: "NotoSansKR-Regular",
+                                marginTop: regHeight * 5,
+                                color: colors.nemoNormal,
+                            }}
+                        >
+                            Choose Book Cover
+                        </Text>
+                    </Pressable>
+                </View>
+                <View style={{ marginHorizontal: regWidth * 38, marginTop: regHeight * 35, }}>
                     <Text
                         style={{
                             fontSize: regWidth * 13,
-                            fontWeight: "400",
+                            fontFamily: "NotoSansKR-Regular",
                             marginTop: regHeight * 5,
                             color: colors.nemoNormal,
                         }}
                     >
-                        Choose Book Cover
+                        Book Title
                     </Text>
-                </Pressable>
-            </View>
-            <View style={{ marginHorizontal: regWidth * 38, marginTop: regHeight * 35, }}>
-                <Text
-                    style={{
-                        fontSize: regWidth * 13,
-                        fontWeight: "400",
-                        marginTop: regHeight * 5,
-                        color: colors.nemoNormal,
-                    }}
+                    <TextInput 
+                        style={{
+                            borderBottomWidth: 1,
+                            fontSize: regWidth * 18,
+                            fontFamily: "NotoSansKR-Medium",
+                            marginTop: 18,
+                        }}
+                        onChangeText={(payload) =>  setBookTitle(payload)}
+                    />
+                </View>
+                <View style={{ marginHorizontal: regWidth * 38, marginTop: regHeight * 35, }}>
+                    <Text
+                        style={{
+                            fontSize: regWidth * 13,
+                            fontFamily: "NotoSansKR-Regular",
+                            marginTop: regHeight * 5,
+                            color: colors.nemoNormal,
+                        }}
+                    >
+                        Author
+                    </Text>
+                    <TextInput 
+                        style={{
+                            borderBottomWidth: 1,
+                            fontSize: regWidth * 18,
+                            fontFamily: "NotoSansKR-Medium",
+                            marginTop: 18,
+                        }}
+                        onChangeText={(payload) =>  setBookAuthor(payload)}
+                    />
+                </View>
+                <Pressable
+                    style={styles.addBtn}
+                    onPress={onAddBook}
                 >
-                    Book Title
-                </Text>
-                <TextInput 
-                    style={{
-                        borderBottomWidth: 1,
-                        fontSize: regWidth * 18,
-                        fontWeight: "600",
-                        marginTop: 18,
-                    }}
-                    onChangeText={(payload) =>  setBookTitle(payload)}
-                />
-            </View>
-            <View style={{ marginHorizontal: regWidth * 38, marginTop: regHeight * 35, }}>
-                <Text
-                    style={{
-                        fontSize: regWidth * 13,
-                        fontWeight: "400",
-                        marginTop: regHeight * 5,
-                        color: colors.nemoNormal,
-                    }}
-                >
-                    Author
-                </Text>
-                <TextInput 
-                    style={{
-                        borderBottomWidth: 1,
-                        fontSize: regWidth * 18,
-                        fontWeight: "600",
-                        marginTop: 18,
-                    }}
-                    onChangeText={(payload) =>  setBookAuthor(payload)}
-                />
-            </View>
-            <Pressable
-                style={styles.addBtn}
-                onPress={onAddBook}
-            >
-                <Text
-                    style={{
-                        fontSize: regWidth * 18,
-                        fontWeight: "900",
-                        color: "#FFFFFF",
-                    }}
-                >
-                    {isLib ? 
-                        "Add to my library"
-                        :
-                        "Add"
+                    {loading ? 
+                        <ActivityIndicator 
+                            color="white"
+                            // style={{ marginTop: 100, }} 
+                            size="small"
+                        />
+                        : 
+                        <Text
+                            style={{
+                                fontSize: regWidth * 18,
+                                fontFamily: "NotoSansKR-Black",
+                                color: "#FFFFFF",
+                            }}
+                        >
+                            {isLib ? 
+                                "Add to my library"
+                                :
+                                "Add"
+                            }
+                        </Text>
                     }
-                </Text>
-            </Pressable>
-        </View>
+
+                </Pressable>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 

@@ -38,7 +38,7 @@ const BookList = (props) => {
                             marginHorizontal: 12,
                             lineHeight: regWidth * 23,
                         }}
-                        numberOfLines={2}
+                        numberOfLines={1}
                         ellipsizeMode='tail'
                     >
                         {book.book_title}

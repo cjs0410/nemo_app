@@ -195,7 +195,7 @@ const UserStorage = ({route, navigation}) => {
                         >
                             <Image 
                                 source={vectorLeftImage} 
-                                style={{ width: regWidth*30, height: regWidth*30 }}
+                                style={{ width: regWidth*35, height: regWidth*35 }}
                             />
                         </Pressable>
                         <Pressable
@@ -239,7 +239,11 @@ const UserStorage = ({route, navigation}) => {
                             <View style={{ flexDirection: "row", alignItems: "flex-end"}}>
                                 <Animated.Image 
                                     source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                                    style={{ ...styles.profileAvatar, opacity: avatarValue }} 
+                                    style={{ 
+                                        ...styles.profileAvatar, 
+                                        opacity: avatarValue,
+                                        borderRadius: profile.user_tag === "nemo" ? 0 : 999,
+                                    }} 
                                     onLoadEnd={showAvatarImage}
                                 />
                                 <View
@@ -295,7 +299,7 @@ const UserStorage = ({route, navigation}) => {
                             </Text>
                             <Pressable
                                 style={{ flexDirection: "row", alignItems: "center", }}
-                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
+                                onPress={() =>  navigation.push("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
                             >
                                 <Text style={styles.boldNumberTxt}>
                                     {profile.followers}
@@ -306,7 +310,7 @@ const UserStorage = ({route, navigation}) => {
                             </Pressable>
                             <Pressable
                                 style={{ flexDirection: "row", alignItems: "center", }}
-                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로잉", userTag: profile.user_tag, name: profile.name, })}
+                                onPress={() =>  navigation.push("FollowScreen", { title: "팔로잉", userTag: profile.user_tag, name: profile.name, })}
                             >
                                 <Text style={styles.boldNumberTxt}>
                                     {profile.followings}
@@ -320,7 +324,7 @@ const UserStorage = ({route, navigation}) => {
                             style={{ 
                                 flexDirection: "row", 
                                 alignItems: "center",
-                                marginTop: regHeight * 40,
+                                marginTop: regHeight * 100,
                                 justifyContent: "space-between" 
                             }}
                         >
@@ -331,7 +335,7 @@ const UserStorage = ({route, navigation}) => {
                                     fontSize: regWidth*20 
                                 }}
                             >
-                                Nemo Calender
+                                Nemo Calendar
                             </Text>
                             <Pressable 
                                 style={{
@@ -492,6 +496,8 @@ const styles = StyleSheet.create({
         borderWidth: 0.5, 
         paddingHorizontal: regWidth * 8,
         paddingVertical: regHeight * 5,
+        position: "absolute",
+        right: 0,
     },
     usertagContainer: {
         flexDirection: "row", 

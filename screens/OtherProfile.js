@@ -395,7 +395,7 @@ const OtherProfile = ({navigation, route}) => {
                         >
                             <Image 
                                 source={vectorLeftImage} 
-                                style={{ width: regWidth*30, height: regWidth*30 }}
+                                style={{ width: regWidth*35, height: regWidth*35 }}
                             />
                         </Pressable>
                         {/* <Pressable
@@ -440,7 +440,11 @@ const OtherProfile = ({navigation, route}) => {
                             <View style={{ flexDirection: "row", alignItems: "flex-end"}}>
                                 <Animated.Image 
                                     source={ profile.avatar !== null ? { uri: profile.avatar } : blankAvatar} 
-                                    style={{ ...styles.profileAvatar, opacity: avatarValue }} 
+                                    style={{ 
+                                        ...styles.profileAvatar, 
+                                        opacity: avatarValue,
+                                        borderRadius: userTag === "nemo" ? 0 : 999,
+                                    }} 
                                     onLoadEnd={showAvatarImage}
                                 />
                                 <View
@@ -505,7 +509,7 @@ const OtherProfile = ({navigation, route}) => {
                             </Text>
                             <Pressable
                                 style={{ flexDirection: "row", alignItems: "center", }}
-                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
+                                onPress={() =>  navigation.push("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
                             >
                                 <Text style={styles.boldNumberTxt}>
                                     {followers}
@@ -516,7 +520,7 @@ const OtherProfile = ({navigation, route}) => {
                             </Pressable>
                             <Pressable
                                 style={{ flexDirection: "row", alignItems: "center", }}
-                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로잉", userTag: profile.user_tag, name: profile.name, })}
+                                onPress={() =>  navigation.push("FollowScreen", { title: "팔로잉", userTag: profile.user_tag, name: profile.name, })}
                             >
                                 <Text style={styles.boldNumberTxt}>
                                     {profile.followings}
@@ -633,7 +637,7 @@ const NemoScreen = ({route, navigation,}) => {
 
         await fetchBookmarkList(sort)
         .then(() => setRefreshing(false));
-    }, []);
+    }, [sort]);
 
 
     const onSort = (sortNum) => {
@@ -940,7 +944,7 @@ const NemoListScreen = ({route, navigation}) => {
 
         await fetchNemoList(sort)
         .then(() => setRefreshing(false));
-    }, []);
+    }, [sort]);
 
     const onSort = (sortNum) => {
         setSort(sortNum);
@@ -1216,7 +1220,7 @@ const BookScreen = ({route, navigation}) => {
 
         await fetchBook(sort)
         .then(() => setRefreshing(false));
-    }, []);
+    }, [sort]);
 
     const renderBook = ({ item, index }) => (
         <Pressable
@@ -1488,6 +1492,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
             style={{
                 borderBottomWidth: 0.3,
                 marginBottom: 2,
+                // backgroundColor:"green"
             }}
             ref={viewRef}
         >
@@ -1556,8 +1561,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                 style={{ 
                                     opacity,
                                     fontSize: regWidth * 16,
-                                    fontWeight: "700",
-                                    fontFamily: "NotoSansKR-Regular",
+                                    fontFamily: "NotoSansKR-Bold",
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}
@@ -1606,7 +1610,7 @@ const styles = StyleSheet.create({
         width: regWidth * 100,
         height: regWidth * 100,
         resizeMode: "cover",
-        borderRadius: 50,
+        borderRadius: 999,
         borderWidth: 2,
         borderColor: "#7341ffcc",
         // marginLeft: regWidth*13,

@@ -13,6 +13,7 @@ import iconCheckmarkCircle from '../assets/icons/iconCheckmarkCircle.png';
 import iconArrowForward from '../assets/icons/iconArrowForward.png';
 import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
 import iconPlusCirclePurple from '../assets/icons/iconPlusCirclePurple.png';
+import iconToBottom from '../assets/icons/iconToBottom.png';
 
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
@@ -106,6 +107,8 @@ const EditBookmark = ({navigation, route}) => {
     const [newNemolistNum, setNewNemolistNum] = useState(0);
     const [scrollLoading, setScrollLoading] = useState(false);
     const [selectedNemolists, setSelectedNemolists] = useState([]);
+
+    const scrollRef = useRef();
 
     useEffect(() => {
         updateWatermark();
@@ -227,7 +230,7 @@ const EditBookmark = ({navigation, route}) => {
             } catch (err) {
                 console.error(err);
             }
-            setEditBookmarkLoading(false);
+            // setEditBookmarkLoading(false);
         } else {
             Alert.alert("북마크를 완성해주세요", "네모를 완성해주세요!", [
                 {
@@ -604,6 +607,7 @@ const EditBookmark = ({navigation, route}) => {
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                ref={scrollRef}
             >
                 {/* <BlankCardChangable 
                     color={color} 
@@ -741,6 +745,12 @@ const EditBookmark = ({navigation, route}) => {
                         }}
                         multiline={true}
                         value={info}
+                        onFocus={() => {
+                            setShowMenu(true);
+                        }}
+                        onBlur={() => {
+                            setShowMenu(false);
+                        }}
                     />
                 </Pressable>
                 <View 
@@ -1149,6 +1159,26 @@ const EditBookmark = ({navigation, route}) => {
                                 <Pressable 
                                     style={{
                                         ...styles.optionBox, 
+                                        backgroundColor: "#ACD8D9",
+                                    }} 
+                                    onPress={() => {
+                                        selectColor("#ACD8D9");
+                                        setBackgroundImage(null);
+                                    }}
+                                >
+                                    <Image 
+                                        source={iconCheckmarkCircle}
+                                        style={{
+                                            position: "absolute",
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            opacity: color === "#ACD8D9" ? 1 : 0,
+                                        }}
+                                    />
+                                </Pressable>
+                                <Pressable 
+                                    style={{
+                                        ...styles.optionBox, 
                                         backgroundColor: "#DBE5F1",
                                     }} 
                                     onPress={() => {
@@ -1178,7 +1208,7 @@ const EditBookmark = ({navigation, route}) => {
                             </View>
                         </View>
 
-                        {/* <View style={styles.separator}/>
+                        <View style={styles.separator}/>
 
                         <View
                             style={{
@@ -1191,7 +1221,7 @@ const EditBookmark = ({navigation, route}) => {
                                     fontWeight: "400",
                                 }}
                             >
-                                Add sheet
+                                Bottom
                             </Text>
                             <View
                                 style={{
@@ -1200,14 +1230,18 @@ const EditBookmark = ({navigation, route}) => {
                                     justifyContent: "center",
                                 }}
                             >
-                                <Pressable>
+                                <Pressable
+                                    onPress={() => {
+                                        scrollRef.current.scrollToEnd({ animated: true })
+                                    }}
+                                >
                                     <Image 
-                                        source={iconPlus}
+                                        source={iconToBottom}
                                         style={styles.iconImage}
                                     />
                                 </Pressable>
                             </View>
-                        </View> */}
+                        </View>
                     </View>
                 </KeyboardAvoidingView>
                 :

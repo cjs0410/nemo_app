@@ -6,6 +6,8 @@ import Api from "../lib/Api";
 import blankAvatar from '../assets/images/blankAvatar.png';
 import vectorLeftImage from '../assets/icons/vector_left.png';
 import { AlbumList, BookList, UserList, } from '../components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwt_decode from "jwt-decode";
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -15,7 +17,7 @@ import {
     setShouldUserRefresh,
     setShouldFollowingRefresh, 
 } from '../modules/user';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { userSelector } from "../modules/hooks";
 
 const TopTab = createMaterialTopTabNavigator();
@@ -77,7 +79,7 @@ const FollowScreen = ({navigation, route}) => {
                     >
                         <Image 
                             source={vectorLeftImage} 
-                            style={{ width: regWidth*30, height: regWidth*30 }}
+                            style={{ width: regWidth*35, height: regWidth*35 }}
                         />
                     </Pressable>
                     <Text style={{
@@ -139,8 +141,11 @@ const FollowScreen = ({navigation, route}) => {
 const FollowerScreen = ({navigation, route}) => {
     const { userTag, } = route.params;
     const [users, setUsers] = useState(null);
+    const [myTag, setMyTag] = useState(null);
+
     useEffect(() => {
         fetchUser();
+        fetchMyTag();
     }, [])
 
     const fetchUser = async() => {
@@ -159,6 +164,15 @@ const FollowerScreen = ({navigation, route}) => {
         }
     }
 
+    const fetchMyTag = async() => {
+        try {
+            const accessToken = await AsyncStorage.getItem('access');
+            setMyTag(jwt_decode(accessToken).user_tag);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View style={styles.container}>
             {users && users.length !== 0 ? 
@@ -166,11 +180,16 @@ const FollowerScreen = ({navigation, route}) => {
                     {users && users.map((user, index) => (
                         <View style={{ justifyContent: "center" }} key={index}>
                             <Pressable
-                                onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
+                                onPress={() => navigation.push("OtherProfile", { userTag: user.user_tag,  })}
                             >
                                 <UserList user={user} navigation={navigation} key={index} />
                             </Pressable>
-                            <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
+                            {user.user_tag === myTag ? 
+                                null
+                                : 
+                                <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
+                            }
+                            
                         </View>
                     ))}
                 </ScrollView>
@@ -246,6 +265,7 @@ const FollowBtn = (props) => {
 }
 
 const FollowingScreen = ({navigation, route}) => {
+    const dispatch = useDispatch();
     const { userTag, } = route.params;
     const [users, setUsers] = useState(null);
     const { shouldFollowingRefresh, } = useSelector(userSelector);
@@ -283,7 +303,7 @@ const FollowingScreen = ({navigation, route}) => {
                 <ScrollView>
                     {users && users.map((user, index) => (
                         <Pressable
-                            onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
+                            onPress={() => navigation.push("OtherProfile", { userTag: user.user_tag,  })}
                             key={index}
                         >
                             <UserList user={user} navigation={navigation} />

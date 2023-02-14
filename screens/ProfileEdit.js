@@ -216,12 +216,15 @@ const ProfileEdit = ({route, navigation}) => {
         // else {
         //     formData.append('avatar', blankAvatar)
         // }
+        if (birth !== null) {
+            formData.append('birth', birth);
+        }
 
         formData.append('name', name);
         formData.append('avatar_change', isChange);
         formData.append('backimg_change', isBgdChange);
         formData.append('bio', bio);
-        formData.append('birth', birth);
+        
         console.log(formData);
         try {
             await Api.put('/api/v1/user/myprofile/edit/', formData, 
@@ -245,7 +248,7 @@ const ProfileEdit = ({route, navigation}) => {
         } catch (err) {
             console.error(err);
         }
-        setEditLoading(false);
+        // setEditLoading(false);
     }
 
     const showDatePicker = (e) => {
@@ -422,7 +425,7 @@ const ProfileEdit = ({route, navigation}) => {
                     </Text>
                     {editLoading ? 
                         <ActivityIndicator 
-                            color="#008000"
+                            color={colors.textLight}
                         />
                         :
                         <Pressable 
@@ -564,7 +567,7 @@ const ProfileEdit = ({route, navigation}) => {
                                     Bio
                                 </Text>
                                 <TextInput 
-                                    placeholder={profile.bio}
+                                    placeholder={profile.bio ? profile.bio : "-"}
                                     style={styles.profileInput}
                                     onChangeText={onChangeBio}
                                 />
@@ -840,13 +843,12 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-    //   backgroundColor: "pink",
-      marginVertical: 10,
-      marginHorizontal: 20,
-      paddingBottom: 8,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+        marginVertical: regHeight * 10,
+        marginHorizontal: regWidth * 13,
+        paddingBottom: regHeight * 8,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     imageEdit: {
         justifyContent: "center",

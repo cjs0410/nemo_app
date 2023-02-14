@@ -84,7 +84,7 @@ const CreateNemolist1 = ({navigation}) => {
                     <Text
                         style={{
                             fontSize: regWidth * 13,
-                            fontWeight: "700",
+                            fontFamily: "NotoSansKR-Bold",
                         }}
                     >
                         Cancel
@@ -101,7 +101,7 @@ const CreateNemolist1 = ({navigation}) => {
                 <Text
                     style={{
                         fontSize: regWidth * 17,
-                        fontWeight: "700",
+                        fontFamily: "NotoSansKR-Bold",
                     }}
                 >
                     Give your Nemolist a name
@@ -125,7 +125,7 @@ const CreateNemolist1 = ({navigation}) => {
                     <Text
                         style={{
                             fontSize: regWidth * 18,
-                            fontWeight: "900",
+                            fontFamily: "NotoSansKR-Black",
                             color: "white",
                         }}
                     >
@@ -174,6 +174,21 @@ const CreateNemolist2 = ({navigation, route}) => {
 
     const makeAlbum = async() => {
         const formData = new FormData();
+        if (!albumCover) {
+            return (
+                Alert.alert("Please choose cover image or click skip for now", "", [
+                    {
+                        text: "Choose imagae",
+                        onPress: () => pickAlbumCover()
+                    },
+                    {
+                        text: "Skip for now", 
+                        onPress: () => makeAlbumNoCover()
+                    }
+                ])
+            )
+        }
+
         if (albumCover) {
             const filename = albumCover.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -206,7 +221,32 @@ const CreateNemolist2 = ({navigation, route}) => {
         } catch (err) {
           console.error(err);
         }
-        setLoading(false);
+        // setLoading(false);
+    }
+
+    const makeAlbumNoCover = async() => {
+        const formData = new FormData();
+        formData.append('nemolist_title', albumTitle)
+        
+        try {
+            setLoading(true);
+            await Api
+            .post("api/v4/album/add/", formData,
+                {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                },
+                }
+            )
+            .then((res) => {
+                console.log(res.data);
+                dispatch(setShouldNemolistRefresh(true));
+                navigation.navigate('CreateNemolist3', { albumTitle: albumTitle, albumCover: albumCover, hex: res.data.hex ? res.data.hex : colors.bgdNormal, albumId: res.data.nemolist_id, })
+            })
+        } catch (err) {
+          console.error(err);
+        }
+        // setLoading(false);
     }
 
     return (
@@ -218,7 +258,7 @@ const CreateNemolist2 = ({navigation, route}) => {
                     <Text
                         style={{
                             fontSize: regWidth * 13,
-                            fontWeight: "700",
+                            fontFamily: "NotoSansKR-Bold",
                         }}
                     >
                         Cancel
@@ -235,7 +275,7 @@ const CreateNemolist2 = ({navigation, route}) => {
                 <Text
                     style={{
                         fontSize: regWidth * 17,
-                        fontWeight: "700",
+                        fontFamily: "NotoSansKR-Bold",
                     }}
                 >
                     Select your cover
@@ -256,50 +296,53 @@ const CreateNemolist2 = ({navigation, route}) => {
                         }}
                     />
                 </Pressable>
-                <Pressable
-                    style={{
-                        marginTop: regHeight * 23,
-                        backgroundColor: colors.nemoDark,
-                        width: "80%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: 30,
-                        height: regWidth * 60,
-                    }}
-                    onPress={makeAlbum}
-                    disabled={loading ? true : false}
-                >
-                    {loading ? 
-                        <ActivityIndicator 
-                            color="white" 
-                            // style={{marginTop: 100}} 
-                            size="small"
-                        />
-                        :
-                        <Text
+                {loading ? 
+                    <ActivityIndicator 
+                        color={colors.nemoDark}
+                        style={{ marginTop: 100, }} 
+                        size="large"
+                    />
+                    : 
+                    <>
+                        <Pressable
                             style={{
-                                fontSize: regWidth * 18,
-                                fontWeight: "900",
-                                color: "white",
+                                marginTop: regHeight * 23,
+                                backgroundColor: colors.nemoDark,
+                                width: "80%",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                borderRadius: 30,
+                                height: regWidth * 60,
                             }}
+                            onPress={makeAlbum}
+                            disabled={loading ? true : false}
                         >
-                            Create
-                        </Text>
-                    }
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 18,
+                                    fontFamily: "NotoSansKR-Black",
+                                    color: "white",
+                                }}
+                            >
+                                Create
+                            </Text>
+                        </Pressable>
+                        <Pressable
+                            style={{
+                                borderBottomWidth: 1,
+                                borderBottomColor: colors.textNormal,
+                                marginTop: regHeight * 7,
+                            }}
+                            onPress={makeAlbumNoCover}
+                            disabled={loading ? true : false}
+                        >
+                            <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Bold", color: colors.textNormal, }}>
+                                Skip for now
+                            </Text>
+                        </Pressable>
+                    </>
+                }
 
-                </Pressable>
-                <Pressable
-                    style={{
-                        borderBottomWidth: 1,
-                        borderBottomColor: colors.textNormal,
-                        marginTop: regHeight * 7,
-                    }}
-                    disabled={loading ? true : false}
-                >
-                    <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: colors.textNormal, }}>
-                        Skip for now
-                    </Text>
-                </Pressable>
             </View>
         </View>
     )
@@ -541,7 +584,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                         <Text
                             style={{
                                 fontSize: regWidth* 13,
-                                fontWeight: "700",
+                                fontFamily: "NotoSansKR-Bold",
                                 color: colors.textLight,
                             }}
                         >
@@ -551,7 +594,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                     <Text
                         style={{
                             fontSize: regWidth * 17,
-                            fontWeight: "700",
+                            fontFamily: "NotoSansKR-Bold",
                         }}
                     >
                         {albumTitle}
@@ -563,7 +606,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                         <Text
                             style={{
                                 fontSize: regWidth* 13,
-                                fontWeight: "700",
+                                fontFamily: "NotoSansKR-Bold",
                                 color: colors.textLight,
                             }}
                         >
@@ -665,7 +708,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                         <Text
                                             style={{
                                                 fontSize: regWidth * 14,
-                                                fontWeight: "500",
+                                                fontFamily: "NotoSansKR-Medium",
                                                 lineHeight: regWidth * 21,
                                             }}
                                         >
@@ -696,7 +739,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                                 <Text
                                                     style={{
                                                         fontSize: regWidth * 17,
-                                                        fontWeight: "700",
+                                                        fontFamily: "NotoSansKR-Bold",
                                                         color: colors.nemoNormal,
                                                     }}
                                                 >
@@ -721,7 +764,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                     <Text
                                         style={{
                                             fontSize: regWidth * 14,
-                                            fontWeight: "700",
+                                            fontFamily: "NotoSansKR-Bold",
                                             color: colors.nemoDark,
                                         }}
                                     >
@@ -774,7 +817,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                     <Text
                                         style={{
                                             fontSize: regWidth * 19,
-                                            fontWeight: "900",
+                                            fontFamily: "NotoSansKR-Black",
                                             color: colors.nemoDark,
                                         }}
                                     >
@@ -784,7 +827,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                 <Text
                                     style={{
                                         fontSize: regWidth * 17,
-                                        fontWeight: "700",
+                                        fontFamily: "NotoSansKR-Bold",
                                         color: colors.nemoDark,
                                     }}
                                 >
@@ -1039,17 +1082,17 @@ const CreateNemolist3 = ({navigation, route}) => {
                         <Pressable
                             onPress={onCloseAddNemos}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
                                 Cancel
                             </Text>
                         </Pressable>
-                        <Text style={{ fontSize: regWidth * 19, fontWeight: "900", }}>
+                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
                             Add Nemos
                         </Text>
                         <Pressable
                             onPress={onAddBookmark}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
                                 Done
                             </Text>
                         </Pressable>
@@ -1080,7 +1123,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                     />
                                     :
                                     <View style={styles.numbering}>
-                                        <Text style={{ fontSize: 16, fontWeight: "500", color: "white", }}>
+                                        <Text style={{ fontSize: 16, fontFamily: "NotoSansKR-Medium", color: "white", }}>
                                             {Number(selectedBookmarks.findIndex(selectedBookmark => selectedBookmark.bookmark_id === bookmark.bookmark_id)) + 1}
                                         </Text>
                                     </View>
@@ -1133,7 +1176,7 @@ const styles = StyleSheet.create({
     },
     albumInfoTxt: {
         fontSize: regWidth * 14,
-        fontWeight: "700",
+        fontFamily: "NotoSansKR-Bold",
         lineHeight: regWidth * 20,
         color: colors.textLight,
     },

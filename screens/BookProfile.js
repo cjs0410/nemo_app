@@ -223,7 +223,7 @@ const BookProfile = ({route, navigation}) => {
                             >
                                 <Image 
                                     source={vectorLeftImage} 
-                                    style={{ width: regWidth*30, height: regWidth*30 }}
+                                    style={{ width: regWidth*35, height: regWidth*35 }}
                                 />
                             </Pressable>
                             <View style={{ alignItems: "center", }}>
@@ -377,7 +377,7 @@ const BookProfile = ({route, navigation}) => {
                                         marginHorizontal: regWidth * 23,
                                         marginBottom: regHeight * 25,
                                     }}
-                                    onPress={() => navigation.navigate("CreateBookmark", { selectedBook: bookInfo, })}
+                                    onPress={() => navigation.navigate("CreateBookmark", { selectedBook: bookInfo, normal: false, })}
                                 >
                                     <Image 
                                         source={iconPlusNemoDark}

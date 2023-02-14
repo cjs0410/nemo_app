@@ -282,7 +282,7 @@ const BookmarkDetail = (props) => {
             .then((res) => {
                 setIsScrap(res.data.is_scrap);
                 setScrapCount(res.data.count);
-                // dispatch(setShouldLibraryRefresh(true));
+                dispatch(setShouldNemolistRefresh(true));
             })
         } catch (err) {
             console.error(err);
@@ -307,7 +307,7 @@ const BookmarkDetail = (props) => {
 
     const fetchNemolist = async(sortNum) => {
         try {
-            console.log( bookmark.bookmark_id)
+            console.log(bookmark.bookmark_id)
             await Api
             .post("/api/v4/album/list/", {
                 bookmark_id: bookmark.bookmark_id,
@@ -1166,58 +1166,44 @@ const BookmarkDetail = (props) => {
                             </Text>
                         </Pressable>
                     </View>
+                    {nemolists && nemolists.length !== 0 ?
+                        <BottomSheetFlatList 
+                            data={nemolists}
+                            renderItem={renderAlbum}
+                            // key={isTile ? '_' : "#"}
+                            // keyExtractor={isTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
+                            keyExtractor={nemolist => nemolist.nemolist_id}
+                            showsVerticalScrollIndicator={false}
+                            onEndReached={onEndReached}
+                            onEndReachedThreshold={0.3}
+                            ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                        />
+                        :
+                        <View style={{ alignItems: "center", marginTop: regHeight * 38, }}>
+                            <Text
+                                style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                lineHeight: regWidth * 24,
+                                }}
+                            >
+                                There is no Nemolist you create.
+                            </Text>
+                            <Text
+                                style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                lineHeight: regWidth * 24,
+                                marginTop: regHeight * 8,
+                                }}
+                            >
+                                Let's create it first!
+                            </Text>
+                        </View>
+                    }
 
-                    <BottomSheetFlatList 
-                        data={nemolists}
-                        renderItem={renderAlbum}
-                        // key={isTile ? '_' : "#"}
-                        // keyExtractor={isTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
-                        keyExtractor={nemolist => nemolist.nemolist_id}
-                        showsVerticalScrollIndicator={false}
-                        onEndReached={onEndReached}
-                        onEndReachedThreshold={0.3}
-                        ListFooterComponent={scrollLoading && <ActivityIndicator />}
-                        // ListHeaderComponent={
-                        //     <>
-                        //         <View
-                        //             style={{
-                        //                 flexDirection: "row",
-                        //                 marginHorizontal: regWidth * 13,
-                        //                 marginVertical: regHeight * 10,
-                        //                 alignItems: "center",
-                        //                 justifyContent: "space-between",
-                        //                 // backgroundColor:"pink"
-                        //             }}
-                        //         >
-                        //             <Pressable
-                        //                 style={{
-                        //                     flexDirection: "row",
-                        //                     alignItems: "center",
-                        //                 }}
-                        //                 onPress={onPressSort}
-                        //             >
-                        //                 <Image 
-                        //                     source={iconRepeat}
-                        //                     style={{
-                        //                         width: regWidth * 15,
-                        //                         height: regWidth * 15,
-                        //                     }}
-                        //                 />
-                        //                 <Text
-                        //                     style={{
-                        //                         fontSize: 13,
-                        //                         fontWeight: "700",
-                        //                         marginHorizontal: regWidth * 5,
-                        //                     }}
-                        //                 >
-                        //                     {/* {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")} */}
-                        //                     Recents
-                        //                 </Text>
-                        //             </Pressable>
-                        //         </View>
-                        //     </>
-                        // }
-                    />
                 </View>
             </BottomSheetModal>
 

@@ -11,6 +11,7 @@ import iconCamera from '../assets/images/iconCamera.png';
 import iconImage from '../assets/icons/iconImage.png';
 import iconPlus from '../assets/images/iconPlus.png';
 import iconPlusCircleOutline from '../assets/icons/iconPlusCircleOutline.png';
+import iconPlusCirclePurple from '../assets/icons/iconPlusCirclePurple.png';
 import iconBook from '../assets/icons/iconBook.png';
 import {actions, RichEditor, RichToolbar} from "react-native-pell-rich-editor";
 import { WebView } from 'react-native-webview';
@@ -172,7 +173,7 @@ const SelectBook = ({navigation, route}) => {
                             <Text 
                                 style={{ 
                                     fontSize: regWidth * 20, 
-                                    fontWeight: "700", 
+                                    fontFamily: "NotoSansKR-Bold",
                                     marginHorizontal: 12,
                                     lineHeight: regWidth * 28,
                                 }}
@@ -182,7 +183,7 @@ const SelectBook = ({navigation, route}) => {
                             <Text 
                                 style={{
                                     fontSize: regWidth*11, 
-                                    fontWeight: "500", 
+                                    fontFamily: "NotoSansKR-Medium",
                                     marginHorizontal: regWidth*12, 
                                     color: "#606060",
                                 }}
@@ -196,7 +197,7 @@ const SelectBook = ({navigation, route}) => {
                         <Pressable
                             key={index}
                             onPress={() => {
-                                navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: book, });
+                                navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: book, normal: true, });
                             }}
                             disabled={isLib ? true : false}
                             style={{ justifyContent: "center", }}
@@ -212,7 +213,8 @@ const SelectBook = ({navigation, route}) => {
                                     onPress={() => onLike(book)}
                                 >
                                     <Image 
-                                        source={iconPlusCircleOutline}
+                                        // source={iconPlusCircleOutline}
+                                        source={book.is_like ? iconPlusCirclePurple : iconPlusCircleOutline}
                                         style={{
                                             width: regWidth * 40,
                                             height: regWidth * 40,
@@ -228,51 +230,52 @@ const SelectBook = ({navigation, route}) => {
                 </ScrollView>
                 : 
                 <>
-                <Text 
-                    style={{ 
-                        fontSize: regWidth * 17, 
-                        fontWeight: "700", 
-                        marginHorizontal: regWidth * 12, 
-                        marginTop: regHeight * 18, 
-                    }}
-                >
-                    Recent
-                </Text>
-                <ScrollView>
-                    {recentRead.map((book, index) => (
-                        <Pressable
-                            key={index}
-                            onPress={() => {
-                                navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: book, });
-                                // dispatch(addRecentRead(book));
-                            }}
-                            disabled={isLib ? true : false}
-                            style={{ justifyContent: "center", }}
-                        >
-                            <BookList book={book} />
-                            {isLib ? 
-                                <Pressable
-                                    style={{
-                                        position: "absolute",
-                                        right: 0,
-                                        marginHorizontal: regWidth * 12,
-                                    }}
-                                    onPress={() => onLike(book)}
-                                >
-                                    <Image 
-                                        source={iconPlusCircleOutline}
+                    <Text 
+                        style={{ 
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Bold", 
+                            marginHorizontal: regWidth * 12, 
+                            marginTop: regHeight * 18, 
+                        }}
+                    >
+                        Recent
+                    </Text>
+                    <ScrollView>
+                        {recentRead.map((book, index) => (
+                            <Pressable
+                                key={index}
+                                onPress={() => {
+                                    navigation.navigate(`CreateBookmark${route.params.index}`, { selectedBook: book, normal: true, });
+                                    // dispatch(addRecentRead(book));
+                                }}
+                                disabled={isLib ? true : false}
+                                style={{ justifyContent: "center", }}
+                            >
+                                <BookList book={book} />
+                                {isLib ? 
+                                    <Pressable
                                         style={{
-                                            width: regWidth * 40,
-                                            height: regWidth * 40,
+                                            position: "absolute",
+                                            right: 0,
+                                            marginHorizontal: regWidth * 12,
                                         }}
-                                    />
-                                </Pressable>
-                                :
-                                null
-                            }
-                        </Pressable>
-                    ))}
-                </ScrollView>
+                                        onPress={() => onLike(book)}
+                                    >
+                                        <Image 
+                                            // source={iconPlusCircleOutline}
+                                            source={book.is_like ? iconPlusCirclePurple : iconPlusCircleOutline}
+                                            style={{
+                                                width: regWidth * 40,
+                                                height: regWidth * 40,
+                                            }}
+                                        />
+                                    </Pressable>
+                                    :
+                                    null
+                                }
+                            </Pressable>
+                        ))}
+                    </ScrollView>
                 </>
             }
 
@@ -302,10 +305,9 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-        // backgroundColor: "red",
-        marginVertical: 10,
-        marginHorizontal: 20,
-        paddingBottom: 8,
+        marginVertical: regHeight * 10,
+        marginHorizontal: regWidth * 13,
+        paddingBottom: regHeight * 8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
