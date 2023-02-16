@@ -275,6 +275,7 @@ const Card = (props) => {
                                 fontFamily: "NotoSansKR-Bold",
                                 // marginTop: regWidth * 9, 
                                 marginHorizontal: regWidth * 2, 
+                                includeFontPadding: false,
                             }}
                         >
                             {`@${bookmark.user_tag}`}
@@ -1319,11 +1320,13 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Regular",
         fontSize: regWidth * 11,
         width: regWidth * 250,
+        includeFontPadding: false,
     },
     bookmarkContentsBookChapter: {
         fontFamily: "NotoSansKR-Bold",
         fontSize: regWidth * 15,
         width: regWidth * 230,
+        includeFontPadding: false,
     },
     bookmarkContentsBookChapterInput: {
         fontWeight: "400",

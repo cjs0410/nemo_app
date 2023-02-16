@@ -420,7 +420,7 @@ const Home = ({route, navigation}) => {
                                     outputRange: ["83%" , "100%"]
                                 })
                             ,
-                            borderRadius: 10,
+                            borderRadius: regWidth * 10,
                             height: regWidth * 36,
                             paddingHorizontal: regWidth * 8,
                             // marginTop: regHeight * 12,
@@ -434,6 +434,10 @@ const Home = ({route, navigation}) => {
                             style={{
                                 height: "100%",
                                 width: "90%",
+                                fontSize: regWidth * 14,
+                                fontFamily: "NotoSansKR-Medium",
+                                marginHorizontal: regWidth * 6,
+                                includeFontPadding: false,
                             }}
                             editable={false}
                             pointerEvents="none"
@@ -448,6 +452,7 @@ const Home = ({route, navigation}) => {
                         fontSize: regWidth * 17, 
                         fontFamily: "NotoSansKR-Black",
                         textTransform: 'none', 
+                        includeFontPadding: false,
                     },
                     tabBarActiveTintColor: colors.nemoDark,
                     tabBarInactiveTintColor: colors.bgdDark,
@@ -657,12 +662,14 @@ const FollowingScreen = ({route, navigation}) => {
                 items: 0,
             })
             .then((res) => {
+                console.log(res.data.feed);
                 setBookmarks(res.data.nemos);
                 setFeed(res.data.feed);
                 setNewBookmarkNum(res.data.nemos.length);
             })
         } catch (err) {
             console.error(err);
+            console.log("asdf")
         }
     }
 
@@ -683,6 +690,7 @@ const FollowingScreen = ({route, navigation}) => {
                 })
             } catch (err) {
                 console.error(err);
+                console.log("inf")
             }
             setScrollLoading(false);
             // setCursor(bookmarks.at(-1).cursor);
@@ -725,25 +733,34 @@ const FollowingScreen = ({route, navigation}) => {
                     keyExtractor={keyExtractor}
                     showsVerticalScrollIndicator={false}
                     ref={ref}
+                    ListHeaderComponent={bookmarks.length !== 0 ? 
+                        null
+                        : 
+                        <View
+                            style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: regHeight * 200,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                }}
+                            >
+                                Follow and explore more insightful Nemo
+                            </Text>
+                        </View>
+                    }
                 />
                 :
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        Follow and explore more insightful Nemo
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
         </View>
     )
@@ -781,6 +798,7 @@ const ExploreScreen = ({route, navigation}) => {
             })
         } catch (err) {
             console.error(err);
+            console.log("trend")
         }
         setLoading(false);
     }
@@ -875,6 +893,7 @@ const ExploreScreen = ({route, navigation}) => {
                                 fontSize: regWidth * 17,
                                 fontFamily: "NotoSansKR-Black",
                                 marginHorizontal: regWidth * 5,
+                                includeFontPadding: false,
                             }}
                         >
                             Trending on Nemo
@@ -911,8 +930,8 @@ const ExploreScreen = ({route, navigation}) => {
                 </View>
                 {loading ? 
                     <ActivityIndicator 
-                        color="black" 
-                        style={{marginTop: regHeight * 50,}} 
+                        color={colors.nemoDark}
+                        style={{marginTop: regHeight * 150,}} 
                         size="large"
                     />
                     : 
@@ -943,6 +962,7 @@ const ExploreScreen = ({route, navigation}) => {
                                                 fontSize: regWidth * 13,
                                                 fontFamily: "NotoSansKR-Bold",
                                                 marginLeft: regWidth * 6,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             {nemo.writer_name}
@@ -981,6 +1001,7 @@ const ExploreScreen = ({route, navigation}) => {
                             fontSize: regWidth * 17,
                             fontFamily: "NotoSansKR-Black",
                             marginHorizontal: regWidth * 5,
+                            includeFontPadding: false,
                         }}
                     >
                         Trending Nemolists
@@ -1016,6 +1037,7 @@ const ExploreScreen = ({route, navigation}) => {
                                                 fontSize: regWidth * 13,
                                                 fontFamily: "NotoSansKR-Bold",
                                                 marginLeft: regWidth * 6,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             {nemolist.name}
@@ -1292,6 +1314,7 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Black",
         color: colors.bgdNormal, 
         width: regWidth * 45,
+        includeFontPadding: false,
     },
     selectContainer: {
         // backgroundColor: colors.nemoLight,
@@ -1324,12 +1347,14 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Black",
         marginHorizontal: -1,
         color: "white",
+        includeFontPadding: false,
     },
     rowText: {
         fontSize: regWidth * 13,
         fontFamily: "NotoSansKR-Regular",
         marginHorizontal: -1,
         color: "black",
+        includeFontPadding: false,
     }
 })
 

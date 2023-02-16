@@ -30,13 +30,12 @@ const BookList = (props) => {
                     }}
                     onLoadEnd={showBookCover}
                 />
-                <View style={{ width: "85.5%", }}>
+                <View style={{ width: "73%", marginHorizontal: regWidth * 12,}}>
                     <Text 
                         style={{ 
                             fontSize: regWidth * 20, 
                             fontFamily: "NotoSansKR-Bold",
-                            marginHorizontal: 12,
-                            lineHeight: regWidth * 23,
+                            includeFontPadding: false,
                         }}
                         numberOfLines={1}
                         ellipsizeMode='tail'
@@ -55,7 +54,7 @@ const BookList = (props) => {
                         >
                             {book.book_author}
                         </Text>
-                        <Entypo name="dot-single" size={16} color="#808080" />
+                        <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
                         <Text 
                             style={{ ...styles.BookInfoText, marginHorizontal: regWidth*3, }}
                             // numberOfLines={1}
@@ -90,9 +89,8 @@ const styles = StyleSheet.create({
     BookInfoText: {
         fontSize: regWidth * 11, 
         fontFamily: "NotoSansKR-Regular",
-        marginHorizontal: regWidth*12, 
         color: "#606060",
-        
+        includeFontPadding: false,
     },
 
 })

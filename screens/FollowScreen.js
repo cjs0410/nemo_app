@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Pressable, Animated, } from "react-native";
+import { View, Text, Button, StyleSheet, Image, ScrollView, Dimensions, TouchableOpacity, Pressable, Animated, ActivityIndicator, } from "react-native";
 import React, { useEffect, useState, useRef, useMemo, useCallback, createRef, } from "react";
 import SelectDropdown from 'react-native-select-dropdown'
 import { Entypo, Feather, AntDesign, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -85,6 +85,7 @@ const FollowScreen = ({navigation, route}) => {
                     <Text style={{
                         fontSize: regWidth * 16,
                         fontFamily: "NotoSansKR-Bold",
+                        includeFontPadding: false,
                     }}>
                         {name}
                     </Text>
@@ -175,42 +176,53 @@ const FollowerScreen = ({navigation, route}) => {
 
     return (
         <View style={styles.container}>
-            {users && users.length !== 0 ? 
-                <ScrollView>
-                    {users && users.map((user, index) => (
-                        <View style={{ justifyContent: "center" }} key={index}>
-                            <Pressable
-                                onPress={() => navigation.push("OtherProfile", { userTag: user.user_tag,  })}
+            {users ? 
+                <>
+                    {users.length !== 0 ? 
+                        <ScrollView>
+                            {users && users.map((user, index) => (
+                                <View style={{ justifyContent: "center" }} key={index}>
+                                    <Pressable
+                                        onPress={() => navigation.push("OtherProfile", { userTag: user.user_tag,  })}
+                                    >
+                                        <UserList user={user} navigation={navigation} key={index} />
+                                    </Pressable>
+                                    {user.user_tag === myTag ? 
+                                        null
+                                        : 
+                                        <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
+                                    }
+                                    
+                                </View>
+                            ))}
+                        </ScrollView>
+                        : 
+                        <View
+                            style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: regHeight * 200,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 17,
+                                    fontFamily: "NotoSansKR-Medium",
+                                    color: colors.textDark,
+                                    includeFontPadding: false,
+                                }}
                             >
-                                <UserList user={user} navigation={navigation} key={index} />
-                            </Pressable>
-                            {user.user_tag === myTag ? 
-                                null
-                                : 
-                                <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
-                            }
-                            
+                                No one followed you yet...
+                            </Text>
                         </View>
-                    ))}
-                </ScrollView>
+                    }
+                </>
                 : 
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        No one followed you yet...
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
 
         </View>
@@ -256,6 +268,7 @@ const FollowBtn = (props) => {
                     fontSize: regWidth * 13, 
                     color: isFollow ? colors.textDark : "white",
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,  
                 }}
             >
                 {isFollow ? "Following" : "Follow"}
@@ -299,35 +312,46 @@ const FollowingScreen = ({navigation, route}) => {
 
     return (
         <View style={styles.container}>
-            {users && users.length !== 0 ? 
-                <ScrollView>
-                    {users && users.map((user, index) => (
-                        <Pressable
-                            onPress={() => navigation.push("OtherProfile", { userTag: user.user_tag,  })}
-                            key={index}
+            {users ? 
+                <>
+                    {users.length !== 0 ? 
+                        <ScrollView>
+                            {users && users.map((user, index) => (
+                                <Pressable
+                                    onPress={() => navigation.push("OtherProfile", { userTag: user.user_tag,  })}
+                                    key={index}
+                                >
+                                    <UserList user={user} navigation={navigation} />
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                        : 
+                        <View
+                            style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: regHeight * 200,
+                            }}
                         >
-                            <UserList user={user} navigation={navigation} />
-                        </Pressable>
-                    ))}
-                </ScrollView>
+                            <Text
+                                style={{
+                                    fontSize: regWidth * 17,
+                                    fontFamily: "NotoSansKR-Medium",
+                                    color: colors.textDark,
+                                    includeFontPadding: false,
+                                }}
+                            >
+                                Ooops..! You're not following anyone.
+                            </Text>
+                        </View>
+                    }
+                </>
                 : 
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        Ooops..! You're not following anyone.
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
 
         </View>
@@ -478,6 +502,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                     fontSize: regWidth * 16,
                                     // fontWeight: "700",
                                     fontFamily: "NotoSansKR-Bold",
+                                    includeFontPadding: false,
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}

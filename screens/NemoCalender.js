@@ -275,7 +275,7 @@ const NemoCalender = ({navigation}) => {
                         }}
                     />
                 </Pressable>
-                <Text style={{ fontSize: regWidth * 18, fontWeight: "700", color: colors.bgdLight, }}>
+                <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Bold", color: colors.bgdLight, includeFontPadding: false, }}>
                     Nemo Calendar
                 </Text>
                 <Image 
@@ -309,7 +309,8 @@ const NemoCalender = ({navigation}) => {
                                             style={{
                                                 color: colors.bgdLight,
                                                 fontSize: regWidth * 16,
-                                                fontWeight: "700",
+                                                fontFamily: "NotoSansKR-Bold",
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             {`${month[0].month} ${month[0].year}`}
@@ -470,10 +471,11 @@ const NemoCalender = ({navigation}) => {
                                                     >
                                                         <Text
                                                             style={{
-                                                                bottom: 5,
-                                                                left: 10,
+                                                                bottom: regWidth * 5,
+                                                                left: regWidth * 10,
                                                                 fontSize: regWidth * 14,
-                                                                fontWeight: "900",
+                                                                fontFamily: "NotoSansKR-Black",
+                                                                includeFontPadding: false,
                                                                 color: "#FFFFFF",
                                                             }}
                                                         >
@@ -521,15 +523,15 @@ const styles = StyleSheet.create({
     },
     dayTxt: {
         color: colors.bgdLight, 
-        fontSize: regWidth * 14, 
-        fontWeight: "700", 
-        lineHeight: regWidth * 20, 
+        fontSize: regWidth * 16, 
+        fontFamily: "NotoSansKR-Bold",
+        includeFontPadding: false, 
     },
     dateTxt: {
         color: colors.bgdLight, 
         fontSize: regWidth * 11, 
-        fontWeight: "700", 
-        lineHeight: regWidth * 16, 
+        fontFamily: "NotoSansKR-Bold",
+        includeFontPadding: false, 
         marginBottom: regHeight * 4,
     }
 })

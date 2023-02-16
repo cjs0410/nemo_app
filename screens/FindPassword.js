@@ -100,6 +100,7 @@ const FindPassword = ({navigation}) => {
                         style={{
                             fontSize: regWidth * 16,
                             fontFamily: "NotoSansKR-Regular",
+                            includeFontPadding: false,
                         }}
                     >
                         Cancel
@@ -109,16 +110,18 @@ const FindPassword = ({navigation}) => {
             <View style={{ marginHorizontal: regWidth * 24, marginTop: regHeight * 28, }}>
                 <Text
                     style={{
-                        fontSize: regWidth * 22,
+                        fontSize: regWidth * 20,
                         fontFamily: "NotoSansKR-Black",
+                        includeFontPadding: false,
                     }}
                 >
                     Enter phone number or email
                 </Text>
                 <Text
                     style={{
-                        fontSize: regWidth * 22,
+                        fontSize: regWidth * 20,
                         fontFamily: "NotoSansKR-Black",
+                        includeFontPadding: false,
                     }}
                 >
                     address of your account
@@ -128,11 +131,12 @@ const FindPassword = ({navigation}) => {
                     style={{
                         width: "100%",
                         // backgroundColor:"pink",
-                        borderBottomWidth: 1,
+                        borderBottomWidth: regWidth * 1,
                         borderBottomColor: colors.textLight,
                         marginTop: regHeight * 42,
                         fontSize: regWidth * 16,
                         fontFamily: "NotoSansKR-Regular",
+                        includeFontPadding: false,
                     }}
                     multiline={true}
                     onChangeText={onChangeHpOrEmail}
@@ -267,6 +271,7 @@ const FindPassword2 = ({route, navigation}) => {
                         fontFamily: "NotoSansKR-Black",
                         lineHeight: regWidth * 44,
                         color: colors.textDark,
+                        includeFontPadding: false,
                     }}
                 >
                     We sent you a code
@@ -277,6 +282,7 @@ const FindPassword2 = ({route, navigation}) => {
                         fontFamily: "NotoSansKR-Medium",
                         lineHeight: regWidth * 20,
                         color: colors.textLight,
+                        includeFontPadding: false,
                     }}
                 >
                     {`Enter it below to verify phone number or email.`}
@@ -446,13 +452,14 @@ const FindPassword3 = ({navigation, route}) => {
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                     style={{opacity: 0,}}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, }}>
                         Done
                     </Text>
                 </Pressable>
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Change password
                 </Text>
@@ -462,7 +469,7 @@ const FindPassword3 = ({navigation, route}) => {
                     disabled={isValid ? false : true}
                     style={{ opacity: isValid ? 1 : 0 }}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, }}>
                         Done
                     </Text>
                 </Pressable>
@@ -473,7 +480,7 @@ const FindPassword3 = ({navigation, route}) => {
                     marginHorizontal: regWidth * 13,     
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }}>
                     New password
                 </Text>
                 <View
@@ -492,6 +499,7 @@ const FindPassword3 = ({navigation, route}) => {
                             fontSize: regWidth * 17, 
                             fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         autoCapitalize={false}
                         secureTextEntry={true}
@@ -511,6 +519,7 @@ const FindPassword3 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.redNormal,
                         opacity: psw.length > 0 && !isPswValid ? 1 : 0,
+                        includeFontPadding: false,
                     }}
                 >
                     {"Make sure to use letters, numbers, and specials(!@#$%^*+-)"}
@@ -523,7 +532,7 @@ const FindPassword3 = ({navigation, route}) => {
                     marginHorizontal: regWidth * 13,     
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }}>
                     Confirm password
                 </Text>
                 <View
@@ -542,6 +551,7 @@ const FindPassword3 = ({navigation, route}) => {
                             fontSize: regWidth * 17, 
                             fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         autoCapitalize={false}
                         secureTextEntry={true}
@@ -561,6 +571,7 @@ const FindPassword3 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.redNormal,
                         opacity: pswCheck.length > 0 && !isPswCheckValid ? 1 : 0,
+                        includeFontPadding: false,
                     }}
                 >
                     Confirm password is differ from your new password.
@@ -595,6 +606,7 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 18,
         fontFamily: "NotoSansKR-Black", 
         color: "white",
+        includeFontPadding: false,
     },
     input: {
         height: regHeight * 50,
@@ -621,8 +633,9 @@ const styles = StyleSheet.create({
         // paddingHorizontal: regWidth*10, 
         marginHorizontal: regWidth*7.5, 
         fontSize: regWidth*30, 
-        fontWeight: "900",
-        textAlign: "center"
+        fontFamily: "NotoSansKR-Black",
+        textAlign: "center",
+        includeFontPadding: false,
     },
 })
 

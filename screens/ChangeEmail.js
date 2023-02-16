@@ -63,7 +63,7 @@ const ChangeEmail1 = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 22,
                         fontFamily: "NotoSansKR-Black",
-                        lineHeight: regWidth * 44,
+                        includeFontPadding: false,
                         color: colors.textDark,
                     }}
                 >
@@ -73,7 +73,7 @@ const ChangeEmail1 = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 13,
                         fontFamily: "NotoSansKR-Medium",
-                        lineHeight: regWidth * 20,
+                        includeFontPadding: false,
                         color: colors.textLight,
                     }}
                 >
@@ -83,7 +83,7 @@ const ChangeEmail1 = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 13,
                         fontFamily: "NotoSansKR-Regular",
-                        lineHeight: regWidth * 20,
+                        includeFontPadding: false,
                         color: colors.textLight,
                         marginTop: regHeight * 50,
                     }}
@@ -102,8 +102,10 @@ const ChangeEmail1 = ({navigation, route}) => {
                     <TextInput 
                         onChangeText={(payload) => setPsw(payload)}
                         style={{
-                            fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         secureTextEntry={visible ? false : true}
                     />
@@ -148,6 +150,7 @@ const ChangeEmail1 = ({navigation, route}) => {
                                 fontSize: regWidth * 18,
                                 fontFamily: "NotoSansKR-Bold", 
                                 color: colors.textNormal,
+                                includeFontPadding: false,
                             }}
                         >
                             Cancel
@@ -233,6 +236,7 @@ const ChangeEmail2 = ({navigation, route}) => {
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Change email
                 </Text>
@@ -243,10 +247,10 @@ const ChangeEmail2 = ({navigation, route}) => {
                     marginHorizontal: regWidth * 13,     
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,}}>
                     Current
                 </Text>
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", marginTop: regHeight * 20, }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", marginTop: regHeight * 20, includeFontPadding: false,}}>
                     {profile.email ? profile.email : "-"}
                 </Text>
             </View>
@@ -256,7 +260,7 @@ const ChangeEmail2 = ({navigation, route}) => {
                     marginHorizontal: regWidth * 13,     
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,}}>
                     New email address
                 </Text>
                 <View
@@ -272,8 +276,10 @@ const ChangeEmail2 = ({navigation, route}) => {
                         onChangeText={onChangeEmail}
                         placeholder="Email Address"
                         style={{
-                            fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         autoCapitalize={false}
                         keyboardType={"email-address"}
@@ -293,6 +299,7 @@ const ChangeEmail2 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.redNormal,
                         opacity: isDup ? 1 : 0,
+                        includeFontPadding: false,
                     }}
                 >
                     That email address has been taken. Please choose another.
@@ -328,6 +335,7 @@ const ChangeEmail2 = ({navigation, route}) => {
                             fontSize: regWidth * 18,
                             fontFamily: "NotoSansKR-Bold", 
                             color: colors.textNormal,
+                            includeFontPadding: false,
                         }}
                     >
                         Cancel
@@ -461,6 +469,7 @@ const ChangeEmail3 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Black",
                         lineHeight: regWidth * 44,
                         color: colors.textDark,
+                        includeFontPadding: false,
                     }}
                 >
                     We sent you a code
@@ -471,6 +480,7 @@ const ChangeEmail3 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         lineHeight: regWidth * 20,
                         color: colors.textLight,
+                        includeFontPadding: false,
                     }}
                 >
                     {`Enter it below to verify ${email}`}
@@ -621,6 +631,7 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 18,
         fontFamily: "NotoSansKR-Black", 
         color: "white",
+        includeFontPadding: false,
     },
     authInput: {
         height: regHeight * 40,
@@ -632,8 +643,9 @@ const styles = StyleSheet.create({
         // paddingHorizontal: regWidth*10, 
         marginHorizontal: regWidth*7.5, 
         fontSize: regWidth*30, 
-        fontWeight: "900",
-        textAlign: "center"
+        fontFamily: "NotoSansKR-Black", 
+        textAlign: "center",
+        includeFontPadding: false,
     },
 })
 

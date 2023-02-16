@@ -446,6 +446,7 @@ const AlbumProfile = ({route, navigation}) => {
                                 style={{
                                     fontSize: regWidth * 17,
                                     fontFamily: "NotoSansKR-Bold",
+                                    includeFontPadding: false,
                                 }}
                             >
                                 {albumInfo.nemolist_title}
@@ -521,7 +522,7 @@ const AlbumProfile = ({route, navigation}) => {
                                             shadowRadius: 8,
                                             },
                                             android: {
-                                            elevation: 3,
+                                                elevation: 3,
                                             },
                                         }),
                                     }}
@@ -532,6 +533,7 @@ const AlbumProfile = ({route, navigation}) => {
                                             ...styles.albumCover,
                                             opacity: albumCoverValue,
                                             marginTop: -regWidth * 10,
+
                                         }}
                                         onLoadEnd={showAlbumCover}
                                     />
@@ -549,7 +551,7 @@ const AlbumProfile = ({route, navigation}) => {
                                     style={{
                                         fontSize: regWidth * 14,
                                         fontFamily: "NotoSansKR-Medium",
-                                        lineHeight: regWidth * 21,
+                                        includeFontPadding: false,
                                     }}
                                 >
                                     {albumInfo.description}
@@ -571,6 +573,7 @@ const AlbumProfile = ({route, navigation}) => {
                                                     fontSize: regWidth * 14,
                                                     fontFamily: "NotoSansKR-Bold",
                                                     color: colors.nemoDark,
+                                                    includeFontPadding: false,
                                                 }}
                                             >
                                                 {`@${albumInfo.user_tag}`}
@@ -618,9 +621,9 @@ const AlbumProfile = ({route, navigation}) => {
                                                 :
                                                 <Pressable
                                                     style={{
-                                                        borderWidth: 2,
+                                                        borderWidth: regWidth * 2,
                                                         borderColor: colors.nemoDark,
-                                                        borderRadius: 20,
+                                                        borderRadius: regWidth * 20,
                                                         paddingHorizontal: regWidth * 14,
                                                         paddingVertical: regWidth * 4,
                                                         flexDirection: "row",
@@ -643,6 +646,7 @@ const AlbumProfile = ({route, navigation}) => {
                                                             fontSize: regWidth * 19,
                                                             fontFamily: "NotoSansKR-Black",
                                                             color: colors.nemoDark,
+                                                            includeFontPadding: false,
                                                         }}
                                                     >
                                                         Add Nemos
@@ -897,7 +901,14 @@ const AlbumProfile = ({route, navigation}) => {
                     <Pressable
                         onPress={onPressClose}
                     >
-                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
+                        <Text 
+                            style={{ 
+                                fontSize: regWidth * 13, 
+                                fontFamily: "NotoSansKR-Bold", 
+                                color: "#606060", 
+                                includeFontPadding: false,
+                            }}
+                        >
                             Cancel
                         </Text>
                     </Pressable>
@@ -916,7 +927,14 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text 
+                                        style={{ 
+                                            fontSize: regWidth * 15, 
+                                            fontFamily: "NotoSansKR-Bold", 
+                                            color: "#202020", 
+                                            includeFontPadding: false,
+                                        }}
+                                    >
                                         {isFollow ? `Unfollow @${albumInfo.user_tag}` : `Follow @${albumInfo.user_tag}`}
                                     </Text>
                                 </View>
@@ -952,10 +970,24 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text 
+                                        style={{ 
+                                            fontSize: regWidth * 15, 
+                                            fontFamily: "NotoSansKR-Bold", 
+                                            color: "#202020", 
+                                            includeFontPadding: false,
+                                        }}
+                                    >
                                         Report
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                                    <Text 
+                                        style={{ 
+                                            fontSize: regWidth * 12, 
+                                            fontFamily: "NotoSansKR-Medium", 
+                                            color: "#606060", 
+                                            includeFontPadding: false,
+                                        }}
+                                    >
                                         Report your issue
                                     </Text>
                                 </View>
@@ -979,10 +1011,24 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text 
+                                        style={{ 
+                                            fontSize: regWidth * 15, 
+                                            fontFamily: "NotoSansKR-Bold", 
+                                            color: "#202020", 
+                                            includeFontPadding: false,
+                                        }}
+                                    >
                                         Edit
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                                    <Text 
+                                        style={{ 
+                                            fontSize: regWidth * 12, 
+                                            fontFamily: "NotoSansKR-Medium", 
+                                            color: "#606060", 
+                                            includeFontPadding: false,
+                                        }}
+                                    >
                                         Edit your Nemolist
                                     </Text>
                                 </View>
@@ -1000,10 +1046,24 @@ const AlbumProfile = ({route, navigation}) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text 
+                                        style={{ 
+                                            fontSize: regWidth * 15, 
+                                            fontFamily: "NotoSansKR-Bold", 
+                                            color: "#202020", 
+                                            includeFontPadding: false,
+                                        }}
+                                    >
                                         Delete
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                                    <Text 
+                                        style={{ 
+                                            fontSize: regWidth * 12, 
+                                            fontFamily: "NotoSansKR-Medium", 
+                                            color: "#606060", 
+                                            includeFontPadding: false,
+                                        }}
+                                    >
                                         Delete Nemolist from your library
                                     </Text>
                                 </View>
@@ -1030,17 +1090,17 @@ const AlbumProfile = ({route, navigation}) => {
                         <Pressable
                             onPress={onCloseAddNemos}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, includeFontPadding: false, }}>
                                 Cancel
                             </Text>
                         </Pressable>
-                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }}>
                             Add Nemos
                         </Text>
                         <Pressable
                             onPress={onAddBookmark}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, includeFontPadding: false, }}>
                                 Done
                             </Text>
                         </Pressable>
@@ -1552,7 +1612,7 @@ const styles = StyleSheet.create({
         width: regWidth * 200,
         height: regWidth * 200,
         resizeMode: "contain",
-        borderRadius: 5,
+        borderRadius: regWidth * 5,
     },
     profileImage: {
         width: regWidth * 25,
@@ -1628,8 +1688,8 @@ const styles = StyleSheet.create({
     },
     albumInfoTxt: {
         fontSize: regWidth * 14,
-        fontWeight: "700",
-        lineHeight: regWidth * 20,
+        fontFamily: "NotoSansKR-Bold",
+        includeFontPadding: false,
         color: colors.textLight,
     },
 })

@@ -19,6 +19,7 @@ import { setUserInfo, setRefreshToken, setFcmToken, } from '../modules/user';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ImagePicker from 'react-native-image-crop-picker';
 import messaging from '@react-native-firebase/messaging';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 Date.prototype.format = function(f) {
     if (!this.valueOf()) return " ";
@@ -48,6 +49,7 @@ String.prototype.zf = function(len){return "0".string(len - this.length) + this;
 Number.prototype.zf = function(len){return this.toString().zf(len);};
 
 const Join1 = ({ navigation }) => {
+    const insets = useSafeAreaInsets();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [authNumber, setAuthNumber] = useState('');
     const [isAuth, setIsAuth] = useState('');
@@ -276,19 +278,27 @@ const Join1 = ({ navigation }) => {
 
     return (
         <View style={{backgroundColor:"white", flex:1}}>
-            <SafeAreaView style={ styles.header } >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable 
                     onPress={() => navigation.goBack()} 
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Text style={{ fontSize: regWidth*16, fontWeight: "400" }}>
+                    <Text style={{ fontSize: regWidth*16, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                         Cancel
                     </Text>
                 </Pressable>
-            </SafeAreaView>
+            </View>
             <View style={{ alignItems: "center" }}>
                 <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
-                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }}>
                         Create your account
                     </Text>
                 </View>
@@ -301,10 +311,11 @@ const Join1 = ({ navigation }) => {
                     <Text 
                         style={{ 
                             fontSize: regWidth * 13, 
-                            fontWeight: "400", 
+                            fontFamily: "NotoSansKR-Regular",
                             marginHorizontal: regWidth * 6, 
                             color: "#606060",
                             opacity: name.length > 0 ? 1 : 0,
+                            includeFontPadding: false,
                         }}
                     >
                         Name
@@ -345,10 +356,11 @@ const Join1 = ({ navigation }) => {
                     <Text 
                         style={{ 
                             fontSize: regWidth * 13, 
-                            fontWeight: "400", 
+                            fontFamily: "NotoSansKR-Regular",
                             marginHorizontal: regWidth * 6, 
                             color: "#606060",
                             opacity: hpOrEmail.length > 0 ? 1 : 0,
+                            includeFontPadding: false,
                         }}
                     >
                         {"ex) XXX-XXXX-XXXX or nemo@namo.com"}
@@ -389,10 +401,11 @@ const Join1 = ({ navigation }) => {
                     <Text 
                         style={{ 
                             fontSize: regWidth * 13, 
-                            fontWeight: "400", 
+                            fontFamily: "NotoSansKR-Regular",
                             marginHorizontal: regWidth * 6, 
                             color: "#606060",
                             opacity: date.length > 0 ? 1 : 0,
+                            includeFontPadding: false,
                         }}
                     >
                         Date of birth
@@ -516,18 +529,18 @@ const Join1 = ({ navigation }) => {
                     >
                         <View style={{ width: regWidth*290, marginTop: regHeight*54 }}>
                             <View style={{flexDirection: "row"}}>
-                                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                                <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     By signing up, you agree to our&nbsp;  
                                 </Text>
                                 <Pressable
                                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                                 >
-                                    <Text style={{ fontSize: regWidth*12, fontWeight: "500", color: "#7341ffcc", lineHeight: regHeight*18 }}>
+                                    <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
                                         Terms of Service&nbsp;  
                                     </Text>
                                 </Pressable>
                                 
-                                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                                <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     and  
                                 </Text>
                             </View> 
@@ -535,26 +548,26 @@ const Join1 = ({ navigation }) => {
                                 <Pressable
                                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                                     >
-                                        <Text style={{ fontSize: regWidth*12, fontWeight: "500", color: "#7341ffcc", lineHeight: regHeight*18 }}>
+                                        <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
                                             Privacy Policy,&nbsp;  
                                         </Text>
                                 </Pressable>
-                                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                                <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     including&nbsp;
                                 </Text>
                                 <Pressable
                                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                                 >
-                                        <Text style={{ fontSize: regWidth*12, fontWeight: "500", color: "#7341ffcc", lineHeight: regHeight*18 }}>
+                                        <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
                                             Cookie Use.&nbsp;
                                         </Text>
                                 </Pressable>
-                                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                                <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     Nemo may use 
                                 </Text>
                             </View>
                             <View style={{flexDirection: "row"}}>
-                                <Text style={{ fontSize: regWidth*12, fontWeight: "400", lineHeight: regHeight*18 }}>
+                                <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, 
                                     like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, 
                                     when provided.
@@ -567,7 +580,7 @@ const Join1 = ({ navigation }) => {
                                 style={ styles.signUpBtn }
                                 disabled={isValid ? false : true }
                             >
-                            <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Sign up</Text>
+                                <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Sign up</Text>
                             </Pressable>
                         </View>  
                     </Animated.View>
@@ -587,6 +600,7 @@ const Join1 = ({ navigation }) => {
   }
   
 const Join2 = ({ navigation, route }) => {
+    const insets = useSafeAreaInsets();
     const { name, hpOrEmail, date, type, } = route.params;
     const inputRefs = useRef([]);
     const [authNumList, setAuthNumList] = useState(['', '', '', '', '', '',]);
@@ -665,7 +679,15 @@ const Join2 = ({ navigation, route }) => {
 
     return (
         <View style={{backgroundColor:"white", flex:1}} >
-            <SafeAreaView style={ styles.header } >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Pressable 
                     onPress={() => navigation.goBack()} 
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
@@ -676,13 +698,13 @@ const Join2 = ({ navigation, route }) => {
                         // onLoadEnd={showLogo}
                     />
                 </Pressable>
-            </SafeAreaView>
+            </View>
             <View style={{ alignItems: "center" }}>
                 <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
-                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontFamily: "NotoSansKR-Black", includeFontPadding: false, color: "#202020" }}>
                         We sent you a code
                     </Text>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color: "#606060", marginTop: regHeight*4 }}>
                         Enter it below to verify 010-0000-0000.
                     </Text>
                     <View style={{ flexDirection: "row", justifyContent: "center", width: regWidth*280, marginTop: regHeight*25 }}>
@@ -762,8 +784,10 @@ const Join2 = ({ navigation, route }) => {
                         }}
                     >
                         <Text style={{
-                            
-                            color: "#7341ffcc"
+                            fontSize: regWidth * 13,
+                            color: "#7341ffcc",
+                            fontFamily: "NotoSansKR-Medium",
+                            includeFontPadding: false,
                         }}>
                             Didn't receive SMS?
                         </Text>
@@ -773,7 +797,7 @@ const Join2 = ({ navigation, route }) => {
                             onPress={onContinue}
                             style={ styles.signUpBtn }
                         >
-                        <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Continue</Text>
+                        <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Continue</Text>
                         </Pressable>
                     </View>    
                 </View>
@@ -801,6 +825,7 @@ function useDebounce(value, delay = 500) {
 }
 
 const Join3 = ({ navigation, route }) => {
+    const insets = useSafeAreaInsets();
     const { name, hpOrEmail, date, type, } = route.params;
     const [psw, setPsw] = useState('');
     const [pswCheck, setPswCheck] = useState('');
@@ -837,7 +862,15 @@ const Join3 = ({ navigation, route }) => {
 
     return (
         <View style={{backgroundColor:"white", flex:1}} >
-            <SafeAreaView style={ styles.header } >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Image 
                     source={Arrow}
                     style={{ width: regWidth*20, height: regHeight*17.5, opacity: 0 }}
@@ -852,13 +885,13 @@ const Join3 = ({ navigation, route }) => {
                         // onLoadEnd={showLogo}
                     />
                 </Pressable> */}
-            </SafeAreaView>
+            </View>
             <View style={{ alignItems: "center" }}>
                 <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
-                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontFamily: "NotoSansKR-Black", includeFontPadding: false, color: "#202020" }}>
                         You'll need a password
                     </Text>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color: "#606060", marginTop: regHeight*4 }}>
                         Make sure it's 8 characters or more.
                     </Text>
                     {/* <Text style={{ fontSize: regWidth*13, fontWeight: "400", color: "#606060", marginTop: regHeight*51 }}>
@@ -867,7 +900,7 @@ const Join3 = ({ navigation, route }) => {
                 </View>
                 
                 <View>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "400", color: "#606060", marginTop: regHeight*51 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Regular'", includeFontPadding: false, color: "#606060", marginTop: regHeight*51 }}>
                             Password
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "flex-end", width: regWidth*280 }}>
@@ -901,7 +934,7 @@ const Join3 = ({ navigation, route }) => {
                     </View>
                 </View>
                 <View>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "400", color: "#606060", marginTop: regHeight*51 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, color: "#606060", marginTop: regHeight*51 }}>
                             Password Check
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "flex-end", width: regWidth*280 }}>
@@ -936,7 +969,7 @@ const Join3 = ({ navigation, route }) => {
                 </View>
                 <Text style={{
                     marginTop: regHeight*60,
-                    color: "white"
+                    color: "white",
                 }}>
                     blank
                 </Text>
@@ -946,7 +979,7 @@ const Join3 = ({ navigation, route }) => {
                         style={ styles.signUpBtn }
                         disabled={isValid ? false : true}
                     >
-                    <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Next</Text>
+                    <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Next</Text>
                     </Pressable>
                 </View>    
             </View>
@@ -956,6 +989,7 @@ const Join3 = ({ navigation, route }) => {
 
 
 const Join4 = ({ navigation, route }) => {
+    const insets = useSafeAreaInsets();
     const { name, hpOrEmail, date, type, psw, } = route.params;
     const [username, setUsername] = useState('');
     const [isUsernameValid, setIsUsernameValid] = useState(false);
@@ -1028,7 +1062,15 @@ const Join4 = ({ navigation, route }) => {
 
     return (
         <View style={{backgroundColor:"white", flex:1}} >
-            <SafeAreaView style={ styles.header } >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Image 
                     source={Arrow}
                     style={{ width: regWidth*20, height: regHeight*17.5, opacity: 0 }}
@@ -1043,16 +1085,16 @@ const Join4 = ({ navigation, route }) => {
                         // onLoadEnd={showLogo}
                     />
                 </Pressable> */}
-            </SafeAreaView>
+            </View>
             <View style={{ alignItems: "center" }}>
                 <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
-                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontFamily: "NotoSansKR-Black", includeFontPadding: false, color: "#202020" }}>
                         What should we call you?
                     </Text>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color: "#606060", marginTop: regHeight*4 }}>
                         Your @username is unique. You can always change it later.
                     </Text>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "400", color: "#606060", marginTop: regHeight*36 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, color: "#606060", marginTop: regHeight*36 }}>
                         Username
                     </Text>
                 </View>
@@ -1061,7 +1103,7 @@ const Join4 = ({ navigation, route }) => {
                 <View 
                     style={{ ...styles.txtInput, flexDirection: "row", alignItems: "center" }}
                 >
-                    <Text style={{ fontSize: regWidth*17, fontWeight: "700", color: "#5c34cc" }}>
+                    <Text style={{ fontSize: regWidth*17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, color: "#5c34cc" }}>
                         @
                     </Text>
                     <TextInput 
@@ -1093,7 +1135,7 @@ const Join4 = ({ navigation, route }) => {
                         onPress={onJoin}
                         style={ styles.signUpBtn }
                     >
-                    <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Next</Text>
+                    <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Next</Text>
                     </Pressable>
                 </View>    
             </View>
@@ -1103,6 +1145,7 @@ const Join4 = ({ navigation, route }) => {
 
 
 const Join5 = ({ navigation, route }) => {
+    const insets = useSafeAreaInsets();
     const { hpOrEmail, type, psw, } = route.params;
     const [avatar, setAvatar] = useState(null);
 
@@ -1163,7 +1206,15 @@ const Join5 = ({ navigation, route }) => {
 
     return (
         <View style={{backgroundColor:"white", flex:1}} >
-            <SafeAreaView style={ styles.header } >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
 
                 <Image 
                     source={Arrow}
@@ -1179,13 +1230,13 @@ const Join5 = ({ navigation, route }) => {
                         // onLoadEnd={showLogo}
                     />
                 </Pressable> */}
-            </SafeAreaView>
+            </View>
             <View style={{ alignItems: "center" }}>
                 <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
-                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontFamily: "NotoSansKR-Black", includeFontPadding: false, color: "#202020" }}>
                         Pick a profile picture
                     </Text>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color: "#606060", marginTop: regHeight*4 }}>
                         Choose your favorite picture
                     </Text>
                 </View>
@@ -1206,14 +1257,14 @@ const Join5 = ({ navigation, route }) => {
                         style={ styles.signUpBtn }
                         disabled={avatar === null ? true : false}
                     >
-                        <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Next</Text>
+                        <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Next</Text>
                     </Pressable>
                     <Pressable
                         onPress={() => navigation.navigate('Join6', { hpOrEmail: hpOrEmail, type: type, psw: psw, })}
                         style={{marginTop: regHeight*13}}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     >
-                        <Text style={{ color: "#404040", fontSize:regWidth*18, fontWeight: "900", borderBottomWidth:regHeight*1 }} >Skip for now</Text>
+                        <Text style={{ color: "#404040", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, borderBottomWidth:regHeight*1 }} >Skip for now</Text>
                     </Pressable>
                 </View>    
             </View>
@@ -1225,6 +1276,7 @@ const Join5 = ({ navigation, route }) => {
 
 
 const Join6 = ({ navigation, route }) => {
+    const insets = useSafeAreaInsets();
     const dispatch = useDispatch();
     const { hpOrEmail, type, psw, } = route.params;
 
@@ -1283,7 +1335,15 @@ const Join6 = ({ navigation, route }) => {
 
     return (
         <View style={{backgroundColor:"white", flex:1}} >
-            <SafeAreaView style={ styles.header } >
+            <View
+                style={{
+                    ...styles.header,
+                    paddingTop: insets.top,
+                    paddingBottom: 0,
+                    paddingLeft: insets.left,
+                    paddingRight: insets.right
+                }}
+            >
                 <Image 
                     source={Arrow}
                     style={{ width: regWidth*20, height: regHeight*17.5, opacity: 0 }}
@@ -1298,13 +1358,13 @@ const Join6 = ({ navigation, route }) => {
                         // onLoadEnd={showLogo}
                     />
                 </Pressable> */}
-            </SafeAreaView>
+            </View>
             <View style={{ alignItems: "center" }}>
                 <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
-                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900", color: "#202020" }}>
+                    <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontFamily: "NotoSansKR-Black", includeFontPadding: false, color: "#202020" }}>
                         Welcome!
                     </Text>
-                    <Text style={{ fontSize: regWidth*13, fontWeight: "500", color: "#606060", marginTop: regHeight*4 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color: "#606060", marginTop: regHeight*4 }}>
                         Let's dive into the knowledge from books
                     </Text>
                 </View>
@@ -1322,7 +1382,7 @@ const Join6 = ({ navigation, route }) => {
                         onPress={onLogin}
                         style={ styles.signUpBtn }
                     >
-                        <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Start</Text>
+                        <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Start</Text>
                     </Pressable>
                 </View>    
             </View>
@@ -1334,8 +1394,9 @@ const Join6 = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     header: {
-        marginTop: regHeight * 55,
-        marginHorizontal: regWidth * 30,
+        marginVertical: regHeight * 10,
+        marginHorizontal: regWidth * 20,
+        paddingBottom: regHeight * 8,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -1346,9 +1407,10 @@ const styles = StyleSheet.create({
         // backgroundColor: "white",
         borderBottomWidth: 1,
         borderBottomColor: "#000000",
-        fontSize: 16,
-        fontWeight: "500",
+        fontSize: regWidth * 16,
+        fontFamily: "NotoSansKR-Medium",
         color: "#5c34cc",
+        includeFontPadding: false,
     },
     nextBtn: {
         borderRadius: 18,
@@ -1391,14 +1453,17 @@ const styles = StyleSheet.create({
         // paddingHorizontal: regWidth*10, 
         marginHorizontal: regWidth*7.5, 
         fontSize: regWidth*30, 
-        fontWeight: "900",
-        textAlign: "center"
+        fontFamily: "NotoSansKR-Black",
+        textAlign: "center",
+        includeFontPadding: false,
     },
     usernameInput: {
         height: "100%", 
         width: "90%", 
         fontSize: regWidth*17, 
         color: "#5c34cc",
+        fontFamily: "NotoSansKR-Bold",
+        includeFontPadding: false,
         // lineHeight: regHeight*25.5
     }
     

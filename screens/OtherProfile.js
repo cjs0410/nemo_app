@@ -255,11 +255,9 @@ const OtherProfile = ({navigation, route}) => {
     //                                             marginHorizontal: regWidth * 7,
     //                                         }}
     //                                     >
-    //                                         <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: colors.nemoNormal, lineHeight: 20, }}>
-    //                                             {`@${profile.user_tag}`}
+    //                                         <Text style={{ fontSize: regWidth * 14, fontWeight: "700", color: colors.nemoNormal, includeFontPadding: false,                                             {`@${profile.user_tag}`}
     //                                         </Text>
-    //                                         <Text style={{ fontSize: regWidth * 23, fontWeight: "900", color: colors.textDark, lineHeight: 33, }}>
-    //                                             {profile.name}
+    //                                         <Text style={{ fontSize: regWidth * 23, fontWeight: "900", color: colors.textDark, includeFontPadding: false,                                             {profile.name}
     //                                         </Text>
     //                                     </View>
     //                                 </View>
@@ -286,7 +284,7 @@ const OtherProfile = ({navigation, route}) => {
     //                                 <Text
     //                                     style={{ 
     //                                         width: "50%", 
-    //                                         lineHeight: regHeight*19, 
+    //                                         includeFontPadding: false,
     //                                         color: "#404040",
     //                                         fontSize: regWidth * 13,
     //                                         fontWeight: "500",
@@ -449,14 +447,14 @@ const OtherProfile = ({navigation, route}) => {
                                 />
                                 <View
                                     style={{
-                                        marginTop: 40,
+                                        marginTop: regHeight * 40,
                                         marginHorizontal: regWidth * 7,
                                     }}
                                 >
-                                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", color: colors.nemoNormal, lineHeight: 20, }}>
+                                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", color: colors.nemoNormal, includeFontPadding: false, }}>
                                         {`@${profile.user_tag}`}
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 23, fontFamily: "NotoSansKR-Black", color: colors.textDark, lineHeight: 33, }}>
+                                    <Text style={{ fontSize: regWidth * 23, fontFamily: "NotoSansKR-Black", color: colors.textDark, includeFontPadding: false, }}>
                                         {profile.name}
                                     </Text>
                                 </View>
@@ -478,6 +476,7 @@ const OtherProfile = ({navigation, route}) => {
                                         // fontWeight: "500",
                                         color: isFollow ? colors.textDark : "white",
                                         fontFamily: "NotoSansKR-Bold",
+                                        includeFontPadding: false,
                                         // width: 
                                     }}
                                 >
@@ -489,7 +488,7 @@ const OtherProfile = ({navigation, route}) => {
                             <Text
                                 style={{ 
                                     width: "50%", 
-                                    lineHeight: regHeight*19, 
+                                    includeFontPadding: false, 
                                     color: "#404040",
                                     fontSize: regWidth * 13,
                                     fontWeight: "500",
@@ -549,7 +548,14 @@ const OtherProfile = ({navigation, route}) => {
                                         key={index}
                                     />
                                 ))}
-                                <Text style={{ marginLeft: regWidth*11, width: "70%", color: "#606060" }}
+                                <Text 
+                                    style={{ 
+                                        marginLeft: regWidth*11, 
+                                        width: "70%", 
+                                        color: "#606060" ,
+                                        fontSize: regWidth * 13,
+                                        fontFamily: "NotoSansKR-Medium",
+                                    }}
                                     numberOfLines={2}
                                 >
                                     {`Followed by ${profile.know_together.map((user, index) => `${index === 0 ? '' : ' '}${user.name}`)} ${profile.know_together_counts - profile.know_together.length === 0 ? "" : `and ${profile.know_together_counts - profile.know_together.length} other`}`}
@@ -755,9 +761,10 @@ const NemoScreen = ({route, navigation,}) => {
                                     />
                                     <Text
                                         style={{
-                                            fontSize: 13,
-                                            fontWeight: "700",
+                                            fontSize: regWidth * 13,
+                                            fontFamily: "NotoSansKR-Bold",
                                             marginHorizontal: regWidth * 5,
+                                            includeFontPadding: false,
                                         }}
                                     >
                                         {sort === 0 ? "Recents" : "Book"}
@@ -796,7 +803,7 @@ const NemoScreen = ({route, navigation,}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: "#606060", }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -1017,9 +1024,10 @@ const NemoListScreen = ({route, navigation}) => {
                                 />
                                 <Text
                                     style={{
-                                        fontSize: 13,
-                                        fontWeight: "700",
+                                        fontSize: regWidth * 13,
+                                        fontFamily: "NotoSansKR-Bold",
                                         marginHorizontal: regWidth * 5,
+                                        includeFontPadding: false,
                                     }}
                                 >
                                     Recent
@@ -1065,7 +1073,7 @@ const NemoListScreen = ({route, navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: "#606060", }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -1308,9 +1316,10 @@ const BookScreen = ({route, navigation}) => {
                                 />
                                 <Text
                                     style={{
-                                        fontSize: 13,
-                                        fontWeight: "700",
+                                        fontSize: regWidth * 13,
+                                        fontFamily: "NotoSansKR-Bold",
                                         marginHorizontal: regWidth * 5,
+                                        includeFontPadding: false,
                                     }}
                                 >
                                     {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
@@ -1341,7 +1350,7 @@ const BookScreen = ({route, navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: "#606060", }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -1562,6 +1571,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                     opacity,
                                     fontSize: regWidth * 16,
                                     fontFamily: "NotoSansKR-Bold",
+                                    includeFontPadding: false,
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}
@@ -1611,7 +1621,7 @@ const styles = StyleSheet.create({
         height: regWidth * 100,
         resizeMode: "cover",
         borderRadius: 999,
-        borderWidth: 2,
+        borderWidth: regWidth * 2,
         borderColor: "#7341ffcc",
         // marginLeft: regWidth*13,
     },
@@ -1624,11 +1634,11 @@ const styles = StyleSheet.create({
         marginTop: regWidth*13,
     },
     followBtn: {
-        borderRadius: 20,
+        borderRadius: regWidth * 20,
         justifyContent: "center",
         alignItems: "center",
         borderColor: colors.textDark,
-        borderWidth: 0.5, 
+        borderWidth: regWidth * 0.5, 
         paddingHorizontal: regWidth * 18,
         paddingVertical: regHeight * 5,
     },
@@ -1658,6 +1668,7 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Black",
         fontSize: regWidth*16,
         letterSpacing: -regWidth,
+        includeFontPadding: false,
         // width: regWidth * 20,
     },
     followTxt: {
@@ -1665,6 +1676,8 @@ const styles = StyleSheet.create({
         marginRight: regWidth*15,
         fontFamily: "NotoSansKR-Medium",
         color: "#404040",
+        fontSize: regWidth*16,
+        includeFontPadding: false,
     },
     followedByContainer: {
         flexDirection: "row",
@@ -1677,7 +1690,7 @@ const styles = StyleSheet.create({
         height: regWidth*30,
         resizeMode: "cover",
         borderRadius: 999,
-        borderWidth: regWidth*1,
+        borderWidth: regWidth * 1,
         borderColor: "#D9D9D9",
     },
     modalContainer: {

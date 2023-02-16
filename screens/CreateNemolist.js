@@ -118,7 +118,7 @@ const CreateNemolist1 = ({navigation}) => {
                         alignItems: "center",
                         justifyContent: "center",
                         height: regWidth * 60,
-                        borderRadius: 30,
+                        borderRadius: regWidth * 30,
                     }}
                     onPress={() => navigation.navigate('CreateNemolist2', { albumTitle: albumTitle, })}
                 >
@@ -311,7 +311,7 @@ const CreateNemolist2 = ({navigation, route}) => {
                                 width: "80%",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                borderRadius: 30,
+                                borderRadius: regWidth * 30,
                                 height: regWidth * 60,
                             }}
                             onPress={makeAlbum}
@@ -709,7 +709,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                             style={{
                                                 fontSize: regWidth * 14,
                                                 fontFamily: "NotoSansKR-Medium",
-                                                lineHeight: regWidth * 21,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             {text}
@@ -719,9 +719,9 @@ const CreateNemolist3 = ({navigation, route}) => {
                                             <Pressable
                                                 style={{
                                                     marginVertical: regHeight * 8,
-                                                    borderWidth: 1,
+                                                    borderWidth: regWidth * 1,
                                                     borderColor: colors.nemoNormal,
-                                                    borderRadius: 20,
+                                                    borderRadius: regWidth * 20,
                                                     paddingHorizontal: regWidth * 14,
                                                     paddingVertical: regWidth * 6,
                                                     flexDirection: "row",
@@ -794,9 +794,9 @@ const CreateNemolist3 = ({navigation, route}) => {
                                 <Pressable
                                     style={{
                                         marginVertical: regHeight * 8,
-                                        borderWidth: 2,
+                                        borderWidth: regWidth * 2,
                                         borderColor: colors.nemoDark,
-                                        borderRadius: 20,
+                                        borderRadius: regWidth * 20,
                                         paddingHorizontal: regWidth * 14,
                                         paddingVertical: regWidth * 4,
                                         flexDirection: "row",
@@ -922,7 +922,7 @@ const CreateNemolist3 = ({navigation, route}) => {
                                     style={{
                                         fontSize: regWidth * 14,
                                         fontWeight: "500",
-                                        lineHeight: regWidth * 21,
+                                        includeFontPadding: false,
                                     }}
                                 >
                                     {text}
@@ -1165,19 +1165,19 @@ const styles = StyleSheet.create({
         borderBottomColor: colors.nemoDark,
         width: "100%",
         marginTop: regHeight * 68,
-        // lineHeight: regWidth * 28,
+        // includeFontPadding: false,
         paddingHorizontal: regWidth * 4,
     },
     albumCover: {
         width: regWidth * 200,
         height: regWidth * 200,
         resizeMode: "contain",
-        borderRadius: 5,
+        borderRadius: regWidth * 5,
     },
     albumInfoTxt: {
         fontSize: regWidth * 14,
         fontFamily: "NotoSansKR-Bold",
-        lineHeight: regWidth * 20,
+        includeFontPadding: false,
         color: colors.textLight,
     },
     modalHeader: {

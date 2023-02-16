@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, TextInput, ScrollView, Pressable, Image, Animated, Dimensions, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, TextInput, ScrollView, Pressable, Image, Animated, Dimensions, ActivityIndicator, } from "react-native";
 import React, { useEffect, useState, useRef, createRef, useMemo, } from "react";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import { Entypo, Feather, AntDesign, Ionicons, } from '@expo/vector-icons'; 
@@ -181,7 +181,7 @@ const Search = ({navigation}) => {
                             //         outputRange: ["0%" , "100%"]
                             //     })
                             // }],
-                            borderRadius: 10,
+                            borderRadius: regWidth * 10,
                             height: regWidth * 36,
                             paddingHorizontal: regWidth * 8,
                             // marginTop: regHeight * 12,
@@ -196,6 +196,9 @@ const Search = ({navigation}) => {
                             style={{
                                 height: "100%",
                                 width: "85%",
+                                fontSize: regWidth * 14,
+                                fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                             }}
                             onChangeText={onChangeSearchInput}
                             onSubmitEditing={autoSearch}
@@ -220,6 +223,7 @@ const Search = ({navigation}) => {
                             style={{
                                 fontSize: regWidth * 15,
                                 fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                             }}
                         >
                             Cancel
@@ -245,6 +249,7 @@ const Search = ({navigation}) => {
                         fontFamily: "NotoSansKR-Black", 
                         marginHorizontal: regWidth * 12, 
                         marginTop: regHeight * 12, 
+                        includeFontPadding: false,
                     }}
                 >
                     Recent searches
@@ -599,6 +604,7 @@ const BookResultScreen = ({route, navigation}) => {
     const dispatch = useDispatch();
     const { searchKeyword, } = useSelector(userSelector);
     const [bookSearchResultList, setBookSearchResultList] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         onSearch();
@@ -608,6 +614,7 @@ const BookResultScreen = ({route, navigation}) => {
     const onSearch = async() => {
         if (searchKeyword.length > 0) {
             try {
+                setLoading(true);
                 await Api
                 .post("/api/v5/search/", {
                     keyword: searchKeyword,
@@ -620,50 +627,61 @@ const BookResultScreen = ({route, navigation}) => {
             } catch (err) {
                 console.error(err);
             }
+            setLoading(false);
         }
     }
 
     return (
         <View style={styles.container}>
-            {bookSearchResultList && bookSearchResultList.length !== 0 ? 
-                <ScrollView>
-                    {bookSearchResultList && bookSearchResultList.map((searchResult, index) => (
-                        <Pressable 
-                            onPress={async() => 
-                                {
-                                    navigation.navigate('BookProfile', {
-                                        bookId: searchResult.book_id, 
-                                    })
-                                    await analytics().logEvent('searchBook', {
-                                        search_book_title: searchResult.book_title,
-                                    })
-                                    dispatch(addRecentSearch({...searchResult, "ctg": "book"}));
-                                }
-                            }
-                            key={index}
+            {!loading ? 
+                <>
+                    {bookSearchResultList && bookSearchResultList.length !== 0 ? 
+                        <ScrollView>
+                            {bookSearchResultList && bookSearchResultList.map((searchResult, index) => (
+                                <Pressable 
+                                    onPress={async() => 
+                                        {
+                                            navigation.navigate('BookProfile', {
+                                                bookId: searchResult.book_id, 
+                                            })
+                                            await analytics().logEvent('searchBook', {
+                                                search_book_title: searchResult.book_title,
+                                            })
+                                            dispatch(addRecentSearch({...searchResult, "ctg": "book"}));
+                                        }
+                                    }
+                                    key={index}
+                                >
+                                    <BookList book={searchResult} navigation={navigation}  />
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                        : 
+                        <View
+                            style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: regHeight * 200,
+                            }}
                         >
-                            <BookList book={searchResult} navigation={navigation}  />
-                        </Pressable>
-                    ))}
-                </ScrollView>
+                            <Text
+                                style={{
+                                fontSize: regWidth * 20,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                }}
+                            >
+                                No Result!
+                            </Text>
+                        </View>
+                    }
+                </>
                 :
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 20,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        No Result!
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
 
         </View>
@@ -674,6 +692,7 @@ const NemolistResultScreen = ({route, navigation}) => {
     const dispatch = useDispatch();
     const { searchKeyword, } = useSelector(userSelector);
     const [albumSearchResultList, setAlbumSearchResultList] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         onSearch();
@@ -682,6 +701,7 @@ const NemolistResultScreen = ({route, navigation}) => {
     const onSearch = async() => {
         if (searchKeyword.length > 0) {
             try {
+                setLoading(true);
                 await Api
                 .post("/api/v5/search/", {
                     keyword: searchKeyword,
@@ -694,50 +714,61 @@ const NemolistResultScreen = ({route, navigation}) => {
             } catch (err) {
                 console.error(err);
             }
+            setLoading(false);
         }
     }
 
     return (
         <View style={styles.container}>
-            {albumSearchResultList && albumSearchResultList.length !== 0 ? 
-                <ScrollView>
-                    {albumSearchResultList && albumSearchResultList.map((searchResult, index) => (
-                        <Pressable 
-                            onPress={async() => 
-                                {
-                                    navigation.navigate('AlbumProfile', {
-                                        albumId: searchResult.nemolist_id,
-                                    })
-                                    await analytics().logEvent('searchAlbum', {
-                                        search_album_title: searchResult.nemolist_title,
-                                    })
-                                    dispatch(addRecentSearch({...searchResult, "ctg": "album"}));
-                                }
-                            }
-                            key={index}
+            {!loading ? 
+                <>
+                    {albumSearchResultList && albumSearchResultList.length !== 0 ? 
+                        <ScrollView>
+                            {albumSearchResultList && albumSearchResultList.map((searchResult, index) => (
+                                <Pressable 
+                                    onPress={async() => 
+                                        {
+                                            navigation.navigate('AlbumProfile', {
+                                                albumId: searchResult.nemolist_id,
+                                            })
+                                            await analytics().logEvent('searchAlbum', {
+                                                search_album_title: searchResult.nemolist_title,
+                                            })
+                                            dispatch(addRecentSearch({...searchResult, "ctg": "album"}));
+                                        }
+                                    }
+                                    key={index}
+                                >
+                                    <AlbumList album={searchResult} navigation={navigation} isDefault={false} />
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                        :
+                        <View
+                            style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: regHeight * 200,
+                            }}
                         >
-                            <AlbumList album={searchResult} navigation={navigation} isDefault={false} />
-                        </Pressable>
-                    ))}
-                </ScrollView>
+                            <Text
+                                style={{
+                                fontSize: regWidth * 20,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                }}
+                            >
+                                No Result!
+                            </Text>
+                        </View>
+                    }
+                </>
                 :
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 20,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        No Result!
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
 
         </View>
@@ -748,6 +779,7 @@ const UserResultScreen = ({route, navigation}) => {
     const dispatch = useDispatch();
     const { searchKeyword, } = useSelector(userSelector);
     const [userSearchResultList, setUserSearchResultList] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         onSearch();
@@ -756,6 +788,7 @@ const UserResultScreen = ({route, navigation}) => {
     const onSearch = async() => {
         if (searchKeyword.length > 0) {
             try {
+                setLoading(true);
                 await Api
                 .post("/api/v5/search/", {
                     keyword: searchKeyword,
@@ -768,50 +801,61 @@ const UserResultScreen = ({route, navigation}) => {
             } catch (err) {
                 console.error(err);
             }
+            setLoading(false);
         }
     }
 
     return (
         <View style={styles.container}>
-            {userSearchResultList && userSearchResultList.length !== 0 ? 
-                <ScrollView>
-                    {userSearchResultList && userSearchResultList.map((searchResult, index) => (
-                        <Pressable
-                            onPress={async() => 
-                                {
-                                    navigation.navigate('OtherProfile', {
-                                        userTag: searchResult.user_tag, 
-                                    })
-                                    await analytics().logEvent('searchUser', {
-                                        search_user_tag: searchResult.user_tag,
-                                    })
-                                    dispatch(addRecentSearch({...searchResult, "ctg": "user"}));
-                                }
-                            }
-                            key={index}
+            {!loading ? 
+                <>
+                    {userSearchResultList && userSearchResultList.length !== 0 ? 
+                        <ScrollView>
+                            {userSearchResultList && userSearchResultList.map((searchResult, index) => (
+                                <Pressable
+                                    onPress={async() => 
+                                        {
+                                            navigation.navigate('OtherProfile', {
+                                                userTag: searchResult.user_tag, 
+                                            })
+                                            await analytics().logEvent('searchUser', {
+                                                search_user_tag: searchResult.user_tag,
+                                            })
+                                            dispatch(addRecentSearch({...searchResult, "ctg": "user"}));
+                                        }
+                                    }
+                                    key={index}
+                                >
+                                    <UserList user={searchResult} navigation={navigation}  />
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                        : 
+                        <View
+                            style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: regHeight * 200,
+                            }}
                         >
-                            <UserList user={searchResult} navigation={navigation}  />
-                        </Pressable>
-                    ))}
-                </ScrollView>
+                            <Text
+                                style={{
+                                fontSize: regWidth * 20,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                }}
+                            >
+                                No Result!
+                            </Text>
+                        </View>
+                    }
+                </>
                 : 
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 20,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        No Result!
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
 
         </View>
@@ -1124,6 +1168,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                     opacity,
                                     fontSize: regWidth * 16,
                                     fontFamily: "NotoSansKR-Bold",
+                                    includeFontPadding: false,
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}

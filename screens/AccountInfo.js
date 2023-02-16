@@ -88,6 +88,7 @@ const AccountInfo = ({route, navigation}) => {
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Account information
                 </Text>
@@ -106,7 +107,7 @@ const AccountInfo = ({route, navigation}) => {
                     marginTop: regHeight * 60,        
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }}>
                     Username
                 </Text>
                 <Pressable 
@@ -120,7 +121,7 @@ const AccountInfo = ({route, navigation}) => {
                 </Pressable>
             </View>
             <View style={styles.infoContainer}>
-                <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }}>
                     Phone
                 </Text>
                 <Pressable 
@@ -142,7 +143,7 @@ const AccountInfo = ({route, navigation}) => {
                 </Pressable>
             </View>
             <View style={styles.infoContainer}>
-                <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }}>
                     Email
                 </Text>
                 <Pressable 
@@ -164,7 +165,7 @@ const AccountInfo = ({route, navigation}) => {
                 </Pressable>
             </View>
             <View style={styles.infoContainer}>
-                <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }}>
                     Gender
                 </Text>
                 <Pressable 
@@ -181,7 +182,7 @@ const AccountInfo = ({route, navigation}) => {
                 <Pressable
                     onPress={logout}
                 >
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "700", color: colors.redNormal,  }}>
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, color: colors.redNormal,  }}>
                         Log out
                     </Text>
                 </Pressable>
@@ -271,13 +272,14 @@ const ChangeUsername = ({navigation, route}) => {
                     onPress={() => navigation.goBack()}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Cancel
                     </Text>
                 </Pressable>
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Change username
                 </Text>
@@ -287,7 +289,7 @@ const ChangeUsername = ({navigation, route}) => {
                     disabled={isUsernameValid ? false : true}
                     style={{ opacity: isUsernameValid ? 1 : 0 }}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Done
                     </Text>
                 </Pressable>
@@ -301,7 +303,7 @@ const ChangeUsername = ({navigation, route}) => {
                 <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
                     Current
                 </Text>
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", marginTop: regHeight * 20, }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", marginTop: regHeight * 20, includeFontPadding: false,}}>
                     {`@${userTag}`}
                 </Text>
             </View>
@@ -311,7 +313,7 @@ const ChangeUsername = ({navigation, route}) => {
                     marginHorizontal: regWidth * 13,     
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,}}>
                     New username
                 </Text>
                 <View
@@ -322,13 +324,15 @@ const ChangeUsername = ({navigation, route}) => {
                         marginTop: regHeight * 20,
                     }}
                 >
-                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",  }}>
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, }}>
                         @
                     </Text>
                     <TextInput 
                         onChangeText={onChangeUserTag}
                         style={{
-                            fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Medium",
+                            includeFontPadding: false,
                             width: "88%",
                         }}
                         autoCapitalize={false}
@@ -392,9 +396,10 @@ const styles = StyleSheet.create({
     },
     infoTxt: {
         fontSize: regWidth * 17, 
-        fontWeight: "500", 
+        fontFamily: "NotoSansKR-Medium", 
         color: colors.textLight,
         marginHorizontal: regWidth * 10,
+        includeFontPadding: false,
     },
     btn: {
         width: regWidth * 300,
@@ -419,7 +424,8 @@ const styles = StyleSheet.create({
         // paddingHorizontal: regWidth*10, 
         marginHorizontal: regWidth*7.5, 
         fontSize: regWidth*30, 
-        fontWeight: "900",
+        fontFamily: "NotoSansKR-Black", 
+        includeFontPadding: false,
         textAlign: "center"
     },
 })

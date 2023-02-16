@@ -221,7 +221,7 @@ const UserLibrary = ({navigation, route }) => {
                         fontSize: regWidth * 24,
                         fontFamily: "NotoSansKR-Black",
                         marginHorizontal: regWidth * 10,
-                        lineHeight: regWidth * 34,
+                        includeFontPadding: false,
                     }}>
                         My Library
                     </Text>
@@ -292,7 +292,7 @@ const UserLibrary = ({navigation, route }) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                         Create
                     </Text>
                     <Pressable 
@@ -311,10 +311,10 @@ const UserLibrary = ({navigation, route }) => {
                             }}
                         />
                         <View style={{ justifyContent: "center", marginHorizontal: regWidth * 8, }}>
-                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", includeFontPadding: false, }}>
                                 New Nemolist
                             </Text>
-                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", includeFontPadding: false, }}>
                                 Add Nemos to a new Nemolist
                             </Text>
                         </View>
@@ -335,10 +335,10 @@ const UserLibrary = ({navigation, route }) => {
                             }}
                         />
                         <View style={{ justifyContent: "center", marginHorizontal: regWidth * 8, }}>
-                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", includeFontPadding: false, }}>
                                 New Book
                             </Text>
-                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", includeFontPadding: false, }}>
                                 Add new Book to your library
                             </Text>
                         </View>
@@ -487,7 +487,7 @@ const NemoScreen = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            { bookmarks && bookmarks.length !== 0 ? 
+            { bookmarks ? 
                 <>
                     <FlatList 
                         data={bookmarks}
@@ -500,7 +500,7 @@ const NemoScreen = ({route, navigation}) => {
                         onEndReached={onEndReached}
                         onEndReachedThreshold={0.3}
                         ListFooterComponent={scrollLoading && <ActivityIndicator />}
-                        ListHeaderComponent={
+                        ListHeaderComponent={bookmarks.length !== 0 ?
                             <View
                                 style={{
                                     flexDirection: "row",
@@ -527,58 +527,65 @@ const NemoScreen = ({route, navigation}) => {
                                     />
                                     <Text
                                         style={{
-                                            fontSize: 13,
+                                            fontSize: regWidth * 13,
                                             fontFamily: "NotoSansKR-Bold",
                                             marginHorizontal: regWidth * 5,
+                                            includeFontPadding: false,
                                         }}
                                     >
                                         {sort === 0 ? "Recents" : "Book"}
                                     </Text>
                                 </Pressable>
                             </View>
+                            :
+                            <View
+                                style={{
+                                alignItems: "center",
+                                justifyContent: "center",
+                                marginTop: regHeight * 200,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                    fontSize: regWidth * 17,
+                                    fontFamily: "NotoSansKR-Medium",
+                                    color: colors.textDark,
+                                    }}
+                                >
+                                    Let's start creating Nemo!
+                                </Text>
+                                <Text
+                                    style={{
+                                    fontSize: regWidth * 17,
+                                    fontFamily: "NotoSansKR-Medium",
+                                    color: colors.textDark,
+                                    marginTop: regHeight * 8,
+                                    }}
+                                >
+                                    It'll be worthwhile.
+                                </Text>
+                                <Pressable 
+                                    style={{ marginTop: regHeight * 24, }}
+                                    onPress={() => navigation.navigate("SelectBook0", { index: 0, isLib: false, })}
+                                >
+                                    <Image 
+                                        source={iconPlusPurple}
+                                        style={{
+                                            width: regWidth * 50,
+                                            height: regWidth * 50,
+                                        }}
+                                    />
+                                </Pressable>
+                            </View>
                         }
                     />
                 </>
                 :
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        Let's start creating Nemo!
-                    </Text>
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        marginTop: regHeight * 8,
-                        }}
-                    >
-                        It'll be worthwhile.
-                    </Text>
-                    <Pressable 
-                        style={{ marginTop: regHeight * 24, }}
-                        onPress={() => navigation.navigate("SelectBook0", { index: 0, isLib: false, })}
-                    >
-                        <Image 
-                            source={iconPlusPurple}
-                            style={{
-                                width: regWidth * 50,
-                                height: regWidth * 50,
-                            }}
-                        />
-                    </Pressable>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
             <BottomSheetModal
                 index={0}
@@ -590,7 +597,7 @@ const NemoScreen = ({route, navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -602,6 +609,7 @@ const NemoScreen = ({route, navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold",
                                 color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Recents
@@ -625,6 +633,7 @@ const NemoScreen = ({route, navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold",
                                 color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Book
@@ -815,9 +824,10 @@ const NemoListScreen = ({navigation}) => {
                                 />
                                 <Text
                                     style={{
-                                        fontSize: 13,
+                                        fontSize: regWidth * 13,
                                         fontFamily: "NotoSansKR-Bold",
                                         marginHorizontal: regWidth * 5,
+                                        includeFontPadding: false,
                                     }}
                                 >
                                     {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
@@ -947,7 +957,7 @@ const NemoListScreen = ({navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -959,6 +969,7 @@ const NemoListScreen = ({navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold",
                                 color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Recents
@@ -982,6 +993,7 @@ const NemoListScreen = ({navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold",
                                 color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Alphabetical
@@ -1005,6 +1017,7 @@ const NemoListScreen = ({navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold",
                                 color: sort === 2 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Creator
@@ -1154,7 +1167,7 @@ const BookScreen = ({navigation}) => {
 
     return (
         <View style={styles.container}>
-            { books && books.length !== 0 ? 
+            { books ? 
                 <FlatList 
                     data={books}
                     renderItem={renderBook}
@@ -1168,7 +1181,7 @@ const BookScreen = ({navigation}) => {
                     onEndReachedThreshold={0.3}
                     ListFooterComponent={scrollLoading && <ActivityIndicator />}
                     numColumns={isBookTile ? 2 : 1}
-                    ListHeaderComponent={
+                    ListHeaderComponent={books.length !== 0 ? 
                         <>
                             <View
                                 style={{
@@ -1195,9 +1208,10 @@ const BookScreen = ({navigation}) => {
                                     />
                                     <Text
                                         style={{
-                                            fontSize: 13,
+                                            fontSize: regWidth * 13,
                                             fontFamily: "NotoSansKR-Bold",
                                             marginHorizontal: regWidth * 5,
+                                            includeFontPadding: false,
                                         }}
                                     >
                                         {sort === 0 ? "Recents" : (sort === 1 ? "Alphabetical" : "Creator")}
@@ -1216,38 +1230,44 @@ const BookScreen = ({navigation}) => {
                                 </Pressable>
                             </View>
                         </>
+                        :
+                        <View 
+                            style={{
+                                alignItems: "center", 
+                                justifyContent: "center",
+                                marginTop: regHeight * 200,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                includeFontPadding: false,
+                                }}
+                            >
+                                Let's create a new book that you like.
+                            </Text>
+                            <Text
+                                style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                includeFontPadding: false,
+                                marginTop: regHeight * 8,
+                                }}
+                            >
+                                Click + button above to create a new book.
+                            </Text>
+                        </View>
                     }
                 />
                 : 
-                <View 
-                    style={{
-                        alignItems: "center", 
-                        justifyContent: "center",
-                        marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        lineHeight: regWidth * 24,
-                        }}
-                    >
-                        Let's create a new book that you like.
-                    </Text>
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        lineHeight: regWidth * 24,
-                        marginTop: regHeight * 8,
-                        }}
-                    >
-                        Click + button above to create a new book.
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
 
             <BottomSheetModal
@@ -1260,7 +1280,7 @@ const BookScreen = ({navigation}) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -1272,6 +1292,7 @@ const BookScreen = ({navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold",
                                 color: sort === 0 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Recents
@@ -1295,6 +1316,7 @@ const BookScreen = ({navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold",
                                 color: sort === 1 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Alphabetical
@@ -1318,6 +1340,7 @@ const BookScreen = ({navigation}) => {
                                 fontSize: regWidth * 14, 
                                 fontFamily: "NotoSansKR-Bold", 
                                 color: sort === 2 ? colors.nemoDark : colors.textDark, 
+                                includeFontPadding: false,
                             }}
                         >
                             Creator
@@ -1481,6 +1504,7 @@ function MyTabBar({ state, descriptors, navigation, position }) {
                                     opacity,
                                     fontSize: regWidth * 16,
                                     fontFamily: "NotoSansKR-Bold",
+                                    includeFontPadding: false,
                                     // paddingHorizontal: 4,
                                     // backgroundColor: "green",
                                 }}

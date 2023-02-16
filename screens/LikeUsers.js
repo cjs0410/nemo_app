@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, Image, ScrollView, FlatList, Dimensions, TouchableOpacity, Pressable, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, Image, ScrollView, FlatList, Dimensions, TouchableOpacity, Pressable, ActivityIndicator, } from "react-native";
 import React, { useEffect, useState, useRef, useCallback, } from "react";
 import { useFocusEffect } from '@react-navigation/native';
 import SelectDropdown from 'react-native-select-dropdown'
@@ -9,6 +9,8 @@ import user from "../modules/user";
 import Api from '../lib/Api';
 import blankAvatar from '../assets/images/peopleicon.png';
 import vectorLeftImage from '../assets/icons/vector_left.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwt_decode from "jwt-decode";
 import { colors, regHeight, regWidth } from "../config/globalStyles";
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,9 +23,11 @@ const LikeUsers = ({route, navigation}) => {
     const { ctg, id, } = route.params;
     const [users, setUsers] = useState(null);
     const insets = useSafeAreaInsets();
+    const [myTag, setMyTag] = useState(null);
 
     useEffect(() => {
         fetchUsers();
+        fetchMyTag();
     }, [])
 
     const fetchUsers = async() => {
@@ -38,6 +42,15 @@ const LikeUsers = ({route, navigation}) => {
                 console.log(res.data);
                 setUsers(res.data);
             })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const fetchMyTag = async() => {
+        try {
+            const accessToken = await AsyncStorage.getItem('access');
+            setMyTag(jwt_decode(accessToken).user_tag);
         } catch (err) {
             console.error(err);
         }
@@ -66,6 +79,7 @@ const LikeUsers = ({route, navigation}) => {
                     <Text style={{
                         fontSize: regWidth * 19,
                         fontFamily: "NotoSansKR-Black",
+                        includeFontPadding: false,
                     }}>
                         Liked by
                     </Text>
@@ -80,36 +94,50 @@ const LikeUsers = ({route, navigation}) => {
                 </View>
             </View>
             {users && users.length !== 0 ? 
-                <ScrollView>
-                    { users && users.map((user, index) => (
-                        <View style={{ justifyContent: "center" }} key={index}>
-                            <Pressable
-                                onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
+                <>
+                    {users.length !== 0 ? 
+                        <ScrollView>
+                            { users && users.map((user, index) => (
+                                <View style={{ justifyContent: "center" }} key={index}>
+                                    <Pressable
+                                        onPress={() => navigation.navigate("OtherProfile", { userTag: user.user_tag,  })}
+                                    >
+                                        <UserList user={user} navigation={navigation} key={index} />
+                                    </Pressable>
+                                    {user.user_tag === myTag ? 
+                                        null
+                                        : 
+                                        <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
+                                    }
+                                </View>
+                            ))}
+                        </ScrollView>
+                        : 
+                        <View
+                            style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginTop: regHeight * 200,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                }}
                             >
-                                <UserList user={user} navigation={navigation} key={index} />
-                            </Pressable>
-                            <FollowBtn isFollow={user.is_follow} userTag={user.user_tag} />
+                                No one liked it yet.
+                            </Text>
                         </View>
-                    ))}
-                </ScrollView>
+                    }
+                </>
                 : 
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 17,
-                        fontFamily: "NotoSansKR-Medium",
-                        color: colors.textDark,
-                        }}
-                    >
-                        No one liked it yet.
-                    </Text>
-                </View>
+                <ActivityIndicator
+                    style={{ marginTop: regHeight * 200, }}
+                    size="large"
+                    color={colors.nemoDark}
+                />
             }
 
         </View>
@@ -154,6 +182,7 @@ const FollowBtn = (props) => {
                     fontSize: regWidth * 13, 
                     color: isFollow ? colors.textDark : "white",
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}
             >
                 {isFollow ? "Following" : "Follow"}

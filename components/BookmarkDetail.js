@@ -566,7 +566,7 @@ const BookmarkDetail = (props) => {
                         >
                             <Text style={styles.bookmakrWriterName}>{bookmark.writer_name}</Text>
                         </Pressable>
-                        <Entypo name="dot-single" size={10} color="#808080" />
+                        <Entypo name="dot-single" size={regWidth * 10} color="#808080" />
                         <View>
                             <Text style={styles.bookmarkDateText}>{date}</Text>
                         </View>
@@ -641,7 +641,7 @@ const BookmarkDetail = (props) => {
                     <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: -12, }}>
                         {bookmark.contents.map((contents, index) => {
                             if (index === current) {
-                                return <Entypo name="dot-single" size={regWidth * 24} color="red" style={{ marginHorizontal: -regWidth * 6, }} key={index} />
+                                return <Entypo name="dot-single" size={regWidth * 24} color={colors.nemoDark} style={{ marginHorizontal: -regWidth * 6, }} key={index} />
                             }
                             return <Entypo name="dot-single" size={regWidth * 24} color="grey" style={{ marginHorizontal: -regWidth * 6, }} key={index} />
                         })}
@@ -1018,7 +1018,7 @@ const BookmarkDetail = (props) => {
                     <Pressable
                         onPress={onPressClose}
                     >
-                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                             Cancel
                         </Text>
                     </Pressable>
@@ -1037,7 +1037,7 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", includeFontPadding: false, }}>
                                         {isFollow ? `Unfollow @${bookmark.user_tag}` : `Follow @${bookmark.user_tag}`}
                                     </Text>
                                 </View>
@@ -1073,10 +1073,10 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", includeFontPadding: false, }}>
                                         Report
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", includeFontPadding: false, }}>
                                         Report your issue
                                     </Text>
                                 </View>
@@ -1103,10 +1103,10 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", includeFontPadding: false, }}>
                                         Edit
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", includeFontPadding: false, }}>
                                         Edit your Nemo
                                     </Text>
                                 </View>
@@ -1124,10 +1124,10 @@ const BookmarkDetail = (props) => {
                                     }}
                                 />
                                 <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", includeFontPadding: false, }}>
                                         Delete
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                                    <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", includeFontPadding: false, }}>
                                         Delete Nemo from your library
                                     </Text>
                                 </View>
@@ -1151,17 +1151,17 @@ const BookmarkDetail = (props) => {
                         <Pressable
                             onPress={onPressScrapClose}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: "#606060", }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: "#606060", includeFontPadding: false,}}>
                                 Cancel
                             </Text>
                         </Pressable>
-                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Bold", }}>
+                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,}}>
                             Add Nemos
                         </Text>
                         <Pressable
                             onPress={addToAlbum}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: colors.textLight, includeFontPadding: false,}}>
                                 Done
                             </Text>
                         </Pressable>
@@ -1185,7 +1185,7 @@ const BookmarkDetail = (props) => {
                                 fontSize: regWidth * 17,
                                 fontFamily: "NotoSansKR-Medium",
                                 color: colors.textDark,
-                                lineHeight: regWidth * 24,
+                                includeFontPadding: false,
                                 }}
                             >
                                 There is no Nemolist you create.
@@ -1195,7 +1195,7 @@ const BookmarkDetail = (props) => {
                                 fontSize: regWidth * 17,
                                 fontFamily: "NotoSansKR-Medium",
                                 color: colors.textDark,
-                                lineHeight: regWidth * 24,
+                                includeFontPadding: false,
                                 marginTop: regHeight * 8,
                                 }}
                             >
@@ -1217,7 +1217,7 @@ const BookmarkDetail = (props) => {
                 <View
                     style={styles.modalContainer}
                 >
-                    <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                    <Text style={{ fontSize: regWidth * 13, fontWeight: "700", color: "#606060", }}>
                         Sort by
                     </Text>
                     <Pressable 
@@ -1418,12 +1418,14 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Bold",
         fontSize: regWidth * 12.5,
         paddingHorizontal: regWidth * 5,
+        includeFontPadding: false,
     },
     bookmarkDateText: {
         color: "#808080",
         fontFamily: "NotoSansKR-Medium",
         fontSize: regWidth * 10,
         paddingHorizontal: regWidth * 5,
+        includeFontPadding: false,
     },
 
     bookmarkInfo: {
@@ -1431,16 +1433,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: regWidth * 13,
     },
     bookmarkInfoText: {
-        fontWeight: "400",
+        fontFamily: "NotoSansKR-Regular",
         fontSize: regWidth * 14,
         marginTop: regHeight * 10,
+        includeFontPadding: false,
     },
     bookmarkHashtag: {
-        fontWeight: "400",
+        fontFamily: "NotoSansKR-Regular",
         fontSize: regWidth * 14,
         // marginTop: 15,
         marginRight: regWidth * 8,
         color: "#9250FF",
+        includeFontPadding: false,
     },
     bookmarkLikes: {
         flexDirection: "row", 
@@ -1451,9 +1455,10 @@ const styles = StyleSheet.create({
         marginHorizontal: regWidth * 13,
     },
     bookmarkLikesText: {
-        fontWeight: "700",
+        fontFamily: "NotoSansKR-Bold",
         fontSize: regWidth * 15,
         marginLeft: regWidth * 5,
+        includeFontPadding: false,
     },
 
     modal: {

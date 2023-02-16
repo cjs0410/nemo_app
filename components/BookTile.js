@@ -38,9 +38,9 @@ const BookTile = (props) => {
                         style={{ 
                             fontSize: regWidth * 15, 
                             fontFamily: "NotoSansKR-Bold",
-                            lineHeight: regWidth * 18,
+                            includeFontPadding: false,
                         }}
-                        numberOfLines={2}
+                        numberOfLines={1}
                         ellipsizeMode='tail'
                     >
                         {book.book_title}
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         fontSize: regWidth*10, 
         fontFamily: "NotoSansKR-Medium",
         color: colors.textLight,
-        
+        includeFontPadding: false,
     },
 
 })

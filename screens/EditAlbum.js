@@ -375,6 +375,7 @@ const EditAlbum = ({route, navigation}) => {
                                         fontSize: regWidth* 13,
                                         fontFamily: "NotoSansKR-Bold",
                                         color: colors.textLight,
+                                        lineHeight: regWidth * 19,
                                     }}
                                 >
                                     Cancel
@@ -384,6 +385,7 @@ const EditAlbum = ({route, navigation}) => {
                                 style={{
                                     fontSize: regWidth * 17,
                                     fontFamily: "NotoSansKR-Bold",
+                                    lineHeight: regWidth * 25,
                                 }}
                             >
                                 {albumInfo.nemolist_title}
@@ -397,6 +399,7 @@ const EditAlbum = ({route, navigation}) => {
                                         fontSize: regWidth* 13,
                                         fontFamily: "NotoSansKR-Bold",
                                         color: colors.textLight,
+                                        lineHeight: regWidth * 19,
                                     }}
                                 >
                                     Done
@@ -475,7 +478,7 @@ const EditAlbum = ({route, navigation}) => {
                                     }}
                                 >
                                     <View>
-                                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Medium", color: colors.nemoDark, }}>
+                                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Medium", color: colors.nemoDark, lineHeight: regWidth * 20, }}>
                                             Description
                                         </Text>
                                         <TextInput 
@@ -511,6 +514,7 @@ const EditAlbum = ({route, navigation}) => {
                                                     fontSize: regWidth * 14,
                                                     fontFamily: "NotoSansKR-Bold",
                                                     color: colors.nemoDark,
+                                                    lineHeight: regWidth * 20,
                                                 }}
                                             >
                                                 {`@${albumInfo.user_tag}`}
@@ -568,6 +572,7 @@ const EditAlbum = ({route, navigation}) => {
                                                         fontSize: regWidth * 19,
                                                         fontFamily: "NotoSansKR-Black",
                                                         color: colors.nemoDark,
+                                                        lineHeight: regWidth * 28,
                                                     }}
                                                 >
                                                     Add Nemos
@@ -809,17 +814,17 @@ const EditAlbum = ({route, navigation}) => {
                         <Pressable
                             onPress={onCloseAddNemos}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, lineHeight: regWidth * 19, }}>
                                 Cancel
                             </Text>
                         </Pressable>
-                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", lineHeight: regWidth * 28, }}>
                             Add Nemos
                         </Text>
                         <Pressable
                             onPress={onAddBookmark}
                         >
-                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, lineHeight: regWidth * 19, }}>
                                 Done
                             </Text>
                         </Pressable>
@@ -882,7 +887,7 @@ const styles = StyleSheet.create({
         width: regWidth * 200,
         height: regWidth * 200,
         resizeMode: "contain",
-        borderRadius: 5,
+        borderRadius: regWidth * 5,
     },
     profileImage: {
         width: regWidth * 25,

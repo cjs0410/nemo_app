@@ -18,15 +18,14 @@ const UserList = (props) => {
                 source={user.avatar !== null ? { uri: user.avatar } : blankAvatar}
                 style={styles.userImage}
             />
-            <View style={{ marginHorizontal: regWidth * 10, }}>
+            <View style={{ marginHorizontal: regWidth * 10, width: "80%", }}>
                 <Text 
                     style={{ 
                         fontSize: regWidth * 20, 
                         fontFamily: "NotoSansKR-Bold",
-                        width: regWidth * 220, 
-                        lineHeight: regWidth * 23,
+                        includeFontPadding: false,
                     }}
-                    numberOfLines={2}
+                    numberOfLines={1}
                     ellipsizeMode='tail'
                 >
                     {user.name}
@@ -39,7 +38,7 @@ const UserList = (props) => {
                             maxWidth: "50%",
                             
                             color: colors.nemoNormal,
-                            lineHeight: regWidth * 15,
+                            includeFontPadding: false,
                             marginRight: regWidth*3,
                         }}
                         numberOfLines={1}
@@ -49,7 +48,7 @@ const UserList = (props) => {
                     </Text>
                     {user.nemos ? 
                         <>
-                            <Entypo name="dot-single" size={16} color="#808080" />
+                            <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
                             <Text 
                                 style={{ ...styles.userInfoText, marginHorizontal: regWidth*3, }}
                             >
@@ -83,7 +82,8 @@ const styles = StyleSheet.create({
         fontSize: regWidth*11, 
         fontFamily: "NotoSansKR-Medium",
         marginHorizontal: regWidth*12, 
-        color: "#606060"
+        color: "#606060",
+        includeFontPadding: false,
     },
 })
 

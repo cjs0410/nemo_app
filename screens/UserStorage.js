@@ -248,14 +248,14 @@ const UserStorage = ({route, navigation}) => {
                                 />
                                 <View
                                     style={{
-                                        marginTop: 40,
+                                        marginTop: regHeight* 40,
                                         marginHorizontal: regWidth * 7,
                                     }}
                                 >
-                                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", color: colors.nemoNormal, lineHeight: 20, }}>
+                                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", color: colors.nemoNormal, includeFontPadding: false, }}>
                                         {`@${profile.user_tag}`}
                                     </Text>
-                                    <Text style={{ fontSize: regWidth * 23, fontFamily: "NotoSansKR-Black", color: colors.textDark, lineHeight: 33, }}>
+                                    <Text style={{ fontSize: regWidth * 23, fontFamily: "NotoSansKR-Black", color: colors.textDark, includeFontPadding: false, }}>
                                         {profile.name}
                                     </Text>
                                 </View>
@@ -269,6 +269,7 @@ const UserStorage = ({route, navigation}) => {
                                         fontSize: regWidth * 13, 
                                         fontFamily: "NotoSansKR-Medium",
                                         color: colors.textDark,
+                                        includeFontPadding: false,
                                     }}
                                 >
                                     Edit profile
@@ -279,7 +280,7 @@ const UserStorage = ({route, navigation}) => {
                             <Text
                                 style={{ 
                                     width: "50%", 
-                                    lineHeight: regHeight*19, 
+                                    includeFontPadding: false,
                                     color: "#404040",
                                     fontSize: regWidth * 13,
                                     fontFamily: "NotoSansKR-Medium",
@@ -324,15 +325,16 @@ const UserStorage = ({route, navigation}) => {
                             style={{ 
                                 flexDirection: "row", 
                                 alignItems: "center",
-                                marginTop: regHeight * 100,
+                                marginTop: regHeight * 70,
                                 justifyContent: "space-between" 
                             }}
                         >
                             <Text 
                                 style={{ 
                                     color: colors.textDark,
-                                    fontWeight: "700", 
-                                    fontSize: regWidth*20 
+                                    fontFamily: "NotoSansKR-Black", 
+                                    fontSize: regWidth*20,
+                                    includeFontPadding: false,
                                 }}
                             >
                                 Nemo Calendar
@@ -343,7 +345,7 @@ const UserStorage = ({route, navigation}) => {
                                     opacity: profile.streak === 0 ? 0 : 1,
                                 }} 
                             >
-                                <Text style={{ fontSize: regWidth * 16, fontWeight: "700", color: "#FFFFFF" }} >
+                                <Text style={{ fontSize: regWidth * 16, fontFamily: "NotoSansKR-Black", color: "#FFFFFF", includeFontPadding: false, }} >
                                     {`${profile.streak}-day streak!`}
                                 </Text>
                             </Pressable>
@@ -351,10 +353,10 @@ const UserStorage = ({route, navigation}) => {
                         <View style={{ marginTop: regHeight * 15, }}>
                             <Text
                                 style={{ 
-                                    lineHeight: regHeight*19, 
+                                    includeFontPadding: false,
                                     color: "#404040",
                                     fontSize: regWidth * 13,
-                                    fontWeight: "500",
+                                    fontFamily: "NotoSansKR-Medium",
                                 }}
                             >
                                 {`You've made ${profile.month_nemos} Nemos this month!`}
@@ -379,8 +381,9 @@ const UserStorage = ({route, navigation}) => {
                                     marginTop: regHeight*5, 
                                     marginHorizontal: regWidth*7, 
                                     color: "#FFFFFF", 
-                                    fontWeight: "700", 
-                                    fontSize: regWidth*16 
+                                    fontFamily: "NotoSansKR-Bold",
+                                    fontSize: regWidth*16,
+                                    includeFontPadding: false,
                                 }}
                             >
                                 Recent 2 weeks
@@ -403,8 +406,8 @@ const UserStorage = ({route, navigation}) => {
                                                 style={{ 
                                                     color: colors.bgdLight, 
                                                     fontSize: regWidth * 11, 
-                                                    fontWeight: "700", 
-                                                    lineHeight: regWidth * 16, 
+                                                    fontFamily: "NotoSansKR-Bold", 
+                                                    includeFontPadding: false,
                                                     marginBottom: regHeight * 4,
                                                 }}
                                             >
@@ -427,7 +430,7 @@ const UserStorage = ({route, navigation}) => {
                                                         bottom: 5,
                                                         left: 10,
                                                         fontSize: regWidth * 14,
-                                                        fontWeight: "900",
+                                                        fontFamily: "NotoSansKR-Black",
                                                         color: "#FFFFFF",
                                                     }}
                                                 >
@@ -475,8 +478,8 @@ const styles = StyleSheet.create({
         width: regWidth * 100,
         height: regWidth * 100,
         resizeMode: "cover",
-        borderRadius: 50,
-        borderWidth: 2,
+        borderRadius: 999,
+        borderWidth: regWidth * 2,
         borderColor: "#7341ffcc",
         // marginLeft: regWidth*13,
     },
@@ -489,13 +492,13 @@ const styles = StyleSheet.create({
         marginTop: regWidth*13,
     },
     editProfileBtn: {
-        borderRadius: 20,
+        borderRadius: regWidth * 20,
         justifyContent: "center",
         alignItems: "center",
         borderColor: colors.textDark,
-        borderWidth: 0.5, 
+        borderWidth: regWidth * 0.5, 
         paddingHorizontal: regWidth * 8,
-        paddingVertical: regHeight * 5,
+        paddingVertical: regWidth * 5,
         position: "absolute",
         right: 0,
     },
@@ -525,6 +528,7 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Black",
         fontSize: regWidth*16,
         letterSpacing: -regWidth,
+        includeFontPadding: false,
         // width: regWidth * 20,
     },
     followTxt: {
@@ -532,6 +536,8 @@ const styles = StyleSheet.create({
         marginRight: regWidth*15,
         fontFamily: "NotoSansKR-Medium",
         color: "#404040",
+        fontSize: regWidth*16,
+        includeFontPadding: false,
     },
     followedByContainer: {
         flexDirection: "row",
@@ -550,7 +556,7 @@ const styles = StyleSheet.create({
         marginLeft: regWidth*13,
     },
     streakBtn: {
-        borderRadius: 30,
+        borderRadius: regWidth * 30,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: colors.nemoDark,

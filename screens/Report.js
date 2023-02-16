@@ -121,6 +121,7 @@ const Report = ({navigation, route}) => {
                             fontSize: regWidth * 13,
                             fontFamily: "NotoSansKR-Bold",
                             color: colors.textLight,
+                            includeFontPadding: false,
                         }}
                     >
                         Cancel
@@ -129,6 +130,7 @@ const Report = ({navigation, route}) => {
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Report
                 </Text>
@@ -140,6 +142,7 @@ const Report = ({navigation, route}) => {
                             fontSize: regWidth * 13,
                             fontFamily: "NotoSansKR-Bold",
                             color: colors.textLight,
+                            lineHeight: regWidth * 19,
                         }}
                     >
                         Cancel
@@ -151,6 +154,7 @@ const Report = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 15,
                         fontFamily: "NotoSansKR-Bold",
+                        includeFontPadding: false,
                     }}
                 >
                     Tell us about our service error, or 
@@ -159,6 +163,7 @@ const Report = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 15,
                         fontFamily: "NotoSansKR-Bold",
+                        includeFontPadding: false,
                     }}
                 >
                     complains.
@@ -167,11 +172,14 @@ const Report = ({navigation, route}) => {
                     style={{
                         width: "100%",
                         // backgroundColor:"pink",
-                        borderBottomWidth: 1,
+                        borderBottomWidth: regWidth * 1,
                         borderBottomColor: colors.textLight,
                         marginTop: regHeight * 42,
                         fontSize: regWidth * 17,
+                        // fontWeight: "700"
                         fontFamily: "NotoSansKR-Bold",
+                        // lineHeight: regWidth * 10,
+                        includeFontPadding: false,
                     }}
                     multiline={true}
                     onChangeText={(payload) => setReport(payload)}
@@ -222,6 +230,7 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 18,
         fontFamily: "NotoSansKR-Black", 
         color: "white",
+        includeFontPadding: false,
     },
 })
 

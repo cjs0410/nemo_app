@@ -58,13 +58,14 @@ const ChangeGender = ({route, navigation}) => {
                     onPress={() => navigation.goBack()}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Cancel
                     </Text>
                 </Pressable>
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Change Gender
                 </Text>
@@ -74,7 +75,7 @@ const ChangeGender = ({route, navigation}) => {
                     // disabled={isUsernameValid ? false : true}
                     // style={{ opacity: isUsernameValid ? 1 : 0 }}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Done
                     </Text>
                 </Pressable>
@@ -85,14 +86,14 @@ const ChangeGender = ({route, navigation}) => {
                     marginHorizontal: regWidth * 13,     
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,}}>
                     Gender
                 </Text>
                 <Pressable 
                     style={styles.genderBtn}
                     onPress={() => setNewGender("Male")}    
                 >
-                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Male
                     </Text>
                     <Image 
@@ -108,7 +109,7 @@ const ChangeGender = ({route, navigation}) => {
                     style={styles.genderBtn}
                     onPress={() => setNewGender("Female")}    
                 >
-                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Female
                     </Text>
                     <Image 
@@ -124,7 +125,7 @@ const ChangeGender = ({route, navigation}) => {
                     style={styles.genderBtn}
                     onPress={() => setNewGender("Another")}    
                 >
-                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Another gender identity
                     </Text>
                     <Image

@@ -36,7 +36,7 @@ const AlbumList = (props) => {
                             fontSize: regWidth*20, 
                             fontFamily: "NotoSansKR-Bold", 
                             marginHorizontal: regWidth * 12,
-                            lineHeight: regWidth * 23,
+                            includeFontPadding: false,
                         }}
                         numberOfLines={2}
                         ellipsizeMode="tail"
@@ -55,7 +55,7 @@ const AlbumList = (props) => {
                         >
                             {`@${album.user_tag}`}
                         </Text>
-                        <Entypo name="dot-single" size={16} color="#808080" />
+                        <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
                         <Text 
                             style={{ ...styles.AlbumInfoText, marginHorizontal: regWidth*3, }}
                             // numberOfLines={1}
@@ -90,13 +90,14 @@ const styles = StyleSheet.create({
         width: regWidth * 50,
         height: regWidth * 50,
         resizeMode: "contain",
-        borderRadius: 3,
+        borderRadius: regWidth * 3,
     },
     AlbumInfoText: {
         fontSize: regWidth*11, 
         fontFamily: "NotoSansKR-Medium",
         marginHorizontal: regWidth*12, 
-        color: "#606060"
+        color: "#606060",
+        includeFontPadding: false,
     },
 
 })

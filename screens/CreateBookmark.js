@@ -357,8 +357,8 @@ const CreateBookmark = ({navigation, route}) => {
     }
 
     const onChangeFront = (payload) => {
-        // setFrontContent(payload);
-        setFrontContent(payload.replace(" ", "\u00A0"));
+        setFrontContent(payload);
+        // setFrontContent(payload.replace(" ", "\u00A0"));
     }
 
     const onTextLayout = (e) => {
@@ -548,6 +548,7 @@ const CreateBookmark = ({navigation, route}) => {
                 setFrontContent((prevState) => {
                     return prevState + res.data.message;
                 })
+                // setFrontContent(frontContent + res.data.message);
             })
         } catch (err) {
             console.error(err)
@@ -934,7 +935,7 @@ const CreateBookmark = ({navigation, route}) => {
                     }}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "500", marginRight: regWidth * 8, }} >Cancel</Text>
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium", marginRight: regWidth * 8, includeFontPadding: false,}} >Cancel</Text>
                 </Pressable>
                 <Pressable
                     style={{
@@ -956,7 +957,8 @@ const CreateBookmark = ({navigation, route}) => {
                             style={{
                                 color: "white",
                                 fontSize: regWidth * 17,
-                                fontWeight: "700",
+                                fontFamily: "NotoSansKR-Bold",
+                                includeFontPadding: false,
                             }}
                         >
                             Create Nemo
@@ -1482,18 +1484,18 @@ const CreateBookmark = ({navigation, route}) => {
                 <Pressable 
                     style={styles.TagAddBox} 
                 >
-                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Description</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }} >Description</Text>
                     <TextInput 
                         onChangeText={changeInfo}
                         placeholder="Add a description"
                         style={{
-                            height: 90,
+                            height: regWidth * 90,
                             width: "70%",
                             textAlignVertical: "top",
                             // marginLeft: regWidth * 18,
                             fontSize: regWidth * 14,
-                            fontWeight: "500",
-                            lineHeight: regWidth * 20,
+                            fontFamily: "NotoSansKR-Medium",
+                            includeFontPadding: false,
                             padding: 0,
                             // margin: 0,
                             // backgroundColor:"pink"
@@ -1511,7 +1513,7 @@ const CreateBookmark = ({navigation, route}) => {
                     style={styles.TagAddBox} 
                     // onPress={() => setTagVisible(true)}    
                 >
-                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700",  }} >Tags</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }} >Tags</Text>
                     <Pressable
                         style={{
                             width: "70%",
@@ -1532,7 +1534,8 @@ const CreateBookmark = ({navigation, route}) => {
                                 textAlignVertical: "top",
                                 // marginLeft: regWidth * 18,
                                 fontSize: regWidth * 14,
-                                fontWeight: "500",
+                                fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                                 // lineHeight: regWidth * 20,
                                 // backgroundColor:"pink"
                                 color: colors.nemoDark,
@@ -1561,7 +1564,7 @@ const CreateBookmark = ({navigation, route}) => {
                     //     fetchAlbumList();
                     // }}    
                 >
-                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Nemolists</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }} >Nemolists</Text>
                     <Pressable
                         style={{
                             width: "70%",
@@ -1581,7 +1584,8 @@ const CreateBookmark = ({navigation, route}) => {
                                 textAlignVertical: "top",
                                 // marginLeft: regWidth * 18,
                                 fontSize: regWidth * 14,
-                                fontWeight: "500",
+                                fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                                 // lineHeight: regWidth * 20,
                                 // backgroundColor:"pink"
                             }}
@@ -1626,17 +1630,17 @@ const CreateBookmark = ({navigation, route}) => {
                         // onPress={onCloseTag}
                         style={{opacity: 0}}
                     >
-                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, includeFontPadding: false, }}>
                             Done
                         </Text>
                     </Pressable>
-                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }}>
                         Tags
                     </Text>
                     <Pressable
                         onPress={onCloseTag}
                     >
-                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, includeFontPadding: false, includeFontPadding: false, }}>
                             Done
                         </Text>
                     </Pressable>
@@ -1662,6 +1666,7 @@ const CreateBookmark = ({navigation, route}) => {
                             style={{
                                 fontSize: regWidth * 14,
                                 fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                             }}
                         >
                             {"# "}
@@ -1673,6 +1678,7 @@ const CreateBookmark = ({navigation, route}) => {
                                 width: "90%",
                                 fontSize: regWidth * 14,
                                 fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                             }}
                             // value={tagValue}
                             onChange={changeTag}
@@ -1696,6 +1702,7 @@ const CreateBookmark = ({navigation, route}) => {
                                     fontSize: regWidth * 14,
                                     fontFamily: "NotoSansKR-Medium",
                                     color: colors.nemoDark,
+                                    includeFontPadding: false,
                                 }}
                             >
                                 {`# ${tag}`}
@@ -1724,17 +1731,17 @@ const CreateBookmark = ({navigation, route}) => {
                         // onPress={onCloseAlbum}
                         style={{ opacity: 0, }}
                     >
-                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, includeFontPadding: false, }}>
                             Cancel
                         </Text>
                     </Pressable>
-                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", }}>
+                    <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }}>
                         Add to Nemolist
                     </Text>
                     <Pressable
                         onPress={onCloseAlbum}
                     >
-                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, }}>
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: colors.textLight, includeFontPadding: false, }}>
                             Done
                         </Text>
                     </Pressable>

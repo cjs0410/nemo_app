@@ -84,9 +84,9 @@ const BookmarkList = (props) => {
                         onPress={() => navigation.push('OtherProfile', { userTag: bookmark.user_tag, })}
                         hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
                     >
-                        <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Bold", }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }} >{`@${bookmark.user_tag}`}</Text>
                     </Pressable>
-                    <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Medium", color: "#606060" }} >{date.join('. ')}</Text>
+                    <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Medium", color: "#606060", includeFontPadding: false, }} >{date.join('. ')}</Text>
                 </View>
             </View>
             
@@ -169,8 +169,8 @@ const UnTouchableBookmarkList = (props) => {
                         </Text>
                     </View>
                     <View style={styles.bookmarkContentsWatermark}>
-                        <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Bold", }} >{`@${bookmark.user_tag}`}</Text>
-                        <Text style={{ fontSize: regWidth * 11, color: "#606060", fontFamily: "NotoSansKR-Medium", }} >{date.join('. ')}</Text>
+                        <Text style={{ fontSize: regWidth * 11, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }} >{`@${bookmark.user_tag}`}</Text>
+                        <Text style={{ fontSize: regWidth * 11, color: "#606060", fontFamily: "NotoSansKR-Medium", includeFontPadding: false, }} >{date.join('. ')}</Text>
                     </View>
                 </View>
             </MaskedView>
@@ -205,7 +205,8 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsBook: {
         marginLeft: -5,
-        flex: 0.6,
+        // flex: 0.6,
+        height: regWidth * 44,
         flexDirection: "row", 
         justifyContent: "space-between",
         alignItems: "center",
@@ -214,11 +215,13 @@ const styles = StyleSheet.create({
         // fontWeight: "400",
         fontSize: regWidth * 10,
         fontFamily: "NotoSansKR-Regular",
+        includeFontPadding: false,
     },
     bookmarkContentsBookChapter: {
         // fontWeight: "700",
         fontSize: regWidth * 15,
         fontFamily: "NotoSansKR-Bold",
+        includeFontPadding: false,
     },
     bookmarkContentsBookChapterInput: {
         fontWeight: "400",
@@ -226,7 +229,8 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",
-        flex: 1.5,
+        // flex: 1.5,
+        height: regWidth * 100,
         // marginTop: regHeight * 8,
         justifyContent: "center", 
     },
@@ -245,9 +249,10 @@ const styles = StyleSheet.create({
     },
     bookmarkContentsWatermark: {
         // backgroundColor: "blue",
-        flex: 0.3,
+        height: regWidth * 24,
         flexDirection: "row",
         justifyContent: "space-between",
+        marginTop: regWidth * 4,
     },
     backgroungImageContainer: {
         position: "absolute",

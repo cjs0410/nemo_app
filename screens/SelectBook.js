@@ -122,16 +122,16 @@ const SelectBook = ({navigation, route}) => {
                     paddingTop: insets.top,
                     paddingBottom: 0,
                     paddingLeft: insets.left,
-                    paddingRight: insets.right
+                    paddingRight: insets.right,
                 }}
             >
-                <Text style={{ fontSize: regWidth * 24, fontFamily: "NotoSansKR-Black", color: colors.textDark, }}>
+                <Text style={{ fontSize: regWidth * 24, fontFamily: "NotoSansKR-Black", color: colors.textDark, includeFontPadding: false, }}>
                     What are you reading?
                 </Text>
                 <Pressable
                     onPress={() => navigation.goBack()}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", color: colors.textNormal, }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", color: colors.textNormal, includeFontPadding: false, }}>
                         Cancel
                     </Text>
                 </Pressable>
@@ -156,7 +156,7 @@ const SelectBook = ({navigation, route}) => {
                             alignItems: "center", 
                             marginHorizontal: regWidth * 12,
                             paddingVertical: regHeight * 12,
-                            borderBottomWidth: 0.5,
+                            borderBottomWidth: regWidth * 0.5,
                             borderBottomColor: "#CBCBCB",
                         }}
                         onPress={() => navigation.navigate(`CreateBook${route.params.index}`, {index: route.params.index, isLib: route.params.isLib})}
@@ -175,7 +175,7 @@ const SelectBook = ({navigation, route}) => {
                                     fontSize: regWidth * 20, 
                                     fontFamily: "NotoSansKR-Bold",
                                     marginHorizontal: 12,
-                                    lineHeight: regWidth * 28,
+                                    includeFontPadding: false,
                                 }}
                             >
                                 New Book
@@ -186,6 +186,7 @@ const SelectBook = ({navigation, route}) => {
                                     fontFamily: "NotoSansKR-Medium",
                                     marginHorizontal: regWidth*12, 
                                     color: "#606060",
+                                    includeFontPadding: false,
                                 }}
                             >
                                 Add new Book
@@ -236,6 +237,7 @@ const SelectBook = ({navigation, route}) => {
                             fontFamily: "NotoSansKR-Bold", 
                             marginHorizontal: regWidth * 12, 
                             marginTop: regHeight * 18, 
+                            includeFontPadding: false,
                         }}
                     >
                         Recent
@@ -316,19 +318,20 @@ const styles = StyleSheet.create({
         backgroundColor: colors.bgdLight,
         marginTop: regHeight * 31,
         marginHorizontal: regWidth * 12,
-        borderRadius: 10,
-        height: regHeight * 40,
+        borderRadius: regWidth * 10,
+        height: regWidth * 40,
         paddingHorizontal: regWidth * 6,
         flexDirection: "row",
         alignItems: "center",
     },
     searchInput: {
         fontSize: regWidth * 14,
-        fontWeight: "500",
+        fontFamily: "NotoSansKR-Medium",
         color: colors.textLight,
         marginHorizontal: regWidth * 6,
         width: "90%",
         height: "100%",
+        includeFontPadding: false,
     }
 })
 

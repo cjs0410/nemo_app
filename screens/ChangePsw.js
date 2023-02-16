@@ -61,7 +61,7 @@ const ChangePsw1 = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 22,
                         fontFamily: "NotoSansKR-Black",
-                        lineHeight: regWidth * 44,
+                        includeFontPadding: false,
                         color: colors.textDark,
                     }}
                 >
@@ -71,7 +71,7 @@ const ChangePsw1 = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 13,
                         fontFamily: "NotoSansKR-Medium",
-                        lineHeight: regWidth * 20,
+                        includeFontPadding: false,
                         color: colors.textLight,
                     }}
                 >
@@ -81,7 +81,7 @@ const ChangePsw1 = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 13,
                         fontFamily: "NotoSansKR-Regular",
-                        lineHeight: regWidth * 20,
+                        includeFontPadding: false,
                         color: colors.textLight,
                         marginTop: regHeight * 50,
                     }}
@@ -100,8 +100,10 @@ const ChangePsw1 = ({navigation, route}) => {
                     <TextInput 
                         onChangeText={(payload) => setPsw(payload)}
                         style={{
-                            fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         secureTextEntry={true}
                     />
@@ -143,6 +145,7 @@ const ChangePsw1 = ({navigation, route}) => {
                                 fontSize: regWidth * 18,
                                 fontFamily: "NotoSansKR-Bold", 
                                 color: colors.textNormal,
+                                includeFontPadding: false,
                             }}
                         >
                             Cancel
@@ -225,7 +228,7 @@ const ChangePsw2 = ({navigation, route}) => {
                     onPress={() => navigation.navigate("UserSetting", {profile: profile})}
                     hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Cancel
                     </Text>
                 </Pressable>
@@ -241,7 +244,7 @@ const ChangePsw2 = ({navigation, route}) => {
                     disabled={isValid ? false : true}
                     style={{ opacity: isValid ? 1 : 0 }}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", }}>
+                    <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", includeFontPadding: false,}}>
                         Done
                     </Text>
                 </Pressable>
@@ -252,7 +255,7 @@ const ChangePsw2 = ({navigation, route}) => {
                     marginHorizontal: regWidth * 13,     
                 }}
             >
-                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", }}>
+                <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,}}>
                     New password
                 </Text>
                 <View
@@ -271,6 +274,7 @@ const ChangePsw2 = ({navigation, route}) => {
                             fontSize: regWidth * 17, 
                             fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         autoCapitalize={false}
                         secureTextEntry={true}
@@ -290,6 +294,7 @@ const ChangePsw2 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.redNormal,
                         opacity: psw.length > 0 && !isPswValid ? 1 : 0,
+                        includeFontPadding: false,
                     }}
                 >
                     {"Make sure to use letters, numbers, and specials(!@#$%^*+-)"}
@@ -321,6 +326,7 @@ const ChangePsw2 = ({navigation, route}) => {
                             fontSize: regWidth * 17, 
                             fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         autoCapitalize={false}
                         secureTextEntry={true}
@@ -340,6 +346,7 @@ const ChangePsw2 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.redNormal,
                         opacity: pswCheck.length > 0 && !isPswCheckValid ? 1 : 0,
+                        includeFontPadding: false,
                     }}
                 >
                     Confirm password is differ from your new password.
@@ -387,6 +394,7 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 18,
         fontFamily: "NotoSansKR-Black", 
         color: "white",
+        includeFontPadding: false,
     },
 })
 

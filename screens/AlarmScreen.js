@@ -132,6 +132,7 @@ const AlarmScreen = ({navigation}) => {
                                                 fontFamily: "NotoSansKR-Bold",
                                                 marginHorizontal: regWidth * 12, 
                                                 color: colors.redDark,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             Time to read!
@@ -142,6 +143,7 @@ const AlarmScreen = ({navigation}) => {
                                                 fontFamily: "NotoSansKR-Bold",
                                                 marginHorizontal: regWidth * 12, 
                                                 color: colors.textDark,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             Let's read what you want and create Nemo!
@@ -168,7 +170,7 @@ const AlarmScreen = ({navigation}) => {
                                                 fontSize: regWidth * 50,
                                                 fontFamily: "NotoSansKR-Black",
                                                 color: colors.nemoDark,
-                                                lineHeight: regWidth * 60,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             {alarm.detail}
@@ -181,6 +183,7 @@ const AlarmScreen = ({navigation}) => {
                                                 fontFamily: "NotoSansKR-Bold",
                                                 marginHorizontal: regWidth * 12, 
                                                 color: colors.nemoDark,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             {`${alarm.detail} days streak!`}
@@ -191,6 +194,7 @@ const AlarmScreen = ({navigation}) => {
                                                 fontFamily: "NotoSansKR-Bold",
                                                 marginHorizontal: regWidth * 12, 
                                                 color: colors.textDark,
+                                                includeFontPadding: false,
                                             }}
                                         >
                                             Doing really great!
@@ -224,6 +228,7 @@ const AlarmScreen = ({navigation}) => {
                                                         fontSize: regWidth * 16, 
                                                         fontFamily: "NotoSansKR-Bold",
                                                         color: colors.nemoDark,
+                                                        includeFontPadding: false,
                                                     }}
                                                     numberOfLines={1}
                                                     ellipsizeMode="tail"
@@ -236,6 +241,7 @@ const AlarmScreen = ({navigation}) => {
                                                 style={{ 
                                                     fontSize: regWidth * 16, 
                                                     fontFamily: "NotoSansKR-Medium",
+                                                    includeFontPadding: false,
                                                     // width: "85%", 
                                                     // backgroundColor:"pink"
                                                 }}
@@ -248,6 +254,7 @@ const AlarmScreen = ({navigation}) => {
                                             style={{ 
                                                 fontSize: regWidth * 16, 
                                                 fontFamily: "NotoSansKR-Medium",
+                                                includeFontPadding: false,
                                                 // width: "85%", 
                                                 // backgroundColor:"pink"
                                             }}
@@ -291,6 +298,7 @@ const AlarmScreen = ({navigation}) => {
                                                     fontFamily: "NotoSansKR-Bold",
                                                     marginLeft: regWidth * 12, 
                                                     color: colors.nemoDark,
+                                                    includeFontPadding: false,
                                                     
                                                 }}
                                                 numberOfLines={1}
@@ -304,6 +312,7 @@ const AlarmScreen = ({navigation}) => {
                                             style={{ 
                                                 fontSize: regWidth * 16, 
                                                 fontFamily: "NotoSansKR-Medium",
+                                                includeFontPadding: false,
                                                 // width: "85%", 
                                                 // backgroundColor:"pink"
                                             }}
@@ -363,6 +372,7 @@ const FollowBtn = (props) => {
                     fontSize: regWidth * 13, 
                     color: isFollow ? colors.textDark : "white",
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}
             >
                 {isFollow ? "Following" : "Follow"}

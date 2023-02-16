@@ -339,8 +339,8 @@ const App = () => {
         <Image 
           source={NemoLogo}
           style={{
-            width: regWidth * 150,
-            height: regWidth * 150,
+            width: regWidth * 256,
+            height: regWidth * 256,
           }}
         />
       </View>
@@ -404,11 +404,25 @@ const App = () => {
                 let iconName;
       
                 if (route.name === 'Home') {
-                  iconName = 'compass';
+                  return <Image 
+                    source={focused ? focusExplore : unfocusExplore}
+                    style={{
+                      width: size,
+                      height: size,
+                      resizeMode: "contain",
+                    }}
+                  />
                 } else if (route.name === 'Search') {
                   iconName = 'search';
                 } else if (route.name === 'Post') {
-                  iconName = 'plus-square';
+                  return <Image 
+                    source={createBookmark}
+                    style={{        
+                      width: size,
+                      height: size,
+                      resizeMode: "contain",
+                    }} 
+                  />
                 } else if (route.name === 'Bookmark') {
                   iconName = 'download';
                 } else if (route.name === 'Profile') {
@@ -424,7 +438,7 @@ const App = () => {
                   />
                 } else if (route.name === 'UserLibrary') {
                   return <Image 
-                    source={userLibraryLogo}
+                    source={focused ? focusUserLibrary : unfocusUserLibrary}
                     style={{
                       width: size,
                       height: size,
@@ -448,19 +462,18 @@ const App = () => {
               // options={{ headerShown: false, }} 
               options={({ route }) => ({
                 headerShown: false,
-                tabBarIcon: ({ focused }) => {
-                  return (
-                    <Image 
-                      // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
-                      source={focused ? focusUserLibrary : unfocusUserLibrary}
-                      style={{        
-                        width: regWidth * 28,
-                        height: regWidth * 28,
-                        resizeMode: "cover",
-                      }} 
-                    />
-                  )
-                },
+                // tabBarIcon: ({ focused }) => {
+                //   return (
+                //     <Image 
+                //       source={focused ? focusUserLibrary : unfocusUserLibrary}
+                //       style={{        
+                //         width: regWidth * 28,
+                //         height: regWidth * 28,
+                //         resizeMode: "cover",
+                //       }} 
+                //     />
+                //   )
+                // },
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
                   if ((routeName === 'SelectBook0' || routeName === 'CreateBook0' || routeName === 'CreateBookmark0')) {
@@ -491,19 +504,19 @@ const App = () => {
               name="Post" 
               component={PostScreen}
               options={{
-                tabBarIcon: ({ focused }) => {
-                  return (
-                    <Image 
-                      // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
-                      source={createBookmark}
-                      style={{        
-                        width: regWidth * 35,
-                        height: regWidth * 35,
-                        resizeMode: "cover",
-                      }} 
-                    />
-                  )
-                },
+                // tabBarIcon: ({ focused }) => {
+                //   return (
+                //     <Image 
+                //       // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
+                //       source={createBookmark}
+                //       style={{        
+                //         width: regWidth * 35,
+                //         height: regWidth * 35,
+                //         resizeMode: "cover",
+                //       }} 
+                //     />
+                //   )
+                // },
               }}
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
@@ -517,19 +530,19 @@ const App = () => {
               component={HomeScreen} 
               options={({ route }) => ({
                 headerShown: false,
-                tabBarIcon: ({ focused }) => {
-                  return (
-                    <Image 
-                      // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
-                      source={focused ? focusExplore : unfocusExplore}
-                      style={{        
-                        width: regWidth * 35,
-                        height: regWidth * 35,
-                        resizeMode: "cover",
-                      }} 
-                    />
-                  )
-                },
+                // tabBarIcon: ({ focused }) => {
+                //   return (
+                //     <Image 
+                //       // source={ avatar !== null ? { uri: avatar } : blankAvatar} 
+                //       source={focused ? focusExplore : unfocusExplore}
+                //       style={{        
+                //         width: regWidth * 35,
+                //         height: regWidth * 35,
+                //         resizeMode: "cover",
+                //       }} 
+                //     />
+                //   )
+                // },
                 tabBarStyle: ((route) => {
                   const routeName = getFocusedRouteNameFromRoute(route)
                   if ((routeName === 'SelectBook2' || routeName === 'CreateBook2' || routeName === 'CreateBookmark2')) {

@@ -155,13 +155,13 @@ const UserSetting = ({route, navigation}) => {
                     style={styles.icon}
                 />
                 <View style={{ justifyContent: "center", width: "75%", }}>
-                    <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
+                    <Text style={{ fontSize: regWidth * 17, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }}>
                         Account information
                     </Text>
-                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
+                    <Text style={{ fontSize: regWidth * 10, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, marginTop: regHeight * 5, }}>
                         See your account information such as your phone
                     </Text>
-                    <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 2, }}>
+                    <Text style={{ fontSize: regWidth * 10, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, marginTop: regHeight * 2, }}>
                         number and email address.
                     </Text>
                 </View>
@@ -213,7 +213,7 @@ const UserSetting = ({route, navigation}) => {
                 onPress={() => navigation.navigate('Contact', { profile: profile, })}
             >
                 <Image 
-                    source={iconLock}
+                    source={iconCheckmark}
                     style={styles.icon}
                 />
                 <View style={{ justifyContent: "center", width: "75%", }}>

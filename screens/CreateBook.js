@@ -139,6 +139,7 @@ const CreateBook = ({navigation, route}) => {
                             fontFamily: "NotoSansKR-Black",
                             color: colors.textDark, 
                             marginHorizontal: regWidth * 5, 
+                            includeFontPadding: false,
                         }}
                     >
                         Add new Book
@@ -147,7 +148,7 @@ const CreateBook = ({navigation, route}) => {
                 <Pressable
                     onPress={() => navigation.goBack()}
                 >
-                    <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: colors.textNormal, }}>
+                    <Text style={{ fontSize: regWidth * 15, fontWeight: "500", color: colors.textNormal, includeFontPadding: false,}}>
                         Cancel
                     </Text>
                 </Pressable>
@@ -172,6 +173,7 @@ const CreateBook = ({navigation, route}) => {
                                 fontFamily: "NotoSansKR-Regular",
                                 marginTop: regHeight * 5,
                                 color: colors.nemoNormal,
+                                includeFontPadding: false,
                             }}
                         >
                             Choose Book Cover
@@ -185,6 +187,7 @@ const CreateBook = ({navigation, route}) => {
                             fontFamily: "NotoSansKR-Regular",
                             marginTop: regHeight * 5,
                             color: colors.nemoNormal,
+                            includeFontPadding: false,
                         }}
                     >
                         Book Title
@@ -195,6 +198,7 @@ const CreateBook = ({navigation, route}) => {
                             fontSize: regWidth * 18,
                             fontFamily: "NotoSansKR-Medium",
                             marginTop: 18,
+                            includeFontPadding: false,
                         }}
                         onChangeText={(payload) =>  setBookTitle(payload)}
                     />
@@ -206,6 +210,7 @@ const CreateBook = ({navigation, route}) => {
                             fontFamily: "NotoSansKR-Regular",
                             marginTop: regHeight * 5,
                             color: colors.nemoNormal,
+                            includeFontPadding: false,
                         }}
                     >
                         Author
@@ -216,6 +221,7 @@ const CreateBook = ({navigation, route}) => {
                             fontSize: regWidth * 18,
                             fontFamily: "NotoSansKR-Medium",
                             marginTop: 18,
+                            includeFontPadding: false,
                         }}
                         onChangeText={(payload) =>  setBookAuthor(payload)}
                     />
@@ -236,6 +242,7 @@ const CreateBook = ({navigation, route}) => {
                                 fontSize: regWidth * 18,
                                 fontFamily: "NotoSansKR-Black",
                                 color: "#FFFFFF",
+                                includeFontPadding: false,
                             }}
                         >
                             {isLib ? 

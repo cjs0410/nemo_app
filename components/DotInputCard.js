@@ -1,4 +1,4 @@
-import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, ActivityIndicator, Modal, } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, ScrollView, Text, Pressable, TextInput, Button, Dimensions, Image, TouchableOpacity, Animated, Touchable, ActivityIndicator, Modal, Platform, } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import Svg, {Line, Polygon} from 'react-native-svg';
 import { Entypo, Feather, AntDesign, FontAwesome } from '@expo/vector-icons'; 
@@ -32,6 +32,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
     const [cardFlag, setCardFlag] = useState([]);
     const [lineBarList, setLineBarList] = useState([]);
     const [loadFont, setLoadFont] = useState(false);
+    const [androidLineHeight, setAndroidLineHeight] = useState(null);
 
     useEffect(() => {
         fetchBook();
@@ -39,7 +40,7 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
 
     useEffect(() => {
         console.log(selectedBook);
-        console.log(color)
+        console.log(regWidth * 16);
     }, [selectedBook]);
 
     useEffect(() => {
@@ -359,15 +360,16 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                         > */}
                             <TextInput 
                                 style={{         
+                                    // fontSize: Platform.OS === 'android' ? regWidth * 20 : regWidth * 16,
                                     fontSize: regWidth * 16,
-                                    lineHeight: regWidth * 28,
+                                    // height: Platform.OS === 'android' ? regWidth * 300 + extraHeight : regWidth * 270 + extraHeight,
                                     height: regWidth * 270 + extraHeight,
                                     textAlignVertical: "top",
-                                    fontWeight: "500",
-                                    // fontFamily: "NotoSansKR-Medium",
+                                    fontFamily: "NotoSansKR-Medium",
+                                    includeFontPadding: false,
+                                    lineHeight: regWidth * 28,
+                                    // paddingTop: regWidth * 4,
                                     // backgroundColor: "pink"
-                                    // paddingHorizontal: regWidth * 7,
-                                    // width: "100%",
                                 }} 
                                 placeholder="Write anything from your reading"
                                 multiline={true}
@@ -384,30 +386,60 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                 scrollEnabled="false"
                                 onContentSizeChange={(e) => {
                                     console.log(e.nativeEvent);
-                                    const contentHeight = e.nativeEvent.contentSize.height;
-                                    const lineNum = parseInt(contentHeight / (regWidth * 28));
-                                    if (lineNum === 0) {
-                                        setLineNum(1);
-                                    } else {
+                                    if (Platform.OS === 'android') {
+                                        if (!androidLineHeight) {
+                                            setAndroidLineHeight(e.nativeEvent.contentSize.height);
+                                        }
+                                        const contentHeight = e.nativeEvent.contentSize.height;
+                                        const lineNum = androidLineHeight ? 
+                                            parseInt(parseInt(contentHeight) / parseInt(androidLineHeight)) 
+                                            : 
+                                            parseInt(parseInt(contentHeight) / parseInt(contentHeight));
                                         setLineNum(lineNum);
-                                    }
-                                    
-                                    console.log(lineNum);
+                                        console.log(lineNum);
 
-                                    if (lineNum !== 0 && lineNum % 9 === 0) {
-                                        let copy = [...lineBarList];
-                                        if (!(copy[parseInt(lineNum / 9) - 1])) {
-                                            copy[parseInt(lineNum / 9) - 1] = contentHeight;
-                                            setLineBarList(copy);
+                                        if (lineNum !== 0 && lineNum % 9 === 0) {
+                                            let copy = [...lineBarList];
+                                            if (!(copy[parseInt(lineNum / 9) - 1])) {
+                                                copy[parseInt(lineNum / 9) - 1] = contentHeight;
+                                                setLineBarList(copy);
+                                            }
+                                        }
+    
+                                        if (lineNum > 9) {
+                                            setExtraHeight(androidLineHeight * (lineNum - 9));
+    
+                                        } else {
+                                            setExtraHeight(0);
+                                        }
+
+                                    } else {
+                                        const contentHeight = e.nativeEvent.contentSize.height;
+                                        const lineNum = parseInt(contentHeight / (regWidth * 28));
+                                        if (lineNum === 0) {
+                                            setLineNum(1);
+                                        } else {
+                                            setLineNum(lineNum);
+                                        }
+                                        
+                                        console.log(lineNum);
+    
+                                        if (lineNum !== 0 && lineNum % 9 === 0) {
+                                            let copy = [...lineBarList];
+                                            if (!(copy[parseInt(lineNum / 9) - 1])) {
+                                                copy[parseInt(lineNum / 9) - 1] = contentHeight;
+                                                setLineBarList(copy);
+                                            }
+                                        }
+    
+                                        if (lineNum > 9) {
+                                            setExtraHeight(regHeight * 28 * (lineNum - 9));
+    
+                                        } else {
+                                            setExtraHeight(0);
                                         }
                                     }
 
-                                    if (lineNum > 9) {
-                                        setExtraHeight(regHeight * 28 * (lineNum - 9));
-
-                                    } else {
-                                        setExtraHeight(0);
-                                    }
                                 }}
                                 // textAlign={align === "center" ? "center" : "left"}
                             />
@@ -421,8 +453,8 @@ const DotInputCard = ({ color, selectedBook, onChangeChapter, whatChapter, onCha
                                         borderStyle: 'dashed',
                                         borderWidth: 0.3,
                                         // backgroundColor: "black",
-                                        top: regHeight * 28 * 9 * (index + 1) + regHeight * 6,
-                                        // top: lineBarList[index] + regHeight * 4,
+                                        // top: regHeight * 28 * 9 * (index + 1) + regHeight * 6,
+                                        top: Platform.OS === 'android' ? lineBarList[index] : lineBarList[index] + regHeight * 4,
                                     }}
                                     key={index}
                                 />
@@ -534,8 +566,9 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 12,
         // marginTop: regWidth * 8,
         width: regWidth * 250,
-        lineHeight: regWidth * 17,
+        // lineHeight: regWidth * 17,
         fontFamily: "NotoSansKR-Medium",
+        includeFontPadding: false,
     },
     bookmarkContentsBookChapter: {
         // fontWeight: "400",
@@ -544,10 +577,10 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Regular",
     },
     bookmarkContentsBookChapterInput: {
-        fontWeight: "900",
+        // fontWeight: "900",
         fontSize: regWidth * 15,
-        lineHeight: regWidth * 21,
-        // fontFamily: "NotoSansKR-Black",
+        includeFontPadding: false,
+        fontFamily: "NotoSansKR-Black",
     },
     bookmarkContentsTextBox: {
         // backgroundColor: "pink",

@@ -10,12 +10,14 @@ import { setUserInfo, setRefreshToken, setFcmToken, } from '../modules/user';
 import Api from '../lib/Api';
 import NemoLogo from '../assets/images/NemoLogo(small).png';
 import messaging from '@react-native-firebase/messaging';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [hpOrEmail, setHpOrEmail] = useState('');
   const [hpOrEmailValue, setHpOrEmailValue] = useState('');
@@ -125,19 +127,27 @@ const Login = ({ navigation }) => {
 
     return (
       <View style={{backgroundColor:"white", flex:1}}>
-        <SafeAreaView style={ styles.header } >
+        <View
+            style={{
+                ...styles.header,
+                paddingTop: insets.top,
+                paddingBottom: 0,
+                paddingLeft: insets.left,
+                paddingRight: insets.right
+            }}
+        >
            <Pressable 
              onPress={() => navigation.goBack()} 
              hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
            >
-              <Text style={{ fontSize: regWidth*16, fontWeight: "400" }}>
+              <Text style={{ fontSize: regWidth*16, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                 Cancel
               </Text>
            </Pressable>
-         </SafeAreaView>
-         <View style={{ alignItems: "center" }}>
+        </View>
+        <View style={{ alignItems: "center" }}>
           <View style={{ width: regWidth*280, alignItems: "flex-start" }}>
-            <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontWeight: "900" }}>
+            <Text style={{ marginTop: regHeight*32, fontSize: regWidth*22, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }}>
                 Welcome back!
             </Text>
           </View>
@@ -162,7 +172,7 @@ const Login = ({ navigation }) => {
               hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
               onPress={() => navigation.navigate('FindPassword')}
             >
-              <Text style={{fontSize:regWidth*12, fontWeight: "400", color:"#7341ffcc"}}>
+              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Regular", color:"#7341ffcc", includeFontPadding: false,}}>
                 Forgot password?
               </Text>
             </Pressable>
@@ -172,10 +182,10 @@ const Login = ({ navigation }) => {
                onPress={onLogin}
                style={{...styles.Btn, backgroundColor: "#5c34cc" }}
              >
-               <Text style={{ color: "white", fontSize:regWidth*18, fontWeight: "900" }} >Sign in</Text>
+               <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Sign in</Text>
              </TouchableOpacity>
           </View>            
-         </View>
+        </View>
       </View>
       
     );
@@ -243,25 +253,29 @@ const Login = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: regHeight * 55,
-    marginHorizontal: regWidth * 30,
+    marginVertical: regHeight * 10,
+    marginHorizontal: regWidth * 20,
+    paddingBottom: regHeight * 8,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   txtInput: {
+    fontSize: regWidth * 16,
     height: regHeight * 40,
-    width: regWidth*280,
+    width: regWidth * 280,
     backgroundColor: "white",
     borderBottomWidth: 1,
-    borderBottomColor: "#000000"
+    borderBottomColor: "#000000",
+    fontFamily: "NotoSansKR-Regular",
+    includeFontPadding: false,
   },
   Btn: {
-    borderRadius: 40,
+    borderRadius: regWidth * 40,
     justifyContent: "center",
     alignItems: "center",
-    width: regWidth*280,
-    height: regHeight*60,
+    width: regWidth * 280,
+    height: regHeight * 60,
     flexDirection: "row"
   },
 })

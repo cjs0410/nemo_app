@@ -229,8 +229,9 @@ const BookProfile = ({route, navigation}) => {
                             <View style={{ alignItems: "center", }}>
                                 <TouchableOpacity>
                                 <Text style={{
-                                    fontSize: regWidth * 16,
+                                    fontSize: regWidth * 17,
                                     fontFamily: "NotoSansKR-Bold",
+                                    includeFontPadding: false,
                                 }}>
                                     {bookInfo.book_title}
                                 </Text>
@@ -295,7 +296,7 @@ const BookProfile = ({route, navigation}) => {
                                                 shadowRadius: 8,
                                                 },
                                                 android: {
-                                                elevation: 3,
+                                                    elevation: 3,
                                                 },
                                             }),
                                         }}
@@ -323,7 +324,7 @@ const BookProfile = ({route, navigation}) => {
                                             style={{
                                                 fontSize: regWidth * 14,
                                                 fontFamily: "NotoSansKR-Bold",
-                                                lineHeight: regWidth * 20,
+                                                includeFontPadding: false,
                                                 color: colors.textDark,
                                             }}
                                         >
@@ -391,7 +392,7 @@ const BookProfile = ({route, navigation}) => {
                                             fontSize: regWidth * 19,
                                             color: colors.nemoDark,
                                             fontFamily: "NotoSansKR-Black",
-                                            lineHeight: regWidth * 28,
+                                            includeFontPadding: false,
                                         }}
                                     >
                                         Create Nemo from this book
@@ -578,7 +579,7 @@ const BookProfile = ({route, navigation}) => {
                     <Pressable
                         onPress={onPressClose}
                     >
-                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", }}>
+                        <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                             Cancel
                         </Text>
                     </Pressable>
@@ -613,10 +614,10 @@ const BookProfile = ({route, navigation}) => {
                             }}
                         />
                         <View style={{ justifyContent: "center", marginHorizontal: regWidth * 7, }}>
-                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", }}>
+                            <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Bold", color: "#202020", includeFontPadding: false, }}>
                                 Report
                             </Text>
-                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", }}>
+                            <Text style={{ fontSize: regWidth * 12, fontFamily: "NotoSansKR-Medium", color: "#606060", includeFontPadding: false, }}>
                                 Report your issue
                             </Text>
                         </View>
@@ -825,31 +826,17 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
     },
     header: {
-        // backgroundColor: "pink",
-        marginVertical: 10,
-        marginHorizontal: 10,
-        paddingBottom: 8,
+        paddingHorizontal: regWidth * 10,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-    },
+        paddingVertical: regHeight * 8,
+      },
     bookImage: {
-        width: 200,
-        height: 200,
+        width: regWidth * 200,
+        height: regWidth * 200,
         resizeMode: "contain",
         // backgroundColor:"pink",
-
-        // ...Platform.select({
-        //     ios: {
-        //       shadowColor: "black",
-        //       shadowOffset: { width: 0, height: 10 },
-        //       shadowOpacity: 0.5,
-        //     //   shadowRadius: 10,
-        //     },
-        //     android: {
-        //       elevation: 3,
-        //     },
-        // }),
     },
     bookmarkOrPost: {
         width: SCREEN_WIDTH * 0.5,
@@ -894,7 +881,7 @@ const styles = StyleSheet.create({
     bookInfoTxt: {
         fontSize: regWidth * 14,
         fontFamily: "NotoSansKR-Bold",
-        lineHeight: regWidth * 20,
+        includeFontPadding: false,
         color: colors.textLight,
     },
     modalContainer: {

@@ -72,6 +72,7 @@ const Contact = ({navigation, route}) => {
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Contact us
                 </Text>
@@ -89,6 +90,7 @@ const Contact = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 15,
                         fontFamily: "NotoSansKR-Bold",
+                        includeFontPadding: false,
                     }}
                 >
                     Tell us anything you felt about our service,
@@ -97,6 +99,7 @@ const Contact = ({navigation, route}) => {
                     style={{
                         fontSize: regWidth * 15,
                         fontFamily: "NotoSansKR-Bold",
+                        includeFontPadding: false,
                     }}
                 >
                     or your feedback, or idea.
@@ -111,6 +114,7 @@ const Contact = ({navigation, route}) => {
                         marginTop: regHeight * 42,
                         fontSize: regWidth * 17,
                         fontFamily: "NotoSansKR-Bold",
+                        includeFontPadding: false,
                     }}
                     multiline={true}
                     onChangeText={(payload) => setFeedback(payload)}
@@ -161,6 +165,7 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 18,
         fontFamily: "NotoSansKR-Black", 
         color: "white",
+        includeFontPadding: false,
     },
 })
 

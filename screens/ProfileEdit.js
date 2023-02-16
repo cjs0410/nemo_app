@@ -409,6 +409,7 @@ const ProfileEdit = ({route, navigation}) => {
                                 fontSize: regWidth * 15, 
                                 fontFamily: "NotoSansKR-Medium", 
                                 color: colors.textDark,
+                                includeFontPadding: false,
                             }}
                         >
                             Cancel
@@ -419,6 +420,7 @@ const ProfileEdit = ({route, navigation}) => {
                             fontSize: regWidth * 15, 
                             fontFamily: "NotoSansKR-Black",
                             color: colors.textDark,
+                            includeFontPadding: false,
                         }}
                     >
                         Edit profile
@@ -437,6 +439,7 @@ const ProfileEdit = ({route, navigation}) => {
                                     fontSize: regWidth * 15, 
                                     fontFamily: "NotoSansKR-Medium", 
                                     color: colors.textLight,
+                                    includeFontPadding: false,
                                 }}
                             >
                                 Save
@@ -553,7 +556,7 @@ const ProfileEdit = ({route, navigation}) => {
                             }}
                         >
                             <View style={styles.profileEdit}>
-                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", }}>
+                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", includeFontPadding: false,}}>
                                     Name
                                 </Text>
                                 <TextInput 
@@ -563,7 +566,7 @@ const ProfileEdit = ({route, navigation}) => {
                                 />
                             </View>
                             <View style={styles.profileEdit}>
-                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", }}>
+                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", includeFontPadding: false,}}>
                                     Bio
                                 </Text>
                                 <TextInput 
@@ -573,11 +576,15 @@ const ProfileEdit = ({route, navigation}) => {
                                 />
                             </View>
                             <View style={styles.profileEdit}>
-                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", }}>
+                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", includeFontPadding: false,}}>
                                     Birthday
                                 </Text>
                                 <Pressable
-                                    style={styles.profileInput}
+                                    style={{
+                                        ...styles.profileInput,
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                    }}
                                     onPress={showDatePicker}
                                 >
                                     <TextInput 
@@ -585,7 +592,8 @@ const ProfileEdit = ({route, navigation}) => {
                                         style={{
                                             fontSize: regWidth * 15, 
                                             fontFamily: "NotoSansKR-Medium", 
-                                            width: "80%"
+                                            width: "80%",
+                                            includeFontPadding: false,
                                         }}
                                         onChangeText={onChangeName}
                                         editable={false}
@@ -604,8 +612,9 @@ const ProfileEdit = ({route, navigation}) => {
                                 style={{
                                     fontSize: regWidth * 13,
                                     fontFamily: "NotoSansKR-Medium",
-                                    lineHeight: regWidth * 18,
+                                    includeFontPadding: false,
                                     marginTop: regHeight * 37,
+                                    includeFontPadding: false,
                                 }}
                             >
                                 Personal information. To change your personal
@@ -615,7 +624,8 @@ const ProfileEdit = ({route, navigation}) => {
                                     style={{
                                         fontSize: regWidth * 13,
                                         fontFamily: "NotoSansKR-Medium",
-                                        lineHeight: regWidth * 18,
+                                        includeFontPadding: false,
+                                        includeFontPadding: false,
                                     }}
                                 >
                                     setting, visit
@@ -627,8 +637,9 @@ const ProfileEdit = ({route, navigation}) => {
                                         style={{
                                             fontSize: regWidth * 13,
                                             fontFamily: "NotoSansKR-Medium",
-                                            lineHeight: regWidth * 18,
+                                            includeFontPadding: false,
                                             color: colors.nemoNormal,
+                                            includeFontPadding: false,
                                         }}
                                     >
                                         {" Settings."}
@@ -637,7 +648,7 @@ const ProfileEdit = ({route, navigation}) => {
                             </View>
 
                             <View style={styles.profileEdit}>
-                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", }}>
+                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", includeFontPadding: false,}}>
                                     Username
                                 </Text>
                                 <View 
@@ -652,6 +663,7 @@ const ProfileEdit = ({route, navigation}) => {
                                             fontSize: regWidth * 15, 
                                             fontFamily: "NotoSansKR-Medium",
                                             color: colors.nemoNormal,
+                                            includeFontPadding: false,
                                         }}
                                     >
                                         @
@@ -662,7 +674,8 @@ const ProfileEdit = ({route, navigation}) => {
                                         style={{
                                             fontSize: regWidth * 15, 
                                             fontFamily: "NotoSansKR-Medium", 
-                                            width: "80%"
+                                            width: "80%",
+                                            includeFontPadding: false,
                                         }}
                                         onChangeText={onChangeName}
                                         editable={false}
@@ -671,7 +684,7 @@ const ProfileEdit = ({route, navigation}) => {
  
                             </View>
                             <View style={styles.profileEdit}>
-                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", }}>
+                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", includeFontPadding: false,}}>
                                     Email
                                 </Text>
                                 <TextInput 
@@ -683,7 +696,7 @@ const ProfileEdit = ({route, navigation}) => {
                                 />
                             </View>
                             <View style={styles.profileEdit}>
-                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", }}>
+                                <Text style={{ fontSize: regWidth * 15, fontFamily: "NotoSansKR-Medium", width: "30%", includeFontPadding: false, }}>
                                     Phone
                                 </Text>
                                 <TextInput 
@@ -710,7 +723,7 @@ const ProfileEdit = ({route, navigation}) => {
                     <Pressable
                         onPress={onCloseBgdImg}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                             Cancel
                         </Text>
                     </Pressable>
@@ -727,7 +740,8 @@ const ProfileEdit = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
+                                includeFontPadding: false,
                                 // color: sort === 0 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -741,7 +755,8 @@ const ProfileEdit = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
+                                includeFontPadding: false,
                                 // color: sort === 1 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -755,7 +770,8 @@ const ProfileEdit = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
+                                includeFontPadding: false,
                                 // color: sort === 2 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -777,7 +793,7 @@ const ProfileEdit = ({route, navigation}) => {
                     <Pressable
                         onPress={onCloseAvatarImg}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: "700", color: "#606060", }}>
+                        <Text style={{ fontSize: 13, fontFamily: "NotoSansKR-Bold", color: "#606060", includeFontPadding: false, }}>
                             Cancel
                         </Text>
                     </Pressable>
@@ -794,7 +810,8 @@ const ProfileEdit = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
+                                includeFontPadding: false,
                                 // color: sort === 0 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -808,7 +825,8 @@ const ProfileEdit = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
+                                includeFontPadding: false,
                                 // color: sort === 1 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -822,7 +840,8 @@ const ProfileEdit = ({route, navigation}) => {
                         <Text 
                             style={{ 
                                 fontSize: regWidth * 14, 
-                                fontWeight: "700", 
+                                fontFamily: "NotoSansKR-Bold",
+                                includeFontPadding: false,
                                 // color: sort === 2 ? colors.nemoDark : colors.textDark, 
                             }}
                         >
@@ -880,8 +899,10 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 15, 
         fontFamily: "NotoSansKR-Medium", 
         width: "70%",
+        // height: regWidth * 20,
         borderBottomWidth: 0.5,
         borderBottomColor: colors.bgdDark,
+        includeFontPadding: false,
     },
     modalContainer: {
         marginHorizontal: regWidth * 20,

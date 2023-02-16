@@ -49,8 +49,9 @@ const AlbumTile = (props) => {
                         style={{ 
                             fontSize: regWidth * 15, 
                             fontFamily: "NotoSansKR-Bold", 
+                            includeFontPadding: false,
                         }}
-                        numberOfLines={2}
+                        numberOfLines={1}
                         ellipsizeMode="tail"
                     >
                         {album.nemolist_title}
@@ -73,7 +74,7 @@ const AlbumTile = (props) => {
                         >
                             {`@${album.user_tag}`}
                         </Text>
-                        <Entypo name="dot-single" size={16} color="#808080" />
+                        <Entypo name="dot-single" size={regWidth * 16} color="#808080" />
                         <Text 
                             style={{ 
                                 ...styles.AlbumInfoText, 
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
         fontFamily: "NotoSansKR-Medium",
         // marginHorizontal: regWidth*12, 
         color: colors.textLight,
+        includeFontPadding: false,
     },
 
 })

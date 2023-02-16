@@ -311,37 +311,37 @@ const Welcome = ({ navigation }) => {
           height: "30%",
 
         }}>
-          <SafeAreaView >
-           <Animated.Image 
-             source={NemoLogo}
-             style={{
-              width: regWidth*150,
-              height: regHeight*42.44
-             }}
-             onLoadEnd={showLogo}
-           />
-         </SafeAreaView>
-         <View style={{
-          alignItems: "center",
-          marginTop: regHeight*50.5,        
-         }}>
-          <Text style={{
-            fontSize: regWidth*25,
-            fontFamily: "NotoSansKR-Black",
-            lineHeight: regWidth*50,
-            color: "#202020"
+          <Animated.Image 
+            source={NemoLogo}
+            style={{
+            width: regWidth*150,
+            height: regHeight*42.44
+            }}
+            onLoadEnd={showLogo}
+          />
+          <View style={{
+            alignItems: "center",
+            marginTop: regHeight*50.5,        
           }}>
-            Where memo from books
-          </Text>
-          <Text style={{
-            fontSize: regWidth*25,
-            fontFamily: "NotoSansKR-Black",
-            lineHeight: regWidth*50,
-            color: "#202020"
-          }}>
-            meets social search.
-          </Text>
-         </View>
+            <Text style={{
+              fontSize: regWidth*25,
+              fontFamily: "NotoSansKR-Black",
+              lineHeight: regWidth*50,
+              color: "#202020",
+              includeFontPadding: false,
+            }}>
+              Where memo from books
+            </Text>
+            <Text style={{
+              fontSize: regWidth*25,
+              fontFamily: "NotoSansKR-Black",
+              includeFontPadding: false,
+              lineHeight: regWidth*50,
+              color: "#202020"
+            }}>
+              meets social search.
+            </Text>
+          </View>
         </View>
         <View style={{ alignItems: "center" }}>
           <Pressable 
@@ -359,7 +359,7 @@ const Welcome = ({ navigation }) => {
                 }}
                 onLoadEnd={showLogo}
               />
-              <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Bold", color: "#202020" }} >
+              <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, color: "#202020" }} >
                   Continue with Google</Text>
           </Pressable>
           {Platform.OS === "ios" ?
@@ -377,7 +377,7 @@ const Welcome = ({ navigation }) => {
                   }}
                   onLoadEnd={showLogo}
                 />
-                <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Bold", color: "#202020" }} >
+                <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, color: "#202020" }} >
                   Continue with Apple
                 </Text>
             </Pressable>
@@ -395,7 +395,7 @@ const Welcome = ({ navigation }) => {
         <View style={{flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: regHeight*25}}>
           <View style={{ backgroundColor: "#606060", height: regHeight*1, width: regWidth*130 }}>
           </View>
-          <Text style={{ marginHorizontal: regWidth*6, fontSize: regWidth*10, fontFamily: "NotoSansKR-Medium", color: "#606060"}}>
+          <Text style={{ marginHorizontal: regWidth*6, fontSize: regWidth*10, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color: "#606060"}}>
             or
           </Text>
           <View style={{ backgroundColor: "#606060", height: regHeight*1, width: regWidth*130 }}>
@@ -406,21 +406,21 @@ const Welcome = ({ navigation }) => {
               style={{ ...styles.Btn, borderColor: "#5c34cc" }} 
               onPress={() => navigation.navigate('Join1')}
           >
-              <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Black", color: "#5c34cc" }} >
+              <Text style={{ fontSize: regWidth * 18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, color: "#5c34cc" }} >
                 Create account
               </Text>
           </Pressable>
         </View>
         <View style={{ alignItems: "center", marginTop: regHeight*9 }}>
           <View style = { styles.introTxt }>
-            <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", color:"#606060"}}>
+            <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color:"#606060"}}>
               By signing up, you agree to our&nbsp;
             </Text>
             <Pressable
               hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
               onPress={() => openURL(termsURL)}
             >
-              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", color:"#7341ff"}}>
+              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color:"#7341ff"}}>
                 {"Terms, "}
               </Text>
             </Pressable>
@@ -428,33 +428,33 @@ const Welcome = ({ navigation }) => {
               hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
               onPress={() => openURL(privacyURL)}
             >
-              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", color:"#7341ff"}}>
+              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color:"#7341ff"}}>
                 Privacy Policy,
               </Text>
             </Pressable>
           </View>
           <View style = { styles.introTxt }>
-            <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", color:"#606060"}}>
+            <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color:"#606060"}}>
               and&nbsp;
             </Text>
             <Pressable
               hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
               onPress={() => openURL(cookieURL)}
             >
-              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", color:"#7341ff"}}>
+              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color:"#7341ff"}}>
                 Cookie Use.
               </Text>
             </Pressable>
           </View>
           <View style = {{ ...styles.introTxt, marginTop:regHeight*36 }}>
-            <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", color:"#606060"}}>
+            <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Medium", includeFontPadding: false, color:"#606060"}}>
               Have an account already?&nbsp;
             </Text>
             <Pressable
               onPress={() => navigation.navigate('Login')}
               hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
             >
-              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Bold", color:"#5c34cc" }}>
+              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, color:"#5c34cc" }}>
                 Sign in
               </Text>
             </Pressable>
@@ -467,7 +467,7 @@ const Welcome = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   Btn: {
-    borderRadius: 40,
+    borderRadius: regWidth * 40,
     justifyContent: "center",
     alignItems: "center",
     width: regWidth*280,

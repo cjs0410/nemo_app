@@ -75,11 +75,11 @@ const BookmarkNewDetail = ({route, navigation}) => {
                 >
                     <Image 
                         source={vectorLeftImage} 
-                        style={{ width: regWidth*30, height: regWidth*30 }}
+                        style={{ width: regWidth*35, height: regWidth*35 }}
                     />
                 </Pressable>
                 <View style={{ alignItems: "center", }}>
-                    <Text style={{ fontSize: regWidth * 10, fontFamily: "NotoSansKR-Medium", color: "#808080", }} >
+                    <Text style={{ fontSize: regWidth * 10, fontFamily: "NotoSansKR-Medium", color: "#808080", includeFontPadding: false, }} >
                         {subTitle}
                     </Text>
                     <TouchableOpacity
@@ -88,6 +88,7 @@ const BookmarkNewDetail = ({route, navigation}) => {
                         <Text style={{
                             fontSize: regWidth * 16,
                             fontFamily: "NotoSansKR-Medium",
+                            includeFontPadding: false,
                         }}>
                             {title}
                         </Text>
