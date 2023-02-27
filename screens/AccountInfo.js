@@ -336,6 +336,8 @@ const ChangeUsername = ({navigation, route}) => {
                             width: "88%",
                         }}
                         autoCapitalize={false}
+                        maxLength={20}
+                        placeholder="up to 20 letters"
                     />
                     {isUsernameValid ? 
                         <Image 
@@ -400,6 +402,8 @@ const styles = StyleSheet.create({
         color: colors.textLight,
         marginHorizontal: regWidth * 10,
         includeFontPadding: false,
+        maxWidth: "85%",
+
     },
     btn: {
         width: regWidth * 300,

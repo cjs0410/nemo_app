@@ -297,7 +297,7 @@ const FindPassword2 = ({route, navigation}) => {
                         ref={el => inputRefs.current[0] = el}
                         onChangeText={(text) => onSetAuthNum(text, 0)}
                         onKeyPress={(e) => onKeyPress(e, 0)}
-                        autoFocus="true"
+                        autoFocus={true}
                         value={authNumList[0]}
                     />
                     <TextInput 
@@ -327,7 +327,7 @@ const FindPassword2 = ({route, navigation}) => {
                         placeholderTextColor={"#606060"}
                         keyboardType="numeric"
                         maxLength={1}
-                        caretHidden="true"
+                        // caretHidden="true"
                         ref={el => inputRefs.current[3] = el}
                         // onChangeText={(text) => onSetAuthNum(text, 3)}
                         onKeyPress={(e) => onKeyPress(e, 3)}

@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
         // fontWeight: "700",
         fontSize: regWidth * 15,
         fontFamily: "NotoSansKR-Bold",
+        width: regWidth * 290,
         includeFontPadding: false,
     },
     bookmarkContentsBookChapterInput: {

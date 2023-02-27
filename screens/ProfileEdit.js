@@ -308,7 +308,6 @@ const ProfileEdit = ({route, navigation}) => {
                 width: SCREEN_WIDTH,
                 height: SCREEN_WIDTH * (110 / 375),
                 cropping: true,
-                cropperCircleOverlay: true,
             }).then(image => {
                 console.log(image);
     

@@ -81,6 +81,7 @@ const Deactivate1 = ({navigation, route}) => {
                 <Text style={{
                     fontSize: regWidth * 18,
                     fontFamily: "NotoSansKR-Bold",
+                    includeFontPadding: false,
                 }}>
                     Delete your account
                 </Text>
@@ -99,6 +100,7 @@ const Deactivate1 = ({navigation, route}) => {
                         fontSize: regWidth * 16,
                         fontFamily: "NotoSansKR-Bold",
                         color: colors.textDark,
+                        includeFontPadding: false,
                     }}
                 >
                     This will permanently delete your account
@@ -109,6 +111,7 @@ const Deactivate1 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.textNormal,
                         marginTop: regHeight * 18,
+                        includeFontPadding: false,
                     }}
                 >
                     You’re about to start the process of deleting your Nemo account. Your display name, @username, and public profile will no longer be viewable on Nemo for iOS, or Nemo for Android.
@@ -119,6 +122,7 @@ const Deactivate1 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Bold",
                         color: colors.textDark,
                         marginTop: regHeight * 33,
+                        includeFontPadding: false,
                     }}
                 >
                     What else you should know
@@ -129,6 +133,7 @@ const Deactivate1 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.redNormal,
                         marginTop: regHeight * 18,
+                        includeFontPadding: false,
                     }}
                 >
                     This process is irrevocable. You can not restore your Nemo account and Nemo database.                   </Text>
@@ -137,6 +142,7 @@ const Deactivate1 = ({navigation, route}) => {
                         fontSize: regWidth * 12,
                         fontFamily: "NotoSansKR-Medium",
                         color: colors.textNormal,
+                        includeFontPadding: false,
                     }}
                 >
                     {"\nSome account information may still be available in search engines, such as Google or Naver."}
@@ -152,7 +158,7 @@ const Deactivate1 = ({navigation, route}) => {
                             
                         }}
                     >
-                        <Text style={{ fontSize: regWidth * 17, fontWeight: "700", color: colors.redNormal,  }}>
+                        <Text style={{ fontSize: regWidth * 17, fontWeight: "700", color: colors.redNormal, includeFontPadding: false, }}>
                             Delete
                         </Text>
                     </Pressable>
@@ -163,6 +169,7 @@ const Deactivate1 = ({navigation, route}) => {
 }
 
 const Deactivate2 = ({navigation, route}) => {
+    const dispatch = useDispatch();
     const insets = useSafeAreaInsets();
     const [psw, setPsw] = useState('');
     const { profile, } = route.params;
@@ -226,6 +233,7 @@ const Deactivate2 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Black",
                         lineHeight: regWidth * 44,
                         color: colors.textDark,
+                        includeFontPadding: false,
                     }}
                 >
                     Verify your password
@@ -236,6 +244,7 @@ const Deactivate2 = ({navigation, route}) => {
                         fontFamily: "NotoSansKR-Medium",
                         lineHeight: regWidth * 20,
                         color: colors.textLight,
+                        includeFontPadding: false,
                     }}
                 >
                     re-enter your Nemo password to continue.
@@ -247,6 +256,7 @@ const Deactivate2 = ({navigation, route}) => {
                         lineHeight: regWidth * 20,
                         color: colors.textLight,
                         marginTop: regHeight * 50,
+                        includeFontPadding: false,
                     }}
                 >
                     Password
@@ -263,8 +273,10 @@ const Deactivate2 = ({navigation, route}) => {
                     <TextInput 
                         onChangeText={(payload) => setPsw(payload)}
                         style={{
-                            fontSize: regWidth * 17, fontFamily: "NotoSansKR-Medium",
+                            fontSize: regWidth * 17, 
+                            fontFamily: "NotoSansKR-Medium",
                             width: "90%",
+                            includeFontPadding: false,
                         }}
                         secureTextEntry={true}
                     />
@@ -306,6 +318,7 @@ const Deactivate2 = ({navigation, route}) => {
                                 fontSize: regWidth * 18,
                                 fontFamily: "NotoSansKR-Bold", 
                                 color: colors.textNormal,
+                                includeFontPadding: false,
                             }}
                         >
                             Cancel

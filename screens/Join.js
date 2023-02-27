@@ -1,5 +1,5 @@
 import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, TextInput, Pressable, Image, Animated, ScrollView, TouchableWithoutFeedback, Keyboard, Alert, } from "react-native";
-import React, { useEffect, useState, useRef, createRef, } from "react";
+import React, { useEffect, useState, useRef, createRef, useCallback, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { AntDesign, Ionicons, } from '@expo/vector-icons';
@@ -717,7 +717,7 @@ const Join2 = ({ navigation, route }) => {
                             ref={el => inputRefs.current[0] = el}
                             onChangeText={(text) => onSetAuthNum(text, 0)}
                             onKeyPress={(e) => onKeyPress(e, 0)}
-                            autoFocus="true"
+                            autoFocus={true}
                             value={authNumList[0]}
                         />
                         <TextInput 
@@ -747,7 +747,7 @@ const Join2 = ({ navigation, route }) => {
                             placeholderTextColor={"#606060"}
                             keyboardType="numeric"
                             maxLength={1}
-                            caretHidden="true"
+                            // caretHidden="true"
                             ref={el => inputRefs.current[3] = el}
                             // onChangeText={(text) => onSetAuthNum(text, 3)}
                             onKeyPress={(e) => onKeyPress(e, 3)}

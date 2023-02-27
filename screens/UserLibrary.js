@@ -550,6 +550,7 @@ const NemoScreen = ({route, navigation}) => {
                                     fontSize: regWidth * 17,
                                     fontFamily: "NotoSansKR-Medium",
                                     color: colors.textDark,
+                                    includeFontPadding: false,
                                     }}
                                 >
                                     Let's start creating Nemo!
@@ -560,6 +561,7 @@ const NemoScreen = ({route, navigation}) => {
                                     fontFamily: "NotoSansKR-Medium",
                                     color: colors.textDark,
                                     marginTop: regHeight * 8,
+                                    includeFontPadding: false,
                                     }}
                                 >
                                     It'll be worthwhile.

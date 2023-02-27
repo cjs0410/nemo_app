@@ -93,7 +93,7 @@ const LikeUsers = ({route, navigation}) => {
                     </Pressable>
                 </View>
             </View>
-            {users && users.length !== 0 ? 
+            {users  ? 
                 <>
                     {users.length !== 0 ? 
                         <ScrollView>

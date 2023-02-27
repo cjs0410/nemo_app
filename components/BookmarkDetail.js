@@ -1188,7 +1188,7 @@ const BookmarkDetail = (props) => {
                                 includeFontPadding: false,
                                 }}
                             >
-                                There is no Nemolist you create.
+                                There are no Nemolist you created.
                             </Text>
                             <Text
                                 style={{

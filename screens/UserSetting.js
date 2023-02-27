@@ -200,10 +200,10 @@ const UserSetting = ({route, navigation}) => {
                 />
                 <View style={{ justifyContent: "center", width: "75%", }}>
                     <Text style={{ fontSize: regWidth * 17, fontWeight: "700", }}>
-                        Deactivate your account
+                        Delete your account
                     </Text>
                     <Text style={{ fontSize: regWidth * 10, fontWeight: "400", marginTop: regHeight * 5, }}>
-                        You can recover your account within 30 days.
+                        You can’t recover your account after delete it.
                     </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={24} color="black" />

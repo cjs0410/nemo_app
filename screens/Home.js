@@ -662,7 +662,7 @@ const FollowingScreen = ({route, navigation}) => {
                 items: 0,
             })
             .then((res) => {
-                console.log(res.data.feed);
+                // console.log(res.data.feed);
                 setBookmarks(res.data.nemos);
                 setFeed(res.data.feed);
                 setNewBookmarkNum(res.data.nemos.length);
@@ -719,7 +719,7 @@ const FollowingScreen = ({route, navigation}) => {
 
     return (
         <View style={styles.container}>
-            { bookmarks && bookmarks.length !== 0 ? 
+            { bookmarks ? 
                 <FlatList 
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.3}

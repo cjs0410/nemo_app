@@ -441,7 +441,7 @@ const OtherProfile = ({navigation, route}) => {
                                     style={{ 
                                         ...styles.profileAvatar, 
                                         opacity: avatarValue,
-                                        borderRadius: userTag === "nemo" ? 0 : 999,
+                                        borderRadius: userTag === "nemo" ? regWidth * 10 : 999,
                                     }} 
                                     onLoadEnd={showAvatarImage}
                                 />
@@ -534,7 +534,7 @@ const OtherProfile = ({navigation, route}) => {
                             : 
                             <Pressable 
                                 style={ styles.followedByContainer}
-                                onPress={() =>  navigation.navigate("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
+                                onPress={() =>  navigation.push("FollowScreen", { title: "팔로워", userTag: profile.user_tag, name: profile.name, })}
                             >
                                 {profile.know_together.map((user, index) => (
                                     <Animated.Image 

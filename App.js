@@ -262,7 +262,7 @@ const App = () => {
   // Foreground 상태인 경우
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log(remoteMessage);
+      console.log(remoteMessage.notification);
       if (remoteMessage.notification.title === "Patch") {
         Alert.alert(remoteMessage.notification.body, "", [
           {
@@ -305,7 +305,7 @@ const App = () => {
       await Api
       .get("/api/v1/user/check_announce/")
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         if (res.data.accessible) {
           setPreparing(false);
           if (res.data.message !== "No Announce") {

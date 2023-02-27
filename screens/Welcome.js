@@ -21,7 +21,8 @@ import jwtDecode from "jwt-decode";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
-import { setUserInfo, setRefreshToken, } from '../modules/user';
+import { setUserInfo, setRefreshToken, setFcmToken, } from '../modules/user';
+import messaging from '@react-native-firebase/messaging';
 
 const {width:SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -35,6 +36,8 @@ const Welcome = ({ navigation }) => {
   const googleSigninConfigure = () => { 
     GoogleSignin.configure({ 
       webClientId: '594229461555-l001ir3b47pdahbqbioo23og1fjuus7i.apps.googleusercontent.com',
+      // webClientId: '594229461555-jj0lrqph4o81vq8fdkgesskvu0pdh0js.apps.googleusercontent.com',
+      // webClientId: '594229461555-6mhekt9rlok1vn3veetjst8ivbvs29k9.apps.googleusercontent.com',
       offlineAccess: true,
     }) 
   }
@@ -64,35 +67,63 @@ const Welcome = ({ navigation }) => {
     googleSigninConfigure();
   },[]);
 
+  const getFcmToken = useCallback(async () => {
+    const fcmToken = await messaging().getToken();
+    // Alert.alert(fcmToken);
+    // console.log(fcmToken);
+
+    try {
+      console.log(fcmToken);
+      await Api
+      .post("/api/v1/user/fcm_token/", {
+        token: fcmToken,
+      })
+      .then((res) => {
+        dispatch(setFcmToken(fcmToken));
+      })
+      // .then((res) => {
+      //   console.log(res.data);
+      // })
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   const onGoogleButtonPress = async () => { 
     // const { idToken } = await GoogleSignin.signIn(); 
     // const googleCredential = auth.GoogleAuthProvider.credential(idToken);
     // console.log(googleCredential); 
     // return auth().signInWithCredential(googleCredential); 
     try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      // console.log(userInfo);
-      // console.log(jwtDecode(userInfo.idToken));
-      console.log(userInfo.idToken);
-      try {
-        await Api
-        .post("/api/v1/user/social_login/", {
-          ctg: "google",
-          id_token: userInfo.idToken,
-        })
-        .then(async(res) => {
-          try {
-            await AsyncStorage.setItem('refresh', res.data.refresh);
-            await AsyncStorage.setItem('access', res.data.access);
-            dispatch(setRefreshToken(res.data.refresh));
-          } catch (err) {
-            console.error(err);
-          }
-        })
-      } catch (err) {
-        console.error(err);
-      }
+      await GoogleSignin.hasPlayServices()
+      // const userInfo = await GoogleSignin.signIn()
+      await GoogleSignin.signIn()
+      .then(async(userInfo) => {
+        // console.log(userInfo);
+        // console.log(jwtDecode(userInfo.idToken));
+        // console.log(userInfo.idToken);
+        try {
+          console.log(userInfo.idToken);
+          await Api
+          .post("/api/v1/user/social_login/", {
+            ctg: "google",
+            id_token: userInfo.idToken,
+          })
+          .then(async(res) => {
+            try {
+              await AsyncStorage.setItem('refresh', res.data.refresh);
+              await AsyncStorage.setItem('access', res.data.access);
+              dispatch(setRefreshToken(res.data.refresh));
+              getFcmToken();
+            } catch (err) {
+              console.error(err);
+            }
+          })
+        } catch (err) {
+          console.error(err);
+        }
+      })
+
 
     } catch (err) {
       console.log(err.message);
@@ -156,6 +187,7 @@ const Welcome = ({ navigation }) => {
               await AsyncStorage.setItem('refresh', res.data.refresh);
               await AsyncStorage.setItem('access', res.data.access);
               dispatch(setRefreshToken(res.data.refresh));
+              getFcmToken();
             } catch (err) {
               console.error(err);
             }
@@ -339,7 +371,7 @@ const Welcome = ({ navigation }) => {
               lineHeight: regWidth*50,
               color: "#202020"
             }}>
-              meets social search.
+              meet social search.
             </Text>
           </View>
         </View>

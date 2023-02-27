@@ -126,7 +126,7 @@ const EditBookmark = ({navigation, route}) => {
         setColor(bookmark.hex);
         setInfo(bookmark.text);
         setTags(bookmark.tags.map((tag) => tag.tag));
-        console.log(bookmark);
+        // console.log(bookmark);
     }, []);
 
     useEffect(() => {
@@ -727,7 +727,7 @@ const EditBookmark = ({navigation, route}) => {
                 <Pressable 
                     style={styles.TagAddBox} 
                 >
-                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Description</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }} >Description</Text>
                     <TextInput 
                         onChangeText={changeInfo}
                         placeholder="Add a description"
@@ -737,7 +737,8 @@ const EditBookmark = ({navigation, route}) => {
                             textAlignVertical: "top",
                             // marginLeft: regWidth * 18,
                             fontSize: regWidth * 14,
-                            fontWeight: "500",
+                            fontFamily: "NotoSansKR-Medium",
+                            includeFontPadding: false,
                             lineHeight: regWidth * 20,
                             padding: 0,
                             // margin: 0,
@@ -757,7 +758,7 @@ const EditBookmark = ({navigation, route}) => {
                     style={styles.TagAddBox} 
                     // onPress={() => setTagVisible(true)}    
                 >
-                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700",  }} >Tags</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,  }} >Tags</Text>
                     <Pressable
                         style={{
                             width: "70%",
@@ -778,7 +779,8 @@ const EditBookmark = ({navigation, route}) => {
                                 textAlignVertical: "top",
                                 // marginLeft: regWidth * 18,
                                 fontSize: regWidth * 14,
-                                fontWeight: "500",
+                                fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                                 // lineHeight: regWidth * 20,
                                 // backgroundColor:"pink"
                                 color: colors.nemoDark,
@@ -808,7 +810,7 @@ const EditBookmark = ({navigation, route}) => {
                     //     fetchAlbumList();
                     // }}    
                 >
-                    <Text style={{ fontSize: regWidth * 14, fontWeight: "700", }} >Nemolists</Text>
+                    <Text style={{ fontSize: regWidth * 14, fontFamily: "NotoSansKR-Bold", includeFontPadding: false, }} >Nemolists</Text>
                     <Pressable
                         style={{
                             width: "70%",
@@ -828,7 +830,8 @@ const EditBookmark = ({navigation, route}) => {
                                 textAlignVertical: "top",
                                 // marginLeft: regWidth * 18,
                                 fontSize: regWidth * 14,
-                                fontWeight: "500",
+                                fontFamily: "NotoSansKR-Medium",
+                                includeFontPadding: false,
                                 // lineHeight: regWidth * 20,
                                 // backgroundColor:"pink"
                             }}

@@ -17,6 +17,7 @@ target 'Nemo' do
 
   use_frameworks! :linkage => :static
   # use_frameworks!
+  pod 'GoogleTagManager'
   
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
 

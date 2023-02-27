@@ -242,7 +242,7 @@ const UserStorage = ({route, navigation}) => {
                                     style={{ 
                                         ...styles.profileAvatar, 
                                         opacity: avatarValue,
-                                        borderRadius: profile.user_tag === "nemo" ? 0 : 999,
+                                        borderRadius: profile.user_tag === "nemo" ? regWidth * 10 : 999,
                                     }} 
                                     onLoadEnd={showAvatarImage}
                                 />

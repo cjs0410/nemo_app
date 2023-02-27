@@ -132,7 +132,7 @@ const Card = (props) => {
     }
 
     const textLineNum = (e) => {
-        // console.log(e.nativeEvent.lines.length);
+        // console.log(e.nativeEvent.lines);
         const currentList = e.nativeEvent.lines.length;
         setLineList(
             [...lineList, currentList]
@@ -252,15 +252,19 @@ const Card = (props) => {
                             style={{
                                 ...styles.bookmarkContentsText,
                                 fontSize: regWidth * fontSize,
-                                height: line === "\n" ? regWidth * 28 : null,
+                                // height: line === "" ? regWidth * 28 : null,
+                                minHeight: regWidth * 28,
                                 maxHeight: regWidth * 28 * 2,
                                 // height: regWidth * 28,
+                                // backgroundColor:"pink"
                             }} 
                             onTextLayout={textLineNum}
                             key={index}
                             // adjustsFontSizeToFit={true}
                         >
-                            {line.replace(/\n/g, '')}
+                            {/* {line.replace(/\n/g, '')} */}
+                            {line.replace('\n', '')}
+                            {/* {line} */}
                         </Text> 
                     ))}
                 </Animated.View>
@@ -1325,7 +1329,7 @@ const styles = StyleSheet.create({
     bookmarkContentsBookChapter: {
         fontFamily: "NotoSansKR-Bold",
         fontSize: regWidth * 15,
-        width: regWidth * 230,
+        width: regWidth * 290,
         includeFontPadding: false,
     },
     bookmarkContentsBookChapterInput: {
@@ -1347,6 +1351,7 @@ const styles = StyleSheet.create({
         fontSize: regWidth * 16,
         lineHeight: regWidth * 28,
         fontFamily: "NotoSansKR-Medium",
+        includeFontPadding: false,
     },
     bookmarkContentsInput: {
         // backgroundColor: "pink",

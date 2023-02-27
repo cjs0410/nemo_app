@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "594229461555-0je8avmfke52vmmu0qa0hf3k81i9lkg1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cjs0410.Nemo",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "594229461555-6mhekt9rlok1vn3veetjst8ivbvs29k9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cjs0410.Nemo",
+            "certificate_hash": "64e70d669154800e2888bddf3aa125006205df0f"
+          }
+        },
+        {
           "client_id": "594229461555-jj0lrqph4o81vq8fdkgesskvu0pdh0js.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +45,13 @@
             {
               "client_id": "594229461555-jj0lrqph4o81vq8fdkgesskvu0pdh0js.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "594229461555-ettbqpkul833iks4trsh5uovg0tpgb0a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "NemoAppStore"
+              }
             }
           ]
         }
