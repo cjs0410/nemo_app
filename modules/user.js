@@ -22,6 +22,7 @@ const initialState = {
     shouldFollowingRefresh: false,
     recentSearch: [],
     searchKeyword: '',
+    isBookmarkList: false,
     isAlbumTile: false,
     isBookTile: false,
     fcmToken: null,
@@ -131,6 +132,9 @@ export const userSlice = createSlice({
         setSearchKeyword: (state, action) => {
             state.searchKeyword = action.payload;
         },
+        toggleBookmarkList: (state, action) => {
+            state.isBookmarkList = !state.isBookmarkList;
+        },
         toggleAlbumTile: (state, action) => {
             state.isAlbumTile = !state.isAlbumTile;
         },
@@ -155,7 +159,7 @@ export const {
     setIsStaff,
     addRecentSearch, deleteRecentSearch,
     setSearchKeyword,
-    toggleAlbumTile, toggleBookTile,
+    toggleBookmarkList, toggleAlbumTile, toggleBookTile,
     setFcmToken, resetFcmToken,
 } = userSlice.actions;
 

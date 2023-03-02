@@ -24,7 +24,7 @@ import {
 } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SelectDropdown from 'react-native-select-dropdown';
-import { Card, BookmarkTile, BookmarkList, AlbumList, BookList, AlbumTile, BookTile, } from '../components';
+import { Card, BookmarkTile, BookmarkList, BookmarkSimple, AlbumList, BookList, AlbumTile, BookTile, } from '../components';
 import Api from "../lib/Api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -47,6 +47,7 @@ import {
     resetAvatar, 
     setAvatar, 
     setIsStaff, 
+    toggleBookmarkList,
     toggleAlbumTile,
     toggleBookTile,
 } from '../modules/user';
@@ -355,7 +356,7 @@ const NemoScreen = ({route, navigation}) => {
     const [loading, setLoading] = useState(false);
     const [bookmarks, setBookmarks] = useState(null);
     const [newBookmarkNum, setNewBookmarkNum] = useState(0);
-    const { shouldNemoRefresh } = useSelector(userSelector);
+    const { shouldNemoRefresh, isBookmarkList, } = useSelector(userSelector);
     const [refreshing, setRefreshing] = useState(false);
     const snapPoints = useMemo(() => [regHeight * 250], []);
     const sortList = [ "recents", "book", ];
@@ -385,7 +386,12 @@ const NemoScreen = ({route, navigation}) => {
         <Pressable
             onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: "My Library", title: "Nemos", index: index, })} 
         >
-            <BookmarkList bookmark={item} navigation={navigation} />
+            {isBookmarkList ? 
+                <BookmarkList bookmark={item} navigation={navigation} />
+                : 
+                <BookmarkSimple bookmark={item} navigation={navigation} />
+            }
+            
         </Pressable>
     )
 
@@ -433,7 +439,7 @@ const NemoScreen = ({route, navigation}) => {
     };
 
     const getBookmarks = async() => {
-        if (bookmarks.length >= 4 && newBookmarkNum >= 4) {
+        if (bookmarks.length >= 8 && newBookmarkNum >= 8) {
             // console.log(bookmarks[bookmarks.length - 1].nemo_num);
             try {
                 setScrollLoading(true);
@@ -535,6 +541,17 @@ const NemoScreen = ({route, navigation}) => {
                                     >
                                         {sort === 0 ? "Recents" : "Book"}
                                     </Text>
+                                </Pressable>
+                                <Pressable
+                                    onPress={() => dispatch(toggleBookmarkList())}
+                                >
+                                    <Image 
+                                        source={isBookmarkList ? iconList : iconGrid}
+                                        style={{
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                        }}
+                                    />
                                 </Pressable>
                             </View>
                             :

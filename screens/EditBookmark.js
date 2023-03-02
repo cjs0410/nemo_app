@@ -97,7 +97,7 @@ const EditBookmark = ({navigation, route}) => {
     const [createBookLoading, setCreateBookLoading] = useState(false);
     const [editBookmarkLoading, setEditBookmarkLoading] = useState(false);
 
-    const isEmpty = (frontContent.length === 0) || (selectedBook === null);
+    const isEmpty = (whatChapter.length === 0) || (frontContent.length === 0) || (selectedBook === null);
     const [showMenu, setShowMenu] = useState(false);
     const [align, setAlign] = useState('normal');
     const tagRef = useRef();

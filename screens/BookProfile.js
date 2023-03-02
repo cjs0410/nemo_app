@@ -7,7 +7,7 @@ import blankBookCover from '../assets/images/blankBookImage.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import Api from '../lib/Api';
-import { BookmarkList, AlbumList } from '../components';
+import { BookmarkList, BookmarkSimple, AlbumList, } from '../components';
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 import LinearGradient from 'react-native-linear-gradient';
 import {
@@ -25,6 +25,8 @@ import iconHeartOutline from '../assets/icons/iconHeartOutline.png';
 import iconHeartOutlineBlack from '../assets/icons/iconHeartOutlineBlack.png';
 import bookShelf from '../assets/images/bookShelf.png';
 import iconAlert from '../assets/icons/iconAlert.png';
+import iconGrid from '../assets/icons/iconGrid.png';
+import iconList from '../assets/icons/iconList.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { setShouldBookRefresh, } from '../modules/user';
@@ -49,6 +51,8 @@ const BookProfile = ({route, navigation}) => {
     const [bookmarks, setBookmarks] = useState(null);
     const [scrollLoading, setScrollLoading] = useState(false);
     const [newBookmarkNum, setNewBookmarkNum] = useState(0);
+
+    const [isList, setIsList] = useState(true);
 
     useEffect(() => {
         fetchBook();
@@ -90,7 +94,11 @@ const BookProfile = ({route, navigation}) => {
         <Pressable
             onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookmarks, subTitle: bookInfo.book_title, title: "Nemos", index: index, })} 
         >
-            <BookmarkList bookmark={item} navigation={navigation} />
+            {isList ? 
+                <BookmarkList bookmark={item} navigation={navigation} />
+                : 
+                <BookmarkSimple bookmark={item} navigation={navigation} />
+            }
         </Pressable>
     )
 
@@ -351,17 +359,37 @@ const BookProfile = ({route, navigation}) => {
                                             </Text>
                                         </View>
                                     </View>
-                                    <Pressable
-                                        onPress={onLike}
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
                                     >
-                                        <Image 
-                                            source={isLike ? iconHeart : iconHeartOutline}
-                                            style={{
-                                                width: regWidth * 35,
-                                                height: regWidth * 35,
-                                            }}
-                                        />
-                                    </Pressable>
+                                        <Pressable
+                                            onPress={onLike}
+                                        >
+                                            <Image 
+                                                source={isLike ? iconHeart : iconHeartOutline}
+                                                style={{
+                                                    width: regWidth * 35,
+                                                    height: regWidth * 35,
+                                                    marginRight: regWidth * 18,
+                                                }}
+                                            />
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => setIsList(!isList)}
+                                        >
+                                            <Image 
+                                                source={isList ? iconList : iconGrid}
+                                                style={{
+                                                    width: regWidth * 35,
+                                                    height: regWidth * 35,
+                                                }}
+                                            />
+                                        </Pressable>
+                                    </View>
                                 </View>
 
                                 <Pressable

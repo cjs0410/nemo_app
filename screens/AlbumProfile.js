@@ -9,7 +9,7 @@ import bookCover from '../assets/images/steve.jpeg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwt_decode from "jwt-decode";
 import Api from '../lib/Api';
-import { BookmarkList, } from '../components';
+import { BookmarkList, BookmarkSimple, } from '../components';
 import { UnTouchableBookmarkList, } from "../components/BookmarkList";
 import {colors, regWidth, regHeight} from '../config/globalStyles';
 
@@ -29,6 +29,8 @@ import iconFollow from '../assets/icons/iconFollow.png';
 import iconUnfollow from '../assets/icons/iconUnfollow.png';
 import iconEyeoff from '../assets/icons/iconEyeoff.png';
 import iconThreeDot from '../assets/icons/iconThreeDot.png';
+import iconGrid from '../assets/icons/iconGrid.png';
+import iconList from '../assets/icons/iconList.png';
 import vectorLeftImage from '../assets/icons/vector_left.png';
 import likedNemos from '../assets/images/likedNemos.png';
 import shadow from '../assets/images/shadow.png';
@@ -79,6 +81,8 @@ const AlbumProfile = ({route, navigation}) => {
     const [rgb, setRgb] = useState(null);
     const [scrollLoading, setScrollLoading] = useState(false);
 
+    const [isList, setIsList] = useState(true);
+
     useEffect(() => {
         fetchUserTag();
     }, []);
@@ -128,7 +132,11 @@ const AlbumProfile = ({route, navigation}) => {
         <Pressable
             onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: orderedBookmarks, subTitle: albumInfo.nemolist_title, title: "Nemos", index: index, })} 
         >
-            <BookmarkList bookmark={item} navigation={navigation} />
+            {isList ? 
+                <BookmarkList bookmark={item} navigation={navigation} />
+                : 
+                <BookmarkSimple bookmark={item} navigation={navigation} />
+            }
         </Pressable>
     )
 
@@ -539,29 +547,49 @@ const AlbumProfile = ({route, navigation}) => {
                                     />
                                 {/* </ImageBackground> */}
                                 </View>
+                                {isDefault ? 
+                                    <Text
+                                        style={{
+                                            fontSize: regWidth * 14,
+                                            fontFamily: "NotoSansKR-Bold",
+                                            color: colors.textLight,
+                                            marginTop: regHeight * 16,
+                                        }}
+                                    >
+                                        Nemos you liked
+                                    </Text>
+                                    : 
+                                    null
+                                }
+
                             </View>
                             <View
                                 style={{
-                                    marginTop: regHeight * 18,
+                                    marginTop: regHeight * 14,
                                     marginHorizontal: regWidth * 18,
                                     marginBottom: regHeight * 25,
                                 }}
                             >
-                                <Text
-                                    style={{
-                                        fontSize: regWidth * 14,
-                                        fontFamily: "NotoSansKR-Medium",
-                                        includeFontPadding: false,
-                                    }}
-                                >
-                                    {albumInfo.description}
-                                </Text>
+                                {albumInfo.description ? 
+                                    <Text
+                                        style={{
+                                            fontSize: regWidth * 14,
+                                            fontFamily: "NotoSansKR-Medium",
+                                            includeFontPadding: false,
+                                        }}
+                                    >
+                                        {albumInfo.description}
+                                    </Text>
+                                    : 
+                                    null
+                                }
+
                                 <View
                                     style={{ 
                                         flexDirection: "row",
                                         justifyContent: "space-between",
                                         alignItems: "flex-end",
-                                        marginTop: regHeight * 9,
+                                        marginTop: regHeight * 10,
                                     }}
                                 >
                                     <View>
@@ -610,63 +638,106 @@ const AlbumProfile = ({route, navigation}) => {
                                     {albumInfo.user_tag === userTag ? 
                                         <>
                                             {isDefault ? 
-                                                <Text
-                                                    style={{
-                                                        fontSize: regWidth * 14,
-                                                        fontFamily: "NotoSansKR-Bold"
-                                                    }}
-                                                >
-                                                    Nemos that you liked
-                                                </Text>
-                                                :
                                                 <Pressable
-                                                    style={{
-                                                        borderWidth: regWidth * 2,
-                                                        borderColor: colors.nemoDark,
-                                                        borderRadius: regWidth * 20,
-                                                        paddingHorizontal: regWidth * 14,
-                                                        paddingVertical: regWidth * 4,
-                                                        flexDirection: "row",
-                                                        alignItems: "center",
-                                                    }}
-                                                    onPress={() => {
-                                                        onPressAddNemos();
-                                                        fetchBookmarks();
-                                                    }}
+                                                    onPress={() => setIsList(!isList)}
                                                 >
                                                     <Image 
-                                                        source={iconPlusNemoDark}
+                                                        source={isList ? iconList : iconGrid}
                                                         style={{
-                                                            width: regWidth * 28,
-                                                            height: regWidth * 28,
+                                                            width: regWidth * 35,
+                                                            height: regWidth * 35,
                                                         }}
                                                     />
-                                                    <Text
+                                                </Pressable>
+                                                :
+                                                <View
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                    }}
+                                                >
+                                                    <Pressable
                                                         style={{
-                                                            fontSize: regWidth * 19,
-                                                            fontFamily: "NotoSansKR-Black",
-                                                            color: colors.nemoDark,
-                                                            includeFontPadding: false,
+                                                            borderWidth: regWidth * 2,
+                                                            borderColor: colors.nemoDark,
+                                                            borderRadius: regWidth * 20,
+                                                            paddingHorizontal: regWidth * 10,
+                                                            paddingVertical: regWidth * 6,
+                                                            flexDirection: "row",
+                                                            alignItems: "center",
+                                                            marginRight: regWidth * 10,
+                                                        }}
+                                                        onPress={() => {
+                                                            onPressAddNemos();
+                                                            fetchBookmarks();
                                                         }}
                                                     >
-                                                        Add Nemos
-                                                    </Text>
-                                                </Pressable>
+                                                        <Image 
+                                                            source={iconPlusNemoDark}
+                                                            style={{
+                                                                width: regWidth * 25,
+                                                                height: regWidth * 25,
+                                                            }}
+                                                        />
+                                                        <Text
+                                                            style={{
+                                                                fontSize: regWidth * 17,
+                                                                fontFamily: "NotoSansKR-Black",
+                                                                color: colors.nemoDark,
+                                                                includeFontPadding: false,
+                                                            }}
+                                                        >
+                                                            Add Nemos
+                                                        </Text>
+                                                    </Pressable>
+                                                    <Pressable
+                                                        onPress={() => setIsList(!isList)}
+                                                    >
+                                                        <Image 
+                                                            source={isList ? iconList : iconGrid}
+                                                            style={{
+                                                                width: regWidth * 35,
+                                                                height: regWidth * 35,
+                                                            }}
+                                                        />
+                                                    </Pressable>
+                                                </View>
                                             }
                                         </>
 
                                         :
-                                        <Pressable
-                                            onPress={onLike}
+                                        <View
+                                            style={{
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                            }}
                                         >
-                                            <Image 
-                                                source={isLike ? iconHeart : iconHeartOutline}
-                                                style={{
-                                                    width: regWidth * 35,
-                                                    height: regWidth * 35,
-                                                }}
-                                            />
-                                        </Pressable>
+                                            <Pressable
+                                                onPress={onLike}
+                                            >
+                                                <Image 
+                                                    source={isLike ? iconHeart : iconHeartOutline}
+                                                    style={{
+                                                        width: regWidth * 35,
+                                                        height: regWidth * 35,
+                                                        marginRight: regWidth * 18,
+                                                    }}
+                                                />
+                                            </Pressable>
+                                            <Pressable
+                                                onPress={() => setIsList(!isList)}
+                                            >
+                                                <Image 
+                                                    source={isList ? iconList : iconGrid}
+                                                    style={{
+                                                        width: regWidth * 35,
+                                                        height: regWidth * 35,
+                                                    }}
+                                                />
+                                            </Pressable>
+                                        </View>
                                     }
 
                                 </View>

@@ -75,7 +75,7 @@ const BookmarkDetail = (props) => {
     const [reportContents, setReportContents] = useState('');
     const [albumModalVisible, setAlbumModalVisible] = useState(false);
     const modalValue = useRef(new Animated.Value(0)).current;
-    const [nemolists, setNemolists] = useState(null);
+    
 
     const [pushLike, setPushLike] = useState(false);
     const [pushScrap, setPushScrap] = useState(false);
@@ -84,9 +84,14 @@ const BookmarkDetail = (props) => {
 
     const sortList = [ "recents", "alphabetical", "creator", ];
     const [sort, setSort] = useState(0);
+
+    const [nemolists, setNemolists] = useState(null);
     const [newNemolistNum, setNewNemolistNum] = useState(0);
     const [scrollLoading, setScrollLoading] = useState(false);
     const [selectedNemolists, setSelectedNemolists] = useState([]);
+
+    const [includeNLs, setIncludeNLs] = useState(null);
+
 
     useEffect(() => {
         fetchUserTag();
@@ -399,6 +404,38 @@ const BookmarkDetail = (props) => {
         </View>
     )
 
+    const fetchIncludeNL = async(sortNum) => {
+        try {
+            console.log(bookmark.bookmark_id)
+            await Api
+            .post("/api/v2/bookmark/scraping_nemolist/", {
+                bookmark_id: bookmark.bookmark_id,
+                // sort: sortList[sortNum],
+                // items: 0,
+            })
+            .then((res) => {
+                console.log(res.data);
+                setIncludeNLs(res.data);
+                // setNewNemolistNum(res.data.length);
+                onPressInclude();
+            })
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const renderInclude = ({ item, index }) => (
+        <Pressable
+            onPress={() => {
+                onPressIncludeClose();
+                navigation.push('AlbumProfile', { albumId: item.nemolist_id, })
+            }}
+            style={{ justifyContent: "center",  }}
+        >
+            <AlbumList album={item} navigation={navigation} isDefault={false} />
+        </Pressable>
+    )
+
     const deleteBookmark = async() => {
         Alert.alert("Are you sure", "Once you delete your Nemo, it can't be restored.", [
             {
@@ -526,6 +563,17 @@ const BookmarkDetail = (props) => {
         // @ts-ignore
         scrapModalRef.current.dismiss();
     }, [scrapModalRef]);
+
+    const includeModalRef = useRef();
+    const includeSnapPoints = useMemo(() => [regHeight * 765], []);
+    const onPressInclude = useCallback(() => {
+        includeModalRef.current.present();
+    }, [includeModalRef]);
+
+    const onPressIncludeClose = useCallback(() => {
+        // @ts-ignore
+        includeModalRef.current.dismiss();
+    }, [includeModalRef]);
 
     const sortModalRef = useRef();
 
@@ -718,6 +766,7 @@ const BookmarkDetail = (props) => {
                             style={{ 
                                 flexDirection: "row", 
                                 alignItems: "center", 
+                                paddingRight: regWidth * 8,
                                 paddingVertical: regHeight * 8,
 
                             }}
@@ -742,16 +791,37 @@ const BookmarkDetail = (props) => {
                                     height: regWidth * 25,
                                 }}
                             />
+                            {/* <Text 
+                                style={{
+                                    ...styles.bookmarkLikesText, 
+                                }}
+                            >
+                                { scrapCount }
+                            </Text> */}
+                        </Pressable>
+
+                        <Pressable 
+                            activeOpacity={1} 
+                            style={{ 
+                                flexDirection: "row", 
+                                alignItems: "center", 
+                                width: regWidth * 60,
+                                paddingVertical: regHeight * 8,
+                            }}
+                            hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                            onPress={() => {
+                                fetchIncludeNL();
+                            }}
+                        >
                             <Text 
                                 style={{
                                     ...styles.bookmarkLikesText, 
-                                    // color: userTag === bookmark.user_tag ? "#C9C9C9" : "black",
                                 }}
                             >
-                                {/* { !pushScrap ? bookmark.scraps : scrapCount } */}
                                 { scrapCount }
                             </Text>
                         </Pressable>
+
 
                         {/* { userTag !== bookmark.user_tag ? 
                             <Pressable 
@@ -1200,6 +1270,64 @@ const BookmarkDetail = (props) => {
                                 }}
                             >
                                 Let's create it first!
+                            </Text>
+                        </View>
+                    }
+
+                </View>
+            </BottomSheetModal>
+
+
+            <BottomSheetModal
+                index={0}
+                ref={includeModalRef}
+                snapPoints={includeSnapPoints}
+                backdropComponent={renderBackdrop}
+                backgroundStyle={{ backgroundColor: "#D9D9D9"}}
+            >
+                <View
+                    style={{ flex: 1, }}
+                >
+                    <View style={styles.modalHeader}>
+                        <Pressable
+                            onPress={onPressIncludeClose}
+                        >
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: "#606060", includeFontPadding: false,}}>
+                                Close
+                            </Text>
+                        </Pressable>
+                        <Text style={{ fontSize: regWidth * 19, fontFamily: "NotoSansKR-Bold", includeFontPadding: false,}}>
+                            Add Nemos
+                        </Text>
+                        <Pressable style={{opacity: 0, }}>
+                            <Text style={{ fontSize: regWidth * 13, fontFamily: "NotoSansKR-Black", color: colors.textLight, includeFontPadding: false,}}>
+                                Close
+                            </Text>
+                        </Pressable>
+                    </View>
+                    {includeNLs && includeNLs.length !== 0 ?
+                        <BottomSheetFlatList 
+                            data={includeNLs}
+                            renderItem={renderInclude}
+                            // key={isTile ? '_' : "#"}
+                            // keyExtractor={isTile ? nemolist => "_" + nemolist.nemolist_id : nemolist => "#" + nemolist.nemolist_id}
+                            keyExtractor={includeNL => includeNL.nemolist_id}
+                            showsVerticalScrollIndicator={false}
+                            // onEndReached={onEndReached}
+                            // onEndReachedThreshold={0.3}
+                            // ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                        />
+                        :
+                        <View style={{ alignItems: "center", marginTop: regHeight * 38, }}>
+                            <Text
+                                style={{
+                                fontSize: regWidth * 17,
+                                fontFamily: "NotoSansKR-Medium",
+                                color: colors.textDark,
+                                includeFontPadding: false,
+                                }}
+                            >
+                                No nemolists contain that nemo.
                             </Text>
                         </View>
                     }

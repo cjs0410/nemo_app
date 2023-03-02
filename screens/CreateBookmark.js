@@ -108,7 +108,7 @@ const CreateBookmark = ({navigation, route}) => {
 
     const [tempBookmarks, setTempBookmarks] = useState(null);
     
-    const isEmpty = (frontContent.length === 0) || (selectedBook === null);
+    const isEmpty = (whatChapter.length === 0) || (frontContent.length === 0) || (selectedBook === null);
     const [showMenu, setShowMenu] = useState(false);
     const insets = useSafeAreaInsets();
     const tagRef = useRef();

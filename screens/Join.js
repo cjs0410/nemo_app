@@ -1,4 +1,4 @@
-import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, TextInput, Pressable, Image, Animated, ScrollView, TouchableWithoutFeedback, Keyboard, Alert, } from "react-native";
+import { View, SafeAreaView, Text, Button, StyleSheet, TouchableOpacity, TextInput, Pressable, Image, Animated, ScrollView, Keyboard, Alert, Linking, } from "react-native";
 import React, { useEffect, useState, useRef, createRef, useCallback, } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
@@ -12,6 +12,8 @@ import Eye from '../assets/images/Eye.png';
 import EyeOpen from '../assets/images/EyeOpen.png';
 import ProfileImage from '../assets/images/ProfileImage.png';
 import Arrow from '../assets/icons/LeftArrow.png';
+import iconCheckmarkCircle from '../assets/icons/iconCheckmarkCircle.png';
+import iconCheckmarkCircleGrey from '../assets/icons/iconCheckmarkCircleGrey.png';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { userSelector } from '../modules/hooks';
@@ -20,6 +22,10 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ImagePicker from 'react-native-image-crop-picker';
 import messaging from '@react-native-firebase/messaging';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const termsURL = "https://nemomemo.notion.site/Terms-of-Use-cfaefb66ef8d472da963a82e496908dc";
+const privacyURL = "https://nemomemo.notion.site/Privacy-Policy-4c19c386e67240e593b38a10769e0938";
+const cookieURL = "https://nemomemo.notion.site/Cookie-Policy-f56d8881fc5241cdb75fbdbcbd35ce89";
 
 Date.prototype.format = function(f) {
     if (!this.valueOf()) return " ";
@@ -77,6 +83,7 @@ const Join1 = ({ navigation }) => {
     const [isNextPressed, setIsNextPressed] = useState(false);
     const [type, setType] = useState("hp");
     const isValid = isNameValid && isHpOrEmailValid && isDateValid;
+    const [marketing, setMarketing] = useState(false);
 
     // useEffect(() => {
     //     timerId.current = setInterval(() => {
@@ -198,7 +205,7 @@ const Join1 = ({ navigation }) => {
                 [
                     {
                         text: "OK",
-                        onPress: () => navigation.navigate('Join2', {name: name, hpOrEmail: hpOrEmail, date: date, type: type, })
+                        onPress: () => navigation.navigate('Join2', {name: name, hpOrEmail: hpOrEmail, date: date, type: type, marketing: marketing })
                     },
                 ]);
             })
@@ -274,6 +281,19 @@ const Join1 = ({ navigation }) => {
         setDate(date.format("yyyy-MM-dd"));
         setIsDateValid(true);
         hideDatePicker();
+    };
+
+    const openURL = async(url) => {
+        // Checking if the link is supported for links with custom URL scheme.
+        const supported = await Linking.canOpenURL(url);
+    
+        if (supported) {
+          // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+          // by some browser in the mobile
+          await Linking.openURL(url);
+        } else {
+          Alert.alert(`Don't know how to open this URL: ${url}`);
+        }
     };
 
     return (
@@ -527,13 +547,14 @@ const Join1 = ({ navigation }) => {
                             opacity: btnValue
                         }}
                     >
-                        <View style={{ width: regWidth*290, marginTop: regHeight*54 }}>
+                        <View style={{ width: regWidth*290, marginTop: regHeight*38, }}>
                             <View style={{flexDirection: "row"}}>
                                 <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     By signing up, you agree to our&nbsp;  
                                 </Text>
                                 <Pressable
                                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                    onPress={() => openURL(termsURL)}
                                 >
                                     <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
                                         Terms of Service&nbsp;  
@@ -546,34 +567,60 @@ const Join1 = ({ navigation }) => {
                             </View> 
                             <View style={{flexDirection: "row"}}>
                                 <Pressable
-                                        hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
-                                    >
-                                        <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
-                                            Privacy Policy,&nbsp;  
-                                        </Text>
+                                    hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                    onPress={() => openURL(privacyURL)}
+                                >
+                                    <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
+                                        Privacy Policy,&nbsp;  
+                                    </Text>
                                 </Pressable>
                                 <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     including&nbsp;
                                 </Text>
                                 <Pressable
                                     hitSlop={{ bottom: 10, left: 10, right: 10, top: 10 }}
+                                    onPress={() => openURL(cookieURL)}
                                 >
-                                        <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
-                                            Cookie Use.&nbsp;
-                                        </Text>
+                                    <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Medium", color: "#7341ffcc", includeFontPadding: false, }}>
+                                        Cookie Use.&nbsp;
+                                    </Text>
                                 </Pressable>
                                 <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
                                     Nemo may use 
                                 </Text>
                             </View>
-                            <View style={{flexDirection: "row"}}>
+                            <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
+                                your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, 
+                                like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, 
+                                when provided.
+                            </Text>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    marginTop: regHeight * 16,
+                                }}
+                            >
+                                <Pressable
+                                    onPress={() => setMarketing(!marketing)}
+                                >
+                                    <Image 
+                                        source={marketing ? iconCheckmarkCircle : iconCheckmarkCircleGrey}
+                                        style={{
+                                            width: regWidth * 20,
+                                            height: regWidth * 20,
+                                            marginRight: regWidth * 10,
+                                        }}
+                                    />
+                                </Pressable>
                                 <Text style={{ fontSize: regWidth*12, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, }}>
-                                    your contact information, including your email address and phone number for purposes outlined in our Privacy Policy, 
-                                    like keeping your account secure and personalizing our services, including ads. Others will be able to find you by email or phone number, 
-                                    when provided.
+                                    I also agree to the third party usage, promotion & marketing usage. (optional)
                                 </Text>
                             </View>
                         </View>
+
+
+                        
                         <View style={{ marginTop: regHeight*16, width: regWidth*280, alignItems: "center" }}>
                             <Pressable
                                 onPress={onSignUp}
@@ -601,7 +648,7 @@ const Join1 = ({ navigation }) => {
   
 const Join2 = ({ navigation, route }) => {
     const insets = useSafeAreaInsets();
-    const { name, hpOrEmail, date, type, } = route.params;
+    const { name, hpOrEmail, date, type, marketing, } = route.params;
     const inputRefs = useRef([]);
     const [authNumList, setAuthNumList] = useState(['', '', '', '', '', '',]);
 
@@ -670,7 +717,7 @@ const Join2 = ({ navigation, route }) => {
                 auth_number: authNumList.join(''),
             })
             .then((res) => {
-                navigation.navigate('Join3', {name: name, hpOrEmail: hpOrEmail, date: date, type: type, });
+                navigation.navigate('Join3', {name: name, hpOrEmail: hpOrEmail, date: date, type: type, marketing: marketing, });
             })
         } catch (err) {
             console.error(err);
@@ -826,7 +873,7 @@ function useDebounce(value, delay = 500) {
 
 const Join3 = ({ navigation, route }) => {
     const insets = useSafeAreaInsets();
-    const { name, hpOrEmail, date, type, } = route.params;
+    const { name, hpOrEmail, date, type, marketing, } = route.params;
     const [psw, setPsw] = useState('');
     const [pswCheck, setPswCheck] = useState('');
     const [isPswValid, setIsPswValid] = useState(false);
@@ -900,7 +947,7 @@ const Join3 = ({ navigation, route }) => {
                 </View>
                 
                 <View>
-                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Regular'", includeFontPadding: false, color: "#606060", marginTop: regHeight*51 }}>
+                    <Text style={{ fontSize: regWidth*13, fontFamily: "NotoSansKR-Regular", includeFontPadding: false, color: "#606060", marginTop: regHeight*51 }}>
                             Password
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "flex-end", width: regWidth*280 }}>
@@ -975,7 +1022,7 @@ const Join3 = ({ navigation, route }) => {
                 </Text>
                 <View style={{ marginTop: regHeight*8, width: regWidth*280, alignItems: "center" }}>
                     <Pressable
-                        onPress={() => navigation.navigate('Join4', {name: name, hpOrEmail: hpOrEmail, date: date, type: type, psw: psw, })}
+                        onPress={() => navigation.navigate('Join4', {name: name, hpOrEmail: hpOrEmail, date: date, type: type, psw: psw, marketing: marketing, })}
                         style={ styles.signUpBtn }
                         disabled={isValid ? false : true}
                     >
@@ -990,7 +1037,7 @@ const Join3 = ({ navigation, route }) => {
 
 const Join4 = ({ navigation, route }) => {
     const insets = useSafeAreaInsets();
-    const { name, hpOrEmail, date, type, psw, } = route.params;
+    const { name, hpOrEmail, date, type, psw, marketing, } = route.params;
     const [username, setUsername] = useState('');
     const [isUsernameValid, setIsUsernameValid] = useState(false);
     const debounceVal = useDebounce(username);
@@ -1040,6 +1087,7 @@ const Join4 = ({ navigation, route }) => {
                 password: psw,
                 user_tag: username,
                 date: date,
+                marketing: marketing,
             })
             .then(async(res) => {
                 // console.log(res.data);
