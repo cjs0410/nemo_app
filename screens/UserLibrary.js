@@ -478,7 +478,11 @@ const NemoScreen = ({route, navigation}) => {
 
     const onEndReached = () => {
     	if(!scrollLoading) {
-        	getBookmarks();
+            if (sort === 0) {
+                getBookmarks();
+            } else {
+                getBooks();
+            }
         }
     };
 
@@ -492,20 +496,12 @@ const NemoScreen = ({route, navigation}) => {
                     ctg: "nemos",
                     sort: sortList[sort],
                     items: bookmarks.length,
-                    // cursor: bookmarks[bookmarks.length - 1].nemo_num,
                 })
                 .then((res) => {
                     // console.log([...bookmarks, ...res.data, ]);
                     // console.log(res.data);
-                    if (sort === 0) {
-                        setBookmarks([...bookmarks, ...res.data, ]);
-                        setNewBookmarkNum(res.data.length);
-                    }
-                    if (sort === 1) {
-                        setBooks([...books, ...res.data, ]);
-                        setNewBookNum(res.data.length);
-                    }
-
+                    setBookmarks([...bookmarks, ...res.data, ]);
+                    setNewBookmarkNum(res.data.length);
                 })
             } catch (err) {
                 console.error(err);
@@ -514,6 +510,29 @@ const NemoScreen = ({route, navigation}) => {
             // setCursor(bookmarks.at(-1).cursor);
         }
     };
+
+    const getBooks = async() => {
+        if (books.length >= 8 && newBookNum >= 8) {
+            try {
+                setScrollLoading(true);
+                await Api
+                .post("api/v1/user/library/", {
+                    ctg: "nemos",
+                    sort: sortList[sort],
+                    items: bookmarks.length,
+                })
+                .then((res) => {
+                    // console.log([...bookmarks, ...res.data, ]);
+                    // console.log(res.data);
+                    setBooks([...books, ...res.data, ]);
+                    setNewBookNum(res.data.length);
+                })
+            } catch (err) {
+                console.error(err);
+            }
+            setScrollLoading(false);
+        }
+    }
 
     const fetchUserTag = async() => {
         try {
