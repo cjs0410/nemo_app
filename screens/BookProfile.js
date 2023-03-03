@@ -92,7 +92,14 @@ const BookProfile = ({route, navigation}) => {
 
     const renderBookmark = ({ item, index }) => (
         <Pressable
-            onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: bookmarks, subTitle: bookInfo.book_title, title: "Nemos", index: index, })} 
+            onPress={() => navigation.push('SpreadInBooks', {
+                bookmarks: bookmarks, 
+                subTitle: bookInfo.book_title, 
+                title: "Nemos", 
+                index: index, 
+                newBookmarkNum: newBookmarkNum,
+                bookId: bookId,
+            })} 
         >
             {isList ? 
                 <BookmarkList bookmark={item} navigation={navigation} />

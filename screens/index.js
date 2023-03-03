@@ -35,3 +35,7 @@ export { default as ChangeGender } from './ChangeGender';
 export { default as EditAlbum } from './EditAlbum';
 export { default as Contact } from './Contact';
 export { default as Report } from './Report';
+export { default as SpreadInNemos } from './SpreadInNemos';
+export { default as SpreadInNemolists } from './SpreadInNemolists';
+export { default as SpreadInBooks } from './SpreadInBooks';
+export { default as SpreadInMyBooks } from './SpreadInMyBooks';

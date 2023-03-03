@@ -73,6 +73,10 @@ import {
   EditAlbum,
   Contact,
   Report,
+  SpreadInNemos,
+  SpreadInNemolists,
+  SpreadInBooks,
+  SpreadInMyBooks,
 } from "./screens";
 
 import { Feather, MaterialIcons } from '@expo/vector-icons'; 
@@ -715,6 +719,10 @@ const UserLibraryScreen = ({route, navigation}) => {
       />
       <UserLibraryStack.Screen name="AlarmScreen" component={AlarmScreen} />
       <UserLibraryStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
+      <UserLibraryStack.Screen name="SpreadInNemos" component={SpreadInNemos} />
+      <UserLibraryStack.Screen name="SpreadInNemolists" component={SpreadInNemolists} />
+      <UserLibraryStack.Screen name="SpreadInBooks" component={SpreadInBooks} />
+      <UserLibraryStack.Screen name="SpreadInMyBooks" component={SpreadInMyBooks} />
       <UserLibraryStack.Screen name="AlbumProfile" component={AlbumProfile} />
       <UserLibraryStack.Screen name="BookProfile" component={BookProfile} />
       <UserLibraryStack.Screen name="OtherProfile" component={OtherProfile} />
@@ -961,6 +969,10 @@ const HomeScreen = ({route, navigation}) => {
       />
       <HomeStack.Screen name="BookProfile" component={BookProfile} />
       <HomeStack.Screen name="BookmarkNewDetail" component={BookmarkNewDetail} />
+      <HomeStack.Screen name="SpreadInNemos" component={SpreadInNemos} />
+      <HomeStack.Screen name="SpreadInNemolists" component={SpreadInNemolists} />
+      <HomeStack.Screen name="SpreadInBooks" component={SpreadInBooks} />
+      <HomeStack.Screen name="SpreadInMyBooks" component={SpreadInMyBooks} />
       <HomeStack.Screen name="Profile" component={Profile} />
       <HomeStack.Screen name="AlarmScreen" component={AlarmScreen} />
       <HomeStack.Screen name="FollowScreen" component={FollowScreen} />

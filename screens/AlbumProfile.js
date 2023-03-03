@@ -130,7 +130,14 @@ const AlbumProfile = ({route, navigation}) => {
 
     const renderBookmark = ({ item, index }) => (
         <Pressable
-            onPress={() => navigation.push('BookmarkNewDetail', {bookmarks: orderedBookmarks, subTitle: albumInfo.nemolist_title, title: "Nemos", index: index, })} 
+            onPress={() => navigation.push('SpreadInNemolists', {
+                bookmarks: orderedBookmarks, 
+                subTitle: albumInfo.nemolist_title,
+                title: "Nemos", 
+                index: index, 
+                newBookmarkNum: newBookmarkNum,
+                albumId: albumId,
+            })} 
         >
             {isList ? 
                 <BookmarkList bookmark={item} navigation={navigation} />

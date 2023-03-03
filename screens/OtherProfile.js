@@ -608,6 +608,10 @@ const NemoScreen = ({route, navigation,}) => {
     const [scrollLoading, setScrollLoading] = useState(false);
     const [isList, setIsList] = useState(false);
 
+    const [isBookTile, setIsBookTile] = useState(false);
+    const [books, setBooks] = useState(null);
+    const [newBookNum, setNewBookNum] = useState(null);
+
     const ref = useRef();
     useScrollToTop(ref);
 
@@ -630,8 +634,14 @@ const NemoScreen = ({route, navigation,}) => {
                 // console.log(res.data);
                 // console.log("fetch Nemos");
                 // setBookmarks(res.data.reverse());
-                setBookmarks(res.data);
-                setNewBookmarkNum(res.data.length);
+                if (sortNum === 0) {
+                    setBookmarks(res.data);
+                    setNewBookmarkNum(res.data.length);
+                }
+                if (sortNum === 1) {
+                    setBooks(res.data);
+                    setNewBookNum(res.data.length);
+                }
             })
         } catch (err) {
             console.error(err);
@@ -660,7 +670,7 @@ const NemoScreen = ({route, navigation,}) => {
     };
 
     const getBookmarks = async() => {
-        if (bookmarks.length >= 8 && newBookmarkNum >= 8) {
+        if ((bookmarks.length >= 8 && newBookmarkNum >= 8) || (books && books.length >= 8 && newBookNum >= 8)) {
             // console.log(bookmarks[bookmarks.length - 1].nemo_num);
             try {
                 setScrollLoading(true);
@@ -675,8 +685,14 @@ const NemoScreen = ({route, navigation,}) => {
                 .then((res) => {
                     // console.log([...bookmarks, ...res.data, ]);
                     // console.log(res.data);
-                    setBookmarks([...bookmarks, ...res.data, ]);
-                    setNewBookmarkNum(res.data.length);
+                    if (sort === 0) {
+                        setBookmarks([...bookmarks, ...res.data, ]);
+                        setNewBookmarkNum(res.data.length);
+                    }
+                    if (sort === 1) {
+                        setBooks([...books, ...res.data, ]);
+                        setNewBookNum(res.data.length);
+                    }
                 })
             } catch (err) {
                 console.error(err);
@@ -689,12 +705,42 @@ const NemoScreen = ({route, navigation,}) => {
 
     const renderBookmark = ({ item, index }) => (
         <Pressable
-            onPress={() => navigation.navigate('BookmarkNewDetail', { bookmarks: bookmarks, subTitle: userTag, title: "Nemos", index: index, })} 
+            onPress={() => navigation.navigate('SpreadInNemos', { 
+                bookmarks: bookmarks, 
+                subTitle: userTag, 
+                title: "Nemos", 
+                index: index, 
+                newBookmarkNum: newBookmarkNum,
+                sort: sort,
+                userTag: userTag,
+            })} 
         >
             {isList ? 
                 <BookmarkList bookmark={item} navigation={navigation} />
                 : 
                 <BookmarkSimple bookmark={item} navigation={navigation} />
+            }
+            
+        </Pressable>
+    );
+
+    const renderBook = ({ item, index }) => (
+        <Pressable
+            activeOpacity={1}
+            onPress={() => navigation.push('SpreadInMyBooks', {
+                bookmarks: null, 
+                subTitle: item.book_title, 
+                title: "Nemos", 
+                index: 0, 
+                newBookmarkNum: 0,
+                bookId: item.book_id,
+                userTag: userTag,
+            })}
+        >
+            {isBookTile ? 
+                <BookTile book={item} />
+                :
+                <BookList book={item} />
             }
             
         </Pressable>
@@ -727,89 +773,222 @@ const NemoScreen = ({route, navigation,}) => {
 
     return (
         <View style={styles.container}>
-            { bookmarks && bookmarks.length !== 0 ? 
-                <>
-                    <FlatList 
-                        data={bookmarks}
-                        renderItem={renderBookmark}
-                        keyExtractor={bookmark => bookmark.bookmark_id}
-                        showsVerticalScrollIndicator={false}
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        ref={ref}
-                        onEndReached={onEndReached}
-                        onEndReachedThreshold={0.3}
-                        ListFooterComponent={scrollLoading && <ActivityIndicator />}
-                        ListHeaderComponent={
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    marginHorizontal: regWidth * 13,
-                                    marginVertical: regHeight * 10,
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                }}
-                            >
-                                <Pressable
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                    }}
-                                    // onPress={() => navigation.navigate('UserLibrary', { test: "test", })}
-                                    onPress={onPressSort}
-                                >
-                                    <Image 
-                                        source={iconRepeat}
-                                        style={{
-                                            width: regWidth * 15,
-                                            height: regWidth * 15,
-                                        }}
-                                    />
-                                    <Text
-                                        style={{
-                                            fontSize: regWidth * 13,
-                                            fontFamily: "NotoSansKR-Bold",
-                                            marginHorizontal: regWidth * 5,
-                                            includeFontPadding: false,
-                                        }}
-                                    >
-                                        {sort === 0 ? "Recents" : "Book"}
-                                    </Text>
-                                </Pressable>
-                                <Pressable
-                                    onPress={() => setIsList(!isList)}
-                                >
-                                    <Image 
-                                        source={isList ? iconList : iconGrid}
-                                        style={{
-                                            width: regWidth * 20,
-                                            height: regWidth * 20,
-                                        }}
-                                    />
-                                </Pressable>
-                            </View>
+            <>
+                {sort === 0 ? 
+                    <>
+                        { bookmarks ? 
+                            <>
+                                <FlatList 
+                                    data={bookmarks}
+                                    renderItem={renderBookmark}
+                                    keyExtractor={bookmark => bookmark.bookmark_id}
+                                    showsVerticalScrollIndicator={false}
+                                    refreshing={refreshing}
+                                    onRefresh={onRefresh}
+                                    ref={ref}
+                                    onEndReached={onEndReached}
+                                    onEndReachedThreshold={0.3}
+                                    ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                                    ListHeaderComponent={bookmarks.length !== 0 ?
+                                        <View
+                                            style={{
+                                                flexDirection: "row",
+                                                marginHorizontal: regWidth * 13,
+                                                marginVertical: regHeight * 10,
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                            }}
+                                        >
+                                            <Pressable
+                                                style={{
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                }}
+                                                // onPress={() => navigation.navigate('UserLibrary', { test: "test", })}
+                                                onPress={onPressSort}
+                                            >
+                                                <Image 
+                                                    source={iconRepeat}
+                                                    style={{
+                                                        width: regWidth * 15,
+                                                        height: regWidth * 15,
+                                                    }}
+                                                />
+                                                <Text
+                                                    style={{
+                                                        fontSize: regWidth * 13,
+                                                        fontFamily: "NotoSansKR-Bold",
+                                                        marginHorizontal: regWidth * 5,
+                                                        includeFontPadding: false,
+                                                    }}
+                                                >
+                                                    {sort === 0 ? "Recents" : "Book"}
+                                                </Text>
+                                            </Pressable>
+                                            <Pressable
+                                                onPress={() => setIsList(!isList)}
+                                            >
+                                                <Image 
+                                                    source={isList ? iconList : iconGrid}
+                                                    style={{
+                                                        width: regWidth * 20,
+                                                        height: regWidth * 20,
+                                                    }}
+                                                />
+                                            </Pressable>
+                                        </View>
+                                        :
+                                        <View
+                                            style={{
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            marginTop: regHeight * 200,
+                                            }}
+                                        >
+                                            <Text
+                                                style={{
+                                                fontSize: regWidth * 17,
+                                                fontFamily: "NotoSansKR-Medium",
+                                                color: colors.textDark,
+                                                includeFontPadding: false,
+                                                }}
+                                            >
+                                                There is no Nemo..
+                                            </Text>
+                                        </View>
+                                    }
+                                />
+                            </>
+                            :
+                            <ActivityIndicator
+                                style={{ marginTop: regHeight * 200, }}
+                                size="large"
+                                color={colors.nemoDark}
+                            />
                         }
-                    />
-                </>
-                :
-                <View
-                    style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginTop: regHeight * 200,
-                    }}
-                >
-                    <Text
-                        style={{
-                        fontSize: regWidth * 20,
-                        fontWeight: "500",
-                        color: "grey",
-                        }}
-                    >
-                        북마크를 생성해보세요
-                    </Text>
-                </View>
-            }
+                    </>
+                    : 
+                    <>
+                        {books ? 
+                            <>
+                                <FlatList 
+                                    data={books}
+                                    renderItem={renderBook}
+                                    key={isBookTile ? '_' : "#"}
+                                    keyExtractor={isBookTile ? book => "_" + book.book_id : book => "#" + book.book_id}
+                                    showsVerticalScrollIndicator={false}
+                                    refreshing={refreshing}
+                                    onRefresh={onRefresh}
+                                    ref={ref}
+                                    onEndReached={onEndReached}
+                                    onEndReachedThreshold={0.3}
+                                    ListFooterComponent={scrollLoading && <ActivityIndicator />}
+                                    numColumns={isBookTile ? 2 : 1}
+                                    // numColumns={2}
+                                    ListHeaderComponent={books.length !== 0 ?
+                                        <View
+                                            style={{
+                                                flexDirection: "row",
+                                                marginHorizontal: regWidth * 13,
+                                                marginVertical: regHeight * 10,
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                            }}
+                                        >
+                                            <Pressable
+                                                style={{
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                }}
+                                                // onPress={() => navigation.navigate('UserLibrary', { test: "test", })}
+                                                onPress={onPressSort}
+                                            >
+                                                <Image 
+                                                    source={iconRepeat}
+                                                    style={{
+                                                        width: regWidth * 15,
+                                                        height: regWidth * 15,
+                                                    }}
+                                                />
+                                                <Text
+                                                    style={{
+                                                        fontSize: regWidth * 13,
+                                                        fontFamily: "NotoSansKR-Bold",
+                                                        marginHorizontal: regWidth * 5,
+                                                        includeFontPadding: false,
+                                                    }}
+                                                >
+                                                    {sort === 0 ? "Recents" : "Book"}
+                                                </Text>
+                                            </Pressable>
+                                            <Pressable
+                                                onPress={() => setIsBookTile(!isBookTile)}
+                                            >
+                                                <Image 
+                                                    source={isBookTile ? iconGrid : iconList}
+                                                    style={{
+                                                        width: regWidth * 20,
+                                                        height: regWidth * 20,
+                                                    }}
+                                                />
+                                            </Pressable>
+                                        </View>
+                                        :
+                                        <View
+                                            style={{
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            marginTop: regHeight * 200,
+                                            }}
+                                        >
+                                            <Text
+                                                style={{
+                                                fontSize: regWidth * 17,
+                                                fontFamily: "NotoSansKR-Medium",
+                                                color: colors.textDark,
+                                                includeFontPadding: false,
+                                                }}
+                                            >
+                                                Let's start creating Nemo!
+                                            </Text>
+                                            <Text
+                                                style={{
+                                                fontSize: regWidth * 17,
+                                                fontFamily: "NotoSansKR-Medium",
+                                                color: colors.textDark,
+                                                marginTop: regHeight * 8,
+                                                includeFontPadding: false,
+                                                }}
+                                            >
+                                                It'll be worthwhile.
+                                            </Text>
+                                            <Pressable 
+                                                style={{ marginTop: regHeight * 24, }}
+                                                onPress={() => navigation.navigate("SelectBook0", { index: 0, isLib: false, })}
+                                            >
+                                                <Image 
+                                                    source={iconPlusPurple}
+                                                    style={{
+                                                        width: regWidth * 50,
+                                                        height: regWidth * 50,
+                                                    }}
+                                                />
+                                            </Pressable>
+                                        </View>
+                                    }
+                                />
+                            </>
+                            :
+                            <ActivityIndicator
+                                style={{ marginTop: regHeight * 200, }}
+                                size="large"
+                                color={colors.nemoDark}
+                            />
+                        }
+                    </>
+                }
+            </>
+
             <BottomSheetModal
                 index={0}
                 ref={sortModalRef}
