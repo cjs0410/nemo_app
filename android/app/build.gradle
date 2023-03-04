@@ -154,7 +154,7 @@ android {
         
         // targetSdkVersion 33
 
-        versionCode 46
+        versionCode 47
         versionName "1.0.4"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
         

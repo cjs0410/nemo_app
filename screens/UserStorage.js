@@ -432,6 +432,7 @@ const UserStorage = ({route, navigation}) => {
                                                         fontSize: regWidth * 14,
                                                         fontFamily: "NotoSansKR-Black",
                                                         color: "#FFFFFF",
+                                                        includeFontPadding: false,
                                                     }}
                                                 >
                                                     {day.count}
@@ -447,7 +448,8 @@ const UserStorage = ({route, navigation}) => {
                                         onPress={() => navigation.navigate('NemoCalender')}
                                     >
                                         <Text style={{ fontSize: regWidth * 15, fontWeight: "700", color: "#FFFFFF" }} >
-                                            View all</Text>
+                                            View all
+                                        </Text>
                                     </Pressable>
                                 </View>
                             </View>

@@ -94,10 +94,13 @@ const Login = ({ navigation }) => {
     } catch (err) {
       // console.error(err);
       if (err.response.status === 401) {
-        setWarning('잘못된 비밀번호입니다');
+        setWarning('Invalid password! Please check again.');
       }
       if (err.response.status === 404) {
-        setWarning('존재하지 않는 계정입니다');
+        setWarning('This account does not exist.');
+      }
+      if (err.response.status === 400) {
+        setWarning('Please enter your password!')
       }
     }
     setLoading(false);
@@ -172,7 +175,7 @@ const Login = ({ navigation }) => {
               hitSlop={{ bottom: 20, left: 20, right: 20, top: 20 }}
               onPress={() => navigation.navigate('FindPassword')}
             >
-              <Text style={{fontSize:regWidth*12, fontFamily: "NotoSansKR-Regular", color:"#7341ffcc", includeFontPadding: false,}}>
+              <Text style={{ fontSize:regWidth*12, fontFamily: "NotoSansKR-Regular", color:"#7341ffcc", includeFontPadding: false,}}>
                 Forgot password?
               </Text>
             </Pressable>
@@ -184,6 +187,9 @@ const Login = ({ navigation }) => {
              >
                <Text style={{ color: "white", fontSize:regWidth*18, fontFamily: "NotoSansKR-Black", includeFontPadding: false, }} >Sign in</Text>
              </TouchableOpacity>
+            <Text style={{ fontSize: regWidth*14, fontFamily: "NotoSansKR-Regular", color:"red", includeFontPadding: false, marginTop: regHeight * 8, }}>
+              {warning}
+            </Text>
           </View>            
         </View>
       </View>
